@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
+
+    <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
+
+        <ui:define name="title">#{msgs.mediaitem_MEDIA_REPOSITORIES}</ui:define>
+
+        <ui:define name="body">
+            <a4j:keepAlive beanName="administrator_MediaRepositories" />
+
+            <a4j:outputPanel ajaxRendered="true">
+                <converge:message for="frmPage" />
+            </a4j:outputPanel>
+
+            <h:form id="frmPage">
+                <converge:moduleHeader moduleTitle="#{msgs.mediaitem_MEDIA_REPOSITORIES}" />
+                <div class="moduleContent">
+                    <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
+                        <h:outputText value="&#160;" />
+                        <h:column>
+                            <a4j:commandButton id="btnNew" styleClass="button mediumButton" value="#{msgs.NEW}" actionListener="#{administrator_MediaRepositories.onNew}" reRender="frmMediaRepositoryDetails" ajaxSingle="true">
+                                <rich:componentControl for="mpMediaRepositoryDetails" operation="show" event="oncomplete" />
+                            </a4j:commandButton>
+
+                            <a4j:commandButton id="btnIndex" styleClass="button mediumButton" value="Index" actionListener="#{administrator_MediaRepositories.onIndex}" ajaxSingle="true" />
+                        </h:column>
+                    </h:panelGrid>
+
+                    <rich:dataTable id="dtMediaRepositories" value="#{administrator_MediaRepositories.repositories}" var="repository" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
+                        <rich:column styleClass="center columnIcon">
+                            <f:facet name="header">&#160;</f:facet>
+                            <a4j:commandLink reRender="frmMediaRepositoryDetails" ajaxSingle="true">
+                                <f:setPropertyActionListener target="#{administrator_MediaRepositories.selectedMediaRepository}" value="#{repository}" />
+                                <rich:componentControl for="mpMediaRepositoryDetails" operation="show" event="oncomplete" />
+                                <h:graphicImage alt="#{msgs.MEDIA_REPOSITORY}" title="#{msgs.MEDIA_REPOSITORY}" value="#{res.MEDIA_REPOSITORY_ICON}" />
+                            </a4j:commandLink>
+                        </rich:column>
+
+                        <rich:column sortBy="#{repository.id}" styleClass="right columnId">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.MEDIA_REPOSITORY_ID}" title="#{msgs.MEDIA_REPOSITORY_ID_TOOLTIP}" />
+                            </f:facet>
+                            <a4j:commandLink reRender="frmMediaRepositoryDetails" ajaxSingle="true">
+                                <f:setPropertyActionListener target="#{administrator_MediaRepositories.selectedMediaRepository}" value="#{repository}" />
+                                <rich:componentControl for="mpMediaRepositoryDetails" operation="show" event="oncomplete" />
+                                <h:outputText value="#{repository.id}">
+                                    <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                                </h:outputText>
+                            </a4j:commandLink>
+                        </rich:column>
+
+                        <rich:column sortBy="#{repository.name}" sortOrder="ASCENDING">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.MEDIA_REPOSITORY_NAME}" title="#{msgs.MEDIA_REPOSITORY_NAME_TOOLTIP}" />
+                            </f:facet>
+                            <h:outputText value="#{repository.name}" title="#{repository.description}" />
+                        </rich:column>
+
+                        <rich:column sortBy="#{repository.editorRole.name}">
+                            <f:facet name="header">
+                                <h:outputText value="Editor" title="Editors of the repository" />
+                            </f:facet>
+                            <h:outputText value="#{repository.editorRole.name}" />
+                        </rich:column>
+
+                        <rich:column sortBy="#{repository.readOnly}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.MEDIA_REPOSITORY_TYPE}" title="#{msgs.MEDIA_REPOSITORY_TYPE_TOOLTIP}" />
+                            </f:facet>
+                            <h:outputText value="#{msgs.MEDIA_REPOSITORY_TYPE_READ_ONLY}" rendered="#{repository.readOnly}" />
+                            <h:outputText value="#{msgs.MEDIA_REPOSITORY_TYPE_READ_WRITE}" rendered="#{!repository.readOnly}" />
+                        </rich:column>
+
+                        <rich:column sortBy="#{repository.lastIndex}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.MEDIA_REPOSITORY_LAST_INDEX}" title="#{msgs.MEDIA_REPOSITORY_LAST_INDEX_TOOLTIP}" />
+                            </f:facet>
+                            <h:outputText value="#{repository.lastIndex.time}" rendered="#{repository.lastIndex != null}">
+                                <f:convertDateTime pattern="#{msgs.FORMAT_SHORT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                            </h:outputText>
+                            <h:outputText value="#{msgs.MEDIA_REPOSITORY_LAST_INDEX_NEVER}" rendered="#{repository.lastIndex == null}" />
+                        </rich:column>
+
+                        <rich:column sortBy="#{repository.itemCount}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.MEDIA_REPOSITORY_ITEM_COUNT}" title="#{msgs.MEDIA_REPOSITORY_ITEM_COUNT_TOOLTIP}" />
+                            </f:facet>
+                            <h:outputText value="#{repository.itemCount}" />
+                        </rich:column>
+
+                        <rich:column sortBy="#{repository.enabled}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.MEDIA_REPOSITORY_ENABLED}" title="#{msgs.MEDIA_REPOSITORY_ENABLED_TOOLTIP}" />
+                            </f:facet>
+                            <h:outputText value="#{msgs.MEDIA_REPOSITORY_ENABLED_TRUE}" styleClass="enabled" rendered="#{repository.enabled}" />
+                            <h:outputText value="#{msgs.MEDIA_REPOSITORY_ENABLED_FALSE}" styleClass="disabled" rendered="#{!repository.enabled}" />
+                        </rich:column>
+                    </rich:dataTable>
+                    <rich:spacer height="30" />
+                </div>
+            </h:form>
+
+            <h:form id="frmMediaRepositoryDetails">
+                <rich:modalPanel id="mpMediaRepositoryDetails" autosized="true" domElementAttachment="parent" rendered="#{administrator_MediaRepositories.selectedMediaRepository != null}">
+                    <f:facet name="header">
+                        <h:panelGroup>
+                            <h:outputText value="#{msgs.MEDIA_REPOSITORY_DETAILS}" />
+                        </h:panelGroup>
+                    </f:facet>
+                    <h:panelGrid id="pgMediaRepositoryDetails" style="width: 480px;">
+
+                        <rich:tabPanel id="tpMediaRepository" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+
+                            <rich:tab id="tabMediaRepository" label="#{msgs.MEDIA_REPOSITORY}">
+                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
+                                    <h:outputText value="#{msgs.MEDIA_REPOSITORY_NAME}:" />
+                                    <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_MediaRepositories.selectedMediaRepository.name}" title="#{msgs.MEDIA_REPOSITORY_NAME_TOOLTIP}" required="true" requiredMessage="#{msgs.MEDIA_REPOSITORY_NAME_REQUIRED}"/>
+
+                                    <h:outputText value="#{msgs.MEDIA_REPOSITORY_DESCRIPTION}:" />
+                                    <h:inputTextarea id="txtDescription" styleClass="text mediumTextArea" value="#{administrator_MediaRepositories.selectedMediaRepository.description}" title="#{msgs.MEDIA_REPOSITORY_DESCRIPTION_TOOLTIP}" />
+
+                                    <h:outputText value="#{msgs.MEDIA_REPOSITORY_ENABLED_TRUE}:" />
+                                    <h:selectBooleanCheckbox value="#{administrator_MediaRepositories.selectedMediaRepository.enabled}" title="#{msgs.MEDIA_REPOSITORY_ENABLED}" />
+
+                                    <h:outputText value="#{msgs.MEDIA_REPOSITORY_TYPE_READ_ONLY}:" />
+                                    <h:selectBooleanCheckbox value="#{administrator_MediaRepositories.selectedMediaRepository.readOnly}" title="#{msgs.MEDIA_REPOSITORY_TYPE_TOOLTIP}">
+                                        <a4j:support event="onchange" reRender="somWorkflow" />
+                                    </h:selectBooleanCheckbox>
+
+                                    <h:outputText value="Editor role:" />
+                                    <h:selectOneMenu id="somUserRoles" value="#{administrator_MediaRepositories.selectedMediaRepository.editorRole}" converter="#{converters.userRoleConverter}" disabled="#{administrator_MediaRepositories.selectedMediaRepository.readOnly}">
+                                        <f:selectItem itemLabel=""  />
+                                        <f:selectItems value="#{common.userRoles}" />
+                                    </h:selectOneMenu>
+
+                                    <h:outputText value="#{msgs.MEDIA_REPOSITORY_LOCATION}:" />
+                                    <h:inputText id="txtLocation" styleClass="text mediumInput" value="#{administrator_MediaRepositories.selectedMediaRepository.location}" title="#{msgs.MEDIA_REPOSITORY_LOCATION_TOOLTIP}" required="true" requiredMessage="#{msgs.MEDIA_REPOSITORY_LOCATION_REQUIRED}"/>
+
+                                    <h:outputText value="#{msgs.MEDIA_REPOSITORY_WEB_ACCESS}" />
+                                    <h:inputText id="txtWebAccess" styleClass="text mediumInput" value="#{administrator_MediaRepositories.selectedMediaRepository.webAccess}" title="#{msgs.MEDIA_REPOSITORY_WEB_ACCESS_TOOLTIP}" required="true" requiredMessage="#{msgs.MEDIA_REPOSITORY_WEB_ACCESS_REQUIRED}"/>
+
+                                    <h:outputText value="#{msgs.MEDIA_REPOSITORY_WATCH}:" />
+                                    <h:inputText id="txtWatch" styleClass="text mediumInput" value="#{administrator_MediaRepositories.selectedMediaRepository.watchLocation}" title="#{msgs.MEDIA_REPOSITORY_WATCH_TOOLTIP}" />
+                                </h:panelGrid>
+                            </rich:tab>
+                        </rich:tabPanel>
+
+                        <h:panelGroup styleClass="dialogueButtons">
+                            <a4j:commandLink id="lnkSave" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_MediaRepositories.onSave}" reRender="frmPage">
+                                <rich:componentControl for="mpMediaRepositoryDetails" operation="hide" event="oncomplete" />
+                            </a4j:commandLink>
+
+                            <a4j:commandLink id="lnkApply" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{administrator_MediaRepositories.onSave}" reRender="frmPage, pgMediaRepositoryDetails" />
+
+                            <a4j:commandLink id="lnkDelete" rendered="#{administrator_MediaRepositories.editMode}" onclick="if (confirm('#{msgs.mediaitem_MEDIA_REPOSITORY_DELETE_CONFIRM}') != true){ return false; };" actionListener="#{administrator_MediaRepositories.onDelete}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="frmPage">
+                                <rich:componentControl for="mpMediaRepositoryDetails" operation="hide" event="oncomplete" />
+                            </a4j:commandLink>
+
+                            <h:commandLink id="lnkCloseDialog" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpMediaRepositoryDetails')}.hide(); return false;" />
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                </rich:modalPanel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</jsp:root>

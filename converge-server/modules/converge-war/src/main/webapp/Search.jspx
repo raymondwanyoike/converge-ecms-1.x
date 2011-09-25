@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
+
+    <ui:composition template="/WEB-INF/facelets/templates/search.xhtml">
+
+        <ui:define name="body">
+            <a4j:keepAlive beanName="search" />
+
+            <a4j:outputPanel ajaxRendered="true">
+                <v:message />
+            </a4j:outputPanel>
+
+            <h:form id="frmQuery">
+                <converge:moduleHeader moduleTitle="#{msgs.search_SEARCH}"  />
+                <div class="moduleContent">
+                    <h:panelGrid style="width: 100%;">
+                        <h:column>
+                            <h:panelGrid columns="2" style="width: 100%" columnClasses="left,btnC">
+                                <h:inputText id="txtSearchKeyword" styleClass="text searchInput" value="#{search.keyword}" title="" />
+                                <a4j:commandButton type="submit" styleClass="button dynamicButton searchButton" value="#{msgs.search_SEARCH_BUTTON_LABEL}" actionListener="#{search.onSearch}" reRender="frmPage,frmQuery" />
+                            </h:panelGrid>
+                        </h:column>
+                        <h:column>
+
+                        </h:column>
+                    </h:panelGrid>
+                </div>
+
+                <converge:moduleSpacer />
+
+                <converge:moduleHeader moduleTitle="#{msgs.search_CRITERIA}"  />
+                <div class="moduleContent">
+                    <h:panelGrid style="width: 100%;" id="criteria">
+                        <h:panelGrid columns="2">
+                            <h:selectBooleanCheckbox value="#{search.criteriaType}">
+                                <a4j:support ajaxSingle="true" reRender="criteria" event="onchange" />
+                            </h:selectBooleanCheckbox>
+                            <h:column>
+                                <h:panelGrid columns="2">
+                                    
+                                <h:outputText value="#{msgs.search_CRITERIA_TYPE}" styleClass="#{search.criteriaType?'':'disabledCriteria'}" />
+                                <h:selectOneRadio id="smcType" value="#{search.searchType}" disabled="#{!search.criteriaType}" styleClass="#{search.criteriaType?'':'disabledCriteria'}" >
+                                    <f:selectItem itemLabel="#{msgs.content_type_STORY}" itemValue="type:Story" />
+                                    <f:selectItem itemLabel="#{msgs.content_type_MEDIA}" itemValue="type:Media" />
+                                </h:selectOneRadio>
+                                </h:panelGrid>
+                            </h:column>
+
+                            <h:selectBooleanCheckbox value="#{search.criteriaDate}">
+                                <a4j:support ajaxSingle="true" reRender="criteria" event="onchange" />
+                            </h:selectBooleanCheckbox>
+                            <h:column>
+                                <h:outputText value="#{msgs.search_CRITERIA_DATE_FROM}" styleClass="#{search.criteriaDate?'':'disabledCriteria'}" />
+                                <rich:calendar disabled="#{!search.criteriaDate}" popup="true" value="#{search.dateFrom}" datePattern="#{msgs.FORMAT_DATE}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}" />
+                                <h:outputText value="#{msgs.search_CRITERIA_DATE_TO}" styleClass="#{search.criteriaDate?'':'disabledCriteria'}"/>
+                                <rich:calendar  disabled="#{!search.criteriaDate}" popup="true" value="#{search.dateTo}" datePattern="#{msgs.FORMAT_DATE}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}" />
+                            </h:column>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </div>
+
+                <converge:moduleSpacer />
+
+                <converge:moduleHeader moduleTitle="#{msgs.search_BROWSE}"  />
+                <h:panelGrid>
+                    <h:column>
+                        <h:graphicImage value="#{res.BULLET_ICON}" alt="" title="" />
+                        <h:commandLink action="/search/byedition">
+                            <h:outputText value="#{msgs.search_BY_EDITION}" />
+                        </h:commandLink>
+                    </h:column>
+                </h:panelGrid>
+            </h:form>
+
+            <converge:moduleSpacer />
+
+            <h:form id="frmPage">
+                <h:panelGroup rendered="#{search.showResults}">
+                    <h:panelGroup style="width: 100%;">
+
+                        <h:panelGrid style="width: 100%;" columns="2" columnClasses="results, facets">
+                            <h:column>
+
+                                <div style="float: left;">
+                                    <h:outputText value="Sort by " />
+                                    <h:selectOneMenu id="somSearchSortField" value="#{search.sortField}">
+                                        <f:selectItem  itemLabel="Score" itemValue="score" />
+                                        <f:selectItem  itemLabel="Date" itemValue="date" />
+                                        <a4j:support event="onchange" actionListener="#{search.onSearch}" reRender="frmPage,frmQuery" />
+                                    </h:selectOneMenu>
+                                    <h:selectOneMenu id="somSearchSortOrder" value="#{search.sortOrder}">
+                                        <f:selectItem  itemLabel="Ascending" itemValue="true" />
+                                        <f:selectItem  itemLabel="Descending" itemValue="false" />
+                                        <a4j:support event="onchange" actionListener="#{search.onSearch}" reRender="frmPage,frmQuery" />
+                                    </h:selectOneMenu>
+
+                                </div>
+
+                                <div style="text-align: right;">
+                                    <h:outputFormat value="#{msgs.search_X_RESULTS_FOUND}  -  " style="color: #0E774A;">
+                                        <f:param value="#{search.results.numberOfResults}" />
+                                        <f:param value="#{search.results.searchTimeInSeconds}" />
+                                        <f:param value="#{search.results.numberOfPages}" />
+                                    </h:outputFormat>
+
+                                    <h:outputFormat value="#{msgs.search_SHOWING}" style="color: #0E774A;">
+                                        <f:param value="#{search.results.start+1}" />
+                                        <f:param value="#{search.results.start+search.searchResults.rowCount}" />
+                                    </h:outputFormat>
+
+                                </div>
+                                <div style="clear: both; padding: 9px;" />
+
+                                <ui:repeat value="#{search.searchResults}" var="item">
+                                    <h2 style="padding-bottom: 0px;">
+                                        <h:outputLink value="#{item.link}" target="_blank">
+                                            <h:outputText value="#{item.title}" escape="false" />
+                                        </h:outputLink></h2>
+
+                                    <p style="margin-top: 1px;">
+                                        <h:graphicImage url="#{item.previewLink}" rendered="#{item.preview &amp;&amp; !item.video &amp;&amp; !item.audio}" styleClass="searchResultThumb" />
+                                        <h:panelGroup rendered="#{item.video || item.audio}" styleClass="searchResultThumb">
+                                        <converge:mediaPlayer id="#{item.id}" value="#{item.directLink}" height="150" width="150" controlbar="none" />
+                                    </h:panelGroup>
+                                    <h:outputText value="#{item.description}" escape="false" /><br/>
+                                    <span class="searchResultDescription"><h:outputText value="#{item.note}" escape="false" /></span>
+                                    <span class="searchResultDate">#{msgs.DATE}:&#160;
+                                        <h:outputText value="#{item.earliestDate}" rendered="#{item.earliestDate != null}">
+                                            <f:convertDateTime pattern="#{msgs.FORMAT_DATE}" timeZone="#{userSession.user.timeZone}" />
+                                        </h:outputText>
+                                        <h:outputText value="#{msgs.UNKNOWN}" rendered="#{item.earliestDate == null}" />
+                                    </span>
+                                </p>
+                                <converge:moduleSpacer />
+                            </ui:repeat>
+
+                            <h:panelGroup styleClass="searchPages" layout="block">
+                                <h:outputText value="#{msgs.search_PAGES}" />
+                                <ui:repeat value="#{search.pages}" var="page">
+                                    <a4j:commandLink styleClass="#{((search.results.currentPage+1) == page.page) ? 'searchPageSelected' : 'searchPage'}" actionListener="#{search.onChangePage}" reRender="frmQuery, frmPage" onclick="jQuery( 'html, body' ).animate( { scrollTop: 0 }, 'slow' );">
+                                        <f:param name="changePage" value="#{page.page}" />
+                                        <h:outputText value="#{page.page}" />
+                                    </a4j:commandLink>
+                                </ui:repeat>
+                            </h:panelGroup>
+
+                        </h:column>
+                        <h:column rendered="#{search.results.facetsAvailable}">
+
+                            <h:outputText value="#{msgs.search_FILTER_RESULTS}" style="font-weight: bold; font-size: 1.3em; text-align: center;" /><br/>
+
+                            <ui:repeat value="#{search.results.availableFacets}" var="facetName">
+                                <h:outputText value="#{facetName}" style="font-weight: bold; text-decoration: underline; text-transform: capitalize;" />
+                                <rich:dataList value="#{search.results.facets[facetName]}" var="facet" style="margin-top: 5px;">
+                                    <a4j:commandLink actionListener="#{search.onAddFacet}" reRender="frmQuery, frmPage" onclick="jQuery( 'html, body' ).animate( { scrollTop: 0 }, 'slow' );" rendered="#{!facet.selected}">
+                                        <f:param name="addFacet" value="#{facet.query}" />
+                                        <h:outputText value="#{facet.name} (#{facet.matches})" />
+                                    </a4j:commandLink>
+
+                                    <a4j:commandLink actionListener="#{search.onRemoveFacet}" style="font-weight: bold; color: red;" reRender="frmQuery, frmPage" onclick="jQuery( 'html, body' ).animate( { scrollTop: 0 }, 'slow' );" rendered="#{facet.selected}">
+                                        <f:param name="filterQuery" value="#{facet.query}" />
+                                        <h:outputText value="(-) #{facet.name} (#{facet.matches})" />
+                                    </a4j:commandLink>
+                                </rich:dataList>
+                            </ui:repeat>
+
+                        </h:column>
+                    </h:panelGrid>
+                </h:panelGroup>
+
+            </h:panelGroup>
+        </h:form>
+
+        <script type="text/javascript">
+            document.getElementById("frmQuery:txtSearchKeyword").focus();
+        </script>
+    </ui:define>
+
+</ui:composition>
+</jsp:root>

@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:v="http://converge.i2m.dk" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
+
+    <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
+        <ui:define name="title">#{msgs.language_LANGUAGES}</ui:define>
+
+        <ui:define name="body">
+
+            <a4j:keepAlive beanName="administrator_Languages" />
+
+            <a4j:outputPanel ajaxRendered="true">
+                <v:message />
+            </a4j:outputPanel>
+
+            <h:form id="frmLanguages">
+                <converge:moduleHeader moduleTitle="#{msgs.language_LANGUAGES}" />
+                <div class="moduleContent">
+
+                    <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
+                        <h:outputText value="" />
+                        <a4j:commandButton id="btnNew" styleClass="button dynamicButton" value="#{msgs.language_NEW}" actionListener="#{administrator_Languages.onNew}" reRender="frmLanguageDetails"
+                                           oncomplete="#{rich:component('mpLanguageDetails')}.show(); #{rich:element('frmLanguageDetails:txtName')}.focus()" />
+                    </h:panelGrid>
+
+                    <rich:dataTable id="dtLanguages" value="#{administrator_Languages.languages}" var="language" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
+                        <rich:column styleClass="center columnIcon">
+                            <f:facet name="header">
+                                <a4j:status id="staLanguages">
+                                    <f:facet name="start">
+                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" />
+                                    </f:facet>
+                                    <f:facet name="stop">
+                                        <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                                    </f:facet>
+                                </a4j:status>
+                            </f:facet>
+                            <a4j:commandLink reRender="pgLanguageDetails" oncomplete="#{rich:component('mpLanguageDetails')}.show(); #{rich:element('frmLanguageDetails:txtName')}.focus()">
+                                <f:setPropertyActionListener value="#{language}" target="#{administrator_Languages.selectedLanguage}" />
+                                <h:graphicImage alt="#{msgs.language_LANGUAGE}" title="#{msgs.language_LANGUAGE}" value="#{res.LANGUAGE_ICON}" />
+                            </a4j:commandLink>
+                        </rich:column>
+
+                        <rich:column sortBy="#{language.name}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.language_NAME}" title="#{msgs.language_NAME_TOOLTIP}" />
+                            </f:facet>
+                            <a4j:commandLink reRender="pgLanguageDetails" oncomplete="#{rich:component('mpLanguageDetails')}.show(); #{rich:element('frmLanguageDetails:txtName')}.focus()">
+                                <f:setPropertyActionListener value="#{language}" target="#{administrator_Languages.selectedLanguage}" />
+                                <h:outputText value="#{language.name}" />
+                            </a4j:commandLink>
+                        </rich:column>
+
+                        <rich:column sortBy="#{language.code}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.language_CODE}" title="#{msgs.language_CODE_TOOLTIP}" />
+                            </f:facet>
+                            <h:outputText value="#{language.code}" />
+                        </rich:column>
+
+                    </rich:dataTable>
+                </div>
+            </h:form>
+
+            <h:form id="frmLanguageDetails">
+                <rich:modalPanel id="mpLanguageDetails" autosized="true" domElementAttachment="parent">
+                    <f:facet name="header">
+                        <h:panelGroup>
+                            <h:outputText value="#{msgs.language_LANGUAGE_DETAIL}"></h:outputText>
+                        </h:panelGroup>
+                    </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage id="imgCloseLanguageDetails" value="#{res.DIALOGUE_CLOSE_ICON}" style="link" />
+                            <rich:componentControl for="mpLanguageDetails" attachTo="imgCloseLanguageDetails" operation="hide" event="onclick"/>
+                        </h:panelGroup>
+                    </f:facet>
+
+                    <h:panelGrid style="width: 480px;" id="pgLanguageDetails">
+
+                        <rich:tabPanel id="tpLanguageDetails" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+                            <rich:tab label="#{msgs.language_LANGUAGE}">
+                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
+                                    <h:outputText value="#{msgs.language_NAME}" />
+                                    <h:inputText id="txtName" value="#{administrator_Languages.selectedLanguage.name}" required="true" requiredMessage="#{msgs.language_NAME_REQUIRED}" styleClass="text mediumInput" />
+
+                                    <h:outputText value="#{msgs.language_CODE}" />
+                                    <h:inputText value="#{administrator_Languages.selectedLanguage.code}" required="true" requiredMessage="#{msgs.language_CODE_REQUIRED}" styleClass="text mediumInput" />
+                                </h:panelGrid>
+                            </rich:tab>
+                        </rich:tabPanel>
+
+                        <h:panelGroup styleClass="dialogueButtons">
+                            <a4j:commandLink id="lnkSaveLanguageDetails" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Languages.onSave}" reRender="pgLanguageDetails,dtLanguages" oncomplete="if (#{converge:isAllValid()}) { Richfaces.hideModalPanel('mpLanguageDetails'); return false;}" />
+                            <a4j:commandLink id="lnkApplyLanguageDetails" styleClass="dialogButton" value="#{msgs.APPLY}" reRender="pgLanguageDetails,dtLanguages" actionListener="#{administrator_Languages.onSave}" />
+                            <a4j:commandLink id="lnkDeleteLanguageDetails" rendered="#{administrator_Languages.editMode}" onclick="if (confirm('#{msgs.language_DELETE_PROMPT}') != true){ return false; };" actionListener="#{administrator_Languages.onDelete}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="frmLanguageDetails,dtLanguages">
+                                <rich:componentControl for="mpLanguageDetails" operation="hide" event="oncomplete" />
+                            </a4j:commandLink>
+                            <h:commandLink id="lnkCancelLanguageDetails" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpLanguageDetails')}.hide(); return false;" />
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                </rich:modalPanel>
+            </h:form>
+
+        </ui:define>
+    </ui:composition>
+</jsp:root>

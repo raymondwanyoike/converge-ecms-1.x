@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
+
+    <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
+        <ui:define name="title">#{msgs.USER_SESSIONS}</ui:define>
+
+        <ui:define name="body">
+            <a4j:keepAlive beanName="administrator_UserSessions" />
+
+            <h:form id="frmUserSessions">
+                <a4j:outputPanel ajaxRendered="true">
+                    <v:message />
+                </a4j:outputPanel>
+
+                <converge:moduleHeader moduleTitle="#{msgs.USER_SESSIONS} (#{administrator_UserSessions.sessions.rowCount})" />
+                <div class="moduleContent">
+                    <rich:dataTable id="dtUserSessions" value="#{administrator_UserSessions.sessions}" var="activeSession" styleClass="table" headerClass="tableHeader" rowClasses="odd, even" columnClasses="columnIcon center, columnDateTime, columnDateTime, left, left, left, columnSmallNumber, columnOneButton">
+
+                        <rich:column>
+                            <f:facet name="header">
+                                <a4j:status id="dtUserSessionsLoading">
+                                    <f:facet name="start">
+                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" />
+                                    </f:facet>
+                                    <f:facet name="stop">
+                                        <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                                    </f:facet>
+                                </a4j:status>
+                            </f:facet>
+                            <h:graphicImage alt="#{msgs.USER}" title="#{msgs.USER}" value="#{res.USER_ICON}" />
+                        </rich:column>
+
+                        <rich:column sortBy="#{activeSession.start.time}" sortOrder="DESCENDING">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.SESSION_START}" />
+                            </f:facet>
+                            <h:outputText value="#{activeSession.start.time}">
+                                <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                            </h:outputText>
+                        </rich:column>
+
+                        <rich:column sortBy="#{activeSession.lastActivity.time}">
+                            <f:facet name="header">
+                                <h:outputText value="Duration" />
+                            </f:facet>
+                            <h:outputText value="#{activeSession.durationMinutes} minutes" />
+                        </rich:column>
+
+                        <rich:column sortBy="#{activeSession.ipAddress}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.usersessions_IP_ADDRESS}" />
+                            </f:facet>
+                            <h:outputText value="#{activeSession.ipAddress}" />
+                        </rich:column>
+
+                        <rich:column sortBy="#{activeSession.userAccount.username}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.USER}" />
+                            </f:facet>
+                            <h:outputText value="#{activeSession.userAccount.username}" />
+                        </rich:column>
+
+                        <rich:column sortBy="#{activeSession.userAccount.fullName}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.NAME}" />
+                            </f:facet>
+                            <h:outputText value="#{activeSession.userAccount.fullName}" />
+                        </rich:column>
+
+                        <rich:column sortBy="#{activeSession.numberOfLocks}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.administrator_user_sessions_LOCKS}" />
+                            </f:facet>
+                            <h:outputText value="#{activeSession.numberOfLocks}" />
+                            <rich:toolTip showDelay="500" style="width: 300px;" styleClass="tooltip" rendered="#{activeSession.numberOfLocks > 0}">
+                                <rich:dataTable id="dtLocks" value="#{activeSession.locks}" var="lock" styleClass="table" rowClasses="odd, even">
+                                    <rich:column>
+                                        <h:outputText value="#{lock.id}">
+                                            <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                                        </h:outputText>
+                                    </rich:column>
+
+                                    <rich:column>
+                                        <h:outputText value="#{lock.title}" />
+                                    </rich:column>
+                                </rich:dataTable>
+                            </rich:toolTip>
+                        </rich:column>
+
+                        <rich:column>
+                            <f:facet name="header">
+                                <h:outputText value="&#160;" />
+                            </f:facet>
+                            <a4j:commandButton id="logoff" value="#{msgs.administrator_user_sessions_LOGOFF}" styleClass="button dynamicButton">
+                                <f:setPropertyActionListener target="#{administrator_UserSessions.invalidateSession}" value="#{activeSession}" />
+                                <a4j:support event="oncomplete" reRender="frmUserSessions"/>
+                            </a4j:commandButton>
+                        </rich:column>
+
+                    </rich:dataTable>
+                </div>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</jsp:root>

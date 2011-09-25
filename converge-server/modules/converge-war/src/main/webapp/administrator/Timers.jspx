@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
+    <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
+        <ui:define name="title">#{msgs.administrator_timer_PAGE_TITLE}</ui:define>
+        <ui:define name="body">
+            <a4j:keepAlive beanName="administrator_Timers" />
+
+            <converge:loading for="regMainContent" />
+            <a4j:region id="regMainContent">
+                <h:form id="frmTimers">
+
+                    <converge:moduleHeader moduleTitle="#{msgs.administrator_timer_TIMERS}" />
+                    <div class="moduleContent">
+                        <rich:dataTable id="dtTimers" value="#{administrator_Timers.systemTimers}" var="timer" styleClass="table" headerClass="tableHeader">
+                            <rich:column styleClass="center columnIcon">
+                                <f:facet name="header">
+                                    <a4j:status forceId="true" id="dtTimersStatus">
+                                        <f:facet name="start">
+                                            <h:graphicImage value="#{res.AJAX_LOADING_ICON}" />
+                                        </f:facet>
+                                        <f:facet name="stop">
+                                            <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                                        </f:facet>
+                                    </a4j:status>
+                                </f:facet>
+                                <h:graphicImage title="#{msgs.TIMER}" alt="#{msgs.TIMER}" value="/images/icons/timer.png" />
+                            </rich:column>
+                            <rich:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msgs.administrator_timer_NAME}" />
+                                </f:facet>
+                                <c:set var="keyLabel" value="PERIODIC_TIMER_LABEL_#{timer.name}" />
+                                <c:set var="keyDescription" value="PERIODIC_TIMER_DESCRIPTION_#{timer.name}" />
+                                <h:outputText value="#{msgs[keyLabel]}" />
+                                <f:verbatim><br/></f:verbatim>
+                                <h:outputText value="#{msgs[keyDescription]}" style="font-size: 0.9em;" />
+                            </rich:column>
+                            <rich:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msgs.administrator_timer_NEXT_TIMEOUT}" />
+                                </f:facet>
+                                <h:outputText value="#{timer.nextTimeout}" renedered="#{timer.active}">
+                                    <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                </h:outputText>
+                                <h:outputText value="&#160;" renedered="#{!timer.active}" />
+                            </rich:column>
+                            <rich:column styleClass="center subColumnIcon">
+                                <a4j:commandLink rendered="#{!timer.active}" ajaxSingle="true" reRender="dtTimers">
+                                    <f:setPropertyActionListener target="#{administrator_Timers.startTimer}" value="#{timer}" />
+                                    <h:graphicImage title="#{msgs.TIMER_START_ICON_LABEL}" alt="#{msgs.TIMER_START_ICON_LABEL}" value="/images/icons/timer-stop.png" />
+                                </a4j:commandLink>
+                                <a4j:commandLink rendered="#{timer.active}" ajaxSingle="true" reRender="dtTimers">
+                                    <f:setPropertyActionListener target="#{administrator_Timers.stopTimer}" value="#{timer}" />
+                                    <h:graphicImage title="#{msgs.TIMER_STOP_ICON_LABEL}" alt="#{msgs.TIMER_STOP_ICON_LABEL}" value="/images/icons/timer-start.png" />
+                                </a4j:commandLink>
+                            </rich:column>
+                        </rich:dataTable>
+                    </div>
+                </h:form>
+            </a4j:region>
+
+        </ui:define>
+    </ui:composition>
+</jsp:root>

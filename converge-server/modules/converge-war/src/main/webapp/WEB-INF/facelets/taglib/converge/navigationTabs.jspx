@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<jsp:root version="2.0"
+          xmlns:html="http://www.w3.org/1999/xhtml"
+          xmlns:jsp="http://java.sun.com/JSP/Page"
+          xmlns:c="http://java.sun.com/jstl/core"
+          xmlns:ui="http://java.sun.com/jsf/facelets"
+          xmlns:h="http://java.sun.com/jsf/html"
+          xmlns:f="http://java.sun.com/jsf/core"
+          xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+          xmlns:t="http://myfaces.apache.org/tomahawk"
+          xmlns:a4j="http://richfaces.org/a4j"
+          xmlns:rich="http://richfaces.org/rich">
+    <ui:composition>
+        <div id="navTabs">
+            <h:form id="tabNavigationForm">
+                <table>
+                    <tr>
+                        <c:if test="#{securityScope.userInRole['BASIC']}">
+                            <td class="tableft#{showDashboard == 'true' ? 'Selected' : ''}"></td>
+                            <td class="tabmiddle#{showDashboard  == 'true' ? 'Selected' : ''}">
+                                <h:commandLink styleClass="unselected" 
+                                               action="DASHBOARD"
+                                               immediate="true">
+                                    <span><h:outputText value="#{msgs.NAVIGATION_TAB_DASHBOARD}" escape="false" /></span>
+                                </h:commandLink>
+                            </td>
+                            <td class="tabright#{showDashboard == 'true' ? 'Selected' : ''}"></td>
+                        </c:if>
+
+                        <c:if test="#{securityScope.userInRole['BASIC']}">
+                            <td class="tableft#{search}"></td>
+                            <td class="tabmiddle#{search}">
+                                <h:commandLink styleClass="unselected" action="SEARCH_ADVANCED" immediate="true">
+                                    <span><h:outputText value="#{msgs.NAVIGATION_TAB_SEARCH}" escape="false" /></span>
+                                </h:commandLink>
+                            </td>
+                            <td class="tabright#{search}"></td>
+                        </c:if>
+
+                        <c:if test="#{securityScope.userInRole['CHIEF_EDITOR'] || securityScope.userInRole['MONITORING']}">
+                            <td class="tableft#{planning}"></td>
+                            <td class="tabmiddle#{planning}">
+                                <h:commandLink styleClass="unselected" action="PLANNING" immediate="true">
+                                    <span><h:outputText value="#{msgs.NAVIGATION_TAB_PLANNING}" escape="false" /></span>
+                                </h:commandLink>
+                            </td>
+                            <td class="tabright#{planning}"></td>
+                        </c:if>
+
+                        <c:if test="#{securityScope.userInRole['BASIC']}">
+                            <td class="tableft#{articles}"></td>
+                            <td class="tabmiddle#{articles}">
+                                <h:commandLink styleClass="unselected" action="INBOX" immediate="true">
+                                    <span><h:outputText value="#{msgs.NAVIGATION_TAB_ARTICLES}" escape="false" /></span>
+                                </h:commandLink>
+                            </td>
+                            <td class="tabright#{articles}"></td>
+                        </c:if>
+                        <c:if test="#{securityScope.userInRole['PHOTO_JOURNALIST']}">
+                            <td class="tableft#{photos}"></td>
+                            <td class="tabmiddle#{photos}">
+                                <h:commandLink styleClass="unselected" action="MY_PHOTOS" immediate="true">
+                                    <span><h:outputText value="#{msgs.NAVIGATION_TAB_PHOTOS}" escape="false" /></span>
+                                </h:commandLink>
+                            </td>
+                            <td class="tabright#{photos}"></td>
+                        </c:if>
+
+                        <c:if test="#{securityScope.userInRole['LIBRARY']}">
+                            <td class="tableft#{library}"></td>
+                            <td class="tabmiddle#{library}">
+                                <h:commandLink styleClass="unselected" action="LIBRARY" immediate="true">
+                                    <span><h:outputText value="#{msgs.NAVIGATION_TAB_LIBRARY}" escape="false" /></span>
+                                </h:commandLink>
+                            </td>
+                            <td class="tabright#{library}"></td>
+                        </c:if>
+
+                        <c:if test="#{securityScope.userInRole['ADMINISTRATOR']}">
+                            <td class="tableft#{administration}"></td>
+                            <td class="tabmiddle#{administration}">
+                                <h:commandLink styleClass="unselected" action="ADMINISTRATION" immediate="true">
+                                    <span><h:outputText value="#{msgs.NAVIGATION_TAB_ADMINISTRATION}" escape="false" /></span>
+                                </h:commandLink>
+                            </td>
+                            <td class="tabright#{administration}"></td>
+                        </c:if>
+
+
+                        <c:if test="#{Clipboard.notEmpty &amp;&amp; securityScope.userInRole['BASIC']}">
+                            <td class="tableft#{clipboard}"></td>
+                            <td class="tabmiddle#{clipboard}">
+                                <h:commandLink styleClass="unselected" action="CLIPBOARD" immediate="true">
+                                    <span><h:outputText value="#{msgs.NAVIGATION_TAB_CLIPBOARD}" escape="false" /></span>
+                                </h:commandLink>
+                            </td>
+                            <td class="tabright#{clipboard}"></td>
+                        </c:if>
+                    </tr>
+                </table>
+            </h:form>
+        </div>
+    </ui:composition>
+</jsp:root>

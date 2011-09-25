@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
+
+    <ui:composition template="/WEB-INF/facelets/templates/mediaitem_archive.xhtml">
+        <ui:define name="title">#{mediaItemArchive.selectedMediaItem.title}</ui:define>
+        <ui:define name="body">
+            <a4j:keepAlive beanName="mediaItemArchive" />
+
+            <div id="layout4">
+                <div id="leftColumn">
+
+                    <h:panelGroup styleClass="right" layout="block" style="margin-top: -25px; margin-bottom: 10px;" rendered="#{mediaItemArchive.editor}">
+                        <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{mediaItemArchive.selectedMediaItem.id}" styleClass="textButton">
+                            <h:outputText value="Refine" />
+                        </h:outputLink>
+                    </h:panelGroup>
+
+                    <converge:moduleHeader moduleTitle="#{msgs.newsitem_HEADLINE}" />
+                    <div class="moduleContent">
+                        <h:inputText value="#{mediaItemArchive.selectedMediaItem.title}" style="width: 98%; margin-left: 1%; margin-right: 1%;" styleClass="text" disabled="true" />
+                    </div>
+                    <converge:moduleSpacer />
+
+                    <converge:moduleHeader moduleTitle="#{msgs.newsitem_BY_LINE}" />
+                    <div class="moduleContent">
+                        <h:inputText value="#{mediaItemArchive.selectedMediaItem.byLine}" style="width: 98%; margin-left: 1%; margin-right: 1%;" styleClass="text" disabled="true" />
+                    </div>
+
+                    <converge:moduleSpacer />
+
+                    <converge:moduleHeader moduleTitle="Media File" />
+                    <div class="moduleContent">
+                        <h:panelGrid columns="2">
+                            <h:outputLink value="#{mediaItemArchive.selectedMediaItem.absoluteFilename}" target="_blank" rendered="#{!mediaItemArchive.selectedMediaItem.video &amp;&amp; !mediaItemArchive.selectedMediaItem.audio}">
+                                <h:graphicImage styleClass="searchResultThumb" url="#{mediaItemArchive.selectedMediaItem.thumbURL}" />
+                            </h:outputLink>
+                            <h:panelGroup rendered="#{mediaItemArchive.selectedMediaItem.video || mediaItemArchive.selectedMediaItem.audio}">
+                                <converge:mediaPlayer id="#{mediaItemArchive.selectedMediaItem.id}" value="#{mediaItemArchive.selectedMediaItem.absoluteFilename}" />
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+                        <h:outputLink value="#{mediaItemArchive.selectedMediaItem.absoluteFilename}" target="_blank">
+                            <h:outputText value="#{msgs.DOWNLOAD}" />
+                        </h:outputLink>
+
+                    </div>
+
+                    <converge:moduleSpacer />
+
+                    <converge:moduleHeader moduleTitle="#{msgs.CAPTION}" />
+                    <div class="moduleContent">
+                        <h:inputTextarea value="#{mediaItemArchive.selectedMediaItem.description}" style="width: 98%; height: 100px; margin-left: 1%; margin-right: 1%" styleClass="text mediumInput" disabled="true" />
+                    </div>
+
+                    <converge:moduleSpacer />
+
+                    <converge:moduleHeader moduleTitle="#{msgs.newsitem_META_DATA}" />
+                    <div class="moduleContent">
+                        <rich:dataTable id="dtNewsItemConcepts" var="concept" value="#{mediaItemArchive.selectedMediaItem.concepts}" rowClasses="odd, even" style="width: 96%; margin-left: 2%; margin-right: 2%; border: 0px;">
+
+                            <rich:column style="width: 26px;  border: 0px;" styleClass="center">
+                                <c:set var="key" value="#{concept.type}_SHORT" />
+                                <h:outputText value="#{msgs[key]}" styleClass="concept_#{msgs[key]}" style="width: 30px" />
+                            </rich:column>
+
+                            <rich:column style=" border: 0px;">
+                                <h:outputText value="#{concept.name}" />
+                            </rich:column>
+                        </rich:dataTable>
+                    </div>
+
+                    <converge:moduleSpacer />
+
+                    <converge:moduleHeader moduleTitle="Editorial Note" />
+                    <div class="moduleContent">
+                        <h:inputTextarea value="#{mediaItemArchive.selectedMediaItem.editorialNote}" style="width: 98%; height: 100px; margin-left: 1%; margin-right: 1%" styleClass="text mediumInput" disabled="true" />
+                    </div>
+
+                </div>
+            </div>
+        </ui:define>
+    </ui:composition>
+
+</jsp:root>

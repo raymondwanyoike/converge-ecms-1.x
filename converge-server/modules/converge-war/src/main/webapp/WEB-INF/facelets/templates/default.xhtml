@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:c="http://java.sun.com/jstl/core" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title><ui:insert name="title" />&#160;-&#160;#{msgs.APPLICATION_TITLE}</title>
+        <link rel="shortcut icon" href="#{facesContext.externalContext.request.contextPath}/favicon.ico" />
+        <link rel="stylesheet" href="#{facesContext.externalContext.request.contextPath}/css/template.css" type="text/css" />
+        <a4j:loadScript src="resource://jquery.js"/>
+        <script type="text/javascript" src="#{facesContext.externalContext.request.contextPath}/scripts/windowutils.js"></script>
+        <script type="text/javascript" src="#{facesContext.externalContext.request.contextPath}/scripts/domutils.js"></script>
+        <script type="text/javascript" src="#{facesContext.externalContext.request.contextPath}/scripts/jquery.gritter.js"></script>
+        <script type="text/javascript" src="#{facesContext.externalContext.request.contextPath}/scripts/jwplayer/jwplayer.js"></script>
+        <ui:insert name="header" />
+    </head>
+
+    <body>
+        <div id="logo"></div>
+        <div id="header_shadow"></div>
+
+        <!-- Menu and Search -->
+        <div id="header">
+            <div class="wrapper">
+
+                <!-- Menu Start -->
+                <div id="left">
+                    <div id="navigation">
+                        <h:form id="navigationForm">
+                            <ul>
+                                <ui:repeat value="#{userSession.items}" var="menuItem">
+                                    <li class="#{menuItem.active ? 'active' : '' }">
+                                        <span>
+                                            <h:commandLink action="#{menuItem.action}" value="#{msgs[menuItem.label]}" />
+                                        </span>
+                                    </li>
+                                </ui:repeat>
+                            </ul>
+                        </h:form>
+                    </div>
+                </div>
+                <!-- Menu End -->
+            </div>
+        </div>
+        <!-- End Menu Toolbar -->
+
+        <div id="header_spacer"></div>
+
+        <!-- Sub header start -->
+        <h:form id="frmSubHeader">
+            <a4j:poll ajaxSingle="true" ignoreDupResponses="true" limitToList="true" interval="300000" reRender="notificationCount" />
+
+            <div id="subheader_spacer">
+
+                <h:outputLink id="btnSignOut" value=""></h:outputLink>
+                <div class="subheader_tabs" onclick="window.location.href = '#{facesContext.externalContext.request.contextPath}/logout.jsp';" style="z-index: 2;">
+                    <div class="left"></div>
+                    <div class="middle">#{msgs.SIGN_OUT}</div>
+                    <div class="right"></div>
+                </div>
+
+                <ui:repeat value="#{userSession.submenuItems}" var="menuItem">
+                    <h:commandLink action="#{menuItem.action}" styleClass="subheader_link">
+                        <div class="#{menuItem.active ? 'subheader_tabs_selected' : 'subheader_tabs' }" style="z-index: 2;">
+                            <div class="left"></div>
+                            <div class="middle">#{msgs[menuItem.label]}</div>
+                            <div class="right"></div>
+                        </div>
+                    </h:commandLink>
+                </ui:repeat>
+
+                <c:if test="#{userSession.administrator}">
+                    <h:commandLink id="#{userSession.administration.id}" action="#{userSession.administration.action}" />
+                    <div class="#{userSession.administration.active ? 'subheader_tabs_selected' : 'subheader_tabs'}"
+                         onclick="document.getElementById('frmSubHeader:#{userSession.administration.id}').onclick();">
+                        <div class="left"></div>
+                        <div class="middle"> #{msgs.ADMINISTRATION} </div>
+                        <div class="right"></div>
+                    </div>
+                </c:if>
+
+                <a4j:outputPanel id="notificationCount">
+                    <c:if test="#{userSession.notificationCount > 0}">
+                        <h:commandLink id="lnkNotifications" action="#{userSession.onNotifications}"/>
+                        <div class="notification_tabs" onclick="document.getElementById('frmSubHeader:lnkNotifications').onclick();">
+                            <div class="left"></div>
+                            <div class="middle">
+                                <h:outputFormat value="#{msgs.notification_NOTIFICATION_ANNOUNCEMENT}">
+                                    <f:param value="#{userSession.notificationCount}" />
+                                </h:outputFormat>
+                            </div>
+                            <div class="right"></div>
+                        </div>
+                    </c:if>
+                </a4j:outputPanel>
+            </div>
+        </h:form>
+
+        <a name="top"></a>
+        <ui:insert name="pageBody" />
+
+        <script type="text/javascript">
+            A4J.AJAX.onError = function(req,status,message){
+                window.status = "#{msgs.CONNECTION_ERROR_ERROR}: " + message;
+                return false;
+            }
+
+            A4J.AJAX.onExpired = function(loc,expiredMsg){
+                window.status = "#{msgs.CONNECTION_ERROR_SESSION_EXPIRED}: " + expiredMsg;
+                return false;
+            }
+        </script>
+
+        <rich:modalPanel id="mpLoading" autosized="true" resizeable="false" minHeight="50" minWidth="300" zindex="2000" >
+            <h:panelGrid styleClass="pleaseWaitBackground">
+                <h:outputText value="#{msgs.LOADING_PLEASE_WAIT}" styleClass="pleaseWaitMessage" />
+                <h:outputText value="&#160;" />
+                <h:outputText value="&#160;" />
+                <h:outputText value="&#160;" />
+                <h:outputText value="&#160;" />
+            </h:panelGrid>
+        </rich:modalPanel>
+    </body>
+</html>

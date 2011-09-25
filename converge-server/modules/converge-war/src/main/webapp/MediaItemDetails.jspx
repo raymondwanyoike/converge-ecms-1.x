@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
+
+    <ui:composition template="/WEB-INF/facelets/templates/mediaitemdetails.xhtml">
+
+        <ui:define name="leftTop">
+            <c:if test="#{mediaItemDetails.authorized}">
+                <converge:moduleHeader moduleTitle="#{msgs.newsitem_OPTIONS}" />
+                <div>
+                    <h:panelGrid id="pgWorkflowOptions" style="margin-left: 2%; margin-right: 2%; width: 98%" rowClasses="left, left,center, center">
+                        <h:selectOneRadio style="margin-top: 5px;" layout="pageDirection" value="#{mediaItemDetails.selectedMediaItem.status}" converter="#{converters.enumTypeConverter}" rendered="#{mediaItemDetails.editor}">
+                            <f:selectItems value="#{common.mediaItemStatuses}" />
+                        </h:selectOneRadio>
+
+                        <h:selectOneRadio style="margin-top: 5px;" layout="pageDirection" value="#{mediaItemDetails.selectedMediaItem.status}" converter="#{converters.enumTypeConverter}" rendered="#{mediaItemDetails.owner &amp;&amp; !mediaItemDetails.editor &amp;&amp; mediaItemDetails.notProcessed}">
+                            <f:selectItems value="#{common.mediaItemOwnerStatuses}" />
+                        </h:selectOneRadio>
+
+                        <h:column>
+                            <a4j:commandButton id="btnSave"  type="submit" value="#{msgs.SAVE}" actionListener="#{mediaItemDetails.onApply}" styleClass="button" style="margin-top: 8px; margin-left: 5px; padding-left: 5px; padding-right: 5px; width: 60px;" rendered="#{mediaItemDetails.changable}" />
+                            <h:commandButton id="btnDelete" value="#{msgs.DELETE}" action="#{mediaItemDetails.onDelete}" immediate="true" styleClass="button" style="margin-top: 8px; margin-left: 5px; padding-left: 5px; padding-right: 5px; width: 60px;" rendered="#{mediaItemDetails.notProcessed || mediaItemDetails.changable}" />
+                            <h:commandButton id="btnClose" value="#{msgs.CLOSE}" action="/inbox" immediate="true" styleClass="button" style="margin-top: 8px; margin-left: 5px; padding-left: 5px; padding-right: 5px; width: 60px;" />
+                        </h:column>
+                    </h:panelGrid>
+                </div>
+
+                <converge:moduleSpacer />
+
+                <converge:moduleHeader moduleTitle="Properties" />
+                <div>
+                    <h:panelGrid columns="2" columnClasses="right, left">
+                        <h:outputText value="#{msgs.media_item_TITLE_LABEL}" />
+                        <h:inputText id="txtHeadline" value="#{mediaItemDetails.selectedMediaItem.title}" required="true" requiredMessage="The title of of the media item is mandatory" style="width: 98%; margin-left: 1%; margin-right: 1%;" styleClass="text" disabled="#{!mediaItemDetails.changable}" />
+
+                        <h:outputText value="#{msgs.media_item_CREATOR_LABEL}" />
+                        <h:inputText styleClass="text" disabled="true" value="#{mediaItemDetails.selectedMediaItem.owner.fullName}" style="width: 98%; margin-left: 1%; margin-right: 1%;" />
+
+                        <h:outputText value="#{msgs.media_item_DATE_LABEL}" />
+                        <rich:calendar popup="true" value="#{mediaItemDetails.selectedMediaItem.mediaDate.time}" datePattern="#{msgs.FORMAT_DATE}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}" disabled="#{!mediaItemDetails.changable}"/>
+
+                        <h:outputText value="#{msgs.media_item_BYLINE_LABEL}" />
+                        <h:inputText id="txtByLine" value="#{mediaItemDetails.selectedMediaItem.byLine}" style="width: 98%; margin-left: 1%; margin-right: 1%;" styleClass="text" disabled="#{!mediaItemDetails.changable}" />
+
+                        <h:outputText value="#{msgs.media_item_NOTE_LABEL}" />
+                        <h:inputText id="txtEditorialNote" value="#{mediaItemDetails.selectedMediaItem.editorialNote}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text" disabled="#{!mediaItemDetails.changable}" />
+
+                        <h:outputText value="#{msgs.media_item_CATALOGUE}" />
+                        <h:inputText id="txtCatalogue" readonly="true" value="#{mediaItemDetails.selectedMediaItem.mediaRepository.name}" title="#{mediaItemDetails.selectedMediaItem.mediaRepository.description}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text" />
+
+                        <h:outputText value="#{msgs.media_item_LINK}" />
+                        <h:column>
+                            <h:inputText id="txtLink" readonly="true" value="#{mediaItemDetails.selectedMediaItem.absoluteFilename}" style="width: 82%; margin-left: 1%; margin-right: 1%" styleClass="text" />
+                            <h:outputLink target="_blank" value="#{mediaItemDetails.selectedMediaItem.absoluteFilename}">
+                                <h:graphicImage value="/images/icons/download.png" alt="#{msgs.DOWNLOAD}" title="#{msgs.DOWNLOAD}" />
+                            </h:outputLink>
+                        </h:column>
+
+                        <h:outputText value="#{msgs.media_item_FILE_NAME_LABEL}" />
+                        <h:inputText id="txtFileName" readonly="true" value="#{mediaItemDetails.selectedMediaItem.filename}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text" />
+
+                        <h:outputText value="#{msgs.media_item_CONTENT_TYPE_LABEL}" />
+                        <h:inputText id="txtContentType" readonly="true" value="#{mediaItemDetails.selectedMediaItem.contentType}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text" />
+
+
+                    </h:panelGrid>
+                </div>
+            </c:if>
+
+        </ui:define>
+
+        <ui:define name="body">
+            <a4j:keepAlive beanName="mediaItemDetails" />
+
+            <a4j:outputPanel ajaxRendered="true">
+                <v:message />
+            </a4j:outputPanel>
+
+            <c:if test="#{!mediaItemDetails.authorized}">
+                <h:panelGrid>
+                    <h:outputText value="#{msgs.newsitem_UNAUTHORISED}" />
+                    <h:commandLink action="/inbox" immediate="true">
+                        <h:outputText value="#{msgs.newsitem_GO_TO_INBOX}" />
+                    </h:commandLink>
+                </h:panelGrid>
+            </c:if>
+
+            <c:if test="#{mediaItemDetails.authorized}">
+
+                <converge:moduleHeader moduleTitle="Media" />
+                <div class="moduleContent">
+                    <h:panelGroup id="pgMedia">
+                        <h:panelGrid columns="2">
+                            <h:outputLink value="#{mediaItemDetails.selectedMediaItem.absoluteFilename}" target="_blank" rendered="#{!mediaItemDetails.selectedMediaItem.video &amp;&amp; !mediaItemDetails.selectedMediaItem.audio}">
+                                <h:graphicImage styleClass="searchResultThumb" url="#{mediaItemDetails.selectedMediaItem.thumbURL}" />
+                            </h:outputLink>
+                            <h:panelGroup rendered="#{mediaItemDetails.selectedMediaItem.video || mediaItemDetails.selectedMediaItem.audio}">
+                                <converge:mediaPlayer id="#{mediaItemDetails.selectedMediaItem.id}" value="#{mediaItemDetails.selectedMediaItem.absoluteFilename}" />
+                            </h:panelGroup>
+                        </h:panelGrid>
+
+                        <rich:spacer height="5px" width="100%" />
+                        <h:outputText value="Discovered embedded content" style="font-weight: bold" rendered="#{mediaItemDetails.discovered.rowCount &gt; 0}" />
+                        <rich:dataTable value="#{mediaItemDetails.discovered}" var="discovered">
+                            <rich:column>
+                                <h:outputText value="#{discovered.property}" />
+                            </rich:column>
+                            <rich:column>
+                                <h:outputText value="#{discovered.value}" />
+                            </rich:column>
+                            <rich:column>
+                                <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.TITLE}" title="Use as title" reRender="txtHeadline">
+                                    <f:setPropertyActionListener target="#{mediaItemDetails.selectedMediaItem.title}" value="#{discovered.value}" />
+                                </a4j:commandButton>
+                            </rich:column>
+                            <rich:column>
+                                <a4j:commandButton styleClass="button dynamicButton" value="By-Line" title="Use as byline" reRender="txtByLine">
+                                    <f:setPropertyActionListener target="#{mediaItemDetails.selectedMediaItem.byLine}" value="#{discovered.value}" />
+                                </a4j:commandButton>
+                            </rich:column>
+                            <rich:column>
+                                <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.CAPTION}" title="Use as caption" reRender="txtDescription">
+                                    <f:setPropertyActionListener target="#{mediaItemDetails.selectedMediaItem.description}" value="#{discovered.value}" />
+                                </a4j:commandButton>
+                            </rich:column>
+                            <rich:column>
+                                <a4j:commandButton styleClass="button dynamicButton" value="Editorial Note" title="Use as editorial note" reRender="txtEditorialNote">
+                                    <f:setPropertyActionListener target="#{mediaItemDetails.selectedMediaItem.editorialNote}" value="#{discovered.value}" />
+                                </a4j:commandButton>
+                            </rich:column>
+                        </rich:dataTable>
+
+                        <rich:fileUpload listWidth="0" id="fuMediaItemFile"
+                                         allowFlash="false"
+                                         listHeight="0"
+                                         maxFilesQuantity="1"
+                                         immediateUpload="true"
+                                         immediate="true"
+                                         autoclear="true"
+                                         fileUploadListener="#{mediaItemDetails.onUploadFile}"
+                                         ajaxSingle="true"
+                                         rendered="#{mediaItemDetails.changable}"
+                                         addControlLabel="#{mediaItemDetails.selectedMediaItem.filename == '' ? 'Upload Media File' : 'Replace Media File'}">
+                            <a4j:support event="onuploadcomplete" reRender="pgMedia,txtFileName,txtContentType"/>
+                        </rich:fileUpload>
+                    </h:panelGroup>
+                </div>
+                <converge:moduleSpacer />
+
+                <converge:moduleHeader moduleTitle="#{msgs.CAPTION}" />
+                <div class="moduleContent">
+                    <h:inputTextarea id="txtDescription" value="#{mediaItemDetails.selectedMediaItem.description}" style="width: 98%; height: 100px; margin-left: 1%; margin-right: 1%" styleClass="text mediumInput" disabled="#{!mediaItemDetails.changable}" required="true" requiredMessage="The caption is required" />
+                </div>
+                <converge:moduleSpacer />
+
+                <converge:moduleHeader moduleTitle="#{msgs.CONCEPTS}" />
+                <div class="moduleContent">
+
+                    <h:panelGrid columns="3">
+                        <h:column>
+                            <h:inputText id="txtNewConcept" value="#{mediaItemDetails.newConcept}" styleClass="text mediumInput" />
+                            <rich:suggestionbox id="sbNewConcept" for="txtNewConcept" var="result" suggestionAction="#{mediaItemDetails.onConceptSuggestion}" ajaxSingle="true" fetchValue="#{result.name}" minChars="2" nothingLabel="No match">
+                                <h:column>
+                                    <h:outputText value="#{result.name}" />
+                                </h:column>
+                                <h:column>
+                                    <c:set var="key" value="#{result.type}_SHORT" />
+                                    <h:outputText value="#{msgs[key]}" styleClass="concept_#{msgs[key]}" style="width: 30px" />
+                                </h:column>
+                            </rich:suggestionbox>
+                        </h:column>
+                        <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.ADD}" actionListener="#{mediaItemDetails.onAddConcept}" reRender="dtConcepts,mpNewConcept,txtNewConcept,sbNewConcept" oncomplete="if (#{!mediaItemDetails.conceptAdded}){ #{rich:component('mpNewConcept')}.show(); return false; }" />
+                        <a4j:commandButton styleClass="button dynamicButton" value="Subjects" reRender="pgConceptSelector" oncomplete="#{rich:component('mpConceptSelector')}.show();" />
+                    </h:panelGrid>
+                    <rich:dataTable id="dtConcepts" var="concept" value="#{mediaItemDetails.selectedMediaItem.concepts}" rowClasses="odd, even" style="width: 100%; border: 0px;">
+                        <rich:column style=" border: 0px; width: 20px;">
+                            <a4j:commandLink reRender="dtConcepts">
+                                <f:setPropertyActionListener target="#{mediaItemDetails.removeConcept}" value="#{concept}" />
+                                <h:graphicImage url="#{res.REMOVE_ICON}" />
+                            </a4j:commandLink>
+                        </rich:column>
+
+                        <rich:column style="width: 26px;  border: 0px;" styleClass="center">
+                            <c:set var="key" value="#{concept.type}_SHORT" />
+                            <h:outputText value="#{msgs[key]}" styleClass="concept_#{msgs[key]}" style="width: 30px" />
+                        </rich:column>
+
+                        <rich:column style=" border: 0px;">
+                            <h:outputText value="#{concept.fullTitle}" />
+                            <rich:toolTip style="width: 350px;" styleClass="tooltip">
+                                <h:panelGrid>
+                                    <h:outputText styleClass="smallHeading" value="#{concept.name}" />
+                                    <h:outputText value="#{concept.definition}" escape="false" />
+                                </h:panelGrid>
+                            </rich:toolTip>
+                        </rich:column>
+                    </rich:dataTable>
+
+                    <converge:conceptSelector onSelectSubject="#{mediaItemDetails.onSelectSubject}" />
+                </div>
+                <converge:moduleSpacer />
+
+
+                <rich:modalPanel id="mpNewConcept" autosized="true" domElementAttachment="parent">
+                    <f:facet name="header">
+                        <h:panelGroup>
+                            <h:outputText value="#{msgs.concepts_NEW_CONCEPT}" />
+                        </h:panelGroup>
+                    </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage id="imgCloseNewConcept" value="#{res.DIALOGUE_CLOSE_ICON}" style="link" />
+                            <rich:componentControl for="mpNewConcept" attachTo="imgCloseNewConcept" operation="hide" event="onclick"/>
+                        </h:panelGroup>
+                    </f:facet>
+
+                    <h:panelGrid id="pgNewConcept" style="width: 480px;">
+
+                        <rich:tabPanel id="tpNewConcept" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+
+                            <rich:tab id="tabNewConcept" label="New Concept">
+
+                                <h:panelGrid id="pgDetails" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                    <h:outputText value="#{msgs.concepts_CONCEPT_TYPE}" />
+                                    <h:selectOneRadio value="#{mediaItemDetails.conceptType}">
+                                        <f:selectItem itemLabel="#{msgs['dk.i2m.converge.core.metadata.Organisation_NAME']}" itemValue="ORGANISATION" />
+                                        <f:selectItem itemLabel="#{msgs['dk.i2m.converge.core.metadata.Person_NAME']}" itemValue="PERSON" />
+                                        <f:selectItem itemLabel="#{msgs['dk.i2m.converge.core.metadata.GeoArea_NAME']}" itemValue="LOCATION" />
+                                        <f:selectItem itemLabel="#{msgs['dk.i2m.converge.core.metadata.PointOfInterest_NAME']}" itemValue="POI" />
+                                    </h:selectOneRadio>
+
+                                    <h:outputText value="#{msgs.concepts_CONCEPT}" />
+                                    <h:inputText value="#{mediaItemDetails.newConceptName}" styleClass="text mediumInput" />
+
+                                    <h:outputText value="#{msgs.concepts_DEFINITION}" />
+                                    <h:inputTextarea value="#{mediaItemDetails.newConceptDescription}" styleClass="text mediumTextArea" />
+                                </h:panelGrid>
+                            </rich:tab>
+                        </rich:tabPanel>
+
+                        <h:panelGroup styleClass="dialogueButtons">
+                            <a4j:commandLink id="lnkAddNewConcept" styleClass="dialogButton" value="#{msgs.ADD}" actionListener="#{mediaItemDetails.onAddNewConcept}" reRender="dtConcepts,txtNewConcept,sbNewConcept" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpNewConcept')}.hide(); return false; }" />
+                            <h:commandLink id="lnkCloseNewConcept" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpNewConcept')}.hide(); return false;" />
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </rich:modalPanel>
+
+            </c:if>
+        </ui:define>
+
+    </ui:composition>
+
+</jsp:root>

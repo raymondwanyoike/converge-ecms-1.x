@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root version="2.0" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:v="http://converge.i2m.dk" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
+
+    <ui:composition template="/WEB-INF/facelets/templates/planning.xhtml">
+
+        <ui:define name="leftColumnBottom">
+            <h:form id="frmEditionDate" rendered="#{userSession.privileged['OUTLET_PLANNING']}">
+                <converge:moduleHeader moduleTitle="#{msgs.planning_EDITION_DATE}" />
+                <div class="moduleContent">
+                    <a4j:region id="regOutletEdition">
+                        <a4j:status onstart="Richfaces.showModalPanel('mpLoading')" onstop="Richfaces.hideModalPanel('mpLoading')" />
+                        <rich:calendar id="calEditionDate" value="#{planning.selectedDate}" popup="false" firstWeekDay="1" style="width: 100%" timeZone="#{common.systemTimeZone}">
+                            <a4j:support event="onchanged" actionListener="#{planning.onSelectDate}" reRender="frmPage,lnkNewEdition" />
+                        </rich:calendar>
+
+                        <h:panelGrid columns="2">
+                            <h:graphicImage value="#{res.BULLET_ICON}" alt="#{msgs.planning_EDITION_NEW_TOOLTIP}" title="#{msgs.planning_EDITION_NEW_TOOLTIP}" />
+                            <a4j:commandLink id="lnkNewEdition" actionListener="#{planning.onNewEdition}" reRender="frmEditionDetails" ajaxSingle="true">
+                                <h:outputFormat value="#{msgs.planning_EDITION_NEW}">
+                                    <f:param value="#{planning.selectedDate}" />
+                                    <f:param value="#{planning.selectedOutlet.title}" />
+                                </h:outputFormat>
+                                <rich:componentControl for="mpEditionDetails" operation="show" event="oncomplete" />
+                            </a4j:commandLink>
+                        </h:panelGrid>
+                    </a4j:region>
+                </div>
+            </h:form>
+        </ui:define>
+
+        <ui:define name="body">
+            <a4j:keepAlive beanName="planning" />
+
+            <a4j:outputPanel ajaxRendered="true">
+                <v:message />
+            </a4j:outputPanel>
+
+            <a4j:region id="regEditionLineUp">
+                <a4j:status onstart="Richfaces.showModalPanel('mpLoading')" onstop="Richfaces.hideModalPanel('mpLoading')" />
+                <h:form id="frmPage" rendered="#{userSession.privileged['OUTLET_PLANNING']}">
+
+                    <converge:moduleHeader moduleTitle="#{planning.editionTitle}" />
+                    <div class="moduleContent">
+                        <a4j:repeat value="#{planning.selectedEditions}" var="edition">
+                            <div style="clear: both; padding-bottom: 12px;"></div>
+
+                            <h2 style="#{!edition.open ? 'color: #aaaaaa;' :''}"><h:outputText value="#{edition.publicationDate}" >
+                                    <f:convertDateTime pattern="#{msgs.FORMAT_TIME}" timeZone="#{common.systemTimeZone}" />
+                                </h:outputText> #{!edition.open ? ' - Closed' :''}</h2>
+
+                            <rich:dataTable id="dtEditionAssignments" value="#{edition.assignments}" var="assignment" styleClass="table" headerClass="tableHeader" rowClasses="odd, even" sortPriority="#{converge:createList('colPosition,colPriority')}">
+                                <c:set var="rowStyle" value="#{assignment.endState ? 'endState' : ''} #{assignment.trashState ? 'trashState' : ''} #{assignment.inprogressState ? 'intermediateState' : ''}" />
+                                
+                                <rich:column styleClass="columnIcon center #{rowStyle}" headerClass="subColumnIcon">
+                                    <f:facet name="header">
+                                        <h:panelGroup>
+                                            <a4j:commandLink reRender="frmEditionDetails" rendered="#{edition.id != null}">
+                                                <f:setPropertyActionListener target="#{planning.selectedEditionView}" value="#{edition}" />
+                                                <rich:componentControl for="mpEditionDetails" operation="show" event="oncomplete" />
+                                                <h:graphicImage value="#{res.PROPERTIES_ICON}" title="#{msgs.planning_EDITION_PROPERTIES_TOOLTIP}" alt="#{msg.planning_EDITION_PROPERTIES_TOOLTIP}"  />
+                                            </a4j:commandLink>
+
+                                            <a4j:commandLink reRender="frmPage" rendered="#{edition.id == null &amp;&amp; edition.open}">
+                                                <f:setPropertyActionListener target="#{planning.createEdition}" value="#{edition}" />
+                                                <h:graphicImage value="#{res.ADD_ICON}" title="#{msgs.planning_EDITION_CREATE_TOOLTIP}" alt="#{msg.planning_EDITION_CREATE_TOOLTIP}"  />
+                                            </a4j:commandLink>
+                                        </h:panelGroup>
+
+                                    </f:facet>
+                                    <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml">
+                                        <f:param value="#{assignment.id}" name="id" />
+                                        <h:graphicImage value="#{res.NEWS_ITEM_ICON}" rendered="#{!assignment.locked}" title="#{assignment.status}" alt="#{assignment.status}"  />
+                                        <h:graphicImage value="#{res.LOCK_ICON}" rendered="#{assignment.locked}" />
+                                    </h:outputLink>
+                                    <rich:toolTip styleClass="lockTooltip" rendered="#{assignment.locked}">
+
+                                        <h:outputFormat value="#{msgs.newsitem_LOCKED_TOOLTIP}" escape="false">
+                                            <f:param value="#{assignment.checkedOutBy}" />
+                                            <f:param value="#{assignment.checkedOut}" />
+                                        </h:outputFormat>
+                                    </rich:toolTip>
+                                </rich:column>
+
+                                <rich:column sortBy="#{assignment.id}" styleClass="right columnId #{rowStyle}" headerClass="columnId">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msgs.ID}" title="#{msgs.ARTICLE_ID_TOOLTIP}" />
+                                    </f:facet>
+                                    <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml">
+                                        <f:param value="#{assignment.id}" name="id" />
+                                        <h:outputText value="#{assignment.id}">
+                                            <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                                        </h:outputText>
+                                    </h:outputLink>
+                                </rich:column>
+
+                                <rich:column sortBy="#{assignment.title}" styleClass="#{rowStyle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msgs.newsitem_HEADLINE}" />
+                                    </f:facet>
+                                    <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml">
+                                        <f:param value="#{assignment.id}" name="id" />
+                                        <h:outputText value="#{assignment.title}" />
+                                    </h:outputLink>
+                                </rich:column>
+
+                                <rich:column sortBy="#{assignment.actor}" styleClass="#{rowStyle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msgs.newsitem_ACTOR}" />
+                                    </f:facet>
+                                    <h:outputText value="#{assignment.actor}" />
+                                </rich:column>
+
+                                <rich:column sortBy="#{assignment.status}" styleClass="#{rowStyle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msgs.newsitem_STATUS}" />
+                                    </f:facet>
+                                    <h:outputText value="#{assignment.status}" />
+                                </rich:column>
+
+                                <rich:column sortBy="#{assignment.section}" styleClass="#{rowStyle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msgs.newsitem_SECTION}" />
+                                    </f:facet>
+                                    <h:outputText value="#{assignment.section}" />
+                                </rich:column>
+
+                                <rich:column sortBy="#{assignment.wordCount}" styleClass="#{rowStyle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msgs.newsitem_WORD_COUNT}" />
+                                    </f:facet>
+                                    <h:outputText value="#{assignment.wordCount} (#{assignment.targetWordCount})" rendered="#{assignment.targetWordCount != 0}" />
+                                    <h:outputText value="#{assignment.wordCount}" rendered="#{assignment.targetWordCount == 0}" />
+                                </rich:column>
+
+                                <rich:column id="colPosition" sortBy="#{assignment.start}" sortOrder="ASCENDING" styleClass="#{rowStyle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msgs.newsitem_START}" />
+                                    </f:facet>
+
+                                    <rich:inplaceInput required="true" value="#{assignment.start}" viewClass="placementPositionInplace" viewHoverClass="placementPositionInplaceHover">
+                                        <a4j:support ajaxSingle="true" event="onviewactivated" reRender="dtEditionAssignments">
+                                            <f:setPropertyActionListener target="#{planning.updatePlacement}" value="#{assignment}" />
+                                        </a4j:support>
+                                    </rich:inplaceInput>
+
+                                </rich:column>
+
+                                <rich:column id="colPriority" sortBy="#{assignment.position}" sortOrder="ASCENDING" styleClass="#{rowStyle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msgs.newsitem_POSITION}" />
+                                    </f:facet>
+                                    <rich:inplaceInput required="true" value="#{assignment.position}"  viewClass="placementPositionInplace" viewHoverClass="placementPositionInplaceHover">
+                                        <a4j:support ajaxSingle="true" event="onviewactivated" reRender="dtEditionAssignments">
+                                            <f:setPropertyActionListener target="#{planning.updatePlacement}" value="#{assignment}" />
+                                        </a4j:support>
+                                    </rich:inplaceInput>
+                                </rich:column>
+
+                                <rich:column styleClass="columnOneButton center #{rowStyle}" headerClass="columnOneButton center">
+                                    <f:facet name="header">
+                                        <a4j:commandButton styleClass="button smallButton" value="#{msgs.ADD}" title="#{msgs.planning_ADD_NEWS_ITEM_TO_THIS_EDITION}" actionListener="#{planning.onNewEditionPlacement}" reRender="frmEditionDetails" ajaxSingle="true" rendered="#{false &amp;&amp; edition.open &amp;&amp; edition.exist}">
+                                            <f:setPropertyActionListener target="#{planning.selectedEdition}" value="#{edition}" />
+                                            <rich:componentControl for="mpEditionPlacement" operation="show" event="oncomplete" />
+                                        </a4j:commandButton>
+                                    </f:facet>
+
+                                    <a4j:commandButton styleClass="button smallButton" value="#{msgs.REMOVE}" title="#{msgs.planning_REMOVE_NEWS_ITEM_FROM_THIS_EDITION}" reRender="frmPage" onclick="if (confirm('#{msgs.planning_CONFIRM_PLACEMENT_REMOVE}') != true){ return false; };">
+                                        <f:setPropertyActionListener target="#{planning.deletePlacement}" value="#{assignment.placementId}" />
+                                    </a4j:commandButton>
+
+                                </rich:column>
+
+                            </rich:dataTable>
+                        </a4j:repeat>
+                    </div>
+                </h:form>
+            </a4j:region>
+
+            <a4j:region id="regEditionDetails">
+                <a4j:status onstart="Richfaces.showModalPanel('mpLoading')" onstop="Richfaces.hideModalPanel('mpLoading')" />
+                <h:form id="frmEditionDetails" rendered="#{userSession.privileged['OUTLET_PLANNING']}">
+
+                    <rich:modalPanel id="mpEditionDetails" autosized="true" domElementAttachment="parent" rendered="#{planning.selectedEditionView != null}">
+                        <f:facet name="header">
+                            <h:panelGroup>
+                                <h:outputText value="#{msgs.planning_EDITION_DETAILS}" />
+                            </h:panelGroup>
+                        </f:facet>
+                        <h:panelGrid id="pgEditionDetails" style="width: 480px;">
+
+                            <rich:tabPanel switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+
+                                <rich:tab id="tabEdition" label="#{msgs.planning_EDITION}">
+                                    <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                        <h:outputText value="#{msgs.planning_EDITION_OUTLET}:" />
+                                        <h:inputText styleClass="text mediumInput" value="#{planning.selectedEditionView.outletName}" disabled="true" />
+
+                                        <h:outputText value="#{msgs.planning_EDITION_OPEN}:" />
+                                        <h:selectBooleanCheckbox value="#{planning.selectedEditionView.open}" />
+
+                                        <h:outputText value="#{msgs.planning_EDITION_PUBLICATION_DATE}:" />
+                                        <rich:calendar popup="true" value="#{planning.selectedEditionView.publicationDate}" datePattern="#{msgs.FORMAT_DATE_AND_TIME}" firstWeekDay="1" timeZone="#{common.systemTimeZone}"/>
+
+                                        <h:outputText value="#{msgs.planning_EDITION_EXPIRATION_DATE}:" />
+                                        <rich:calendar popup="true" value="#{planning.selectedEditionView.expirationDate}" firstWeekDay="1" datePattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{common.systemTimeZone}"/>
+
+                                        <h:outputText value="#{msgs.planning_EDITION_CLOSE_DATE}:" />
+                                        <rich:calendar popup="true" value="#{planning.selectedEditionView.closeDate}" firstWeekDay="1" datePattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{common.systemTimeZone}"/>
+                                    </h:panelGrid>
+                                </rich:tab>
+
+                                <rich:tab id="tabEditionActions" label="#{msgs.planning_EDITION_ACTIONS}">
+                                    <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
+
+                                        <rich:dataTable id="dtActions" value="#{planning.selectedOutletActions}" var="action" styleClass="table pluginPropertiesList" headerClass="tableHeader" rowClasses="odd, even">
+
+                                            <rich:column styleClass="columnIcon center">
+                                                <f:facet name="header">&#160;</f:facet>
+                                                <h:graphicImage value="#{res.WORKFLOW_STEP_ACTION_ICON}" />
+                                            </rich:column>
+
+                                            <rich:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="#{msgs.editions_ACTION_LABEL}" />
+                                                </f:facet>
+                                                <h:outputText value="#{action.label}" />
+                                            </rich:column>
+
+                                            <rich:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="#{msgs.editions_ACTION_TYPE}" />
+                                                </f:facet>
+                                                <h:outputText value="#{action.name}" />
+                                            </rich:column>
+
+                                            <rich:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="#{msgs.editions_ACTION_MANUAL}" title="#{msgs.editions_ACTION_MANUAL_TOOLTIP}" />
+                                                </f:facet>
+                                                <h:outputText value="#{msgs.YES}" rendered="#{action.manual}" />
+                                                <h:outputText value="#{msgs.NO}" rendered="#{!action.manual}" />
+                                            </rich:column>
+
+                                            <rich:column styleClass="columnIcon center">
+                                                <f:facet name="header">
+                                                    <a4j:commandLink id="lnkExecuteAll" title="#{msgs.editions_ACTION_EXECUTE_ALL}" actionListener="#{planning.onExecuteAllActions}" reRender="frmPage" >
+                                                        <h:graphicImage value="#{res.RUN_ALL_ICON}" />
+                                                    </a4j:commandLink>
+                                                </f:facet>
+
+                                                <a4j:commandLink ajaxSingle="true" title="#{msgs.editions_ACTION_EXECUTE}">
+                                                    <f:setPropertyActionListener target="#{planning.executeAction}" value="#{action.id}" />
+                                                    <h:graphicImage value="#{res.RUN_ICON}" />
+                                                </a4j:commandLink>
+                                            </rich:column>
+
+                                        </rich:dataTable>
+                                        <rich:spacer width="450" height="1" />
+                                    </h:panelGrid>
+                                </rich:tab>
+                            </rich:tabPanel>
+
+                            <h:panelGroup styleClass="dialogueButtons">
+                                <a4j:commandLink id="lnkSaveEdition" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{planning.onSaveEdition}" reRender="frmPage">
+                                    <rich:componentControl for="mpEditionDetails" operation="hide" event="oncomplete" />
+                                </a4j:commandLink>
+                                <a4j:commandLink id="lnkApplyEdition" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{planning.onSaveEdition}" reRender="pgEditionDetails, frmPage" />
+                                <a4j:commandLink id="lnkDeleteEdition" rendered="#{planning.editionEditMode}" onclick="if (confirm('#{msgs.planning_EDITION_PROMPT_DELETE}') != true){ return false; };" actionListener="#{planning.onDeleteEdition}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="frmPage">
+                                    <rich:componentControl for="mpEditionDetails" operation="hide" event="oncomplete" />
+                                </a4j:commandLink>
+                                <h:commandLink id="lnkCloseOutletForm" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpEditionDetails')}.hide(); return false;" />
+                            </h:panelGroup>
+                        </h:panelGrid>
+                    </rich:modalPanel>
+                </h:form>
+            </a4j:region>
+
+
+            <a4j:region id="regEditionPlacement">
+                <h:form id="frmEditionPlacement" rendered="#{userSession.privileged['OUTLET_PLANNING']}">
+
+                    <rich:modalPanel id="mpEditionPlacement" autosized="true" domElementAttachment="parent" rendered="#{planning.selectedEdition != null}">
+                        <f:facet name="header">
+                            <h:panelGroup>
+                                <h:outputText value="New Placement" />
+                            </h:panelGroup>
+                        </f:facet>
+                        <h:panelGrid id="pgEditionPlacement" style="width: 480px;">
+
+                            <rich:tabPanel switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+
+                                <rich:tab id="tabEditionPlacement" label="Placement">
+                                    <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
+
+                                    </h:panelGrid>
+                                </rich:tab>
+                            </rich:tabPanel>
+
+                            <h:panelGroup styleClass="dialogueButtons">
+                                <a4j:commandLink id="lnkAddToEdition" styleClass="dialogButton" value="Add To Edition" actionListener="#{planning.onAddToEdition}" reRender="frmPage">
+                                    <rich:componentControl for="mpEditionPlacement" operation="hide" event="oncomplete" />
+                                </a4j:commandLink>
+                                <h:commandLink id="lnkCloseEditionPlacement" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpEditionPlacement')}.hide(); return false;" />
+                            </h:panelGroup>
+                        </h:panelGrid>
+                    </rich:modalPanel>
+                </h:form>
+            </a4j:region>
+
+
+        </ui:define>
+    </ui:composition>
+</jsp:root>

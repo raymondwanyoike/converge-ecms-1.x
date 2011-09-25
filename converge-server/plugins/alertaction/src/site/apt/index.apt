@@ -1,0 +1,13 @@
+ ----
+ Alert Action Plug-in
+ ----
+ Allan Lykke Christensen
+ ----
+ 2010-10-30
+ ----
+
+Alert Action Plug-in
+
+   Alert action is a worlflow step action for creating user and role alerts.
+
+   {{{configuration.html}See how configure the plug-in here}}.

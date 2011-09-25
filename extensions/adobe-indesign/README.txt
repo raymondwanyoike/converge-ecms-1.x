@@ -1,0 +1,1 @@
+This directory is for the Adobe InDesign CS3+ extension
