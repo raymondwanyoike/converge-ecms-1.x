@@ -20,7 +20,7 @@ import dk.i2m.commons.BeanComparator;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.domain.search.IndexField;
 import dk.i2m.converge.domain.search.SearchResult;
-import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.content.MediaItem;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.metadata.GeoArea;
@@ -89,7 +89,7 @@ public class SearchEngineBean implements SearchEngineLocal {
 
     @EJB private NewsItemFacadeLocal newsItemFacade;
 
-    @EJB private CatalogueFacadeLocal catalogueFacade;
+    @EJB private MediaDatabaseFacadeLocal catalogueFacade;
     
     private DateFormat solrDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
@@ -415,76 +415,76 @@ public class SearchEngineBean implements SearchEngineLocal {
     public void index(MediaItem mi, SolrServer solrServer) throws SearchEngineIndexingException {
         LOG.log(Level.FINE, "Adding MediaItem #{0} to index", mi.getId());
 
-        if (mi.isOriginalAvailable()) {
-
-            SolrInputDocument solrDoc = new SolrInputDocument();
-            solrDoc.addField(IndexField.ID.getName(), mi.getId(), 1.0f);
-            solrDoc.addField(IndexField.TYPE.getName(), "Media");
-
-            String mediaFormat;
-            String contentType = mi.getOriginal().getContentType();
-
-            if (contentType.startsWith("audio")) {
-                mediaFormat = "Audio";
-            } else if (contentType.startsWith("video")) {
-                mediaFormat = "Video";
-            } else if (contentType.startsWith("image")) {
-                mediaFormat = "Image";
-            } else {
-                mediaFormat = "Unknown";
-            }
-
-            solrDoc.addField(IndexField.MEDIA_FORMAT.getName(), mediaFormat);
-
-            solrDoc.addField(IndexField.TITLE.getName(), mi.getTitle(), 1.0f);
-            solrDoc.addField(IndexField.BYLINE.getName(), mi.getByLine());
-            solrDoc.addField(IndexField.CAPTION.getName(), dk.i2m.commons.StringUtils.stripHtml(mi.getDescription()));
-            solrDoc.addField(IndexField.CONTENT_TYPE.getName(), mi.getOriginal().getContentType());
-            solrDoc.addField(IndexField.REPOSITORY.getName(), mi.getCatalogue().getName());
-            if (mi.getMediaDate() != null) {
-                solrDoc.addField(IndexField.DATE.getName(), mi.getMediaDate().getTime());
-            }
-
-            if (mi.isPreviewAvailable()) {
-                solrDoc.addField(IndexField.THUMB_URL.getName(), mi.getPreview().getAbsoluteFilename());
-                solrDoc.addField(IndexField.DIRECT_URL.getName(), mi.getPreview().getFileLocation());
-            }
-
-            solrDoc.addField(IndexField.ACTOR.getName(), mi.getOwner().getFullName());
-
-            for (Concept concept : mi.getConcepts()) {
-                if (concept instanceof Subject) {
-                    solrDoc.addField(IndexField.SUBJECT.getName(), concept.getFullTitle());
-                }
-                if (concept instanceof Person) {
-                    solrDoc.addField(IndexField.PERSON.getName(), concept.getFullTitle());
-                }
-
-                if (concept instanceof Organisation) {
-                    solrDoc.addField(IndexField.ORGANISATION.getName(), concept.getFullTitle());
-                }
-
-                if (concept instanceof GeoArea) {
-                    solrDoc.addField(IndexField.LOCATION.getName(), concept.getFullTitle());
-                }
-
-                if (concept instanceof PointOfInterest) {
-                    solrDoc.addField(IndexField.POINT_OF_INTEREST.getName(), concept.getFullTitle());
-                }
-
-                solrDoc.addField(IndexField.CONCEPT.getName(), concept.getFullTitle());
-            }
-
-            try {
-                solrServer.add(solrDoc);
-            } catch (SolrServerException ex) {
-                throw new SearchEngineIndexingException(ex);
-            } catch (IOException ex) {
-                throw new SearchEngineIndexingException(ex);
-            }
-        } else {
-            LOG.log(Level.FINE, "Ignoring MediaItem #{0}. Missing original {1} rendition", new Object[]{mi.getId(), mi.getCatalogue().getOriginalRendition().getName()});
-        }
+//        if (mi.isOriginalAvailable()) {
+//
+//            SolrInputDocument solrDoc = new SolrInputDocument();
+//            solrDoc.addField(IndexField.ID.getName(), mi.getId(), 1.0f);
+//            solrDoc.addField(IndexField.TYPE.getName(), "Media");
+//
+//            String mediaFormat;
+//            String contentType = mi.getOriginal().getContentType();
+//
+//            if (contentType.startsWith("audio")) {
+//                mediaFormat = "Audio";
+//            } else if (contentType.startsWith("video")) {
+//                mediaFormat = "Video";
+//            } else if (contentType.startsWith("image")) {
+//                mediaFormat = "Image";
+//            } else {
+//                mediaFormat = "Unknown";
+//            }
+//
+//            solrDoc.addField(IndexField.MEDIA_FORMAT.getName(), mediaFormat);
+//
+//            solrDoc.addField(IndexField.TITLE.getName(), mi.getTitle(), 1.0f);
+//            solrDoc.addField(IndexField.BYLINE.getName(), mi.getByLine());
+//            solrDoc.addField(IndexField.CAPTION.getName(), dk.i2m.commons.StringUtils.stripHtml(mi.getDescription()));
+//            solrDoc.addField(IndexField.CONTENT_TYPE.getName(), mi.getOriginal().getContentType());
+//            solrDoc.addField(IndexField.REPOSITORY.getName(), mi.getCatalogue().getName());
+//            if (mi.getMediaDate() != null) {
+//                solrDoc.addField(IndexField.DATE.getName(), mi.getMediaDate().getTime());
+//            }
+//
+//            if (mi.isPreviewAvailable()) {
+//                solrDoc.addField(IndexField.THUMB_URL.getName(), mi.getPreview().getAbsoluteFilename());
+//                solrDoc.addField(IndexField.DIRECT_URL.getName(), mi.getPreview().getFileLocation());
+//            }
+//
+//            solrDoc.addField(IndexField.ACTOR.getName(), mi.getOwner().getFullName());
+//
+//            for (Concept concept : mi.getConcepts()) {
+//                if (concept instanceof Subject) {
+//                    solrDoc.addField(IndexField.SUBJECT.getName(), concept.getFullTitle());
+//                }
+//                if (concept instanceof Person) {
+//                    solrDoc.addField(IndexField.PERSON.getName(), concept.getFullTitle());
+//                }
+//
+//                if (concept instanceof Organisation) {
+//                    solrDoc.addField(IndexField.ORGANISATION.getName(), concept.getFullTitle());
+//                }
+//
+//                if (concept instanceof GeoArea) {
+//                    solrDoc.addField(IndexField.LOCATION.getName(), concept.getFullTitle());
+//                }
+//
+//                if (concept instanceof PointOfInterest) {
+//                    solrDoc.addField(IndexField.POINT_OF_INTEREST.getName(), concept.getFullTitle());
+//                }
+//
+//                solrDoc.addField(IndexField.CONCEPT.getName(), concept.getFullTitle());
+//            }
+//
+//            try {
+//                solrServer.add(solrDoc);
+//            } catch (SolrServerException ex) {
+//                throw new SearchEngineIndexingException(ex);
+//            } catch (IOException ex) {
+//                throw new SearchEngineIndexingException(ex);
+//            }
+//        } else {
+//            LOG.log(Level.FINE, "Ignoring MediaItem #{0}. Missing original {1} rendition", new Object[]{mi.getId(), mi.getCatalogue().getOriginalRendition().getName()});
+//        }
     }
 
     @Override

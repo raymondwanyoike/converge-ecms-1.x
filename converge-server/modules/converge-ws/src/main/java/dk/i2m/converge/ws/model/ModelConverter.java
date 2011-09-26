@@ -52,19 +52,22 @@ public class ModelConverter {
             MediaItem mediaItem = new MediaItem();
             mediaItem.setCaption(attachment.getCaption());
 
+// TODO: Fix dependency on the rendition upgrade            
+            
             mediaItem.setId(attachment.getMediaItem().getId());
-            if (attachment.getMediaItem().getRendition() != null) {
-                mediaItem.setRendition(attachment.getMediaItem().getRendition().getName());
-            } else {
-                mediaItem.setRendition("");
-            }
-            if (attachment.getMediaItem().getContentType() != null) {
-                mediaItem.setContentType(attachment.getMediaItem().getContentType());
-            } else {
+//            if (attachment.getMediaItem().getRendition() != null) {
+//                mediaItem.setRendition(attachment.getMediaItem().getRendition().getName());
+//            } else {
+            mediaItem.setRendition("");
+//            }
+
+//            if (attachment.getMediaItem().getContentType() != null) {
+//                mediaItem.setContentType(attachment.getMediaItem().getContentType());
+//            } else {
                 mediaItem.setContentType("application/unknown");
-            }
+//            }
             mediaItem.setTitle(attachment.getMediaItem().getTitle());
-            mediaItem.setUrl(attachment.getMediaItem().getAbsoluteFilename());
+//            mediaItem.setUrl(attachment.getMediaItem().getAbsoluteFilename());
             return mediaItem;
         } else {
             throw new AttachmentNotAvailableException();
@@ -107,7 +110,7 @@ public class ModelConverter {
 
         return item;
     }
-    
+
     public static NewsItem toNewsItem(dk.i2m.converge.core.content.NewsItem ni) {
         NewsItem item = new NewsItem();
         item.setId(ni.getId());
@@ -141,7 +144,6 @@ public class ModelConverter {
 
         return item;
     }
-
 
     private static WorkflowOption toWorkflowOption(dk.i2m.converge.core.workflow.WorkflowStep step) {
         WorkflowOption option = new WorkflowOption();
