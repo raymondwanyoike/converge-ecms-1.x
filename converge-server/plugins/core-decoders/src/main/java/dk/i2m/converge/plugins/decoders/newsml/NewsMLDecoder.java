@@ -39,7 +39,6 @@ import dk.i2m.converge.nar.newsml.v1_0.Property;
 import dk.i2m.converge.nar.newsml.v1_0.Topic;
 import dk.i2m.converge.nar.newsml.v1_0.TopicSet;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.text.DateFormat;
