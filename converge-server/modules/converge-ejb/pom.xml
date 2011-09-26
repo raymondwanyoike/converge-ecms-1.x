@@ -28,25 +28,20 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <artifactId>videooutput</artifactId>
-            <groupId>dk.i2m.converge.plugins</groupId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
+        
         <dependency>
             <artifactId>core-decoders</artifactId>
             <groupId>dk.i2m.converge.plugins</groupId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        
         <dependency>
             <artifactId>core-actions</artifactId>
             <groupId>dk.i2m.converge.plugins</groupId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-                
                 
         <dependency>
             <artifactId>textoutput</artifactId>
