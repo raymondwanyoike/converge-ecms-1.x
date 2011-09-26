@@ -65,7 +65,7 @@ public class RssDecoder implements NewswireDecoder {
     /** Property containing the OpenCalais ID. */
     public static final String OPENCALAIS_ID = "OpenCalais ID";
 
-    private static final Logger logger = Logger.getLogger(RssDecoder.class.getName());
+    private static final Logger LOG = Logger.getLogger(RssDecoder.class.getName());
 
     private Calendar releaseDate = new GregorianCalendar(2011, Calendar.APRIL, 12, 16, 20);
 
@@ -117,7 +117,7 @@ public class RssDecoder implements NewswireDecoder {
             }
         }
 
-        logger.log(Level.FINE, "Downloading newswire webfeed {0} {1}", new Object[]{newswire.getSource(), url});
+        LOG.log(Level.FINE, "Downloading newswire webfeed {0} {1}", new Object[]{newswire.getSource(), url});
         int duplicates = 0;
         int newItems = 0;
         List<NewswireItem> createdItems = new ArrayList<NewswireItem>();
@@ -138,26 +138,30 @@ public class RssDecoder implements NewswireDecoder {
                     newItems++;
                 } catch (DataExistsException dee) {
                     duplicates++;
+                } catch (Exception rex) {
+                    LOG.log(Level.WARNING, "Could not create fetched item in database. {0}", rex.getMessage());
+                    LOG.log(Level.FINE, "", rex);
                 }
             }
         } catch (MalformedURLException ex) {
-            logger.log(Level.WARNING, "Problem with feed #{0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
-            logger.log(Level.FINE, "", ex);
+            LOG.log(Level.WARNING, "Problem with feed #{0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
+            LOG.log(Level.FINE, "", ex);
         } catch (IllegalArgumentException ex) {
-            logger.log(Level.WARNING, "Problem with feed #{0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
-            logger.log(Level.FINE, "", ex);
+            LOG.log(Level.WARNING, "Problem with feed #{0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
+            LOG.log(Level.FINE, "", ex);
         } catch (FeedException ex) {
-            logger.log(Level.WARNING, "Problem with feed #{0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
-            logger.log(Level.FINE, "", ex);
-//        } catch (final FetcherException ex) {
-//            logger.log(Level.WARNING, "Problem with feed {0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
-//            logger.log(Level.FINE, "", ex);
+            LOG.log(Level.WARNING, "Problem with feed #{0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
+            LOG.log(Level.FINE, "", ex);
         } catch (IOException ex) {
-            logger.log(Level.WARNING, "Problem with feed {0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
-            logger.log(Level.FINE, "", ex);
+            LOG.log(Level.WARNING, "Problem with feed {0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
+            LOG.log(Level.FINE, "", ex);
+        } catch (Exception ex) {
+            // Catch all in case of runtime exceptions
+            LOG.log(Level.WARNING, "Problem with feed {0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
+            LOG.log(Level.FINE, "", ex);
         }
 
-        logger.log(Level.INFO, "{2} had {0} {0, choice, 0#duplicates|1#duplicate|2#duplicates} and {1} new {1, choice, 0#items|1#item|2#items} ", new Object[]{duplicates, newItems, newswire.getSource()});
+        LOG.log(Level.INFO, "{2} had {0} {0, choice, 0#duplicates|1#duplicate|2#duplicates} and {1} new {1, choice, 0#items|1#item|2#items} ", new Object[]{duplicates, newItems, newswire.getSource()});
 
         return createdItems;
     }
@@ -252,11 +256,11 @@ public class RssDecoder implements NewswireDecoder {
                     }
                 }
             } else {
-                logger.log(Level.WARNING, "Invalid response received from OpenCalais [{0}] {1}", new Object[]{returnCode, method.getResponseBodyAsString()});
+                LOG.log(Level.WARNING, "Invalid response received from OpenCalais [{0}] {1}", new Object[]{returnCode, method.getResponseBodyAsString()});
             }
 
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "", e);
+            LOG.log(Level.SEVERE, "", e);
         } finally {
             method.releaseConnection();
         }
