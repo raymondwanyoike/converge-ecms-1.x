@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2011 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.core.content;
 
+import dk.i2m.converge.core.content.catalogue.MediaItem;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -44,6 +45,8 @@ public class NewsItemMediaAttachment implements Serializable {
     /** Query used to determine if a media item is used and how many times. */
     public static final String FIND_BY_MEDIA_ITEM = "NewsItemMediaAttachment.findByMediaItem";
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -60,9 +63,8 @@ public class NewsItemMediaAttachment implements Serializable {
     @Column(name = "caption") @Lob
     private String caption = "";
 
-    @javax.persistence.Version
-    @Column(name = "opt_lock")
-    private int versionIdentifier;
+    @Column(name = "display_order")
+    private int displayOrder;
 
     /**
      * Creates a new instance of {@link NewsItemMediaAttachment}.
@@ -102,12 +104,27 @@ public class NewsItemMediaAttachment implements Serializable {
         this.newsItem = newsItem;
     }
 
-    public int getVersionIdentifier() {
-        return versionIdentifier;
+    /**
+     * Gets the order of display for the attachment. The lowest number is
+     * displayed first.
+     * 
+     * @return Order of display for the attachment in relation to other
+     *         attachments
+     */
+    public int getDisplayOrder() {
+        return displayOrder;
     }
 
-    public void setVersionIdentifier(int versionIdentifier) {
-        this.versionIdentifier = versionIdentifier;
+    /**
+     * Sets the order of display for the attachment. The lowest number is
+     * displayed first.
+     * 
+     * @param displayOrder
+     *          Order of display for the attachment in relation to other
+     *          attachments
+     */
+    public void setDisplayOrder(int displayOrder) {
+        this.displayOrder = displayOrder;
     }
 
     @Override
