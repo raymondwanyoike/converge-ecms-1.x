@@ -584,7 +584,6 @@
 
                                     <h:outputText value="#{msgs.outlet_EDITION_PATTERN_DAY}:" />
                                     <h:selectOneMenu id="somDay" value="#{administrator_Outlets.selectedEditionPattern.day}" required="true" requiredMessage="#{msgs.outlet_EDITION_PATTERN_DAY_REQUIRED}">
-                                        <f:selectItem itemLabel=""  />
                                         <f:selectItem itemLabel="#{msgs.DAY_1}" itemValue="1" />
                                         <f:selectItem itemLabel="#{msgs.DAY_2}" itemValue="2" />
                                         <f:selectItem itemLabel="#{msgs.DAY_3}" itemValue="3" />
