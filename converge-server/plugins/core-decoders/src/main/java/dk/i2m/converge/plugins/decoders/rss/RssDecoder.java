@@ -22,15 +22,16 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
-import dk.i2m.commons.StringUtils;
 import dk.i2m.converge.core.DataExistsException;
 import dk.i2m.converge.core.content.ContentTag;
 import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.plugin.PluginContext;
+import dk.i2m.converge.core.utils.StringUtils;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -64,6 +65,12 @@ public class RssDecoder implements NewswireDecoder {
 
     /** Property containing the OpenCalais ID. */
     public static final String OPENCALAIS_ID = "OpenCalais ID";
+
+    /** Number of seconds to wait for a connection to the RSS feed. */
+    public static final int CONNECTION_TIMEOUT = 60;
+
+    /** Number of seconds to wait for the feed to be downloaded. */
+    public static final int READ_TIMEOUT = 60 * 3;
 
     private static final Logger LOG = Logger.getLogger(RssDecoder.class.getName());
 
@@ -123,12 +130,14 @@ public class RssDecoder implements NewswireDecoder {
         List<NewswireItem> createdItems = new ArrayList<NewswireItem>();
         try {
             URL feedSource = new URL(url);
-
+            URLConnection feedConnection = feedSource.openConnection();
+            feedConnection.setConnectTimeout(CONNECTION_TIMEOUT * 1000);
+            feedConnection.setReadTimeout(READ_TIMEOUT * 1000);
             //final FeedFetcher feedFetcher = new HttpClientFeedFetcher();
             //SyndFeed feed = null;
 
             SyndFeedInput input = new SyndFeedInput();
-            SyndFeed feed = input.build(new XmlReader(feedSource));
+            SyndFeed feed = input.build(new XmlReader(feedConnection));
 
             //        feed = feedFetcher.retrieveFeed(feedSource);
 
@@ -138,9 +147,6 @@ public class RssDecoder implements NewswireDecoder {
                     newItems++;
                 } catch (DataExistsException dee) {
                     duplicates++;
-                } catch (Exception rex) {
-                    LOG.log(Level.WARNING, "Could not create fetched item in database. {0}", rex.getMessage());
-                    LOG.log(Level.FINE, "", rex);
                 }
             }
         } catch (MalformedURLException ex) {
@@ -152,11 +158,10 @@ public class RssDecoder implements NewswireDecoder {
         } catch (FeedException ex) {
             LOG.log(Level.WARNING, "Problem with feed #{0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
             LOG.log(Level.FINE, "", ex);
+//        } catch (final FetcherException ex) {
+//            logger.log(Level.WARNING, "Problem with feed {0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
+//            logger.log(Level.FINE, "", ex);
         } catch (IOException ex) {
-            LOG.log(Level.WARNING, "Problem with feed {0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
-            LOG.log(Level.FINE, "", ex);
-        } catch (Exception ex) {
-            // Catch all in case of runtime exceptions
             LOG.log(Level.WARNING, "Problem with feed {0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
             LOG.log(Level.FINE, "", ex);
         }
