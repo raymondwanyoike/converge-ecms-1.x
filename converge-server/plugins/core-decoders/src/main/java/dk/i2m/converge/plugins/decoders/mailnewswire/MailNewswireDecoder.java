@@ -16,13 +16,12 @@
  */
 package dk.i2m.converge.plugins.decoders.mailnewswire;
 
-import com.sun.mail.imap.IMAPFolder;
 import dk.i2m.converge.core.plugin.NewswireDecoder;
-import dk.i2m.commons.FileUtils;
 import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.newswire.NewswireItemAttachment;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.plugin.PluginContext;
+import dk.i2m.converge.core.utils.FileUtils;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -181,6 +180,7 @@ public class MailNewswireDecoder implements NewswireDecoder {
 
                 Properties props = new Properties();
                 Session session = Session.getDefaultInstance(props, null);
+                session.setDebug(true);
 
                 javax.mail.Store store;
                 try {
@@ -190,7 +190,6 @@ public class MailNewswireDecoder implements NewswireDecoder {
                     Folder folder = store.getFolder(folder_newswire);
 
                     folder.open(Folder.READ_WRITE);
-
 
                     for (Message msg : folder.getMessages()) {
                         Calendar msgSent = Calendar.getInstance();
@@ -233,9 +232,9 @@ public class MailNewswireDecoder implements NewswireDecoder {
                             content = StringEscapeUtils.escapeHtml(content);
                             content = content.replaceAll(System.getProperty("line.separator"), "<br/>");
                             item.addContent(content);
-                            
+
                             item.setSummary(StringUtils.abbreviate(content, 400).replaceAll(System.getProperty("line.separator"), " "));
-                            
+
                         }
 
                         boolean deleteMsg = true;
