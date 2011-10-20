@@ -5,10 +5,7 @@
             <converge:moduleHeader moduleTitle="#{msgs.PROFILE}" />
             <div class="moduleContent">
                 <h:panelGrid columns="2">
-                    <h:graphicImage styleClass="profilePhoto"
-                                    value="/UserPhoto?uid=#{user.id}"
-                                    alt="#{user.fullName}"
-                                    title="#{user.fullName}" height="48" width="48" />
+                    <h:graphicImage styleClass="profilePhoto" value="/UserPhoto?uid=#{user.id}" alt="#{user.fullName}" title="#{user.fullName}" height="48" width="48" />
                     <h:panelGrid>
                         <h:outputText styleClass="profileFirstName" value="#{user.givenName}" title="#{user.givenName}">
                             <f:converter converterId="i2m.abbreviationDisplay" />
@@ -26,7 +23,6 @@
                 </h:panelGrid>
             </div>
         </h:form>
-        <div style="clear: both; padding-bottom: 12px;"></div>
 
     </ui:composition>
 </jsp:root>
