@@ -17,7 +17,6 @@
 package dk.i2m.converge.ejb.services;
 
 import dk.i2m.converge.core.ConfigurationKey;
-import dk.i2m.commons.BeanComparator;
 import dk.i2m.converge.core.workflow.Department;
 import dk.i2m.converge.core.security.EmploymentType;
 import dk.i2m.converge.core.security.FeeType;
@@ -26,6 +25,7 @@ import dk.i2m.converge.core.security.Privilege;
 import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
+import dk.i2m.converge.core.utils.BeanComparator;
 import dk.i2m.jndi.ldap.LdapUtils;
 import java.util.ArrayList;
 import java.util.Collections;

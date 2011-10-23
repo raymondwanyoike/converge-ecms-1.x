@@ -17,7 +17,7 @@
 package dk.i2m.converge.ejb.services;
 
 import dk.i2m.converge.domain.SystemTimer;
-import dk.i2m.converge.ejb.facades.MediaDatabaseFacadeLocal;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
 import dk.i2m.converge.ejb.facades.SearchEngineLocal;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class TimerServiceBean implements TimerServiceLocal {
 
     @EJB private OutletFacadeLocal outletFacade;
 
-    @EJB private MediaDatabaseFacadeLocal catalogueFacade;
+    @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @EJB private SearchEngineLocal searchEngineService;
 
@@ -160,7 +160,7 @@ public class TimerServiceBean implements TimerServiceLocal {
      */
     @Timeout
     public void executeTimer(Timer timer) {
-        LOG.log(Level.INFO, "Executing timer [{0}]", new Object[]{timer.getInfo()});
+        LOG.log(Level.FINE, "Executing timer [{0}]", new Object[]{timer.getInfo()});
 
         try {
             if (timer.getInfo().equals(PeriodicTimer.NEWSWIRE.name())) {

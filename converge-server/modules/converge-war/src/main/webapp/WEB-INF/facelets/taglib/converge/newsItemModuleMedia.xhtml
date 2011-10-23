@@ -12,20 +12,23 @@
 
             </h:panelGrid>
 
-            <rich:dataTable id="dtMediaFiles" value="#{value.selectedNewsItem.mediaAttachments}" var="attachment" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
+            <rich:dataGrid id="dtMediaFiles" value="#{value.selectedNewsItem.mediaAttachments}" var="attachment" columns="#{newsItem.numberOfMediaAttachmentsColumns}" columnClasses="colMediaAttachment"> 
+                <h:panelGrid style="width:100%;">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="#{attachment.displayOrder}" style="font-size: smaller; padding: 4px; margin:4px; font-weight: bold; background: #dddddd" />
+                    </h:panelGrid>
 
-                <rich:column styleClass="center">
+                    <h:outputLink value="#{attachment.mediaItem.original.absoluteFilename}" target="_blank" rendered="#{!attachment.mediaItem.original.video &amp;&amp; !attachment.mediaItem.original.audio}">
+                        <h:graphicImage url="#{attachment.mediaItem.preview.absoluteFilename}" rendered="#{attachment.mediaItem.previewAvailable}" />
+                        <h:graphicImage url="/images/unknown-media-item.png" rendered="#{!attachment.mediaItem.previewAvailable}" />
+                    </h:outputLink>
 
-                    <h:outputLink value="#{attachment.mediaItem.absoluteFilename}" target="_blank" rendered="#{!attachment.mediaItem.video &amp;&amp; !attachment.mediaItem.audio}">
-                        <h:graphicImage url="#{attachment.mediaItem.thumbURL}" rendered="#{attachment.mediaItem.fileAttached}" />
-                    </h:outputLink><br/>
-
-                    <h:panelGroup rendered="#{attachment.mediaItem.audio}" layout="block">
+                    <h:panelGroup rendered="#{attachment.mediaItem.original.audio}" layout="block">
                         <div id="container#{attachment.id}">Loading the player ...</div>
                         <script type="text/javascript"> 
                         jwplayer("container#{attachment.id}").setup({
                             flashplayer: "#{facesContext.externalContext.request.contextPath}/scripts/jwplayer/player.swf", 
-                            file: "#{attachment.mediaItem.absoluteFilename}", 
+                            file: "#{attachment.mediaItem.original.absoluteFilename}", 
                             plugins: {
                             sharing: { link: false }},
                             height: 60, 
@@ -35,12 +38,12 @@
                         </script>
                     </h:panelGroup>
 
-                    <h:panelGroup rendered="#{attachment.mediaItem.video}" layout="block">
+                    <h:panelGroup rendered="#{attachment.mediaItem.original.video}" layout="block">
                         <div id="container#{attachment.id}">Loading the player ...</div>
                         <script type="text/javascript"> 
                         jwplayer("container#{attachment.id}").setup({
                             flashplayer: "#{facesContext.externalContext.request.contextPath}/scripts/jwplayer/player.swf", 
-                            file: "#{attachment.mediaItem.absoluteFilename}", 
+                            file: "#{attachment.mediaItem.original.absoluteFilename}", 
                             plugins: {
                             sharing: { link: false }},
                             width: 480,
@@ -48,27 +51,26 @@
                     });
                         </script>
                     </h:panelGroup>
-                </rich:column>
 
-                <rich:column styleClass="left">
-                    <h:outputText value="#{attachment.caption}" />
-                </rich:column>
-
-                <rich:column styleClass="center columnIcon">
-                    <a4j:commandLink ajaxSingle="true" reRender="pgMediaItemSelected">
-                        <rich:componentControl for="mpMediaItemSelected" operation="show" event="oncomplete" />
-                        <f:setPropertyActionListener  target="#{newsItem.selectedAttachment}" value="#{attachment}" />
-                        <h:graphicImage value="#{res.UPDATE_ICON}" alt="#{msgs.UPDATE}" title="#{msgs.UPDATE}" />
-                    </a4j:commandLink>
-                </rich:column>
-
-                <rich:column styleClass="center columnIcon">
-                    <a4j:commandLink onclick="if (confirm('#{msgs.newsitem_CONFIRM_REMOVE_ATTACHMENT}') != true){ return false; };" ajaxSingle="true" reRender="dtMediaFiles">
-                        <f:setPropertyActionListener target="#{newsItem.deleteMediaItem}" value="#{attachment}" />
-                        <h:graphicImage value="#{res.DELETE_ICON}" alt="#{msgs.DELETE}" title="#{msgs.DELETE}" />
-                    </a4j:commandLink>
-                </rich:column>
-            </rich:dataTable>
+                    <h:panelGrid columns="2" columnClasses="top" style="background: #dedede; border: 1px solid #aaaaaa; width: 100%;">
+                        <h:outputText value="#{msgs.CAPTION}" styleClass="colMediaAttachmentCaptionLabel" style="border: 1px solid #aaaaaa; background: #555555; color: white" />
+                        <h:outputText value="#{attachment.caption}" />
+                        <h:outputText value=""/>
+                        <h:panelGroup>
+                            <a4j:commandLink ajaxSingle="true" reRender="pgMediaItemSelected">
+                                <rich:componentControl for="mpMediaItemSelected" operation="show" event="oncomplete" />
+                                <f:setPropertyActionListener  target="#{newsItem.selectedAttachment}" value="#{attachment}" />
+                                <h:outputText value="#{msgs.UPDATE}" />
+                            </a4j:commandLink>
+                            &#160;
+                            <a4j:commandLink onclick="if (confirm('#{msgs.newsitem_CONFIRM_REMOVE_ATTACHMENT}') != true){ return false; };" ajaxSingle="true" reRender="dtMediaFiles">
+                                <f:setPropertyActionListener target="#{newsItem.deleteMediaItem}" value="#{attachment}" />
+                                <h:outputText value="#{msgs.REMOVE}" />
+                            </a4j:commandLink>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </rich:dataGrid>
 
         </div>
         <div style="clear: both; padding-bottom: 12px;"></div>
@@ -149,9 +151,9 @@
                                     <a4j:support event="onchange" reRender="pgMedia" ajaxSingle="true" />
                                 </h:selectOneMenu>
 
-                                <h:panelGrid id="pgMedia" columnClasses="tabSheet" styleClass="tabSheetGrid" layout="block">
-                                    <h:outputLink value="#{newsItem.userSubmission.absoluteFilename}" rendered="#{newsItem.userSubmission.fileAttached}" target="_blank">
-                                        <h:graphicImage url="#{newsItem.userSubmission.thumbURL}" />
+                                <h:panelGrid id="pgMedia" columnClasses="tabSheet" styleClass="tabSheetGrid">
+                                    <h:outputLink value="#{newsItem.userSubmission.absoluteFilename}" rendered="#{newsItem.userSubmission.previewAvailable}" target="_blank">
+                                        <h:graphicImage url="#{newsItem.userSubmission.preview.absoluteFilename}" />
                                     </h:outputLink>
 
                                     <rich:fileUpload listWidth="0" id="fuMediaItemFile"
@@ -166,7 +168,7 @@
                                                      rendered="#{newsItem.selectedCatalogue != null}">
                                         <a4j:support event="onuploadcomplete" reRender="pgMediaItemUpload"/>
                                         <f:facet name="label">
-                                            <h:outputText value="{_KB}KB from {KB}KB uploaded --- {mm}:{ss}" />
+                                            <h:outputText value="#{msgs.media_item_rendition_UPLOAD_INDICATOR}" />
                                         </f:facet>
                                     </rich:fileUpload>
                                 </h:panelGrid>
@@ -205,9 +207,9 @@
                         <rich:tabPanel id="tpMediaItemSelected" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
                             <rich:tab label="Selected Item">
                                 <h:panelGrid columnClasses="tabSheet center" styleClass="tabSheetGrid">
-                                    <h:outputLink target="_blank" value="#{newsItem.selectedAttachment.mediaItem.absoluteFilename}">
-                                        <h:outputText rendered="#{!newsItem.selectedAttachment.mediaItem.thumbAvailable}" value="#{newsItem.selectedAttachment.mediaItem.title}" />
-                                        <h:graphicImage style="border: 1px solid #aaaaaa;" url="#{newsItem.selectedAttachment.mediaItem.thumbURL}" rendered="#{newsItem.selectedAttachment.mediaItem.thumbAvailable}" title="#{newsItem.selectedAttachment.mediaItem.title}" />
+                                    <h:outputLink target="_blank" value="#{newsItem.selectedAttachment.mediaItem.original.absoluteFilename}">
+                                        <h:graphicImage style="border: 1px solid #aaaaaa; margin-left: 1%; margin-right: 1%;" url="/images/unknown-media-item.png" rendered="#{!newsItem.selectedAttachment.mediaItem.previewAvailable}" title="#{newsItem.selectedAttachment.mediaItem.title}" />
+                                        <h:graphicImage style="border: 1px solid #aaaaaa; margin-left: 1%; margin-right: 1%;" url="#{newsItem.selectedAttachment.mediaItem.preview.absoluteFilename}" rendered="#{newsItem.selectedAttachment.mediaItem.previewAvailable}" title="#{newsItem.selectedAttachment.mediaItem.title}" />
                                     </h:outputLink>
 
                                     <h:inputTextarea id="txtCaption" value="#{newsItem.selectedAttachment.caption}" style="width: 98%; height: 100px; margin-left: 1%; margin-right: 1%" styleClass="text mediumInput" />

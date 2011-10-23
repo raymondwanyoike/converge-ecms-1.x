@@ -14,11 +14,54 @@
     <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
         <ui:define name="title">#{msgs.ADMINISTRATION}</ui:define>
         <ui:define name="body">
+            <converge:message for="frmAboutConverge" />
             <h:form id="frmAboutConverge">
                 <converge:moduleHeader moduleTitle="#{msgs.ABOUT_CONVERGE}" />
                 <div class="moduleContent">
                     <converge:appInfo />
                 </div>
+
+                <h:panelGroup layout="block" rendered="#{administrator_Administration.migrationAvailable}">
+                    <converge:moduleHeader moduleTitle="Migration" />
+                    <div class="moduleContent">
+
+                        <h:panelGroup layout="block" style="padding: 3px; background-color: #ffff00; border: 1px solid silver; margin-bottom: 5px;">Below is a list of available migrations for your installation. Click the <span style="text-decoration: underline;">Migrate</span> link below to start the migration.</h:panelGroup>
+
+                        <rich:dataTable value="#{administrator_Administration.availableMigration}" var="version" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
+                            <rich:column styleClass="center columnIcon">
+                                <f:facet name="header">
+                                    <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                                </f:facet>
+                                <h:graphicImage alt="Migrate" title="Migrate" value="#{res.PLUGIN_ICON}" />
+                            </rich:column>
+
+                            <rich:column>
+                                <f:facet name="header">
+                                    <h:outputText value="From" />
+                                </f:facet>
+                                <h:outputText value="#{version.fromVersion}" />
+                            </rich:column>
+
+                            <rich:column>
+                                <f:facet name="header">
+                                    <h:outputText value="To" />
+                                </f:facet>
+                                <h:outputText value="#{version.toVersion}" />
+                            </rich:column>
+
+                            <rich:column>
+                                <f:facet name="header">
+                                    <h:outputText value="&#160;" />
+                                </f:facet>
+                                <h:commandLink>
+                                    <f:setPropertyActionListener value="#{version}" target="#{administrator_Administration.migrateVersion}" />
+                                    <h:outputText value="Migrate" />
+                                </h:commandLink>
+                            </rich:column>
+                        </rich:dataTable>
+                    </div>
+                    <converge:moduleSpacer />
+                </h:panelGroup>
 
                 <converge:moduleHeader moduleTitle="#{msgs.ABOUT_APPLICATION_SERVER}" />
                 <div class="moduleContent">

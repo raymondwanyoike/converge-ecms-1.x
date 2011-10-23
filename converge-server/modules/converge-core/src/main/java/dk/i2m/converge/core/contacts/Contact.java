@@ -16,8 +16,8 @@
  */
 package dk.i2m.converge.core.contacts;
 
-import dk.i2m.commons.BeanComparator;
 import dk.i2m.converge.core.security.UserAccount;
+import dk.i2m.converge.core.utils.BeanComparator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;

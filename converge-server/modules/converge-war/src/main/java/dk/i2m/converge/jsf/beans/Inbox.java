@@ -16,12 +16,12 @@
  */
 package dk.i2m.converge.jsf.beans;
 
-import dk.i2m.converge.core.content.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemActor;
 import dk.i2m.converge.core.workflow.Outlet;
-import dk.i2m.converge.core.content.MediaItemStatus;
-import dk.i2m.converge.core.content.MediaRepository;
+import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
@@ -29,7 +29,7 @@ import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.views.InboxView;
 import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.ejb.facades.DuplicateExecutionException;
-import dk.i2m.converge.ejb.facades.MediaDatabaseFacadeLocal;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
 import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
 import dk.i2m.converge.jsf.components.tags.DialogSelfAssignment;
@@ -65,7 +65,7 @@ public class Inbox {
 
     @EJB private OutletFacadeLocal outletFacade;
 
-    @EJB private MediaDatabaseFacadeLocal mediaDatabaseFacade;
+    @EJB private CatalogueFacadeLocal catalogueFacade;
 
     private NewsItem selectedNewsItem;
 
@@ -147,7 +147,7 @@ public class Inbox {
             newAssignment.getNewsItem().setLanguage(newAssignment.getNewsItem().getOutlet().getLanguage());
         }
         newAssignment.getAssignment().setType(getUser().getDefaultAssignmentType());
-        newAssignment.getMediaItem().setMediaRepository(getUser().getDefaultMediaRepository());
+        newAssignment.getMediaItem().setCatalogue(getUser().getDefaultMediaRepository());
         newAssignment.setNextEdition(getUser().isDefaultAddNextEdition());
     }
 
@@ -199,7 +199,7 @@ public class Inbox {
                 onShowMyAssignments(event);
                 break;
             case MEDIA_ITEM:
-                if (newAssignment.getMediaItem().getMediaRepository() == null) {
+                if (newAssignment.getMediaItem().getCatalogue() == null) {
                     JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_ERROR, "inbox_MEDIA_ITEM_MEDIA_REPOSITORY_REQUIRED");
                     return;
                 }
@@ -208,12 +208,12 @@ public class Inbox {
                 newAssignment.getMediaItem().setTitle(newAssignment.getTitle());
                 newAssignment.getMediaItem().setOwner(getUser());
                 newAssignment.getMediaItem().setByLine(getUser().getFullName());
-                mediaDatabaseFacade.create(newAssignment.getMediaItem());
+                catalogueFacade.create(newAssignment.getMediaItem());
                 JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_INFO, "inbox_ASSIGNMENT_CREATED");
                 showNewsItem = false;
                 newsItems = new ListDataModel();
-                inboxTitle = newAssignment.getMediaItem().getMediaRepository().getName();
-                mediaItems = new ListDataModel(mediaDatabaseFacade.findMediaItemsByOwner(getUser()));
+                inboxTitle = newAssignment.getMediaItem().getCatalogue().getName();
+                mediaItems = new ListDataModel(catalogueFacade.findMediaItemsByOwner(getUser()));
                 break;
         }
     }
@@ -289,9 +289,9 @@ public class Inbox {
             }
 
 
-            List<MediaRepository> repositories = mediaDatabaseFacade.findWritableMediaRepositories();
+            List<Catalogue> repositories = catalogueFacade.findWritableCatalogues();
 
-            for (MediaRepository repository : repositories) {
+            for (Catalogue repository : repositories) {
                 TreeNode node = new TreeNodeImpl();
                 node.setData(new OutletNode(repository, null, repository.getClass().getName()));
 
@@ -331,30 +331,32 @@ public class Inbox {
             } else {
                 newsItems = new ListDataModel(newsItemFacade.findOutletBox(getUser().getUsername(), outlet, state));
             }
-        } else if (node.getData() instanceof MediaRepository) {
+        } else if (node.getData() instanceof Catalogue) {
             showNewsItem = false;
             newsItems = new ListDataModel();
-            MediaRepository repository = (MediaRepository) node.getData();
+            Catalogue repository = (Catalogue) node.getData();
             if (getUser().getUserRoles().contains(repository.getEditorRole())) {
                 this.catalogueEditor = true;
             }
             inboxTitle = repository.getName();
-            mediaItems = new ListDataModel(mediaDatabaseFacade.findCurrentMediaItems(getUser(), repository.getId()));
+            mediaItems = new ListDataModel(catalogueFacade.findCurrentMediaItems(getUser(), repository.getId()));
         } else if (node.getData() instanceof MediaItemStatus) {
             showNewsItem = false;
             newsItems = new ListDataModel();
-            MediaRepository repository = (MediaRepository) node.getParentData();
+            Catalogue repository = (Catalogue) node.getParentData();
             if (getUser().getUserRoles().contains(repository.getEditorRole())) {
                 this.catalogueEditor = true;
             }
             MediaItemStatus status = (MediaItemStatus) node.getData();
-            inboxTitle = repository.getName() + " " + status.name();
-            mediaItems = new ListDataModel(mediaDatabaseFacade.findCurrentMediaItems(getUser(), status, repository.getId()));
+            
+            String catalogueStatus = JsfUtils.getResourceBundle().getString("MEDIA_ITEM_STATUS_" + status.name());
+            inboxTitle = repository.getName() + " " + catalogueStatus;
+            mediaItems = new ListDataModel(catalogueFacade.findCurrentMediaItems(getUser(), status, repository.getId()));
         }
     }
 
     public void setUpdateMediaItem(MediaItem item) {
-        mediaDatabaseFacade.update(item);
+        catalogueFacade.update(item);
     }
 
     public boolean isCatalogueEditor() {

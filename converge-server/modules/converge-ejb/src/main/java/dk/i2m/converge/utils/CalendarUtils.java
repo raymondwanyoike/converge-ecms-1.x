@@ -130,6 +130,16 @@ public class CalendarUtils {
         result.set(Calendar.MILLISECOND, 0);
         return result;
     }
+    
+    public static Calendar getFirstDayOfMonth() {
+        Calendar today = Calendar.getInstance();
+        return getFirstDayOfMonth(today);
+    }
+
+    public static Calendar getLastDayOfMonth() {
+        Calendar today = Calendar.getInstance();
+        return getLastDayOfMonth(today);
+    }
 
     public static Calendar getFirstDayOfWeek(Calendar c) {
         int week = c.get(java.util.Calendar.WEEK_OF_YEAR);

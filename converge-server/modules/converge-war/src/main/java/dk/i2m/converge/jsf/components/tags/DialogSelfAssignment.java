@@ -19,8 +19,8 @@ package dk.i2m.converge.jsf.components.tags;
 import dk.i2m.converge.core.content.AssignmentType;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.content.Assignment;
-import dk.i2m.converge.core.content.MediaItem;
-import dk.i2m.converge.core.content.MediaRepository;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.NewsItem;
 import java.util.Calendar;
 
@@ -44,10 +44,10 @@ public class DialogSelfAssignment {
     public DialogSelfAssignment() {
     }
 
-    public DialogSelfAssignment(String title, Outlet outlet, MediaRepository mediaRepository, Calendar deadline, AssignmentType type) {
+    public DialogSelfAssignment(String title, Outlet outlet, Catalogue mediaRepository, Calendar deadline, AssignmentType type) {
         this.title = title;
         this.newsItem.setOutlet(outlet);
-        this.mediaItem.setMediaRepository(mediaRepository);
+        this.mediaItem.setCatalogue(mediaRepository);
         this.assignment.setDeadline(deadline);
         this.assignment.setType(type);
     }

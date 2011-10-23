@@ -16,19 +16,20 @@
  */
 package dk.i2m.converge.plugins.joomla;
 
-import dk.i2m.commons.FileUtils;
-import dk.i2m.commons.ImageUtils;
-import dk.i2m.commons.StringUtils;
-import dk.i2m.converge.core.content.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemActor;
 import dk.i2m.converge.core.content.NewsItemMediaAttachment;
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.content.catalogue.RenditionNotFoundException;
 import dk.i2m.converge.core.metadata.Concept;
+import dk.i2m.converge.core.utils.FileUtils;
+import dk.i2m.converge.core.utils.StringUtils;
 import dk.i2m.converge.plugins.joomla.client.JoomlaConnection;
 import dk.i2m.converge.plugins.joomla.client.JoomlaException;
 import java.io.File;
-import java.net.URL;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -102,7 +103,7 @@ public abstract class JoomlaPlugin {
     public static final String PROPERTY_EXCLUDE_MEDIA_ITEM_CONTENT_TYPE = "exclude.mediaitem.contenttype";
 
     public static final String PROPERTY_XMLRPC_TIMEOUT = "xmlrpc.timeout";
-    
+
     /** Property containing the XMLRPC reply timeout. */
     public static final String PROPERTY_XMLRPC_REPLY_TIMEOUT = "xmlrpc.timeout.reply";
 
@@ -141,7 +142,7 @@ public abstract class JoomlaPlugin {
     private Map<String, String> availableProperties = null;
 
     protected static final int DEFAULT_TIMEOUT = 30;
-    
+
     protected static final int DEFAULT_REPLY_TIMEOUT = 0;
 
     public Map<String, String> getAvailableProperties() {
@@ -486,102 +487,66 @@ public abstract class JoomlaPlugin {
             excludeContentTypes = properties.get(PROPERTY_EXCLUDE_MEDIA_ITEM_CONTENT_TYPE).split(";");
         }
 
-        
+        // Read image width resize parameter from the plug-in properties
+        int imgWidth = 640;
+        if (properties.containsKey(PROPERTY_IMAGE_RESIZE_WIDTH)) {
+            try {
+                imgWidth = Integer.valueOf(properties.get(PROPERTY_IMAGE_RESIZE_WIDTH));
+            } catch (NumberFormatException ex) {
+                logger.log(Level.WARNING, "Invalid value contained in property ({0}): {1}", new Object[]{PROPERTY_IMAGE_RESIZE_WIDTH, properties.get(PROPERTY_IMAGE_RESIZE_WIDTH)});
+            }
+        }
 
-        MediaItem webVersion = null;
+        // Read image height resize parameter from the plug-in properties
+        int imgHeight = 480;
+        if (properties.containsKey(PROPERTY_IMAGE_RESIZE_HEIGHT)) {
+            try {
+                imgHeight = Integer.valueOf(properties.get(PROPERTY_IMAGE_RESIZE_HEIGHT));
+            } catch (NumberFormatException ex) {
+                logger.log(Level.WARNING, "Invalid value contained in property ({0}): {1}", new Object[]{PROPERTY_IMAGE_RESIZE_HEIGHT, properties.get(PROPERTY_IMAGE_RESIZE_HEIGHT)});
+            }
+        }
+
+        MediaItemRendition webVersion = null;
         List<UploadedMediaFile> uploadedImages = new ArrayList<UploadedMediaFile>();
-        for (NewsItemMediaAttachment attachment : newsItem.getMediaAttachments()) {
-            int imgWidth = 640;
-            if (properties.containsKey(PROPERTY_IMAGE_RESIZE_WIDTH)) {
-                try {
-                    imgWidth = Integer.valueOf(properties.get(PROPERTY_IMAGE_RESIZE_WIDTH));
-                } catch (NumberFormatException ex) {
-                    logger.log(Level.WARNING, "Invalid value contained in property ({0}): {1}", new Object[]{PROPERTY_IMAGE_RESIZE_WIDTH, properties.get(PROPERTY_IMAGE_RESIZE_WIDTH)});
-                }
-            }
 
-            int imgHeight = 480;
-            if (properties.containsKey(PROPERTY_IMAGE_RESIZE_HEIGHT)) {
-                try {
-                    imgHeight = Integer.valueOf(properties.get(PROPERTY_IMAGE_RESIZE_HEIGHT));
-                } catch (NumberFormatException ex) {
-                    logger.log(Level.WARNING, "Invalid value contained in property ({0}): {1}", new Object[]{PROPERTY_IMAGE_RESIZE_HEIGHT, properties.get(PROPERTY_IMAGE_RESIZE_HEIGHT)});
-                }
-            }
+        for (NewsItemMediaAttachment attachment : newsItem.getMediaAttachments()) {
 
             MediaItem item = attachment.getMediaItem();
+            // verify that the item exist and renditions are attached
+            if (item == null || !item.isRenditionsAttached()) {
+                continue;
+            }
 
-            if (item != null) {
-                if (item.isFileAttached()) {
+            // Check if there is a category setting for this media item
+            if (this.categoryImageMapping.containsKey(joomlaCategoryId)) {
+                logger.log(Level.FINE, "Special settings for Joomla Category {0}", new Object[]{joomlaCategoryId});
+                String imgCat = this.categoryImageMapping.get(joomlaCategoryId);
+                String[] imgCatSettings = imgCat.split(";");
+                mediaLabel = imgCatSettings[1];
+            }
 
-                    // Check if the file should be excluded
+            // Check if a rendition of the image exist
+            try {
+                webVersion = item.findRendition(mediaLabel);
 
-                    if (ArrayUtils.contains(excludeContentTypes, item.getContentType())) {
-                        logger.log(Level.INFO, "Ignoring media item #{0} with content type {1}", new Object[]{item.getId(), item.getContentType()});
-                        continue;
-                    }
-
-                    // Check if there is a category setting for this media item
-
-                    if (this.categoryImageMapping.containsKey(joomlaCategoryId)) {
-                        logger.log(Level.INFO, "Special settings for Joomla Category {0}", new Object[]{joomlaCategoryId});
-                        String imgCat = this.categoryImageMapping.get(joomlaCategoryId);
-                        String[] imgCatSettings = imgCat.split(";");
-
-                        mediaLabel = imgCatSettings[1];
-                        try {
-                            imgWidth = Integer.valueOf(imgCatSettings[2]);
-                            imgHeight = Integer.valueOf(imgCatSettings[3]);
-                        } catch (NumberFormatException ex) {
-                            logger.log(Level.WARNING, "Invalid value contained in property ({0}): {1}", new Object[]{PROPERTY_CATEGORY_IMAGE_RESIZE, imgCat});
-                        }
-                    } else {
-                    }
-
-                    // Check if a rendition of the image exist
-
-                    if (item.getRendition() != null && item.getRendition().getName().equalsIgnoreCase(mediaLabel)) {
-                        webVersion = item;
-                    } else {
-                        for (MediaItem versionItem : item.getVersions()) {
-                            if (versionItem.getRendition() != null && versionItem.getRendition().getName().equalsIgnoreCase(mediaLabel)) {
-                                webVersion = versionItem;
-                            }
-                        }
-                    }
-
-                    // Generate (if rendition does not exist) and upload image
-
-                    String filename = "";
-                    byte[] filedata;
-                    try {
-                        if (webVersion == null) {
-                            logger.log(Level.INFO, "Rendition ({0}) missing for Media Item #{1}. Generating image", new Object[]{mediaLabel, item.getId()});
-                            filename = newsItem.getId() + "-" + item.getId() + "." + item.getExtension();
-
-                            URL mediaFile = new URL(item.getAbsoluteFilename());
-                            filedata = ImageUtils.generateThumbnail(FileUtils.getBytes(mediaFile), imgWidth, imgHeight, 100);
-
-                        } else {
-                            filename = newsItem.getId() + "-" + webVersion.getId() + "." + webVersion.getExtension();
-                            filedata = FileUtils.getBytes(new File(webVersion.getAbsoluteFilename()));
-                        }
-                    } catch (Exception ex) {
-                        logger.log(Level.WARNING, ex.getMessage());
-                        logger.log(Level.FINE, "", ex);
-                        break;
-                    }
-
-                    try {
-                        String webImgLocation = connection.uploadMediaFile(String.valueOf(newsItem.getId()), filename, filedata);
-                        uploadedImages.add(new UploadedMediaFile(webImgLocation, attachment.getCaption()));
-                    } catch (JoomlaException ex) {
-                        logger.log(Level.WARNING, "Could not upload media file", ex);
-                    }
-
-                } else {
-                    logger.log(Level.WARNING, "No file attached to Media Item #{1}", new Object[]{item.getId()});
+                // Check if the file should be excluded
+                if (ArrayUtils.contains(excludeContentTypes, webVersion.getContentType())) {
+                    logger.log(Level.FINE, "Ignoring media item #{0} with content type {1}", new Object[]{item.getId(), webVersion.getContentType()});
+                    continue;
                 }
+
+                String filename = newsItem.getId() + "-" + webVersion.getId() + "." + webVersion.getExtension();
+                byte[] filedata = FileUtils.getBytes(new File(webVersion.getAbsoluteFilename()));
+                String webImgLocation = connection.uploadMediaFile(String.valueOf(newsItem.getId()), filename, filedata);
+                uploadedImages.add(new UploadedMediaFile(webImgLocation, attachment.getCaption()));
+
+            } catch (RenditionNotFoundException ex) {
+                logger.log(Level.WARNING, "Rendition ({0}) missing for Media Item #{1}. Ignoring Media Item.", new Object[]{mediaLabel, item.getId()});
+            } catch (IOException ex) {
+                logger.log(Level.WARNING, "Rendition ({0}) could not be retrieved for Media Item #{1}. Ignoring Media Item.", new Object[]{mediaLabel, item.getId()});
+            } catch (JoomlaException ex) {
+                logger.log(Level.WARNING, "Could not upload media file to Joomla", ex);
             }
         }
 

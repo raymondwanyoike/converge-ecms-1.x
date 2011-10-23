@@ -16,14 +16,14 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.commons.BeanComparator;
 import dk.i2m.converge.core.Notification;
-import dk.i2m.converge.core.content.MediaRepository;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.core.security.Privilege;
 import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
+import dk.i2m.converge.core.utils.BeanComparator;
 import dk.i2m.converge.ejb.services.ConfigurationServiceLocal;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
 import dk.i2m.converge.ejb.services.DirectoryException;
@@ -51,7 +51,7 @@ public class UserFacadeBean implements UserFacadeLocal {
 
     @EJB private UserServiceLocal userService;
 
-    @EJB private MediaDatabaseFacadeLocal catalogueFacade;
+    @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @EJB private DaoServiceLocal daoService;
 
@@ -230,8 +230,8 @@ public class UserFacadeBean implements UserFacadeLocal {
         try {
             UserAccount user = findById(username);
             List<UserRole> roles = user.getUserRoles();
-            List<MediaRepository> catalogues = catalogueFacade.findWritableMediaRepositories();
-            for (MediaRepository catalogue : catalogues) {
+            List<Catalogue> catalogues = catalogueFacade.findWritableCatalogues();
+            for (Catalogue catalogue : catalogues) {
                 if (roles.contains(catalogue.getEditorRole())) {
                     return true;
                 }

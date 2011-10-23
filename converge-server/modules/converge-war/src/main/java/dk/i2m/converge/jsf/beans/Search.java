@@ -20,15 +20,20 @@ import dk.i2m.converge.domain.search.SearchResult;
 import dk.i2m.converge.domain.search.SearchResults;
 import dk.i2m.converge.ejb.facades.SearchEngineLocal;
 import dk.i2m.jsf.JsfUtils;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -69,6 +74,28 @@ public class Search {
     private boolean criteriaType = true;
 
     public Search() {
+    }
+    
+    @PostConstruct
+    public void onInit() {
+        reset();
+    }
+    
+    private void reset() {
+        this.keyword = "";
+        this.searchResults = new ListDataModel();
+        this.pages = new ListDataModel(new ArrayList());
+        this.showResults = false;
+        this.resultsFound = 0;
+        this.sortField = "score";
+        this.sortOrder = "false";
+        this.searchType = "type:Story";
+        this.results = new SearchResults();
+        this.filterQueries = new ArrayList<String>();
+        this.dateFrom = null;
+        this.dateTo = null;
+        this.criteriaDate = false;
+        this.criteriaType = true;
     }
 
     public List<String> getFilterQueries() {
@@ -117,6 +144,27 @@ public class Search {
         return showResults;
     }
 
+    public void onGenerateOverview(ActionEvent event) {
+        byte[] output = searchEngine.generateReport(this.results);
+
+        String filename = "Search Results Overview.xls";
+
+        HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+        response.setContentType("application/vnd.ms-excel");
+        response.setHeader("Content-disposition", "attachment; filename=" + filename);
+        try {
+            ServletOutputStream out = response.getOutputStream();
+            out.write(output);
+            out.flush();
+            out.close();
+        } catch (IOException ex) {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "Could not generate Excel report. " + ex.getMessage(), new Object[]{});
+        }
+
+        FacesContext faces = FacesContext.getCurrentInstance();
+        faces.responseComplete();
+    }
+
     /**
      * Event handler for starting the search.
      *
@@ -129,6 +177,10 @@ public class Search {
         }
         filterQueries = new ArrayList<String>();
         conductSearch(keyword, 0, 10);
+    }
+    
+    public void onClear(ActionEvent event) {
+        reset();
     }
 
     public void onChangePage(ActionEvent event) {

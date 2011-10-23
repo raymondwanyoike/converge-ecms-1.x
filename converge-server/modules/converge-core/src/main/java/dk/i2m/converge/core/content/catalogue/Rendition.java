@@ -14,16 +14,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.core.content;
+package dk.i2m.converge.core.content.catalogue;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -34,8 +37,15 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "rendition")
-@NamedQueries({})
+@NamedQueries({
+    @NamedQuery(name = Rendition.FIND_BY_NAME, query = "SELECT r FROM Rendition r WHERE r.name = :name ORDER BY r.id ASC")
+})
 public class Rendition implements Serializable {
+
+    /** Query used for obtaining a {@link Rendition} by its name. */
+    public static final String FIND_BY_NAME = "Rendition.findByName";
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,6 +60,9 @@ public class Rendition implements Serializable {
 
     @Column(name = "description") @Lob
     private String description;
+
+    @ManyToMany(mappedBy = "renditions")
+    private List<Catalogue> catalogues;
 
     /**
      * Creates a new {@link Rendtion}.

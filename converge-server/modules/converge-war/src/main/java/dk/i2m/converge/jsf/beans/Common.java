@@ -39,9 +39,9 @@ import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.calendar.EventCategory;
 import dk.i2m.converge.core.content.AssignmentType;
-import dk.i2m.converge.core.content.MediaItemStatus;
-import dk.i2m.converge.core.content.Rendition;
-import dk.i2m.converge.core.content.MediaRepository;
+import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
+import dk.i2m.converge.core.content.catalogue.Rendition;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.forex.Currency;
 import dk.i2m.converge.core.content.markets.FinancialMarket;
 import dk.i2m.converge.core.content.weather.Location;
@@ -51,8 +51,9 @@ import dk.i2m.converge.core.metadata.Organisation;
 import dk.i2m.converge.core.metadata.Person;
 import dk.i2m.converge.core.metadata.PointOfInterest;
 import dk.i2m.converge.core.newswire.NewswireService;
+import dk.i2m.converge.core.plugin.CatalogueHook;
 import dk.i2m.converge.ejb.facades.CalendarFacadeLocal;
-import dk.i2m.converge.ejb.facades.MediaDatabaseFacadeLocal;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
 import dk.i2m.converge.ejb.services.NewswireServiceLocal;
 import dk.i2m.converge.core.plugin.Plugin;
@@ -98,7 +99,7 @@ public class Common {
 
     @EJB private NewswireServiceLocal newswireService;
 
-    @EJB private MediaDatabaseFacadeLocal mediaDatabaseFacade;
+    @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @EJB private ListingFacadeLocal listingFacade;
 
@@ -338,13 +339,9 @@ public class Common {
         List<Concept> subjects = metaDataFacade.findConceptByType(Subject.class);
         Map<String, Concept> map = new LinkedHashMap<String, Concept>();
 
-
-
         for (Concept subject : subjects) {
             map.put(((Subject) subject).getFullTitle(), subject);
         }
-
-
 
         return map;
     }
@@ -505,6 +502,26 @@ public class Common {
         return actions;
     }
 
+    /**
+     * Gets a {@link Map} of discovered {@link Catalogue} actions.
+     * 
+     * @return {@link Map} of discovered {@link Catalogue} actions
+     */
+    public Map<String, String> getCatalogueActions() {
+        Map<String, String> actions = new LinkedHashMap<String, String>();
+
+        Map<String, Plugin> plugins = systemFacade.getPlugins();
+
+        for (Plugin plugin : plugins.values()) {
+            if (plugin instanceof CatalogueHook) {
+                CatalogueHook action = (CatalogueHook) plugin;
+                actions.put(action.getName(), action.getClass().getName());
+            }
+        }
+
+        return actions;
+    }
+
     public Map<String, AssignmentType> getAssignmentTypes() {
         Map<String, AssignmentType> types = new LinkedHashMap<String, AssignmentType>();
 
@@ -520,12 +537,12 @@ public class Common {
      *
      * @return {@link Map} of writable media repositories
      */
-    public Map<String, MediaRepository> getWritableMediaRepositories() {
-        Map<String, MediaRepository> repositories = new LinkedHashMap<String, MediaRepository>();
+    public Map<String, Catalogue> getWritableMediaRepositories() {
+        Map<String, Catalogue> repositories = new LinkedHashMap<String, Catalogue>();
 
-        List<MediaRepository> mediaRepositories = mediaDatabaseFacade.findWritableMediaRepositories();
+        List<Catalogue> mediaRepositories = catalogueFacade.findWritableCatalogues();
 
-        for (MediaRepository repository : mediaRepositories) {
+        for (Catalogue repository : mediaRepositories) {
             repositories.put(repository.getName(), repository);
         }
 
@@ -552,16 +569,16 @@ public class Common {
         return statuses;
     }
 
-    public Map<String, Rendition> getMediaItemVersionLabels() {
-        Map<String, Rendition> labels = new LinkedHashMap<String, Rendition>();
+    public Map<String, Rendition> getRenditions() {
+        Map<String, Rendition> renditions = new LinkedHashMap<String, Rendition>();
 
-        List<Rendition> origLabels = mediaDatabaseFacade.findMediaItemVersionLabels();
+        List<Rendition> results = catalogueFacade.findRenditions();
 
-        for (Rendition label : origLabels) {
-            labels.put(label.getName(), label);
+        for (Rendition rendition : results) {
+            renditions.put(rendition.getLabel(), rendition);
         }
 
-        return labels;
+        return renditions;
     }
 
     public Subject[] getParentSubjects() {

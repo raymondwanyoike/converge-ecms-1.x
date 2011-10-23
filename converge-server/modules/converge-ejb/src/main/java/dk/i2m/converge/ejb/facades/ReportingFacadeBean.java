@@ -19,6 +19,7 @@ package dk.i2m.converge.ejb.facades;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.reporting.activity.ActivityReport;
 import dk.i2m.converge.core.reporting.activity.UserActivity;
+import dk.i2m.converge.core.reporting.activity.UserActivitySummary;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.workflow.WorkflowState;
@@ -58,7 +59,21 @@ public class ReportingFacadeBean implements ReportingFacadeLocal {
 
     private static final Logger LOG = Logger.getLogger(ReportingFacadeBean.class.getName());
 
+    /**
+     * Generates an activity report for all user with a given {@link UserRole}.
+     * 
+     * @param start
+     *          Start of activities
+     * @param end
+     *          End of activities
+     * @param userRole
+     *          {@link UserRole} for which to capture activities
+     * @param state
+     *          {@link WorkflowState} to treat as the submitted state
+     * @return 
+     */
     @Override
+    // TODO: Remove - got replaced by generateActivityReport
     public ActivityReport generateActivityReport(Date start, Date end, UserRole userRole, WorkflowState state) {
         ActivityReport report = new ActivityReport(start, end, userRole);
 
@@ -78,15 +93,59 @@ public class ReportingFacadeBean implements ReportingFacadeLocal {
 
         return report;
     }
+    
+    @Override
+    public ActivityReport generateActivityReport(Date start, Date end, UserRole userRole) {
+        ActivityReport report = new ActivityReport(start, end, userRole);
+
+        Map<String, Object> parameters = QueryBuilder.with("userRole", userRole).and("startDate", start).and("endDate", end).parameters();
+
+        List<UserAccount> users = daoService.findWithNamedQuery(UserAccount.FIND_ACTIVE_USERS_BY_ROLE, parameters);
+
+        for (UserAccount user : users) {
+            report.getUserActivity().add(generateUserActivityReport(start, end, user));
+        }
+
+        return report;
+    }
+
+    /**
+     * Generates the activity report for a single user.
+     * 
+     * @param start
+     *          Start of activities
+     * @param end
+     *          End of activities
+     * @param user
+     *          {@link UserAccount} for which to retrieve the report
+     * @return {@link UserActivity} for the given period and user
+     */
+    @Override
+    public UserActivity generateUserActivityReport(Date start, Date end, UserAccount user) {
+        Map<String, Object> param = QueryBuilder.with("startDate", start).and("endDate", end).and("user", user).parameters();
+        List<NewsItem> items = daoService.findWithNamedQuery(NewsItem.FIND_SUBMITTED_BY_USER, param);
+
+        UserActivity userActivity = new UserActivity();
+        userActivity.setUser(user);
+        userActivity.setSubmitted(items);
+       
+        return userActivity;
+    }
+
+    @Override
+    public UserActivitySummary generateUserActivitySummary(Date start, Date end, UserAccount user) {
+        UserActivitySummary summary = new UserActivitySummary(generateUserActivityReport(start, end, user));
+        return summary;
+    }
 
     @Override
     public byte[] convertToExcel(ActivityReport report) {
         SimpleDateFormat format = new SimpleDateFormat("d MMMM yyyy");
         HSSFWorkbook wb = new HSSFWorkbook();
-        
+
         String sheetName = WorkbookUtil.createSafeSheetName("Overview");
         int overviewSheetRow = 0;
-
+   
         Font headerFont = wb.createFont();
         headerFont.setFontHeightInPoints((short) 14);
         headerFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
@@ -94,7 +153,7 @@ public class ReportingFacadeBean implements ReportingFacadeLocal {
         Font userFont = wb.createFont();
         userFont.setFontHeightInPoints((short) 12);
         userFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
-        
+
         Font storyFont = wb.createFont();
         storyFont.setFontHeightInPoints((short) 12);
         storyFont.setBoldweight(Font.BOLDWEIGHT_NORMAL);
@@ -200,12 +259,12 @@ public class ReportingFacadeBean implements ReportingFacadeLocal {
             overviewSheet.autoSizeColumn(i);
         }
 
-        wb.setRepeatingRowsAndColumns(0,0,0,0,0);
+        wb.setRepeatingRowsAndColumns(0, 0, 0, 0, 0);
         wb.setPrintArea(0, 0, 8, 0, overviewSheetRow);
         //overviewSheet.setFitToPage(true);        
         overviewSheet.setAutobreaks(true);
-        overviewSheet.getPrintSetup().setFitWidth((short)1);
-        overviewSheet.getPrintSetup().setFitHeight((short)500);
+        overviewSheet.getPrintSetup().setFitWidth((short) 1);
+        overviewSheet.getPrintSetup().setFitHeight((short) 500);
 
         Footer footer = overviewSheet.getFooter();
         footer.setLeft("Page " + HeaderFooter.page() + " of " + HeaderFooter.numPages());

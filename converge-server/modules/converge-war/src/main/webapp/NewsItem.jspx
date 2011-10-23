@@ -20,6 +20,12 @@
 
                         <h:outputText value="#{msgs.newsitem_TARGET_WORDS}"/>
                         <rich:inputNumberSpinner id="insTargetWords" value="#{newsItem.selectedNewsItem.targetWordCount}" minValue="0" maxValue="100000" step="50" />                        
+
+                        <h:outputText value="#{msgs.newsitem_SUBMITTED}"/>
+                        <h:outputText value="#{newsItem.selectedNewsItem.submittedDate}" rendered="#{newsItem.selectedNewsItem.submitted}">
+                            <f:convertDateTime timeZone="#{common.systemTimeZone}" pattern="#{msgs.FORMAT_SHORT_DATE_AND_TIME}" />
+                        </h:outputText>
+                        <h:outputText value="#{msgs.newsitem_SUBMITTED_NOT_SET}" rendered="#{!newsItem.selectedNewsItem.submitted}" />
                     </h:panelGrid>
                 </div>
                 <div style="clear: both; padding-bottom: 12px;"></div>
@@ -68,6 +74,12 @@
                         <f:facet name="header">
                             <h:panelGroup>
                                 <h:outputText value="#{msgs.PLACEMENT}" />
+                            </h:panelGroup>
+                        </f:facet>
+                        <f:facet name="controls">
+                            <h:panelGroup>
+                                <h:graphicImage id="imgCloseMpPlacement" value="#{res.DIALOGUE_CLOSE_ICON}" styleClass="link" />
+                                <rich:componentControl for="mpPlacement" attachTo="imgCloseMpPlacement" operation="hide" event="onclick" />
                             </h:panelGroup>
                         </f:facet>
                         <h:panelGrid style="width: 450px;" id="pgPlacement" rendered="#{newsItem.selectedNewsItemPlacement != null}">

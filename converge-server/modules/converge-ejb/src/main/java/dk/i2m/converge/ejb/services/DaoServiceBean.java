@@ -268,4 +268,16 @@ public class DaoServiceBean implements DaoServiceLocal {
     public <T> List<T> findAll(Class<T> type) {
         return new LinkedList(this.em.createQuery("SELECT o from " + type.getSimpleName() + " AS o").getResultList());
     }
+    
+    
+    @Override
+    public <T> List<T> findAll(Class<T> type, int start, int resultLimit) {
+        return new LinkedList(this.em.createQuery("SELECT o from " + type.getSimpleName() + " AS o").setFirstResult(start).setMaxResults(resultLimit).getResultList());
+    }
+    
+    
+    @Override
+    public <T> Number count(Class<T> type, String field) {
+        return (Number)this.em.createQuery("SELECT COUNT(o." + field + ") from " + type.getSimpleName() + " o").getSingleResult();
+    }
 }

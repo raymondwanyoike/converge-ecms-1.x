@@ -19,30 +19,34 @@ package dk.i2m.converge.ejb.services;
 import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.content.ContentTag;
-import dk.i2m.converge.core.content.MediaRepository;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.NewsItem;
+import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.content.forex.Rate;
 import dk.i2m.converge.core.content.markets.MarketValue;
 import dk.i2m.converge.core.content.weather.Forecast;
 import dk.i2m.converge.core.newswire.NewswireDecoderException;
 import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.newswire.NewswireService;
+import dk.i2m.converge.core.plugin.ArchiveException;
 import dk.i2m.converge.core.search.QueueEntryOperation;
 import dk.i2m.converge.core.search.QueueEntryType;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.ejb.facades.ListingFacadeLocal;
-import dk.i2m.converge.ejb.facades.MediaDatabaseFacadeLocal;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
 import dk.i2m.converge.ejb.facades.SearchEngineLocal;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 /**
- * Implementation of the {@link PluginContext}
+ * Implementation of the {@link dk.i2m.converge.core.plugin.PluginContext}.
  *
  * @author Allan Lykke Christensen
  */
@@ -65,7 +69,7 @@ public class PluginContextBean implements PluginContextBeanLocal {
 
     @EJB private DaoServiceLocal daoService;
 
-    @EJB private MediaDatabaseFacadeLocal catalogueFacade;
+    @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @Override
     public String getWorkingDirectory() {
@@ -143,10 +147,31 @@ public class PluginContextBean implements PluginContextBeanLocal {
     }
 
     @Override
-    public MediaRepository findCatalogue(Long catalogueId) {
+    public Catalogue findCatalogue(Long catalogueId) {
         try {
-            return catalogueFacade.findMediaRepositoryById(catalogueId);
+            return catalogueFacade.findCatalogueById(catalogueId);
         } catch (DataNotFoundException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public Rendition findRenditionByName(String name) {
+        try {
+            return catalogueFacade.findRenditionByName(name);
+        } catch (DataNotFoundException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public String archive(File file, Long catalogueId, String fileName) throws ArchiveException {
+        try {
+            Catalogue catalogue = catalogueFacade.findCatalogueById(catalogueId);
+            return catalogueFacade.archive(file, catalogue, fileName);
+        } catch (DataNotFoundException ex) {
+            return null;
+        } catch (IOException ex) {
             return null;
         }
     }

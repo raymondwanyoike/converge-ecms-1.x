@@ -310,7 +310,7 @@ public class NewswireServiceBean implements NewswireServiceLocal {
         solrDoc.addField("headline", ni.getTitle(), 1.0f);
         solrDoc.addField("provider", ni.getNewswireService().getSource());
         solrDoc.addField("provider-id", ni.getNewswireService().getId());
-        solrDoc.addField("story", dk.i2m.commons.StringUtils.stripHtml(ni.getContent()));
+        solrDoc.addField("story", dk.i2m.converge.core.utils.StringUtils.stripHtml(ni.getContent()));
         solrDoc.addField("caption", ni.getSummary());
         solrDoc.addField("author", ni.getAuthor());
         solrDoc.addField("date", ni.getDate().getTime());
@@ -777,7 +777,7 @@ public class NewswireServiceBean implements NewswireServiceLocal {
 
                     plainContent.append(sr.getTitle().toUpperCase()).append(NL);
                     plainContent.append(sr.getNote().toUpperCase()).append(" ").append(sr.getLatestDate()).append(NL);
-                    plainContent.append(dk.i2m.commons.StringUtils.stripHtml(sr.getDescription()).trim()).append(NL).append(NL);
+                    plainContent.append(dk.i2m.converge.core.utils.StringUtils.stripHtml(sr.getDescription()).trim()).append(NL).append(NL);
                     plainContent.append(LBL_READ_MORE).append(" ").append(link).append(NL).append("===").append(NL);
                 }
 

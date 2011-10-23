@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.core.content;
+package dk.i2m.converge.core.content.catalogue;
 
-import dk.i2m.commons.FileUtils;
-import dk.i2m.commons.ImageUtils;
+import dk.i2m.converge.core.utils.FileUtils;
+import dk.i2m.converge.core.utils.ImageUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -45,12 +45,14 @@ public class MediaItemThumbnailGenerator {
         generators.put("", new UnknownThumbnailGenerator());
     }
 
+    // TODO: Optimise for new hooks
+    
     public byte[] generateThumbnail(byte[] original, MediaItem mediaItem) throws UnknownMediaItemException, ThumbnailGeneratorException {
         if (mediaItem == null) {
             throw new ThumbnailGeneratorException("MediaItem is null");
         }
 
-        String contentType = mediaItem.getContentType();
+        String contentType = null; // = mediaItem.getContentType();
 
         if (contentType == null) {
             throw new UnknownMediaItemException("Content type not set on media item");

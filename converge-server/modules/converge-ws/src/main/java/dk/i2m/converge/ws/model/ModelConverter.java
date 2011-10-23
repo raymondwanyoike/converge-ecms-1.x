@@ -52,22 +52,20 @@ public class ModelConverter {
             MediaItem mediaItem = new MediaItem();
             mediaItem.setCaption(attachment.getCaption());
 
-// TODO: Fix dependency on the rendition upgrade            
-            
             mediaItem.setId(attachment.getMediaItem().getId());
-//            if (attachment.getMediaItem().getRendition() != null) {
-//                mediaItem.setRendition(attachment.getMediaItem().getRendition().getName());
-//            } else {
-            mediaItem.setRendition("");
-//            }
 
-//            if (attachment.getMediaItem().getContentType() != null) {
-//                mediaItem.setContentType(attachment.getMediaItem().getContentType());
-//            } else {
+            if (attachment.getMediaItem().isOriginalAvailable()) {
+                mediaItem.setRendition(attachment.getMediaItem().getOriginal().getRendition().getName());
+                mediaItem.setContentType(attachment.getMediaItem().getOriginal().getContentType());
+                mediaItem.setUrl(attachment.getMediaItem().getOriginal().getAbsoluteFilename());
+            } else {
+                mediaItem.setRendition("");
                 mediaItem.setContentType("application/unknown");
-//            }
+                mediaItem.setUrl("");
+            }
+
             mediaItem.setTitle(attachment.getMediaItem().getTitle());
-//            mediaItem.setUrl(attachment.getMediaItem().getAbsoluteFilename());
+
             return mediaItem;
         } else {
             throw new AttachmentNotAvailableException();

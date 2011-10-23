@@ -16,10 +16,10 @@
  */
 package dk.i2m.converge.jsf.beans;
 
-import dk.i2m.converge.core.content.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
-import dk.i2m.converge.ejb.facades.MediaDatabaseFacadeLocal;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.jsf.JsfUtils;
 import java.util.logging.Level;
@@ -37,7 +37,7 @@ public class MediaItemArchive {
 
     private Long id;
 
-    @EJB private MediaDatabaseFacadeLocal mediaDatabaseFacade;
+    @EJB private CatalogueFacadeLocal mediaDatabaseFacade;
 
     public Long getId() {
         return id;
@@ -69,7 +69,7 @@ public class MediaItemArchive {
      * @return {@code true} if the current user is an editor of the media repository, otherwise {@code false}
      */
     public boolean isEditor() {
-        UserRole editorRole = getSelectedMediaItem().getMediaRepository().getEditorRole();
+        UserRole editorRole = getSelectedMediaItem().getCatalogue().getEditorRole();
 
         if (getUser().getUserRoles().contains(editorRole)) {
             return true;

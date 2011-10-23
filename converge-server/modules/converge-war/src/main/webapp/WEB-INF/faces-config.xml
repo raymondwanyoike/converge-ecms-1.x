@@ -76,8 +76,8 @@
             <to-view-id>/administrator/Renditions.xhtml</to-view-id>
         </navigation-case>
         <navigation-case>
-            <from-outcome>/administration/media_repositories</from-outcome>
-            <to-view-id>/administrator/MediaRepositories.xhtml</to-view-id>
+            <from-outcome>/administration/catalogues</from-outcome>
+            <to-view-id>/administrator/Catalogues.xhtml</to-view-id>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/search_engine</from-outcome>
@@ -198,6 +198,12 @@
     <managed-bean>
         <managed-bean-name>dashboard</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.Dashboard</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>myActivity</managed-bean-name>
+        <managed-bean-class>dk.i2m.converge.jsf.beans.MyActivity</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
 
@@ -356,11 +362,13 @@
         <managed-bean-name>administrator_Renditions</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Renditions</managed-bean-class>
     
-        <managed-bean-scope>request</managed-bean-scope></managed-bean>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
 
     <managed-bean>
-        <managed-bean-name>administrator_MediaRepositories</managed-bean-name>
-        <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.MediaRepositories</managed-bean-class>
+        <managed-bean-name>administrator_Catalogues</managed-bean-name>
+        <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Catalogues</managed-bean-class>
+    
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
 

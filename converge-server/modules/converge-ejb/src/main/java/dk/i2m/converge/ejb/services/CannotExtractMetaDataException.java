@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2011 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,28 +14,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.core.content;
+package dk.i2m.converge.ejb.services;
 
 /**
- * {@link Exception} thrown when an unknown {@link MediaItem} was encountered.
+ * Exception thrown if meta data could not be extracted from
+ * a given file.
  *
  * @author Allan Lykke Christensen
  */
-public class UnknownMediaItemException extends Exception {
+public class CannotExtractMetaDataException extends Exception {
 
-    public UnknownMediaItemException(Throwable cause) {
+    private static final long serialVersionUID = 1L;
+
+    public CannotExtractMetaDataException(Throwable cause) {
         super(cause);
     }
 
-    public UnknownMediaItemException(String message, Throwable cause) {
+    public CannotExtractMetaDataException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public UnknownMediaItemException(String message) {
+    public CannotExtractMetaDataException(String message) {
         super(message);
     }
 
-    public UnknownMediaItemException() {
+    public CannotExtractMetaDataException() {
         super();
     }
 }

@@ -16,7 +16,6 @@
  */
 package dk.i2m.converge.jsf.functions;
 
-import java.text.MessageFormat;
 import org.apache.commons.lang.StringUtils;
 
 /**

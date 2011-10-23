@@ -22,7 +22,7 @@ import dk.i2m.converge.core.newswire.NewswireBasket;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.converge.core.content.AssignmentType;
-import dk.i2m.converge.core.content.MediaRepository;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.newswire.NewswireService;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -66,10 +66,12 @@ import javax.persistence.UniqueConstraint;
     @NamedQuery(name = UserAccount.FIND_BY_UID, query = "SELECT u FROM UserAccount u WHERE u.username=:username"),
     @NamedQuery(name = UserAccount.FIND_BY_USER_ROLE, query = "SELECT u FROM UserRole r JOIN r.userAccounts u WHERE r.name=:roleName"),
     @NamedQuery(name = UserAccount.FIND_USERS_WITH_PUBLICATIONS, query = "SELECT u FROM NewsItemActor n JOIN n.newsItem ni JOIN ni.placements p JOIN n.user u WHERE (n.role = :userRole AND p.edition.publicationDate >= :startDate AND p.edition.publicationDate <= :endDate) GROUP BY u"),
-    @NamedQuery(name = UserAccount.FIND_ACTIVE_USERS_BY_ROLE, query = "SELECT DISTINCT u FROM NewsItem AS ni JOIN ni.actors AS a JOIN a.user AS u JOIN ni.history AS h WHERE (a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.state = :state) ORDER BY a.user.username DESC")
+    @NamedQuery(name = UserAccount.FIND_ACTIVE_USERS_BY_ROLE, query = "SELECT DISTINCT u FROM NewsItem AS ni JOIN ni.actors AS a JOIN a.user AS u JOIN ni.history AS h WHERE (a.role = :userRole AND h.user = a.user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY a.user.username DESC")
 })
 public class UserAccount implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+    
     /** Query for finding a user account by its unique user identifier. */
     public static final String FIND_BY_UID = "UserAccount.findByUid";
 
@@ -110,7 +112,7 @@ public class UserAccount implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "default_media_repository")
-    private MediaRepository defaultMediaRepository;
+    private Catalogue defaultMediaRepository;
 
     @Column(name = "default_add_next_edition")
     private boolean defaultAddNextEdition;
@@ -689,11 +691,11 @@ public class UserAccount implements Serializable {
         this.defaultAssignmentType = defaultAssignmentType;
     }
 
-    public MediaRepository getDefaultMediaRepository() {
+    public Catalogue getDefaultMediaRepository() {
         return defaultMediaRepository;
     }
 
-    public void setDefaultMediaRepository(MediaRepository defaultMediaRepository) {
+    public void setDefaultMediaRepository(Catalogue defaultMediaRepository) {
         this.defaultMediaRepository = defaultMediaRepository;
     }
 

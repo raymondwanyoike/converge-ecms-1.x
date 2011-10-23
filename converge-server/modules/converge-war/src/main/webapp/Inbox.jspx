@@ -111,12 +111,12 @@
                                 </a4j:status>
                             </f:facet>
 
-                            <h:graphicImage url="#{res.EMPTY_FRAME}" rendered="#{!item.fileAttached}" />
+                            <h:graphicImage url="#{res.EMPTY_FRAME}" rendered="#{!item.renditionsAttached}" />
 
-                            <h:graphicImage url="#{item.thumbURL}" rendered="#{item.fileAttached &amp;&amp; !item.video &amp;&amp; !item.audio}" />
+                            <h:graphicImage url="#{item.preview.absoluteFilename}" rendered="#{item.previewAvailable &amp;&amp; !item.preview.video &amp;&amp; !item.preview.audio}" />
 
-                            <h:panelGroup rendered="#{item.fileAttached &amp;&amp; (item.video || item.audio)}">
-                                <converge:mediaPlayer id="#{item.id}" value="#{item.absoluteFilename}" width="150" height="150" controlbar="none" />
+                            <h:panelGroup rendered="#{item.renditionsAttached &amp;&amp; (item.preview.video || item.preview.audio)}">
+                                <converge:mediaPlayer id="#{item.id}" value="#{item.preview.absoluteFilename}" width="150" height="150" controlbar="none" />
                             </h:panelGroup>
                         </rich:column>
 
@@ -220,7 +220,7 @@
                                     <h:selectBooleanCheckbox value="#{inbox.newAssignment.nextEdition}" />
 
                                     <h:outputText value="#{msgs.assignment_ASSIGNMENT_MEDIA_REPOSITORY}" />
-                                    <h:selectOneMenu id="somMediaRepository" styleClass="text mediumInput" value="#{inbox.newAssignment.mediaItem.mediaRepository}" converter="#{converters.mediaRepositoryConverter}">
+                                    <h:selectOneMenu id="somMediaRepository" styleClass="text mediumInput" value="#{inbox.newAssignment.mediaItem.catalogue}" converter="#{converters.mediaRepositoryConverter}">
                                         <f:selectItem itemLabel="" />
                                         <f:selectItems value="#{common.writableMediaRepositories}" />
                                     </h:selectOneMenu>

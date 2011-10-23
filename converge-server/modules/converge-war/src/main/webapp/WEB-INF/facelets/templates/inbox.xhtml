@@ -50,12 +50,13 @@
                                     <h:outputText value="#{item.data.name}" />
                                 </rich:treeNode>
 
-                                <rich:treeNode type="dk.i2m.converge.core.content.MediaRepository" iconLeaf="#{res.INBOX_MEDIA_REPOSITORY_ICON}" icon="#{res.INBOX_MEDIA_REPOSITORY_ICON}" >
+                                <rich:treeNode type="dk.i2m.converge.core.content.catalogue.Catalogue" iconLeaf="#{res.INBOX_MEDIA_REPOSITORY_ICON}" icon="#{res.INBOX_MEDIA_REPOSITORY_ICON}" >
                                     <h:outputText value="#{item.data.name}" />
                                 </rich:treeNode>
 
-                                <rich:treeNode type="dk.i2m.converge.core.content.MediaItemStatus" iconLeaf="#{res.INBOX_MEDIA_REPOSITORY_ICON}" icon="#{res.INBOX_MEDIA_REPOSITORY_ICON}" >
-                                    <h:outputText value="#{item.data}" />
+                                <rich:treeNode type="dk.i2m.converge.core.content.catalogue.MediaItemStatus" iconLeaf="#{res.INBOX_MEDIA_REPOSITORY_ICON}" icon="#{res.INBOX_MEDIA_REPOSITORY_ICON}" >
+                                    <c:set var="key" value="MEDIA_ITEM_STATUS_#{item.data}" />
+                                    <h:outputText value="#{msgs[key]}" />
                                 </rich:treeNode>
 
                             </rich:tree>

@@ -16,7 +16,7 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.core.content.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.views.CurrentAssignment;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.core.workflow.Outlet;

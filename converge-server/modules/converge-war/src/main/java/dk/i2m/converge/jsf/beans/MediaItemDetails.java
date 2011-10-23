@@ -16,9 +16,11 @@
  */
 package dk.i2m.converge.jsf.beans;
 
-import dk.i2m.commons.FileUtils;
-import dk.i2m.converge.core.helpers.CatalogueHelper;
-import dk.i2m.converge.core.content.MediaItem;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
+import dk.i2m.converge.core.content.catalogue.Rendition;
+import dk.i2m.converge.core.content.catalogue.RenditionNotFoundException;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.metadata.GeoArea;
 import dk.i2m.converge.core.metadata.Organisation;
@@ -27,10 +29,13 @@ import dk.i2m.converge.core.metadata.PointOfInterest;
 import dk.i2m.converge.core.metadata.Subject;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
-import dk.i2m.converge.ejb.facades.MediaDatabaseFacadeLocal;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
+import dk.i2m.converge.ejb.facades.UserFacadeLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.ejb.services.MetaDataServiceLocal;
 import dk.i2m.jsf.JsfUtils;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,15 +59,23 @@ public class MediaItemDetails {
 
     private static final Logger LOG = Logger.getLogger(MediaItemDetails.class.getName());
 
-    @EJB private MediaDatabaseFacadeLocal mediaDatabaseFacade;
+    @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @EJB private MetaDataFacadeLocal metaDataFacade;
+
+    @EJB private MetaDataServiceLocal metaDataService;
+
+    @EJB private UserFacadeLocal userFacade;
 
     private MediaItem selectedMediaItem;
 
     private Long id;
 
+    private MediaItemRendition selectedRendition;
+
     private DataModel discovered = new ListDataModel(new ArrayList());
+
+    private DataModel usage;
 
     private boolean conceptAdded = false;
 
@@ -76,6 +89,15 @@ public class MediaItemDetails {
 
     /** Dev Note: Could not use a Concept object for direct entry as it is abstract. */
     private String conceptType = "";
+
+    /** Editors of the MediaItem catalogue. */
+    private List<UserAccount> editors = new ArrayList<UserAccount>();
+
+    private Map<String, Rendition> renditions;
+
+    private DataModel availableRenditions;
+
+    private Rendition uploadRendition;
 
     /**
      * Creates a new instance of {@link MediaItemDetails}.
@@ -109,57 +131,21 @@ public class MediaItemDetails {
      *         {@code null}
      */
     public String onDelete() {
-        boolean used = mediaDatabaseFacade.isMediaItemUsed(selectedMediaItem.getId());
+        boolean used = catalogueFacade.isMediaItemUsed(selectedMediaItem.getId());
 
         if (used) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "mediaitem_MEDIA_ITEM_REFERENCED_COULD_NOT_BE_DELETED");
             return null;
         } else {
-            mediaDatabaseFacade.deleteMediaItemById(selectedMediaItem.getId());
+            catalogueFacade.deleteMediaItemById(selectedMediaItem.getId());
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "mediaitem_MEDIA_ITEM_DELETED");
             return "/inbox";
         }
     }
 
-    /**
-     * Event handler for receiving uploaded media files.
-     * 
-     * @param event 
-     *          Event that invoked the handler, including the uploaded file
-     */
-    public void onUploadFile(UploadEvent event) {
-        LOG.log(Level.INFO, "Uploading file to MediaItem");
-        if (event == null) {
-            return;
-        }
-
-        org.richfaces.model.UploadItem item = event.getUploadItem();
-
-        if (item.isTempFile()) {
-            java.io.File tempFile = item.getFile();
-
-            selectedMediaItem.setFilename(FileUtils.getFilename(item.getFileName()));
-            selectedMediaItem.setContentType(item.getContentType());
-            Map<String, String> props = CatalogueHelper.getInstance().store(tempFile, selectedMediaItem);
-
-            //mediaDatabaseFacade.store(FileUtils.getBytes(tempFile), selectedMediaItem);
-            List<DiscoveredProperty> discoProps = new ArrayList<DiscoveredProperty>();
-            for (String s : props.keySet()) {
-                discoProps.add(new DiscoveredProperty(s, props.get(s)));
-            }
-
-            discovered = new ListDataModel(discoProps);
-
-        } else {
-            LOG.log(Level.SEVERE, "RichFaces is not set-up to use tempFiles for storing file uploads");
-        }
-
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "Media file updated", null);
-    }
-
     public void onApply(ActionEvent event) {
         try {
-            selectedMediaItem = mediaDatabaseFacade.update(selectedMediaItem);
+            selectedMediaItem = catalogueFacade.update(selectedMediaItem);
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "Media item was saved", null);
         } catch (Exception ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "An error occurred. " + ex.getMessage(), null);
@@ -218,7 +204,7 @@ public class MediaItemDetails {
     }
 
     public boolean isEditor() {
-        UserRole editorRole = selectedMediaItem.getMediaRepository().getEditorRole();
+        UserRole editorRole = selectedMediaItem.getCatalogue().getEditorRole();
         List<UserRole> userRoles = getUser().getUserRoles();
 
         return userRoles.contains(editorRole);
@@ -232,16 +218,127 @@ public class MediaItemDetails {
         return id;
     }
 
+    public MediaItemRendition getSelectedRendition() {
+        return selectedRendition;
+    }
+
+    public void setSelectedRendition(MediaItemRendition selectedRendition) {
+        this.selectedRendition = selectedRendition;
+    }
+
+    public Map<String, Rendition> getRenditions() {
+        return renditions;
+    }
+
+    public void newRenditionUploadListener(UploadEvent event) {
+        if (event == null) {
+            return;
+        }
+        org.richfaces.model.UploadItem item = event.getUploadItem();
+        LOG.log(Level.FINE, "Processing rendition ''{0}'' of content-type ''{1}''", new Object[]{item.getFileName(), item.getContentType()});
+
+        if (item.isTempFile()) {
+            java.io.File tempFile = item.getFile();
+
+            try {
+                selectedRendition = catalogueFacade.create(tempFile, selectedMediaItem, uploadRendition, item.getFileName(), item.getContentType());
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "media_item_rendition_UPLOADED");
+            } catch (IOException ex) {
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "media_item_rendition_UPLOAD_ERROR");
+                LOG.log(Level.WARNING, "Could not upload MediaItemRendition.", ex);
+            }
+
+        } else {
+            LOG.severe("RichFaces is not set-up to use tempFiles for storing file uploads");
+        }
+        this.availableRenditions = null;
+    }
+
+    /**
+     * Listener for uploading a new rendition.
+     * 
+     * @param event
+     *          Event that invoked the listener
+     */
+    public void renditionUploadListener(UploadEvent event) {
+        if (event == null) {
+            return;
+        }
+        org.richfaces.model.UploadItem item = event.getUploadItem();
+        LOG.log(Level.FINE, "Processing rendition ''{0}'' of content-type ''{1}''", new Object[]{item.getFileName(), item.getContentType()});
+
+        if (item.isTempFile()) {
+            java.io.File tempFile = item.getFile();
+
+            try {
+                selectedRendition = catalogueFacade.update(tempFile, item.getFileName(), item.getContentType(), selectedRendition);
+            } catch (IOException ex) {
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "media_item_rendition_UPLOAD_ERROR");
+                LOG.log(Level.WARNING, "Could not upload MediaItemRendition.", ex);
+            }
+
+        } else {
+            LOG.severe("RichFaces is not set-up to use tempFiles for storing file uploads");
+        }
+        this.availableRenditions = null;
+    }
+
+    public void onNewRendition(ActionEvent event) {
+        this.selectedRendition = new MediaItemRendition();
+        this.selectedRendition.setMediaItem(this.selectedMediaItem);
+    }
+
+    public void onSaveRendition(ActionEvent event) {
+        catalogueFacade.update(selectedRendition);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "media_item_rendition_UPDATED");
+    }
+
+    public void onDeleteRendition(ActionEvent event) {
+        catalogueFacade.deleteMediaItemRenditionById(this.selectedRendition.getId());
+        selectedMediaItem.getRenditions().remove(this.selectedRendition);
+        this.availableRenditions = null;
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "media_item_rendition_DELETED");
+    }
+
+    /**
+     * Initialises the bean by retrieving the {@link MediaItem} and related data
+     * from the database.
+     * 
+     * @param id 
+     *          Unique identifier of the {@link MediaItem} to open
+     */
     public void setId(Long id) {
         this.id = id;
 
         if (this.id != null && id != null && selectedMediaItem == null) {
             try {
-                selectedMediaItem = mediaDatabaseFacade.findMediaItemById(id);
+                selectedMediaItem = catalogueFacade.findMediaItemById(id);
+                usage = new ListDataModel(catalogueFacade.getMediaItemUsage(id));
+                editors = userFacade.getMembers(selectedMediaItem.getCatalogue().getEditorRole());
+                this.availableRenditions = null;
+
             } catch (DataNotFoundException ex) {
                 LOG.log(Level.SEVERE, null, ex);
             }
         }
+    }
+
+    public DataModel getAvailableRenditions() {
+        if (this.availableRenditions == null) {
+            Catalogue catalogue = selectedMediaItem.getCatalogue();
+
+            List<AvailableMediaItemRendition> availableMediaItemRenditions = new ArrayList<AvailableMediaItemRendition>();
+            for (Rendition rendition : catalogue.getRenditions()) {
+                try {
+                    availableMediaItemRenditions.add(new AvailableMediaItemRendition(rendition, selectedMediaItem.findRendition(rendition)));
+                } catch (RenditionNotFoundException rnfe) {
+                    availableMediaItemRenditions.add(new AvailableMediaItemRendition(rendition));
+                }
+            }
+
+            availableRenditions = new ListDataModel(availableMediaItemRenditions);
+        }
+        return this.availableRenditions;
     }
 
     public boolean isNotProcessed() {
@@ -283,12 +380,56 @@ public class MediaItemDetails {
         return discovered;
     }
 
+    public DataModel getUsage() {
+        return usage;
+    }
+
     public String getNewConcept() {
         return newConcept;
     }
 
     public void setNewConcept(String newConcept) {
         this.newConcept = newConcept;
+    }
+
+    public List<UserAccount> getEditors() {
+        return editors;
+    }
+
+    public Rendition getUploadRendition() {
+        return uploadRendition;
+    }
+
+    public void setUploadRendition(Rendition uploadRendition) {
+        this.uploadRendition = uploadRendition;
+    }
+
+    public class AvailableMediaItemRendition {
+
+        private MediaItemRendition mediaItemRendition;
+
+        private Rendition rendition;
+
+        public AvailableMediaItemRendition(Rendition rendition, MediaItemRendition mediaItemRendition) {
+            this.rendition = rendition;
+            this.mediaItemRendition = mediaItemRendition;
+        }
+
+        public AvailableMediaItemRendition(Rendition rendition) {
+            this(rendition, null);
+        }
+
+        public boolean isAvailable() {
+            return this.mediaItemRendition != null;
+        }
+
+        public MediaItemRendition getMediaItemRendition() {
+            return this.mediaItemRendition;
+        }
+
+        public Rendition getRendition() {
+            return this.rendition;
+        }
     }
 
     public class DiscoveredProperty {

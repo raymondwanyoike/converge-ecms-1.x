@@ -75,7 +75,7 @@
                             <f:selectItems value="#{userSession.myNewsItemsOutletSections}" />
                         </h:selectOneMenu>
 
-                        <h:outputText value="Default media repository" styleClass="bold" />
+                        <h:outputText value="#{msgs.profile_DEFAULT_CATALGUE}" styleClass="bold" />
                         <h:selectOneMenu value="#{userSession.user.defaultMediaRepository}" style="width: 160px;" converter="#{converters.mediaRepositoryConverter}">
                             <f:selectItem itemLabel="" />
                             <f:selectItems value="#{common.writableMediaRepositories}" />

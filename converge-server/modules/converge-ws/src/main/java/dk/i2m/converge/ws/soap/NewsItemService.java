@@ -21,7 +21,7 @@ import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.views.InboxView;
 import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.ejb.facades.LockingException;
-import dk.i2m.converge.ejb.facades.MediaDatabaseFacadeLocal;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
 import dk.i2m.converge.ejb.facades.NewsItemHolder;
 import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
@@ -51,7 +51,7 @@ public class NewsItemService {
     private static final Logger LOG = Logger.getLogger(NewsItemService.class.getName());
 
     @EJB private NewsItemFacadeLocal newsItemFacade;
-    @EJB private MediaDatabaseFacadeLocal mediaDatabaseFacade;
+    @EJB private CatalogueFacadeLocal mediaDatabaseFacade;
 
     @EJB private OutletFacadeLocal outletFacade;
 

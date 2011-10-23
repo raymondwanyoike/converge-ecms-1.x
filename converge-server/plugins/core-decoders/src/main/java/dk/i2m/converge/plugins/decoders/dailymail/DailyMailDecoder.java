@@ -17,11 +17,11 @@
 package dk.i2m.converge.plugins.decoders.dailymail;
 
 import dk.i2m.converge.core.plugin.NewswireDecoder;
-import dk.i2m.commons.FileUtils;
 import dk.i2m.converge.core.content.ContentTag;
 import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.plugin.PluginContext;
+import dk.i2m.converge.core.utils.FileUtils;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;

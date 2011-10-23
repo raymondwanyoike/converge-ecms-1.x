@@ -422,6 +422,10 @@
                                                      requiredMessage="#{msgs.WORKFLOW_STATE_OPTION_TO_REQUIRED}">
                                         <f:selectItems value="#{administrator_Workflows.workflowStates}" />
                                     </h:selectOneMenu>
+
+                                    <h:outputText value="#{msgs.WORKFLOW_STATE_TREAT_AS_SUBMITTED}:" title="#{msgs.WORKFLOW_STATE_TREAT_AS_SUBMITTED_TOOLTIP}" />
+                                    <h:selectBooleanCheckbox id="sbcTreatAsSubmitted" value="#{administrator_Workflows.selectedWorkflowStep.treatAsSubmitted}" />
+
                                     <h:column>
                                         <h:outputText value="#{msgs.WORKFLOW_STATE_OPTION_DISPLAY_ORDER}:"
                                                       title="#{msgs.WORKFLOW_STATE_OPTION_DISPLAY_ORDER_TOOLTIP}" />

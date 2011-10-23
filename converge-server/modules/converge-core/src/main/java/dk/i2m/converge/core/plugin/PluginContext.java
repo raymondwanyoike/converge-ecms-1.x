@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2011 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,14 +17,15 @@
 package dk.i2m.converge.core.plugin;
 
 import dk.i2m.converge.core.Notification;
-import dk.i2m.converge.core.content.MediaRepository;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.NewsItem;
+import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.content.forex.Rate;
+import dk.i2m.converge.core.content.markets.FinancialMarket;
 import dk.i2m.converge.core.content.markets.MarketValue;
 import dk.i2m.converge.core.content.weather.Forecast;
 import dk.i2m.converge.core.newswire.NewswireDecoderException;
 import dk.i2m.converge.core.newswire.NewswireItem;
-import dk.i2m.converge.core.newswire.NewswireItemAttachment;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.security.UserAccount;
@@ -126,6 +127,23 @@ public interface PluginContext {
 
     dk.i2m.converge.core.content.ContentTag findOrCreateContentTag(java.lang.String name);
 
-    MediaRepository findCatalogue(Long catalogueId);
+    Catalogue findCatalogue(Long catalogueId);
 
+    Rendition findRenditionByName(String name);
+
+    /**
+     * Archives a {@link File} in a {@link dk.i2m.converge.core.content.catalogue.Catalogue}.
+     * 
+     * @param file
+     *          {@link File} to archive
+     * @param catalogueId
+     *          Unique identifier of the {@link dk.i2m.converge.core.content.catalogue.Catalogue}
+     *          where the file should be archived
+     * @param fileName
+     *          Name of the file
+     * @return Path and name of the archived file
+     * @throws ArchiveException
+     *          If the file could not be archived in the given catalogue
+     */
+    java.lang.String archive(java.io.File file, Long catalogueId, String fileName) throws ArchiveException;
 }

@@ -47,9 +47,9 @@ public class MenuHelper {
      * @return Instance of the {@link MenuHelper} singleton
      */
     public static MenuHelper getInstance() {
-        if (instance == null) {
+//        if (instance == null) {
             instance = new MenuHelper();
-        }
+//        }
         return instance;
     }
 

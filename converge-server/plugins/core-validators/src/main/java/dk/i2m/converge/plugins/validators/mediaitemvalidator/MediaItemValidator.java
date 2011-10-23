@@ -16,7 +16,7 @@
  */
 package dk.i2m.converge.plugins.validators.mediaitemvalidator;
 
-import dk.i2m.converge.core.content.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.plugin.WorkflowValidator;
 import dk.i2m.converge.core.plugin.WorkflowValidatorException;

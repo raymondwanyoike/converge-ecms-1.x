@@ -16,7 +16,8 @@
  */
 package dk.i2m.converge.core.newswire;
 
-import dk.i2m.converge.core.content.MediaRepository;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
+import dk.i2m.converge.core.content.catalogue.Rendition;
 import java.io.File;
 import java.io.Serializable;
 import javax.persistence.Basic;
@@ -40,6 +41,8 @@ import javax.persistence.Table;
 @Table(name = "newswire_item_attachment")
 public class NewswireItemAttachment implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -61,7 +64,7 @@ public class NewswireItemAttachment implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "catalogue_id")
-    private MediaRepository catalogue;
+    private Catalogue catalogue;
 
     @Column(name = "catalogue_path") @Lob
     private String cataloguePath = "";
@@ -78,6 +81,11 @@ public class NewswireItemAttachment implements Serializable {
     /** Size (in bytes) of the file. */
     @Column(name = "file_size")
     private long size = 0L;
+
+    /** Rendition of the attachment. */
+    @ManyToOne
+    @JoinColumn(name = "rendition_id")
+    private Rendition rendition;
 
     public Long getId() {
         return id;
@@ -143,11 +151,11 @@ public class NewswireItemAttachment implements Serializable {
         this.size = size;
     }
 
-    public MediaRepository getCatalogue() {
+    public Catalogue getCatalogue() {
         return catalogue;
     }
 
-    public void setCatalogue(MediaRepository catalogue) {
+    public void setCatalogue(Catalogue catalogue) {
         this.catalogue = catalogue;
     }
 
@@ -158,7 +166,15 @@ public class NewswireItemAttachment implements Serializable {
     public void setCataloguePath(String cataloguePath) {
         this.cataloguePath = cataloguePath;
     }
-    
+
+    public Rendition getRendition() {
+        return rendition;
+    }
+
+    public void setRendition(Rendition rendition) {
+        this.rendition = rendition;
+    }
+
     public String getCatalogueUrl() {
         if (isStoredInCatalogue()) {
             StringBuilder url = new StringBuilder();
@@ -168,7 +184,7 @@ public class NewswireItemAttachment implements Serializable {
             return "";
         }
     }
-    
+
     public String getCatalogueFileLocation() {
         if (isStoredInCatalogue()) {
             StringBuilder url = new StringBuilder();
@@ -189,6 +205,20 @@ public class NewswireItemAttachment implements Serializable {
      */
     public boolean isStoredInCatalogue() {
         if (catalogue == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Determines if the {@link Rendition} is set for the attachment.
+     * 
+     * @return {@code true} if the {@link Rendition} is set,
+     *         otherwise {@code false}
+     */
+    public boolean isRenditionSet() {
+        if (rendition == null) {
             return false;
         } else {
             return true;

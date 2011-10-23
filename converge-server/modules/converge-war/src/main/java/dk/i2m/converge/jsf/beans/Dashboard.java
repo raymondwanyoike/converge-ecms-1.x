@@ -30,7 +30,7 @@ import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 
 /**
- * Backing bean for <code>/Dashboard.jspx</code>.
+ * Backing bean for {@code /Dashboard.jspx}.
  *
  * @author Allan Lykke Christensen
  */

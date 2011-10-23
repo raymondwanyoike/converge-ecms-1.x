@@ -21,11 +21,6 @@
                             <f:selectItems value="#{common.userRoles}"/>
                         </h:selectOneMenu>
 
-                        <h:outputText value="#{i18n.REPORT_ACTIVITY_SUBMITTED_STATE}" />
-                        <h:selectOneMenu value="#{reportActivity.state}" converter="#{converters.workflowStateConverter}">
-                            <f:selectItems value="#{common.workflowStates}"/>
-                        </h:selectOneMenu>
-
                         <h:outputText value="#{i18n.REPORT_ACTIVITY_START_DATE}" />
                         <rich:calendar id="calStartDate" value="#{reportActivity.startDate}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{msgs.FORMAT_DATE}" />
 

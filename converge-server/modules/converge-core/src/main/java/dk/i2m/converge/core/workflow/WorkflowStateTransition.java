@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2011 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,6 +43,8 @@ import javax.persistence.TemporalType;
 @Table(name = "news_item_workflow_state_transition")
 public class WorkflowStateTransition implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -76,9 +78,8 @@ public class WorkflowStateTransition implements Serializable {
     @JoinColumn(name = "user_account_id")
     private UserAccount user;
 
-    @javax.persistence.Version
-    @Column(name = "opt_lock")
-    private int versionIdentifier;
+    @Column(name = "submitted")
+    private boolean submitted;
 
     /**
      * Creates a new instance of {@link WorkflowStateTransition}.
@@ -289,6 +290,27 @@ public class WorkflowStateTransition implements Serializable {
         this.user = user;
     }
 
+    /**
+     * Determine if the {@link NewsItem} has been submitted.
+     * 
+     * @return {@code true} if the {@link NewsItem} was submitted
+     *         at this transition, otherwise {@code false}
+     */
+    public boolean isSubmitted() {
+        return this.submitted;
+    }
+
+    /**
+     * Sets the submitted flag for the {@link NewsItem}.
+     * 
+     * @param submitted
+     *          {@code true} if this state transition represents
+     *          the submission of the {@link NewsItem}
+     */
+    public void setSubmitted(boolean submitted) {
+        this.submitted = submitted;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -302,8 +324,7 @@ public class WorkflowStateTransition implements Serializable {
             return false;
         }
         WorkflowStateTransition other = (WorkflowStateTransition) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.
-                equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;

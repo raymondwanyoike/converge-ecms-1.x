@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.core.content;
+package dk.i2m.converge.core.content.catalogue;
 
 /**
  * Status of a {@link MediaItem}

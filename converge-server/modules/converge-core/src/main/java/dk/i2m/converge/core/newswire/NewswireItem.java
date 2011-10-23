@@ -222,7 +222,7 @@ public class NewswireItem implements Serializable {
      *          Content to add
      */
     public void addSummary(String newContent) {
-        this.summary = this.summary + newContent;
+        this.summary += newContent;
     }
 
     public String getContent() {
@@ -240,7 +240,7 @@ public class NewswireItem implements Serializable {
      *          Content to add
      */
     public void addContent(String newContent) {
-        this.content = this.content + newContent;
+        this.content += newContent;
     }
 
     public String getThumbnailUrl() {

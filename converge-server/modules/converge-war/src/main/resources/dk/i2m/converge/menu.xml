@@ -137,9 +137,9 @@
             <role>ADMINISTRATOR</role>
         </children>
 
-        <children id="lnkAdministrationMediaDatabase" resetOnClick="false" sectionMenu="true">
-            <action>/administration/media_repositories</action>
-            <label>MEDIA_REPOSITORIES</label>
+        <children id="lnkAdministrationCatalogues" resetOnClick="false" sectionMenu="true">
+            <action>/administration/catalogues</action>
+            <label>CATALOGUES</label>
             <role>ADMINISTRATOR</role>
 
             <children id="lnkMediaRepositories" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">

@@ -17,13 +17,14 @@
 package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.commons.StringUtils;
-import dk.i2m.converge.core.content.MediaItem;
-import dk.i2m.converge.core.content.MediaItemStatus;
-import dk.i2m.converge.core.content.MediaRepository;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
+import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.helpers.CatalogueHelper;
 import dk.i2m.converge.core.newswire.NewswireItemAttachment;
 import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.ejb.facades.MediaDatabaseFacadeLocal;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.NewswireServiceLocal;
 import dk.i2m.jsf.JsfUtils;
@@ -32,6 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 
 /**
  * JSF backing bean for {@code /NewswireItem.jspx}
@@ -44,7 +46,7 @@ public class NewswireItem {
 
     @EJB private NewswireServiceLocal newswireService;
 
-    @EJB private MediaDatabaseFacadeLocal mediaDatabase;
+    @EJB private CatalogueFacadeLocal mediaDatabase;
 
     private Long id = 0L;
 
@@ -93,40 +95,16 @@ public class NewswireItem {
         return (UserAccount) JsfUtils.getValueOfValueExpression("#{userSession.user}");
     }
 
-    public void setAddToCatalogue(NewswireItemAttachment attachment) {
-        LOG.log(Level.INFO, "Adding newswire attachment to catalogue");
-        
-        MediaRepository catalogue = getUser().getDefaultMediaRepository();
-        MediaItem item = new MediaItem();
-        item.setByLine(selectedItem.getAuthor());
-        item.setContentType(attachment.getContentType());
-        java.util.Calendar now = java.util.Calendar.getInstance();
-        item.setCreated(now);
-        item.setUpdated(now);
-        
-        if (selectedItem.isSummarised()) {
-            LOG.log(Level.INFO, "Using summary for caption");
-            item.setDescription(selectedItem.getSummary());
-        } else {
-            LOG.log(Level.INFO, "Using description for caption");
-            item.setDescription(StringUtils.stripHtml(selectedItem.getContent()));
-        }
-        
-        item.setTitle(selectedItem.getTitle());
-        item.setOwner(getUser());
-        item.setMediaRepository(catalogue);
-        item.setStatus(MediaItemStatus.APPROVED);
-        item = mediaDatabase.create(item);
-        
-        
-        if (attachment.isStoredInCatalogue()) {
-            LOG.log(Level.INFO, "Storing in catalogue");
-            item.setFilename(attachment.getFilename());
-            File mediaFile = new File(attachment.getCatalogueFileLocation());
-            CatalogueHelper.getInstance().store(mediaFile, item);
-            item = mediaDatabase.update(item);
-        }
-        
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "newswire_archive_ATTACHMENT_ADDED_TO_CATALOGUE", new Object[]{attachment.getDescription(), catalogue.getName(), item.getId()});
+    /**
+     * Adds the attachments of a {@link NewswireItem} to the users
+     * default catalogue.
+     * 
+     * @param event 
+     *          Event that invoked the handler
+     */
+    public void onAddToCatalogue(ActionEvent event) {
+        Catalogue catalogue = getUser().getDefaultMediaRepository();
+        MediaItem item = mediaDatabase.create(selectedItem, catalogue);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "newswire_archive_ATTACHMENT_ADDED_TO_CATALOGUE", new Object[]{selectedItem.getTitle(), catalogue.getName(), item.getId()});
     }
 }

@@ -18,17 +18,24 @@ package dk.i2m.converge.ejb.facades;
 
 import dk.i2m.converge.domain.Property;
 import dk.i2m.converge.core.Announcement;
+import dk.i2m.converge.core.AppVersion;
 import dk.i2m.converge.core.content.Language;
 import dk.i2m.converge.core.ConfigurationKey;
+import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.ejb.services.ConfigurationServiceLocal;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
 import dk.i2m.converge.ejb.services.UserServiceLocal;
 import dk.i2m.converge.core.plugin.Plugin;
 import dk.i2m.converge.core.plugin.PluginManager;
+import dk.i2m.converge.core.utils.BeanComparator;
+import dk.i2m.converge.core.workflow.WorkflowState;
+import dk.i2m.converge.core.workflow.WorkflowStateTransition;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.ejb.services.QueryBuilder;
 import dk.i2m.converge.ejb.services.TimerServiceLocal;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -200,5 +207,82 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     @Override
     public Language findLanguageById(Long id) throws DataNotFoundException {
         return daoService.findById(Language.class, id);
+    }
+
+    @Override
+    public List<AppVersion> getVersionsForMigration() {
+        try {
+            AppVersion lastMigration = daoService.findObjectWithNamedQuery(AppVersion.class, AppVersion.FIND_LATEST_MIGRATIONS, Collections.EMPTY_MAP);
+
+            Map<String, Object> parameters = QueryBuilder.with("fromVersion", lastMigration.getToVersion()).parameters();
+            return daoService.findWithNamedQuery(AppVersion.FIND_BY_MIGRATION_AVAILABLE, parameters);
+
+        } catch (DataNotFoundException ex) {
+            LOG.log(Level.WARNING, "Unable to find migration history. Latest migration is missing");
+            return Collections.EMPTY_LIST;
+        }
+    }
+
+    /**
+     * Upgrades the database from one version to another.
+     * 
+     * @param version
+     *          Version to upgrade
+     * @return Status of the upgrade
+     */
+    @Override
+    public boolean upgrade(AppVersion version) {
+        if (version == null) {
+            return false;
+        }
+
+        if (version.getFromVersion().equals("1.0.8") && version.getToVersion().equals("1.0.9")) {
+            // Update the submitted status
+            Number numberOfNewsItems = daoService.count(NewsItem.class, "id");
+
+            LOG.log(Level.INFO, "Migrating {0}", numberOfNewsItems.intValue());
+
+            int page = 1000;
+            for (int i = 0; i < numberOfNewsItems.intValue(); i += page) {
+                LOG.log(Level.INFO, "Migrating records {0} to {1}", new Object[]{i, i + page});
+                List<NewsItem> newsItems = daoService.findAll(NewsItem.class, i, page);
+
+
+                for (NewsItem newsItem : newsItems) {
+                    List<WorkflowStateTransition> history = newsItem.getHistory();
+                    if (history.size() > 1) {
+                        Collections.sort(history, new BeanComparator("id"));
+                        
+                        // Get the second state
+                        WorkflowStateTransition candidate = history.get(1);
+
+                        try {
+                            // If the second state is not trash, mark it as the submitted state
+                            WorkflowState candidateState = candidate.getState();
+                            WorkflowState trashState = newsItem.getOutlet().getWorkflow().getTrashState();
+
+                            if (candidateState == null) {
+                                LOG.log(Level.WARNING, "The submitted workflow state of {0} no longer exist", newsItem.getId());
+                            } else {
+                                if (!candidateState.equals(trashState)) {
+                                    candidate.setSubmitted(true);
+                                }
+                            }
+                        } catch (Exception ex) {
+                            LOG.log(Level.WARNING, "Couldn't update NewsItem " + newsItem.getId() + ". " + ex.getMessage(), ex);
+                        }
+                    }
+                }
+            }
+            
+            version.setMigrated(true);
+            version.setMigratedDate(java.util.Calendar.getInstance().getTime());
+            
+            version = daoService.update(version);
+            
+            return true;
+        }
+
+        return false;
     }
 }

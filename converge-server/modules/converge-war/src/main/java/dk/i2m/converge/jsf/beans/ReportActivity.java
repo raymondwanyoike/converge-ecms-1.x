@@ -108,7 +108,8 @@ public class ReportActivity {
     }
 
     public void onGenerateReport(ActionEvent event) {
-        this.generatedReport = reportingFacade.generateActivityReport(startDate, endDate, userRole, state);
+        //this.generatedReport = reportingFacade.generateActivityReport(startDate, endDate, userRole, state);
+        this.generatedReport = reportingFacade.generateActivityReport(startDate, endDate, userRole);
         this.report = new ListDataModel(this.generatedReport.getUserActivity());
     }
 

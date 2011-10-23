@@ -16,7 +16,7 @@
  */
 package dk.i2m.converge.plugins.decoders.knadecoder;
 
-import dk.i2m.commons.FileUtils;
+import dk.i2m.converge.core.utils.FileUtils;
 import javax.mail.Transport;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.Multipart;

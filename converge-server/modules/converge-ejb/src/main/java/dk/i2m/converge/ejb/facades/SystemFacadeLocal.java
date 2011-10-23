@@ -177,4 +177,8 @@ public interface SystemFacadeLocal {
      *          If no {@link Language} could be matched to the {@code id}
      */
     Language findLanguageById(Long id) throws DataNotFoundException;
+
+    boolean upgrade(dk.i2m.converge.core.AppVersion version);
+
+    java.util.List<dk.i2m.converge.core.AppVersion> getVersionsForMigration();
 }

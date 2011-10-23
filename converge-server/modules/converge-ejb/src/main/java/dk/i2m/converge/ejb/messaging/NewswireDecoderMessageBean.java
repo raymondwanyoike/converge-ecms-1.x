@@ -162,7 +162,7 @@ public class NewswireDecoderMessageBean implements MessageListener {
         solrDoc.addField("headline", ni.getTitle(), 1.0f);
         solrDoc.addField("provider", ni.getNewswireService().getSource());
         solrDoc.addField("provider-id", ni.getNewswireService().getId());
-        solrDoc.addField("story", dk.i2m.commons.StringUtils.stripHtml(ni.getContent()));
+        solrDoc.addField("story", dk.i2m.converge.core.utils.StringUtils.stripHtml(ni.getContent()));
         solrDoc.addField("caption", ni.getSummary());
         solrDoc.addField("author", ni.getAuthor());
         solrDoc.addField("date", ni.getDate().getTime());

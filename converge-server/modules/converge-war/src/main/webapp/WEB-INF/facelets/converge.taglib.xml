@@ -66,6 +66,11 @@
         <tag-name>userProfileModule</tag-name>
         <source>taglib/converge/userProfileModule.jspx</source>
     </tag>
+    
+    <tag>
+        <tag-name>userActivityModule</tag-name>
+        <source>taglib/converge/userActivityModule.jspx</source>
+    </tag>
 
     <tag>
         <tag-name>loading</tag-name>
@@ -194,6 +199,12 @@
         <function-name>abbreviate</function-name>
         <function-class>dk.i2m.converge.jsf.functions.StringFunctions</function-class>
         <function-signature>java.lang.String abbreviate(java.lang.String, int)</function-signature>
+    </function>
+
+    <function>
+        <function-name>displaySize</function-name>
+        <function-class>dk.i2m.converge.jsf.functions.FileSpaceFunctions</function-class>
+        <function-signature>java.lang.String displaySize(java.lang.Long)</function-signature>
     </function>
 
     <function>

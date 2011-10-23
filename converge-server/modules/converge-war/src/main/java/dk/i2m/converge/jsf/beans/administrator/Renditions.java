@@ -16,8 +16,8 @@
  */
 package dk.i2m.converge.jsf.beans.administrator;
 
-import dk.i2m.converge.core.content.Rendition;
-import dk.i2m.converge.ejb.facades.MediaDatabaseFacadeLocal;
+import dk.i2m.converge.core.content.catalogue.Rendition;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.jsf.JsfUtils;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -32,7 +32,7 @@ import javax.faces.model.ListDataModel;
  */
 public class Renditions {
 
-    @EJB private MediaDatabaseFacadeLocal mediaDatabaseFacade;
+    @EJB private CatalogueFacadeLocal mediaDatabaseFacade;
 
     private Rendition selectedLabel = null;
 
@@ -55,7 +55,7 @@ public class Renditions {
 
     public void onDeleteMediaItemVersionLabel(ActionEvent event) {
         if (isEditMode()) {
-            mediaDatabaseFacade.deleteMediaItemVersionLabel(selectedLabel.getId());
+            mediaDatabaseFacade.deleteRendition(selectedLabel.getId());
             this.labels = null;
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "mediaitem_RENDITION_DELETED");
         }
@@ -79,7 +79,7 @@ public class Renditions {
 
     public DataModel getLabels() {
         if (this.labels == null) {
-            this.labels = new ListDataModel(mediaDatabaseFacade.findMediaItemVersionLabels());
+            this.labels = new ListDataModel(mediaDatabaseFacade.findRenditions());
         }
         return this.labels;
     }

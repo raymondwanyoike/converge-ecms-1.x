@@ -26,9 +26,25 @@
 
                 <converge:moduleSpacer />
 
-                <converge:moduleHeader moduleTitle="Properties" />
+                <converge:moduleHeader moduleTitle="#{msgs.media_item_PREVIEW}" />
+                <h:panelGroup layout="block" id="preview" styleClass="mediaItemPreview">
+                    <h:graphicImage url="#{res.EMPTY_FRAME}" rendered="#{!mediaItemDetails.selectedMediaItem.renditionsAttached}" />
+
+                    <h:graphicImage url="#{mediaItemDetails.selectedMediaItem.preview.absoluteFilename}" rendered="#{mediaItemDetails.selectedMediaItem.previewAvailable &amp;&amp; !mediaItemDetails.selectedMediaItem.preview.video &amp;&amp; !mediaItemDetails.selectedMediaItem.preview.audio}" />
+
+                    <h:panelGroup rendered="#{mediaItemDetails.selectedMediaItem.renditionsAttached &amp;&amp; (mediaItemDetails.selectedMediaItem.preview.video || mediaItemDetails.selectedMediaItem.preview.audio)}">
+                        <converge:mediaPlayer id="#{mediaItemDetails.selectedMediaItem.id}" value="#{mediaItemDetails.selectedMediaItem.preview.absoluteFilename}" width="200" height="200" controlbar="none" />
+                    </h:panelGroup>
+                </h:panelGroup>
+
+                <converge:moduleSpacer />
+
+                <converge:moduleHeader moduleTitle="#{msgs.media_item_PROPERTIES}" />
                 <div>
                     <h:panelGrid columns="2" columnClasses="right, left">
+                        <h:outputText value="#{msgs.media_item_ID_LABEL}" />
+                        <h:inputText styleClass="text" disabled="true" value="#{mediaItemDetails.selectedMediaItem.id}" style="width: 98%; margin-left: 1%; margin-right: 1%;" />
+
                         <h:outputText value="#{msgs.media_item_TITLE_LABEL}" />
                         <h:inputText id="txtHeadline" value="#{mediaItemDetails.selectedMediaItem.title}" required="true" requiredMessage="The title of of the media item is mandatory" style="width: 98%; margin-left: 1%; margin-right: 1%;" styleClass="text" disabled="#{!mediaItemDetails.changable}" />
 
@@ -43,25 +59,6 @@
 
                         <h:outputText value="#{msgs.media_item_NOTE_LABEL}" />
                         <h:inputText id="txtEditorialNote" value="#{mediaItemDetails.selectedMediaItem.editorialNote}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text" disabled="#{!mediaItemDetails.changable}" />
-
-                        <h:outputText value="#{msgs.media_item_CATALOGUE}" />
-                        <h:inputText id="txtCatalogue" readonly="true" value="#{mediaItemDetails.selectedMediaItem.mediaRepository.name}" title="#{mediaItemDetails.selectedMediaItem.mediaRepository.description}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text" />
-
-                        <h:outputText value="#{msgs.media_item_LINK}" />
-                        <h:column>
-                            <h:inputText id="txtLink" readonly="true" value="#{mediaItemDetails.selectedMediaItem.absoluteFilename}" style="width: 82%; margin-left: 1%; margin-right: 1%" styleClass="text" />
-                            <h:outputLink target="_blank" value="#{mediaItemDetails.selectedMediaItem.absoluteFilename}">
-                                <h:graphicImage value="/images/icons/download.png" alt="#{msgs.DOWNLOAD}" title="#{msgs.DOWNLOAD}" />
-                            </h:outputLink>
-                        </h:column>
-
-                        <h:outputText value="#{msgs.media_item_FILE_NAME_LABEL}" />
-                        <h:inputText id="txtFileName" readonly="true" value="#{mediaItemDetails.selectedMediaItem.filename}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text" />
-
-                        <h:outputText value="#{msgs.media_item_CONTENT_TYPE_LABEL}" />
-                        <h:inputText id="txtContentType" readonly="true" value="#{mediaItemDetails.selectedMediaItem.contentType}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text" />
-
-
                     </h:panelGrid>
                 </div>
             </c:if>
@@ -85,67 +82,6 @@
             </c:if>
 
             <c:if test="#{mediaItemDetails.authorized}">
-
-                <converge:moduleHeader moduleTitle="Media" />
-                <div class="moduleContent">
-                    <h:panelGroup id="pgMedia">
-                        <h:panelGrid columns="2">
-                            <h:outputLink value="#{mediaItemDetails.selectedMediaItem.absoluteFilename}" target="_blank" rendered="#{!mediaItemDetails.selectedMediaItem.video &amp;&amp; !mediaItemDetails.selectedMediaItem.audio}">
-                                <h:graphicImage styleClass="searchResultThumb" url="#{mediaItemDetails.selectedMediaItem.thumbURL}" />
-                            </h:outputLink>
-                            <h:panelGroup rendered="#{mediaItemDetails.selectedMediaItem.video || mediaItemDetails.selectedMediaItem.audio}">
-                                <converge:mediaPlayer id="#{mediaItemDetails.selectedMediaItem.id}" value="#{mediaItemDetails.selectedMediaItem.absoluteFilename}" />
-                            </h:panelGroup>
-                        </h:panelGrid>
-
-                        <rich:spacer height="5px" width="100%" />
-                        <h:outputText value="Discovered embedded content" style="font-weight: bold" rendered="#{mediaItemDetails.discovered.rowCount &gt; 0}" />
-                        <rich:dataTable value="#{mediaItemDetails.discovered}" var="discovered">
-                            <rich:column>
-                                <h:outputText value="#{discovered.property}" />
-                            </rich:column>
-                            <rich:column>
-                                <h:outputText value="#{discovered.value}" />
-                            </rich:column>
-                            <rich:column>
-                                <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.TITLE}" title="Use as title" reRender="txtHeadline">
-                                    <f:setPropertyActionListener target="#{mediaItemDetails.selectedMediaItem.title}" value="#{discovered.value}" />
-                                </a4j:commandButton>
-                            </rich:column>
-                            <rich:column>
-                                <a4j:commandButton styleClass="button dynamicButton" value="By-Line" title="Use as byline" reRender="txtByLine">
-                                    <f:setPropertyActionListener target="#{mediaItemDetails.selectedMediaItem.byLine}" value="#{discovered.value}" />
-                                </a4j:commandButton>
-                            </rich:column>
-                            <rich:column>
-                                <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.CAPTION}" title="Use as caption" reRender="txtDescription">
-                                    <f:setPropertyActionListener target="#{mediaItemDetails.selectedMediaItem.description}" value="#{discovered.value}" />
-                                </a4j:commandButton>
-                            </rich:column>
-                            <rich:column>
-                                <a4j:commandButton styleClass="button dynamicButton" value="Editorial Note" title="Use as editorial note" reRender="txtEditorialNote">
-                                    <f:setPropertyActionListener target="#{mediaItemDetails.selectedMediaItem.editorialNote}" value="#{discovered.value}" />
-                                </a4j:commandButton>
-                            </rich:column>
-                        </rich:dataTable>
-
-                        <rich:fileUpload listWidth="0" id="fuMediaItemFile"
-                                         allowFlash="false"
-                                         listHeight="0"
-                                         maxFilesQuantity="1"
-                                         immediateUpload="true"
-                                         immediate="true"
-                                         autoclear="true"
-                                         fileUploadListener="#{mediaItemDetails.onUploadFile}"
-                                         ajaxSingle="true"
-                                         rendered="#{mediaItemDetails.changable}"
-                                         addControlLabel="#{mediaItemDetails.selectedMediaItem.filename == '' ? 'Upload Media File' : 'Replace Media File'}">
-                            <a4j:support event="onuploadcomplete" reRender="pgMedia,txtFileName,txtContentType"/>
-                        </rich:fileUpload>
-                    </h:panelGroup>
-                </div>
-                <converge:moduleSpacer />
-
                 <converge:moduleHeader moduleTitle="#{msgs.CAPTION}" />
                 <div class="moduleContent">
                     <h:inputTextarea id="txtDescription" value="#{mediaItemDetails.selectedMediaItem.description}" style="width: 98%; height: 100px; margin-left: 1%; margin-right: 1%" styleClass="text mediumInput" disabled="#{!mediaItemDetails.changable}" required="true" requiredMessage="The caption is required" />
@@ -163,42 +99,241 @@
                                     <h:outputText value="#{result.name}" />
                                 </h:column>
                                 <h:column>
-                                    <c:set var="key" value="#{result.type}_SHORT" />
-                                    <h:outputText value="#{msgs[key]}" styleClass="concept_#{msgs[key]}" style="width: 30px" />
+                                    <c:set var="key" value="#{result.type}_ICON" />
+                                    <h:graphicImage value="#{res[key]}" />
                                 </h:column>
                             </rich:suggestionbox>
                         </h:column>
-                        <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.ADD}" actionListener="#{mediaItemDetails.onAddConcept}" reRender="dtConcepts,mpNewConcept,txtNewConcept,sbNewConcept" oncomplete="if (#{!mediaItemDetails.conceptAdded}){ #{rich:component('mpNewConcept')}.show(); return false; }" />
+                        <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.ADD}" actionListener="#{mediaItemDetails.onAddConcept}" reRender="dtConcepts,mpNewConcept,txtNewConcept,sbNewConcept" oncomplete="if (#{converge:isAllValid()}){ if (#{!mediaItemDetails.conceptAdded}){ #{rich:component('mpNewConcept')}.show(); return false; } }" />
                         <a4j:commandButton styleClass="button dynamicButton" value="Subjects" reRender="pgConceptSelector" oncomplete="#{rich:component('mpConceptSelector')}.show();" />
                     </h:panelGrid>
-                    <rich:dataTable id="dtConcepts" var="concept" value="#{mediaItemDetails.selectedMediaItem.concepts}" rowClasses="odd, even" style="width: 100%; border: 0px;">
-                        <rich:column style=" border: 0px; width: 20px;">
+
+                    <rich:dataGrid id="dtConcepts" var="concept" value="#{mediaItemDetails.selectedMediaItem.concepts}" columns="3" styleClass="noborder" columnClasses="noborder">
+                        <h:panelGrid columns="3">
                             <a4j:commandLink reRender="dtConcepts">
                                 <f:setPropertyActionListener target="#{mediaItemDetails.removeConcept}" value="#{concept}" />
                                 <h:graphicImage url="#{res.REMOVE_ICON}" />
                             </a4j:commandLink>
-                        </rich:column>
-
-                        <rich:column style="width: 26px;  border: 0px;" styleClass="center">
-                            <c:set var="key" value="#{concept.type}_SHORT" />
-                            <h:outputText value="#{msgs[key]}" styleClass="concept_#{msgs[key]}" style="width: 30px" />
-                        </rich:column>
-
-                        <rich:column style=" border: 0px;">
-                            <h:outputText value="#{concept.fullTitle}" />
-                            <rich:toolTip style="width: 350px;" styleClass="tooltip">
-                                <h:panelGrid>
-                                    <h:outputText styleClass="smallHeading" value="#{concept.name}" />
-                                    <h:outputText value="#{concept.definition}" escape="false" />
-                                </h:panelGrid>
-                            </rich:toolTip>
-                        </rich:column>
-                    </rich:dataTable>
+                            <h:column>
+                                <c:set var="keyIcon" value="#{concept.type}_ICON" />
+                                <c:set var="keyName" value="#{concept.type}_NAME" />
+                                <h:graphicImage value="#{res[keyIcon]}" title="#{msgs[keyName]}" />
+                            </h:column>
+                            <h:column>
+                                <h:outputText value="#{concept.fullTitle}" id="conceptTitle" />
+                                <rich:toolTip style="width: 350px;" styleClass="tooltip" for="conceptTitle">
+                                    <h:panelGrid>
+                                        <h:outputText styleClass="smallHeading" value="#{concept.name}" />
+                                        <h:outputText value="#{concept.definition}" escape="false" />
+                                    </h:panelGrid>
+                                </rich:toolTip>
+                            </h:column>
+                        </h:panelGrid>
+                    </rich:dataGrid>
 
                     <converge:conceptSelector onSelectSubject="#{mediaItemDetails.onSelectSubject}" />
                 </div>
+
                 <converge:moduleSpacer />
 
+                <converge:moduleHeader moduleTitle="#{msgs.media_item_RENDITIONS}" />
+                <div class="moduleContent">
+                    <rich:dataTable id="dtRenditions" var="rendition" value="#{mediaItemDetails.availableRenditions}" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
+                        <rich:column styleClass="center columnIcon" headerClass="subColumnIcon">
+                            <f:facet name="header">
+                                <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                            </f:facet>
+                            <h:outputLink target="_blank" value="#{rendition.mediaItemRendition.absoluteFilename}" rendered="#{rendition.available}">
+                                <h:graphicImage value="#{res.MEDIA_ITEM_RENDITION_ICON}"  title="#{rendition.rendition.label}"/>
+                            </h:outputLink>
+                            <h:graphicImage value="#{res.MEDIA_ITEM_RENDITION_ICON}"  title="#{rendition.rendition.label}" rendered="#{!rendition.available}" />
+                        </rich:column>
+                        <rich:column id="colRendition">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.media_item_RENDITION}" />
+                            </f:facet>
+                            <h:outputText value="#{rendition.rendition.label}"  title="#{rendition.rendition.description}" horizontalOffset="0" verticalOffset="0" />
+                            <rich:toolTip style="width: 350px;" styleClass="tooltip" for="colRendition" rendered="#{rendition.available}">
+                                <h:panelGrid>
+                                    <h:outputText value="#{rendition.rendition.label} properties" style="border-bottom: 1px solid black; font-weight: bold;" /> 
+                                    <h:panelGrid columns="2">
+                                        <h:outputText value="Filename:" />
+                                        <h:outputLink value="#{rendition.mediaItemRendition.absoluteFilename}">
+                                            <h:outputText value="#{rendition.mediaItemRendition.filename}" />
+                                        </h:outputLink>
+
+                                        <h:outputText value="Type:" />
+                                        <h:outputText value="#{rendition.mediaItemRendition.contentType}" />
+
+                                        <h:outputText value="Size:" />
+                                        <h:outputText value="#{converge:displaySize(rendition.mediaItemRendition.size)}" />
+
+                                        <h:outputText value="Colour space:" rendered="#{rendition.mediaItemRendition.colourSpace != null}" />
+                                        <h:outputText value="#{rendition.mediaItemRendition.colourSpace}" rendered="#{rendition.mediaItemRendition.colourSpace != null}" />
+
+                                        <h:outputText value="Width:" rendered="#{rendition.mediaItemRendition.width != null}" />
+                                        <h:outputText value="#{rendition.mediaItemRendition.width} px" rendered="#{rendition.mediaItemRendition.width != null }" />
+
+                                        <h:outputText value="Height:" rendered="#{rendition.mediaItemRendition.height != null}" />
+                                        <h:outputText value="#{rendition.mediaItemRendition.height} px" rendered="#{rendition.mediaItemRendition.height != null}" />
+
+                                        <h:outputText value="Resolution:" rendered="#{rendition.mediaItemRendition.resolution != null}" />
+                                        <h:outputText value="#{rendition.mediaItemRendition.resolution}" rendered="#{rendition.mediaItemRendition.resolution != null}" />
+
+                                        <h:outputText value="Bit rate:" rendered="#{rendition.mediaItemRendition.audioBitrate != null}" />
+                                        <h:outputText value="#{rendition.mediaItemRendition.audioBitrate}" rendered="#{rendition.mediaItemRendition.audioBitrate != null}" />
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </rich:toolTip>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.media_item_rendition_SIZE}" />
+                            </f:facet>
+                            <h:outputText value="#{converge:displaySize(rendition.mediaItemRendition.size)}" rendered="#{rendition.available}" />
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.media_item_rendition_STATUS}" />
+                            </f:facet>
+                            <h:outputText value="#{msgs.media_item_rendition_STATUS_AVAILABLE}" styleClass="mediaItemRenditionAvailable" rendered="#{rendition.available}" />
+                            <h:outputText value="#{msgs.media_item_rendition_STATUS_NOT_AVAILABLE}" styleClass="mediaItemRenditionNotAvailable" rendered="#{!rendition.available}" />
+                        </rich:column>
+                        <rich:column headerClass="renditionActionColumn" styleClass="center">
+
+                            <h:outputLink target="_blank" value="#{rendition.mediaItemRendition.absoluteFilename}" rendered="#{rendition.available}">
+                                <h:graphicImage value="#{res.LINK_ICON}" />
+                            </h:outputLink>
+
+                            <a4j:commandLink reRender="mpRenditionDetails" ajaxSingle="true" rendered="#{rendition.available}">
+                                <f:setPropertyActionListener target="#{mediaItemDetails.selectedRendition}" value="#{rendition.mediaItemRendition}" />
+                                <rich:componentControl for="mpRenditionDetails" operation="show" event="oncomplete" />
+                                <h:graphicImage value="#{res.EDIT_ICON}" />
+                            </a4j:commandLink>
+
+                            <a4j:commandLink reRender="mpNewRendition" ajaxSingle="true" rendered="#{!rendition.available}">
+                                <f:setPropertyActionListener target="#{mediaItemDetails.uploadRendition}" value="#{rendition.rendition}" />
+                                <rich:componentControl for="mpNewRendition" operation="show" event="oncomplete" />
+                                <h:graphicImage value="#{res.NEW_RENDITION_ICON}" />
+                            </a4j:commandLink>
+                        </rich:column>
+                    </rich:dataTable>
+                </div>
+
+                <converge:moduleSpacer />
+
+                <converge:moduleHeader moduleTitle="#{msgs.media_item_USAGE} (#{mediaItemDetails.usage.rowCount })" />
+                <div class="moduleContent">
+
+                    <h:panelGroup rendered="#{mediaItemDetails.usage.rowCount &lt; 1}" layout="block">
+                        <h:outputText value="#{msgs.media_item_NO_USAGE}" />
+                    </h:panelGroup>
+
+                    <rich:dataTable id="dtUsage" var="usage" value="#{mediaItemDetails.usage}" styleClass="table" headerClass="tableHeader" rowClasses="odd, even" rendered="#{mediaItemDetails.usage.rowCount &gt; 0}">
+                        <rich:column styleClass="center columnIcon">
+                            <f:facet name="header">
+                                <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                            </f:facet>
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItemArchive.xhtml?id=#{usage.newsItemId}" target="_blank">
+                                <h:graphicImage value="#{res.NEWS_ITEM_ICON}" />
+                            </h:outputLink>
+                        </rich:column>
+
+                        <rich:column sortBy="#{item.id}" sortOrder="DESCENDING" styleClass="right columnId">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.ID}" title="#{msgs.ARTICLE_ID_TOOLTIP}" />
+                            </f:facet>
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItemArchive.xhtml?id=#{usage.newsItemId}" target="_blank">
+                                <h:outputText value="#{usage.newsItemId}">
+                                    <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                                </h:outputText>
+                            </h:outputLink>
+                        </rich:column>
+
+                        <rich:column sortBy="#{usage.title}" styleClass="left">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.TITLE}" title="#{msgs.ARTICLE_TITLE_TOOLTIP}" />
+                            </f:facet>
+                            <h:panelGrid>
+                                <h:outputText value="#{usage.title}" title="" />
+                            </h:panelGrid>
+                        </rich:column>
+
+                        <rich:column sortBy="#{usage.caption}" styleClass="left">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.CAPTION}" />
+                            </f:facet>
+                            <h:panelGrid>
+                                <h:outputText value="#{usage.caption}" title="" />
+                            </h:panelGrid>
+                        </rich:column>
+
+                        <rich:column sortBy="#{usage.date}" styleClass="left">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.DATE}" />
+                            </f:facet>
+                            <h:panelGrid>
+                                <h:outputText value="#{usage.date}" title="" />
+                            </h:panelGrid>
+                        </rich:column>
+
+                        <rich:column sortBy="#{usage.outlet}" styleClass="left">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.OUTLET}" />
+                            </f:facet>
+                            <h:panelGrid>
+                                <h:outputText value="#{usage.outlet}" title="" />
+                            </h:panelGrid>
+                        </rich:column>
+
+                        <rich:column sortBy="#{usage.section}" styleClass="left">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.SECTION}" />
+                            </f:facet>
+                            <h:panelGrid>
+                                <h:outputText value="#{usage.section}" title="" />
+                            </h:panelGrid>
+                        </rich:column>
+
+                        <rich:column sortBy="#{usage.start}" styleClass="left">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.newsitem_START}" />
+                            </f:facet>
+                            <h:panelGrid>
+                                <h:outputText value="#{usage.start}" title="" />
+                            </h:panelGrid>
+                        </rich:column>
+
+                        <rich:column sortBy="#{usage.position}" styleClass="left">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs.newsitem_POSITION}" />
+                            </f:facet>
+                            <h:panelGrid>
+                                <h:outputText value="#{usage.position}" title="" />
+                            </h:panelGrid>
+                        </rich:column>
+                    </rich:dataTable>
+                </div>
+
+                <converge:moduleSpacer />
+
+                <converge:moduleHeader moduleTitle="#{msgs.media_item_CATALOGUE}" />
+                <div class="moduleContent">
+                    <h:panelGrid columns="2" columnClasses="top, top">
+                        <h:outputText value="#{msgs.media_item_CATALOGUE_NAME}" />
+                        <h:outputText value="#{mediaItemDetails.selectedMediaItem.catalogue.name}" />
+                        <h:outputText value="#{msgs.media_item_CATALOGUE_DESCRIPTION}" />
+                        <h:outputText value="#{mediaItemDetails.selectedMediaItem.catalogue.description}" />
+                        <h:outputText value="#{msgs.media_item_CATALOGUE_CAPACITY}" />
+                        <rich:progressBar minValue="0" maxValue="#{mediaItemDetails.selectedMediaItem.catalogue.space}" value="#{mediaItemDetails.selectedMediaItem.catalogue.space - mediaItemDetails.selectedMediaItem.catalogue.spaceAvailable}" enabled="false">
+                            <h:outputText value="#{converge:displaySize(mediaItemDetails.selectedMediaItem.catalogue.spaceAvailable)} remaining of #{converge:displaySize(mediaItemDetails.selectedMediaItem.catalogue.space)}"/>
+                        </rich:progressBar>
+                        <h:outputText value="#{msgs.media_item_CATALOGUE_EDITORS}" />
+                        <rich:dataGrid var="catalogueEditor" value="#{mediaItemDetails.editors}" columns="3">
+                            <h:outputText value="#{catalogueEditor.fullName}" />
+                        </rich:dataGrid>
+                    </h:panelGrid>
+                </div>
 
                 <rich:modalPanel id="mpNewConcept" autosized="true" domElementAttachment="parent">
                     <f:facet name="header">
@@ -244,9 +379,210 @@
                     </h:panelGrid>
                 </rich:modalPanel>
 
+                <a4j:region id="regRenditionUpload">
+                    <rich:modalPanel id="mpRenditionDetails" autosized="true" domElementAttachment="parent">
+
+                        <f:facet name="header">
+                            <h:panelGroup>
+                                <h:outputText value="#{msgs.media_item_rendition_DETAILS}" />
+                            </h:panelGroup>
+                        </f:facet>
+                        <f:facet name="controls">
+                            <h:panelGroup>
+                                <h:graphicImage id="imgCloseRenditionDetails" value="#{res.DIALOGUE_CLOSE_ICON}" style="link" />
+                                <rich:componentControl for="mpRenditionDetails" attachTo="imgCloseRenditionDetails" operation="hide" event="onclick"/>
+                            </h:panelGroup>
+                        </f:facet>
+
+                        <h:panelGrid id="pgRenditionDetails" style="width: 480px;">
+
+                            <rich:tabPanel id="tpRenditionDetails" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+
+                                <rich:tab id="tabRendition" label="#{msgs.media_item_RENDITION}">
+                                    <h:panelGrid id="pgRendition" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                        <h:outputText value="#{msgs.media_item_RENDITION}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.rendition.label}" styleClass="text mediumInput" disabled="true" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_FILENAME}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.filename}" styleClass="text mediumInput" disabled="true" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_URL}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.absoluteFilename}" styleClass="text mediumInput" disabled="true" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_SIZE}" />
+                                        <h:inputText value="#{converge:displaySize(mediaItemDetails.selectedRendition.size)}" styleClass="text mediumInput" disabled="true" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_TYPE}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.contentType}" styleClass="text mediumInput" disabled="true" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_REPLACE}" />
+                                        <rich:fileUpload fileUploadListener="#{mediaItemDetails.renditionUploadListener}"
+                                                         id="fuRendition"
+                                                         immediateUpload="true"
+                                                         addControlLabel="Select"
+                                                         allowFlash="false" listHeight="60" listWidth="450" ajaxSingle="true">
+                                            <a4j:support event="onuploadcomplete" ajaxSingle="true" reRender="pgRenditionDetails" />
+
+                                            <f:facet name="label">
+                                                <h:outputText value="#{msgs.media_item_rendition_UPLOAD_INDICATOR}" />
+                                            </f:facet>
+                                        </rich:fileUpload>
+                                    </h:panelGrid>
+                                </rich:tab>
+
+                                <rich:tab id="tabImage" label="#{msgs.media_item_rendition_IMAGE}">
+                                    <h:panelGrid id="pgImage" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                        <h:outputText value="#{msgs.media_item_rendition_COLOUR_SPACE}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.colourSpace}" styleClass="text mediumInput" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_WIDTH}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.width}" styleClass="text smallInput">
+                                            <f:convertNumber integerOnly="true" groupingUsed="false" />
+                                        </h:inputText>
+
+                                        <h:outputText value="#{msgs.media_item_rendition_HEIGHT}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.height}" styleClass="text smallInput">
+                                            <f:convertNumber integerOnly="true" groupingUsed="false" />
+                                        </h:inputText>
+
+                                        <h:outputText value="#{msgs.media_item_rendition_RESOLUTION}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.resolution}" styleClass="text smallInput">
+                                            <f:convertNumber integerOnly="true" groupingUsed="false" />
+                                        </h:inputText>
+                                    </h:panelGrid>
+                                </rich:tab>
+
+                                <rich:tab id="tabAudio" label="#{msgs.media_item_rendition_AUDIO}">
+                                    <h:panelGrid id="pgAudio" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                        <h:outputText value="#{msgs.media_item_rendition_AUDIO_BITRATE}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.audioBitrate}" styleClass="text smallInput">
+                                            <f:convertNumber integerOnly="true" groupingUsed="false" />
+                                        </h:inputText>
+
+                                        <h:outputText value="#{msgs.media_item_rendition_AUDIO_CHANNELS}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.audioChannels}" styleClass="text mediumInput" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_AUDIO_CODEC}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.audioCodec}" styleClass="text mediumInput" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_AUDIO_SAMPLE_RATE}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.audioSampleRate}" styleClass="text smallInput">
+                                            <f:convertNumber integerOnly="true" groupingUsed="false" />
+                                        </h:inputText>
+
+                                        <h:outputText value="#{msgs.media_item_rendition_AUDIO_SAMPLE_SIZE}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.audioSampleSize}" styleClass="text smallInput">
+                                            <f:convertNumber integerOnly="true" groupingUsed="false" />
+                                        </h:inputText>
+
+                                        <h:outputText value="#{msgs.media_item_rendition_AUDIO_VARIABLE_BITRATE}" />
+                                        <h:selectBooleanCheckbox value="#{mediaItemDetails.selectedRendition.audioVariableBitrate}" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_DURATION}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.duration}" styleClass="text smallInput">
+                                            <f:convertNumber integerOnly="true" groupingUsed="false" />
+                                        </h:inputText>
+                                    </h:panelGrid>
+                                </rich:tab>
+
+                                <rich:tab id="tabVideo" label="#{msgs.media_item_rendition_VIDEO}">
+                                    <h:panelGrid id="pgVideo" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                        <h:outputText value="#{msgs.media_item_rendition_VIDEO_CODEC}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.videoCodec}" styleClass="text mediumInput" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_VIDEO_AVERAGE_BIT_RATE}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.videoAverageBitRate}" styleClass="text smallInput">
+                                            <f:convertNumber integerOnly="true" groupingUsed="false" />
+                                        </h:inputText>
+
+                                        <h:outputText value="#{msgs.media_item_rendition_VIDEO_VARIABLE_BIT_RATE}" />
+                                        <h:selectBooleanCheckbox value="#{mediaItemDetails.selectedRendition.videoVariableBitRate}" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_VIDEO_FRAME_RATE}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.videoFrameRate}" styleClass="text mediumInput" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_VIDEO_SCAN_TECHNIQUE}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.videoScanTechnique}" styleClass="text mediumInput" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_VIDEO_ASPECT_RATIO}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.videoAspectRatio}" styleClass="text mediumInput" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_VIDEO_SAMPLING_METHOD}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.videoSamplingMethod}" styleClass="text mediumInput" />
+
+                                        <h:outputText value="#{msgs.media_item_rendition_DURATION}" />
+                                        <h:inputText value="#{mediaItemDetails.selectedRendition.duration}" styleClass="text smallInput">
+                                            <f:convertNumber integerOnly="true" groupingUsed="false" />
+                                        </h:inputText>
+                                    </h:panelGrid>
+
+                                </rich:tab>
+                            </rich:tabPanel>
+
+                            <h:panelGroup styleClass="dialogueButtons">
+
+                                <a4j:commandLink id="lnkDeleteRendition" styleClass="dialogButton #{mediaItemDetails.selectedRendition.originalRendition ? 'disabledDialogButton' : ''}" disabled="#{mediaItemDetails.selectedRendition.originalRendition}"  value="#{msgs.DELETE}" actionListener="#{mediaItemDetails.onDeleteRendition}" reRender="dtRenditions, preview" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpRenditionDetails')}.hide(); return false; }" onclick="if (confirm('#{msgs.media_item_CONFIRM_DELETE_RENDITION}') != true){ return false; };" />
+                                <a4j:commandLink id="lnkSaveRendition" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{mediaItemDetails.onSaveRendition}" reRender="dtRenditions, preview" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpRenditionDetails')}.hide(); return false; }" />
+                                <h:commandLink id="lnkCloseRendition" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpRenditionDetails')}.hide(); return false;" />
+                            </h:panelGroup>
+                        </h:panelGrid>
+                    </rich:modalPanel>
+                </a4j:region>
+
+
+
+                <a4j:region id="regNewRendition">
+                    <rich:modalPanel id="mpNewRendition" autosized="true" domElementAttachment="parent">
+
+                        <f:facet name="header">
+                            <h:panelGroup>
+                                <h:outputText value="#{msgs.media_item_rendition_DETAILS}" />
+                            </h:panelGroup>
+                        </f:facet>
+                        <f:facet name="controls">
+                            <h:panelGroup>
+                                <h:graphicImage id="imgCloseNewRendition" value="#{res.DIALOGUE_CLOSE_ICON}" style="link" />
+                                <rich:componentControl for="mpNewRendition" attachTo="imgCloseNewRendition" operation="hide" event="onclick"/>
+                            </h:panelGroup>
+                        </f:facet>
+
+                        <h:panelGrid id="pgNewRendition" style="width: 480px;">
+                            <a4j:log popup="false" level="ERROR" width="400" height="200" />
+
+                            <rich:tabPanel id="tpNewRendition" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+
+                                <rich:tab id="tabNewRendition" label="#{msgs.media_item_rendition_UPLOAD}">
+                                    <h:panelGrid id="pgRenditionUpload" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+
+                                        <h:outputText value="#{msgs.media_item_rendition_UPLOAD}" />
+                                        <rich:fileUpload fileUploadListener="#{mediaItemDetails.newRenditionUploadListener}"
+                                                         id="fuNewRendition"
+                                                         immediateUpload="true"
+                                                         addControlLabel="Select"
+                                                         allowFlash="false" listHeight="60" listWidth="450" ajaxSingle="true">
+                                            <f:facet name="label">
+                                                <h:outputText value="#{msgs.media_item_rendition_UPLOAD_INDICATOR}" />
+                                            </f:facet>
+                                        </rich:fileUpload>
+                                    </h:panelGrid>
+                                </rich:tab>
+
+                                <rich:tab id="tabDuplicateImage" label="#{msgs.media_item_rendition_DUPLICATE}" rendered="#{mediaItemDetails.selectedMediaItem.original.image}">
+                                    <h:panelGrid id="pgDuplicateImage" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                    </h:panelGrid>
+                                </rich:tab>
+
+                            </rich:tabPanel>
+
+                            <h:panelGroup styleClass="dialogueButtons">
+                                <a4j:commandLink id="lnkSaveNewRendition" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{mediaItemDetails.onSaveNewRendition}" reRender="dtRenditions, preview" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpNewRendition')}.hide(); return false; }" />
+                                <h:commandLink id="lnkCloseNewRendition" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpNewRendition')}.hide(); return false;" />
+                            </h:panelGroup>
+                        </h:panelGrid>
+                    </rich:modalPanel>
+                </a4j:region>
+
             </c:if>
         </ui:define>
-
     </ui:composition>
-
 </jsp:root>

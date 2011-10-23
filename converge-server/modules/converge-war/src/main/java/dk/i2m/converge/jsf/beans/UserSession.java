@@ -27,11 +27,14 @@ import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.ConfigurationKey;
+import dk.i2m.converge.core.reporting.activity.UserActivitySummary;
+import dk.i2m.converge.ejb.facades.ReportingFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import dk.i2m.converge.jsf.model.MenuItem;
 import dk.i2m.converge.jsf.model.MenuItems;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.jsf.model.MenuHelper;
+import dk.i2m.converge.utils.CalendarUtils;
 import dk.i2m.jsf.JsfUtils;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,6 +68,8 @@ public class UserSession {
 
     @EJB private SystemFacadeLocal systemFacade;
 
+    @EJB private ReportingFacadeLocal reportingFacade;
+
     private UserAccount user;
 
     /** Menu items appearing on the page header. */
@@ -86,6 +91,10 @@ public class UserSession {
     private Notification selectedNotification;
 
     private NewswireService selectedNewswireService;
+
+    private UserActivitySummary lastMonthActivity;
+
+    private UserActivitySummary thisMonthActivity;
 
     /**
      * Creates a new instance of {@link UserSession}.
@@ -157,6 +166,14 @@ public class UserSession {
      */
     public boolean isCatalogueEditor() {
         return userFacade.isCatalogueEditor(getUser().getUsername());
+    }
+
+    public UserActivitySummary getLastMonthActivity() {
+        return lastMonthActivity;
+    }
+
+    public UserActivitySummary getThisMonthActivity() {
+        return thisMonthActivity;
     }
 
     /**
@@ -247,7 +264,7 @@ public class UserSession {
 
             try {
                 user = userFacade.findById(uid, true);
-
+                onRefreshUserActivity();
                 for (SystemPrivilege p : SystemPrivilege.values()) {
                     privilegedOutlets.put(p.name(), user.getPrivilegedOutlets(p));
                     privileges.put(p.name(), user.isPrivileged(p));
@@ -273,8 +290,6 @@ public class UserSession {
     }
 
     private void generateMenu() {
-        LOG.log(Level.FINE, "Generating menu for user");
-
         // Set-up menu items
         MenuItems menuItems = MenuHelper.getInstance().getMenuItems();
 
@@ -376,6 +391,27 @@ public class UserSession {
         }
 
         return sections;
+    }
+
+    /**
+     * Refreshes the {@link UserActivitySummary} for the past two months.
+     * After executing this method, the activity summary is available in
+     * {@link UserSession#getLastMonthActivity()} and 
+     * {@link UserSession#getThisMonthActivity()}.
+     */
+    public void onRefreshUserActivity() {
+        java.util.Calendar lastMonth = java.util.Calendar.getInstance();
+        lastMonth.add(java.util.Calendar.MONTH, -1);
+        java.util.Calendar thisMonth = java.util.Calendar.getInstance();
+
+        java.util.Calendar lastMonthFirstDay = CalendarUtils.getFirstDayOfMonth(lastMonth);
+        java.util.Calendar lastMonthLastDay = CalendarUtils.getLastDayOfMonth(lastMonth);
+
+        java.util.Calendar thisMonthFirstDay = CalendarUtils.getFirstDayOfMonth(thisMonth);
+        java.util.Calendar thisMonthLastDay = CalendarUtils.getLastDayOfMonth(thisMonth);
+
+        this.lastMonthActivity = reportingFacade.generateUserActivitySummary(lastMonthFirstDay.getTime(), lastMonthLastDay.getTime(), getUser());
+        this.thisMonthActivity = reportingFacade.generateUserActivitySummary(thisMonthFirstDay.getTime(), thisMonthLastDay.getTime(), getUser());
     }
 
     /**

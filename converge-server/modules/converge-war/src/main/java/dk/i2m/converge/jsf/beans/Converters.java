@@ -33,7 +33,7 @@ import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.core.workflow.WorkflowStep;
 import dk.i2m.converge.ejb.facades.CalendarFacadeLocal;
 import dk.i2m.converge.ejb.facades.ListingFacadeLocal;
-import dk.i2m.converge.ejb.facades.MediaDatabaseFacadeLocal;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
 import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
@@ -50,8 +50,8 @@ import dk.i2m.converge.jsf.converters.EventCategoryConverter;
 import dk.i2m.converge.jsf.converters.FinancialMarketConverter;
 import dk.i2m.converge.jsf.converters.LanguageConverter;
 import dk.i2m.converge.jsf.converters.LocaleConverter;
-import dk.i2m.converge.jsf.converters.MediaItemVersionLabelConverter;
-import dk.i2m.converge.jsf.converters.MediaRepositoryConverter;
+import dk.i2m.converge.jsf.converters.RenditionConverter;
+import dk.i2m.converge.jsf.converters.CatalogueConverter;
 import dk.i2m.converge.jsf.converters.NewswireServiceConverter;
 import dk.i2m.converge.jsf.converters.OutletConverter;
 import dk.i2m.converge.jsf.converters.SectionConverter;
@@ -82,7 +82,7 @@ public class Converters {
 
     @EJB private CalendarFacadeLocal calendarFacade;
 
-    @EJB private MediaDatabaseFacadeLocal mediaRepositoryFacade;
+    @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @EJB private SystemFacadeLocal systemFacade;
 
@@ -264,17 +264,23 @@ public class Converters {
      * @return {@link Converter} for media repositories
      */
     public Converter getMediaRepositoryConverter() {
-        return new MediaRepositoryConverter(mediaRepositoryFacade);
+        return new CatalogueConverter(catalogueFacade);
     }
 
-    public Converter getMediaItemVersionLabelConverter() {
-        return new MediaItemVersionLabelConverter(mediaRepositoryFacade);
+    
+    /**
+     * Gets a {@link Converter} for {@link Rendition}s.
+     * 
+     * @return JSF {@link Converter} for {@link Rendition}s
+     */
+    public Converter getRenditionConverter() {
+        return new RenditionConverter(catalogueFacade);
     }
 
     public Converter getLanguageConverter() {
         return new LanguageConverter(systemFacade);
     }
-    
+
     public Converter getNewswireServiceConverter() {
         return new NewswireServiceConverter(newswireService);
     }

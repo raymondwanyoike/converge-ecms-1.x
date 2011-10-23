@@ -51,6 +51,8 @@ public class WorkflowStep implements Serializable {
 
     public static final String FIND_BY_WORKFLOW_STATE = "WorkflowStep.findByWorkflowState";
 
+    private static final long serialVersionUID = 1L;
+
     /** Unique ID of the next state. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -79,17 +81,12 @@ public class WorkflowStep implements Serializable {
     @JoinColumn(name = "from_state_id")
     private WorkflowState fromState;
 
-    @OneToMany(mappedBy = "workflowStep", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @PrivateOwned
-    private List<WorkflowStepValidation> validation = new ArrayList<WorkflowStepValidation>();
+    @Column(name = "submitted")
+    private boolean treatAsSubmitted = false;
 
     @OneToMany(mappedBy = "step", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @PrivateOwned
     private List<WorkflowStepValidator> validators = new ArrayList<WorkflowStepValidator>();
-
-    @javax.persistence.Version
-    @Column(name = "opt_lock")
-    private int versionIdentifier;
 
     @OneToMany(mappedBy = "workflowStep", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @PrivateOwned
@@ -142,6 +139,30 @@ public class WorkflowStep implements Serializable {
         this.toState = toState;
     }
 
+    /**
+     * If this {@link WorkflowStep} is selected, submitted will be set
+     * on the {@link WorkflowStateTransition} if this method returns
+     * {@code true}.
+     * 
+     * @return {@link true} if {@link WorkflowStateTransition#submitted}
+     *         should be set, otherwise {@link false}
+     */
+    public boolean isTreatAsSubmitted() {
+        return treatAsSubmitted;
+    }
+
+    /**
+     * If this {@link WorkflowStep} is selected, submitted will be set
+     * on the {@link WorkflowStateTransition} if this method returns
+     * {@code true}.
+     * 
+     * @param {@link true} if {@link WorkflowStateTransition#submitted}
+     *         should be set, otherwise {@link false}
+     */
+    public void setTreatAsSubmitted(boolean treatAsSubmitted) {
+        this.treatAsSubmitted = treatAsSubmitted;
+    }
+
     public Integer getOrder() {
         return order;
     }
@@ -149,14 +170,6 @@ public class WorkflowStep implements Serializable {
     public void setOrder(Integer order) {
         this.order = order;
     }
-
-//    public List<WorkflowStepValidation> getValidation() {
-//        return validation;
-//    }
-//
-//    public void setValidation(List<WorkflowStepValidation> validation) {
-//        this.validation = validation;
-//    }
 
     public List<WorkflowStepAction> getActions() {
         return actions;
@@ -172,14 +185,6 @@ public class WorkflowStep implements Serializable {
 
     public void setValidators(List<WorkflowStepValidator> validators) {
         this.validators = validators;
-    }
-
-    public int getVersionIdentifier() {
-        return versionIdentifier;
-    }
-
-    public void setVersionIdentifier(int versionIdentifier) {
-        this.versionIdentifier = versionIdentifier;
     }
 
     @Override

@@ -109,4 +109,6 @@ public interface SearchEngineLocal {
      *          If the index could not be indexed
      */
     void optimizeIndex() throws SearchEngineIndexingException;
+
+    byte[] generateReport(dk.i2m.converge.domain.search.SearchResults results);
 }

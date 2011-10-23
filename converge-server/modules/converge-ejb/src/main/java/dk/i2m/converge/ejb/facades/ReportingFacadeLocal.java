@@ -30,5 +30,11 @@ public interface ReportingFacadeLocal {
 
     dk.i2m.converge.core.reporting.activity.ActivityReport generateActivityReport(java.util.Date start, java.util.Date end, dk.i2m.converge.core.security.UserRole userRole, WorkflowState state);
 
+    dk.i2m.converge.core.reporting.activity.UserActivity generateUserActivityReport(java.util.Date start, java.util.Date end, dk.i2m.converge.core.security.UserAccount user);
+
+    dk.i2m.converge.core.reporting.activity.UserActivitySummary generateUserActivitySummary(java.util.Date start, java.util.Date end, dk.i2m.converge.core.security.UserAccount user);
+
     byte[] convertToExcel(ActivityReport report);
+
+    public dk.i2m.converge.core.reporting.activity.ActivityReport generateActivityReport(java.util.Date start, java.util.Date end, dk.i2m.converge.core.security.UserRole userRole);
 }

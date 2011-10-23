@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2011 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  */
 package dk.i2m.converge.jsf.converters;
 
-import dk.i2m.converge.core.content.Rendition;
-import dk.i2m.converge.ejb.facades.MediaDatabaseFacadeLocal;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,17 +26,18 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 
 /**
+ * JSF {@link Converter} for {@link Catalogue} objects.
  *
  * @author Allan Lykke Christensen
  */
-public class MediaItemVersionLabelConverter implements Converter {
+public class CatalogueConverter implements Converter {
 
-    private static final Logger log = Logger.getLogger(MediaItemVersionLabelConverter.class.getName());
+    private static final Logger LOG = Logger.getLogger(CatalogueConverter.class.getName());
 
-    private MediaDatabaseFacadeLocal mediaDatabaseFacade;
+    private CatalogueFacadeLocal catalogueFacade;
 
-    public MediaItemVersionLabelConverter(MediaDatabaseFacadeLocal mediaDatabaseFacade) {
-        this.mediaDatabaseFacade = mediaDatabaseFacade;
+    public CatalogueConverter(CatalogueFacadeLocal catalogueFacade) {
+        this.catalogueFacade = catalogueFacade;
     }
 
     @Override
@@ -45,10 +46,10 @@ public class MediaItemVersionLabelConverter implements Converter {
             if (value == null) {
                 return null;
             }
-            return mediaDatabaseFacade.findMediaItemVersionLabelById(Long.valueOf(value));
+            return catalogueFacade.findCatalogueById(Long.valueOf(value));
 
         } catch (DataNotFoundException ex) {
-            log.log(Level.WARNING, "No MediaItemVersionLabel matching [{0}]", value);
+            LOG.log(Level.WARNING, "No Catalogue matching [{0}]", value);
             return null;
         }
     }
@@ -58,8 +59,8 @@ public class MediaItemVersionLabelConverter implements Converter {
         if (value == null) {
             return "";
         } else {
-            Rendition label = (Rendition) value;
-            return String.valueOf(label.getId());
+            Catalogue repository = (Catalogue) value;
+            return String.valueOf(repository.getId());
         }
     }
 }

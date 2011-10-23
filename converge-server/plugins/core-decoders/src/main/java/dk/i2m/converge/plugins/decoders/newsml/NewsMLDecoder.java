@@ -16,16 +16,18 @@
  */
 package dk.i2m.converge.plugins.decoders.newsml;
 
-import dk.i2m.commons.FileUtils;
-import dk.i2m.commons.StringUtils;
 import dk.i2m.converge.core.content.ContentTag;
-import dk.i2m.converge.core.content.MediaRepository;
-import dk.i2m.converge.core.helpers.CatalogueHelper;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
+import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.newswire.NewswireItemAttachment;
 import dk.i2m.converge.core.newswire.NewswireService;
+import dk.i2m.converge.core.newswire.NewswireServiceProperty;
+import dk.i2m.converge.core.plugin.ArchiveException;
 import dk.i2m.converge.core.plugin.NewswireDecoder;
 import dk.i2m.converge.core.plugin.PluginContext;
+import dk.i2m.converge.core.utils.FileUtils;
+import dk.i2m.converge.core.utils.StringUtils;
 import dk.i2m.converge.nar.newsml.v1_0.ContentItem;
 import dk.i2m.converge.nar.newsml.v1_0.DataContent;
 import dk.i2m.converge.nar.newsml.v1_0.Description;
@@ -90,6 +92,8 @@ public class NewsMLDecoder implements NewswireDecoder {
 
     public final static String PROPERTY_NEWSWIRE_DELETE_AFTER_PROCESS = "Delete processed newswires";
 
+    public final static String PROPERTY_RENDITION_MAPPING = "Attachment rendition mapping (converge name;attachment description)";
+
     private final static DateFormat NEWSML_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd'T'HHmmssZZZZ");
 
     private PluginContext pluginCtx;
@@ -97,6 +101,8 @@ public class NewsMLDecoder implements NewswireDecoder {
     private NewswireService newswireService;
 
     private List<NewswireItem> newswireItems = null;
+
+    private Map<String, String> renditionMapping = new HashMap<String, String>();
 
     @Override
     public Map<String, String> getAvailableProperties() {
@@ -106,6 +112,7 @@ public class NewsMLDecoder implements NewswireDecoder {
             availableProperties.put(PROPERTY_ATTACHMENT_CATALOGUE, PROPERTY_ATTACHMENT_CATALOGUE);
             availableProperties.put(PROPERTY_NEWSWIRE_PROCESSED_LOCATION, PROPERTY_NEWSWIRE_PROCESSED_LOCATION);
             availableProperties.put(PROPERTY_NEWSWIRE_DELETE_AFTER_PROCESS, PROPERTY_NEWSWIRE_DELETE_AFTER_PROCESS);
+            availableProperties.put(PROPERTY_RENDITION_MAPPING, PROPERTY_RENDITION_MAPPING);
         }
         return availableProperties;
     }
@@ -115,6 +122,16 @@ public class NewsMLDecoder implements NewswireDecoder {
         this.pluginCtx = ctx;
         this.newswireService = newswire;
         this.properties = newswire.getPropertiesMap();
+
+        // Read rendition mapping properties
+        for (NewswireServiceProperty property : newswire.getProperties()) {
+            if (property.getKey().equals(PROPERTY_RENDITION_MAPPING)) {
+                String[] mapping = property.getValue().split(";");
+                if (mapping != null && mapping.length == 2) {
+                    renditionMapping.put(mapping[0], mapping[1]);
+                }
+            }
+        }
 
         this.newswireItems = new ArrayList<NewswireItem>();
 
@@ -167,7 +184,7 @@ public class NewsMLDecoder implements NewswireDecoder {
             }
 
             boolean useCatalogue = false;
-            MediaRepository catalogue = null;
+            Catalogue catalogue = null;
 
             // Property Validation
             if (this.properties.containsKey(PROPERTY_ATTACHMENT_CATALOGUE)) {
@@ -389,8 +406,8 @@ public class NewsMLDecoder implements NewswireDecoder {
                                                             if (useCatalogue) {
                                                                 attachment.setCatalogue(catalogue);
                                                                 try {
-                                                                    attachment.setCataloguePath(CatalogueHelper.getInstance().archive(imgFile, catalogue));
-                                                                } catch (IOException ex) {
+                                                                    attachment.setCataloguePath(pluginCtx.archive(imgFile, catalogue.getId(), imgFile.getName()));
+                                                                } catch (ArchiveException ex) {
                                                                     fileMissing = true;
                                                                 }
                                                             } else {
@@ -404,6 +421,12 @@ public class NewsMLDecoder implements NewswireDecoder {
                                                             attachment.setDescription(p.getValue());
                                                             attachment.setFilename(picContentItem.getHref());
                                                             attachment.setSize(imgFile.length());
+                                                            
+                                                            if (renditionMapping.containsKey(p.getValue())) {
+                                                                Rendition rendition = pluginCtx.findRenditionByName(renditionMapping.get(p.getValue()));
+                                                                attachment.setRendition(rendition);
+                                                            }
+                                                            
                                                             newswireItem.getAttachments().add(attachment);
 
                                                             if (p.getValue().equalsIgnoreCase("Thumbnail")) {

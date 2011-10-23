@@ -16,11 +16,11 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.commons.BeanComparator;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.dto.EditionAssignmentView;
 import dk.i2m.converge.core.dto.EditionView;
 import dk.i2m.converge.core.dto.OutletActionView;
+import dk.i2m.converge.core.utils.BeanComparator;
 import dk.i2m.converge.core.workflow.EditionActionException;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.core.workflow.Department;

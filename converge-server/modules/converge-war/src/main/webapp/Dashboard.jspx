@@ -31,7 +31,7 @@
                         </rich:column>
 
                     </rich:dataTable>
-                            
+
                 </div>
             </h:form>
             <div style="clear: both; padding-bottom: 12px;"></div>
@@ -62,7 +62,8 @@
 
         <ui:define name="rightColumn">
             <converge:userProfileModule id="modUserProfile" user="#{userSession.user}" />
-
+            <converge:moduleSpacer />
+            <converge:userActivityModule id="modUserActivity" showMoreStatistics="true" />
             <converge:moduleSpacer />
 
             <h:form id="frmTodaysEvents">

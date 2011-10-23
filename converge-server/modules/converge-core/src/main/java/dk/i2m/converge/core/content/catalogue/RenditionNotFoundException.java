@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2011 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,28 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.core.content;
+package dk.i2m.converge.core.content.catalogue;
 
 /**
- * {@link Exception} thrown when thumbnail generation fails.
+ * {@link Exception} thrown when a requested {@link Rendition} could
+ * not be found.
  *
  * @author Allan Lykke Christensen
  */
-public class ThumbnailGeneratorException extends Exception {
+public class RenditionNotFoundException extends Exception {
 
-    public ThumbnailGeneratorException(Throwable cause) {
+    public RenditionNotFoundException(Throwable cause) {
         super(cause);
     }
 
-    public ThumbnailGeneratorException(String string, Throwable cause) {
-        super(string, cause);
+    public RenditionNotFoundException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public ThumbnailGeneratorException(String string) {
-        super(string);
+    public RenditionNotFoundException(String message) {
+        super(message);
     }
 
-    public ThumbnailGeneratorException() {
+    public RenditionNotFoundException() {
         super();
     }
 }

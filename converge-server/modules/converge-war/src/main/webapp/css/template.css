@@ -892,6 +892,16 @@ form {
     margin-left: 5px;
 }
 
+.disabledDialogButton {
+    background-image: url(../images/template/tables/header_background.gif);
+    background-color: #ffffff;
+    background-repeat: repeat-x;
+    border: 1px outset #dddddd;
+    cursor: 'pointer';
+    cursor: 'hand';
+    font-style: italic;
+    color: silver;
+}
 
 .rich-spinner-input-container,
 .text {
@@ -1584,13 +1594,8 @@ form {
     margin-bottom: 5px;
 }
 
-.top {
-    vertical-align: top;
-}
-
-.bold {
-    font-weight: bold;
-}
+.top { vertical-align: top;}
+.bold { font-weight: bold; }
 
 .geoLeft {
     vertical-align: top;
@@ -1714,6 +1719,14 @@ div.black h2 {
 .renditionActionColumn { width: 90px; }
 .noborder {border: 0px;}
 .mediaItemPreview { text-align: center; }
-.mediaItemRenditionAvailable { padding: 2px; background-color: #00AA00; color: white; font-weight: bold; border: 1px solid black; text-transform: uppercase; }
-.mediaItemRenditionNotAvailable { padding: 2px; background-color: #ff0000; color: white; font-weight: bold; border: 1px solid black; text-transform: uppercase; }
+.mediaItemRenditionAvailable { padding: 2px; padding-left: 5px; padding-right: 5px; background-color: #00AA00; color: white; font-weight: bold; border: 1px solid black; text-transform: uppercase; }
+.mediaItemRenditionNotAvailable { padding: 2px;  padding-left: 5px; padding-right: 5px; background-color: #ff0000; color: white; font-weight: bold; border: 1px solid black; text-transform: uppercase; }
 .disabledCriteria { color: #cccccc;}
+.colMediaAttachment { width: 250px; vertical-align: bottom; }
+
+.colMediaAttachmentCaptionLabel { vertical-align: top;  font-size: smaller; padding: 4px; margin:4px; font-weight: bold; background: #dddddd; text-transform: uppercase}
+
+.myActivityTitle { font-weight: bold; font-size: 1.2em; }
+.myActivityTable { border-top: 1px solid silver; margin-top: 2px; margin-bottom: 10px; margin-right: 10px; }
+.myActivityTableHeader { text-transform: uppercase; font-size: 0.9em; }
+.myActivityMonthLabel { padding-right: 5px; }

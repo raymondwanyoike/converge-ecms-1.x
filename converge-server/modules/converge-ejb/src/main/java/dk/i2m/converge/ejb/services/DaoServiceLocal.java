@@ -38,7 +38,7 @@ public interface DaoServiceLocal {
      * Entity to store
      * @return Object stored in the data store.
      */
-    <T> T create(T t);
+     <T> T create(T t);
 
     /**
      * Remove a given object from the data store.
@@ -59,7 +59,11 @@ public interface DaoServiceLocal {
      * Type of entity
      * @return {@link List} of all entities of the given type
      */
-    <T> List<T> findAll(Class<T> type);
+     <T> List<T> findAll(Class<T> type);
+
+     <T> List<T> findAll(Class<T> type, int start, int resultLimit);
+
+     <T> Number count(Class<T> type, String field);
 
     /**
      * Finds a given entity in the data store.
@@ -74,7 +78,7 @@ public interface DaoServiceLocal {
      * @throws DataNotFoundException
      * If no match could be found
      */
-    <T> T findById(Class<T> type, Object id) throws DataNotFoundException;
+     <T> T findById(Class<T> type, Object id) throws DataNotFoundException;
 
     /**
      * Finds a {@link List} of entities returned from the given native SQL
@@ -123,7 +127,7 @@ public interface DaoServiceLocal {
      * @throws DataNotFoundException
      *          If an entity could not be found
      */
-    <T> T findObjectWithNamedQuery(Class<T> type, String namedQueryName, Map<String, Object> parameters) throws DataNotFoundException;
+     <T> T findObjectWithNamedQuery(Class<T> type, String namedQueryName, Map<String, Object> parameters) throws DataNotFoundException;
 
     /**
      * Finds a {@link List} of entity returned by the given named query.
@@ -163,7 +167,7 @@ public interface DaoServiceLocal {
      *          If <code>t</code> is outdated, and updated prior
      *          to the call of this method
      */
-    <T> T update(T t) throws OptimisticLockException;
+     <T> T update(T t) throws OptimisticLockException;
 
     /**
      * Executes a query on the database and returns the number of records affected.

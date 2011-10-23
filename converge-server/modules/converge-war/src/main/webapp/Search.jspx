@@ -17,7 +17,10 @@
                         <h:column>
                             <h:panelGrid columns="2" style="width: 100%" columnClasses="left,btnC">
                                 <h:inputText id="txtSearchKeyword" styleClass="text searchInput" value="#{search.keyword}" title="" />
-                                <a4j:commandButton type="submit" styleClass="button dynamicButton searchButton" value="#{msgs.search_SEARCH_BUTTON_LABEL}" actionListener="#{search.onSearch}" reRender="frmPage,frmQuery" />
+                                <h:panelGrid columns="2">
+                                    <a4j:commandButton type="submit" styleClass="button dynamicButton searchButton" value="#{msgs.search_SEARCH_BUTTON_LABEL}" actionListener="#{search.onSearch}" reRender="frmPage,frmQuery" />
+                                    <a4j:commandButton styleClass="button dynamicButton searchButton" value="Clear" reRender="frmPage,frmQuery" actionListener="#{search.onClear}" />
+                                </h:panelGrid>
                             </h:panelGrid>
                         </h:column>
                         <h:column>
@@ -37,12 +40,12 @@
                             </h:selectBooleanCheckbox>
                             <h:column>
                                 <h:panelGrid columns="2">
-                                    
-                                <h:outputText value="#{msgs.search_CRITERIA_TYPE}" styleClass="#{search.criteriaType?'':'disabledCriteria'}" />
-                                <h:selectOneRadio id="smcType" value="#{search.searchType}" disabled="#{!search.criteriaType}" styleClass="#{search.criteriaType?'':'disabledCriteria'}" >
-                                    <f:selectItem itemLabel="#{msgs.content_type_STORY}" itemValue="type:Story" />
-                                    <f:selectItem itemLabel="#{msgs.content_type_MEDIA}" itemValue="type:Media" />
-                                </h:selectOneRadio>
+
+                                    <h:outputText value="#{msgs.search_CRITERIA_TYPE}" styleClass="#{search.criteriaType?'':'disabledCriteria'}" />
+                                    <h:selectOneRadio id="smcType" value="#{search.searchType}" disabled="#{!search.criteriaType}" styleClass="#{search.criteriaType?'':'disabledCriteria'}" >
+                                        <f:selectItem itemLabel="#{msgs.content_type_STORY}" itemValue="type:Story" />
+                                        <f:selectItem itemLabel="#{msgs.content_type_MEDIA}" itemValue="type:Media" />
+                                    </h:selectOneRadio>
                                 </h:panelGrid>
                             </h:column>
 
@@ -108,6 +111,18 @@
                                         <f:param value="#{search.results.start+search.searchResults.rowCount}" />
                                     </h:outputFormat>
 
+                                    <h:panelGrid style="float: right; margin-bottom: 5px;" columns="2">
+                                        <h:commandLink actionListener="#{search.onGenerateOverview}" >
+                                            <h:graphicImage url="/images/mime/application/vnd.ms-excel.gif" />
+                                        </h:commandLink>
+
+                                        <h:commandLink actionListener="#{search.onGenerateOverview}" >
+                                            <h:outputText value="Download as spreadsheet" />
+                                        </h:commandLink>
+                                    </h:panelGrid>
+
+
+
                                 </div>
                                 <div style="clear: both; padding: 9px;" />
 
@@ -120,61 +135,61 @@
                                     <p style="margin-top: 1px;">
                                         <h:graphicImage url="#{item.previewLink}" rendered="#{item.preview &amp;&amp; !item.video &amp;&amp; !item.audio}" styleClass="searchResultThumb" />
                                         <h:panelGroup rendered="#{item.video || item.audio}" styleClass="searchResultThumb">
-                                        <converge:mediaPlayer id="#{item.id}" value="#{item.directLink}" height="150" width="150" controlbar="none" />
-                                    </h:panelGroup>
-                                    <h:outputText value="#{item.description}" escape="false" /><br/>
-                                    <span class="searchResultDescription"><h:outputText value="#{item.note}" escape="false" /></span>
-                                    <span class="searchResultDate">#{msgs.DATE}:&#160;
-                                        <h:outputText value="#{item.earliestDate}" rendered="#{item.earliestDate != null}">
-                                            <f:convertDateTime pattern="#{msgs.FORMAT_DATE}" timeZone="#{userSession.user.timeZone}" />
-                                        </h:outputText>
-                                        <h:outputText value="#{msgs.UNKNOWN}" rendered="#{item.earliestDate == null}" />
-                                    </span>
-                                </p>
-                                <converge:moduleSpacer />
-                            </ui:repeat>
-
-                            <h:panelGroup styleClass="searchPages" layout="block">
-                                <h:outputText value="#{msgs.search_PAGES}" />
-                                <ui:repeat value="#{search.pages}" var="page">
-                                    <a4j:commandLink styleClass="#{((search.results.currentPage+1) == page.page) ? 'searchPageSelected' : 'searchPage'}" actionListener="#{search.onChangePage}" reRender="frmQuery, frmPage" onclick="jQuery( 'html, body' ).animate( { scrollTop: 0 }, 'slow' );">
-                                        <f:param name="changePage" value="#{page.page}" />
-                                        <h:outputText value="#{page.page}" />
-                                    </a4j:commandLink>
+                                            <converge:mediaPlayer id="#{item.id}" value="#{item.directLink}" height="150" width="150" controlbar="none" />
+                                        </h:panelGroup>
+                                        <h:outputText value="#{item.description}" escape="false" /><br/>
+                                        <span class="searchResultDescription"><h:outputText value="#{item.note}" escape="false" /></span>
+                                        <span class="searchResultDate">#{msgs.DATE}:&#160;
+                                            <h:outputText value="#{item.earliestDate}" rendered="#{item.earliestDate != null}">
+                                                <f:convertDateTime pattern="#{msgs.FORMAT_DATE}" timeZone="#{userSession.user.timeZone}" />
+                                            </h:outputText>
+                                            <h:outputText value="#{msgs.UNKNOWN}" rendered="#{item.earliestDate == null}" />
+                                        </span>
+                                    </p>
+                                    <converge:moduleSpacer />
                                 </ui:repeat>
-                            </h:panelGroup>
 
-                        </h:column>
-                        <h:column rendered="#{search.results.facetsAvailable}">
+                                <h:panelGroup styleClass="searchPages" layout="block">
+                                    <h:outputText value="#{msgs.search_PAGES}" />
+                                    <ui:repeat value="#{search.pages}" var="page">
+                                        <a4j:commandLink styleClass="#{((search.results.currentPage+1) == page.page) ? 'searchPageSelected' : 'searchPage'}" actionListener="#{search.onChangePage}" reRender="frmQuery, frmPage" onclick="jQuery( 'html, body' ).animate( { scrollTop: 0 }, 'slow' );">
+                                            <f:param name="changePage" value="#{page.page}" />
+                                            <h:outputText value="#{page.page}" />
+                                        </a4j:commandLink>
+                                    </ui:repeat>
+                                </h:panelGroup>
 
-                            <h:outputText value="#{msgs.search_FILTER_RESULTS}" style="font-weight: bold; font-size: 1.3em; text-align: center;" /><br/>
+                            </h:column>
+                            <h:column rendered="#{search.results.facetsAvailable}">
 
-                            <ui:repeat value="#{search.results.availableFacets}" var="facetName">
-                                <h:outputText value="#{facetName}" style="font-weight: bold; text-decoration: underline; text-transform: capitalize;" />
-                                <rich:dataList value="#{search.results.facets[facetName]}" var="facet" style="margin-top: 5px;">
-                                    <a4j:commandLink actionListener="#{search.onAddFacet}" reRender="frmQuery, frmPage" onclick="jQuery( 'html, body' ).animate( { scrollTop: 0 }, 'slow' );" rendered="#{!facet.selected}">
-                                        <f:param name="addFacet" value="#{facet.query}" />
-                                        <h:outputText value="#{facet.name} (#{facet.matches})" />
-                                    </a4j:commandLink>
+                                <h:outputText value="#{msgs.search_FILTER_RESULTS}" style="font-weight: bold; font-size: 1.3em; text-align: center;" /><br/>
 
-                                    <a4j:commandLink actionListener="#{search.onRemoveFacet}" style="font-weight: bold; color: red;" reRender="frmQuery, frmPage" onclick="jQuery( 'html, body' ).animate( { scrollTop: 0 }, 'slow' );" rendered="#{facet.selected}">
-                                        <f:param name="filterQuery" value="#{facet.query}" />
-                                        <h:outputText value="(-) #{facet.name} (#{facet.matches})" />
-                                    </a4j:commandLink>
-                                </rich:dataList>
-                            </ui:repeat>
+                                <ui:repeat value="#{search.results.availableFacets}" var="facetName">
+                                    <h:outputText value="#{facetName}" style="font-weight: bold; text-decoration: underline; text-transform: capitalize;" />
+                                    <rich:dataList value="#{search.results.facets[facetName]}" var="facet" style="margin-top: 5px;">
+                                        <a4j:commandLink actionListener="#{search.onAddFacet}" reRender="frmQuery, frmPage" onclick="jQuery( 'html, body' ).animate( { scrollTop: 0 }, 'slow' );" rendered="#{!facet.selected}">
+                                            <f:param name="addFacet" value="#{facet.query}" />
+                                            <h:outputText value="#{facet.name} (#{facet.matches})" />
+                                        </a4j:commandLink>
 
-                        </h:column>
-                    </h:panelGrid>
+                                        <a4j:commandLink actionListener="#{search.onRemoveFacet}" style="font-weight: bold; color: red;" reRender="frmQuery, frmPage" onclick="jQuery( 'html, body' ).animate( { scrollTop: 0 }, 'slow' );" rendered="#{facet.selected}">
+                                            <f:param name="filterQuery" value="#{facet.query}" />
+                                            <h:outputText value="(-) #{facet.name} (#{facet.matches})" />
+                                        </a4j:commandLink>
+                                    </rich:dataList>
+                                </ui:repeat>
+
+                            </h:column>
+                        </h:panelGrid>
+                    </h:panelGroup>
+
                 </h:panelGroup>
+            </h:form>
 
-            </h:panelGroup>
-        </h:form>
+            <script type="text/javascript">
+                document.getElementById("frmQuery:txtSearchKeyword").focus();
+            </script>
+        </ui:define>
 
-        <script type="text/javascript">
-            document.getElementById("frmQuery:txtSearchKeyword").focus();
-        </script>
-    </ui:define>
-
-</ui:composition>
+    </ui:composition>
 </jsp:root>

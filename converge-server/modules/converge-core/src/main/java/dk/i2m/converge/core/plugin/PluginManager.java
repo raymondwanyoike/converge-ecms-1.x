@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2011 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 import org.scannotation.AnnotationDB;
 
 /**
- * Singleton responsible for discovering available {@link NewswireDecoder}s.
+ * Singleton responsible for discovering available {@link Plugin}s.
  *
  * @author Allan Lykke Christensen
  */
@@ -39,7 +39,7 @@ public final class PluginManager {
 
     private static PluginManager instance = null;
 
-    private static final Logger logger = Logger.getLogger(PluginManager.class.getName());
+    private static final Logger LOG = Logger.getLogger(PluginManager.class.getName());
 
     private Map<String, NewswireDecoder> newswireDecoders = new HashMap<String, NewswireDecoder>();
 
@@ -48,6 +48,8 @@ public final class PluginManager {
     private Map<String, EditionAction> outletActions = new HashMap<String, EditionAction>();
 
     private Map<String, WorkflowValidator> workflowValidators = new HashMap<String, WorkflowValidator>();
+
+    private Map<String, CatalogueHook> catalogueActions = new HashMap<String, CatalogueHook>();
 
     private PluginManager() {
         discover();
@@ -71,6 +73,7 @@ public final class PluginManager {
         plugins.putAll(workflowActions);
         plugins.putAll(outletActions);
         plugins.putAll(workflowValidators);
+        plugins.putAll(catalogueActions);
         return plugins;
     }
 
@@ -88,6 +91,10 @@ public final class PluginManager {
 
     public Map<String, WorkflowValidator> getWorkflowValidators() {
         return workflowValidators;
+    }
+    
+    public Map<String, CatalogueHook> getCatalogueActions() {
+        return catalogueActions;
     }
 
     /**
@@ -116,7 +123,7 @@ public final class PluginManager {
                     newURL.openStream();
                     postClassPaths.add(newURL);
                 } catch (FileNotFoundException fnfe) {
-                    logger.log(Level.FINEST, "{0} was not found", newURL.toString());
+                    LOG.log(Level.FINEST, "{0} was not found", newURL.toString());
                 }
             }
 
@@ -126,9 +133,10 @@ public final class PluginManager {
             discoveredPlugins += discoverPlugins(db, dk.i2m.converge.core.annotations.WorkflowAction.class, workflowActions);
             discoveredPlugins += discoverPlugins(db, dk.i2m.converge.core.annotations.OutletAction.class, outletActions);
             discoveredPlugins += discoverPlugins(db, dk.i2m.converge.core.annotations.WorkflowValidator.class, workflowValidators);
-            logger.log(Level.INFO, "{0} {0, choice, 0#plugins|1#plugin|2#plugins} discovered", discoveredPlugins);
+            discoveredPlugins += discoverPlugins(db, dk.i2m.converge.core.annotations.CatalogueAction.class, catalogueActions);
+            LOG.log(Level.INFO, "{0} {0, choice, 0#plugins|1#plugin|2#plugins} discovered", discoveredPlugins);
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, "", ex);
+            LOG.log(Level.SEVERE, "", ex);
         }
 
         return discoveredPlugins;
@@ -139,20 +147,20 @@ public final class PluginManager {
         Set<String> entities = db.getAnnotationIndex().get(type.getName());
 
         if (entities == null) {
-            logger.log(Level.INFO, "No {0} plug-ins found in classpath", type.getName());
+            LOG.log(Level.INFO, "No {0} plug-ins found in classpath", type.getName());
         } else {
             for (String clazz : entities) {
-                logger.log(Level.INFO, "Plug-in ''{0}'' found", clazz);
+                LOG.log(Level.INFO, "Plug-in ''{0}'' found", clazz);
                 try {
                     Class c = Class.forName(clazz);
                     Plugin plugin = (Plugin) c.newInstance();
                     registry.put(plugin.getName(), plugin);
                 } catch (ClassNotFoundException e) {
-                    logger.log(Level.SEVERE, "", e);
+                    LOG.log(Level.SEVERE, "", e);
                 } catch (InstantiationException e) {
-                    logger.log(Level.SEVERE, "", e);
+                    LOG.log(Level.SEVERE, "", e);
                 } catch (IllegalAccessException e) {
-                    logger.log(Level.SEVERE, "", e);
+                    LOG.log(Level.SEVERE, "", e);
                 }
             }
         }

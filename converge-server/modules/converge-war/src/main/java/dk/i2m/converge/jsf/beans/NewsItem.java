@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2011 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,20 +17,19 @@
 package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.commons.BeanComparator;
-import dk.i2m.commons.FileUtils;
-import dk.i2m.converge.core.helpers.CatalogueHelper;
 import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.domain.search.SearchResult;
 import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.converge.core.content.ContentItemPermission;
-import dk.i2m.converge.core.content.MediaItem;
-import dk.i2m.converge.core.content.MediaItemStatus;
-import dk.i2m.converge.core.content.MediaRepository;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.NewsItemActor;
 import dk.i2m.converge.core.content.NewsItemField;
 import dk.i2m.converge.core.content.NewsItemMediaAttachment;
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.metadata.Concept;
@@ -40,13 +39,14 @@ import dk.i2m.converge.core.metadata.Person;
 import dk.i2m.converge.core.metadata.PointOfInterest;
 import dk.i2m.converge.core.metadata.Subject;
 import dk.i2m.converge.core.plugin.WorkflowValidatorException;
+import dk.i2m.converge.core.utils.HttpUtils;
 import dk.i2m.converge.core.workflow.EditionCandidate;
 import dk.i2m.converge.domain.search.SearchResults;
 import dk.i2m.converge.core.workflow.WorkflowStateTransition;
 import dk.i2m.converge.core.workflow.WorkflowStep;
 import dk.i2m.converge.core.workflow.WorkflowStepValidator;
 import dk.i2m.converge.ejb.facades.LockingException;
-import dk.i2m.converge.ejb.facades.MediaDatabaseFacadeLocal;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
 import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
 import dk.i2m.converge.ejb.facades.NewsItemHolder;
@@ -55,7 +55,9 @@ import dk.i2m.converge.ejb.facades.SearchEngineLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
 import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.ejb.services.MetaDataServiceLocal;
 import dk.i2m.jsf.JsfUtils;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -86,13 +88,15 @@ import org.richfaces.event.UploadEvent;
  */
 public class NewsItem {
 
-    private static final Logger log = Logger.getLogger(NewsItem.class.getName());
+    private static final Logger LOG = Logger.getLogger(NewsItem.class.getName());
 
-    @EJB private MediaDatabaseFacadeLocal mediaDatabase;
+    @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @EJB private NewsItemFacadeLocal newsItemFacade;
 
     @EJB private MetaDataFacadeLocal metaDataFacade;
+
+    @EJB private MetaDataServiceLocal metaDataService;
 
     @EJB private OutletFacadeLocal outletFacade;
 
@@ -159,7 +163,7 @@ public class NewsItem {
 
     private Map<String, EditionCandidate> editionCandidates = new LinkedHashMap<String, EditionCandidate>();
 
-    private MediaRepository selectedCatalogue = null;
+    private Catalogue selectedCatalogue = null;
 
     private MediaItem userSubmission = null;
 
@@ -253,7 +257,7 @@ public class NewsItem {
      *          Unique identifier of the news item to load
      */
     public void setId(Long id) {
-        log.log(Level.FINE, "Setting News Item #{0}", id);
+        LOG.log(Level.FINE, "Setting News Item #{0}", id);
         this.id = id;
 
         if (id == null) {
@@ -262,7 +266,7 @@ public class NewsItem {
 
         if (selectedNewsItem == null || (selectedNewsItem.getId() != id)) {
             String username = getUser().getUsername();
-            log.log(Level.FINE, "Checking if {0} is permitted to open news item #{1}", new Object[]{username, id});
+            LOG.log(Level.FINE, "Checking if {0} is permitted to open news item #{1}", new Object[]{username, id});
 
             NewsItemHolder nih;
             try {
@@ -310,7 +314,7 @@ public class NewsItem {
     public dk.i2m.converge.core.content.NewsItem getSelectedNewsItem() {
         return selectedNewsItem;
     }
-
+    
     /**
      * Gets a {@link Map} containing the visibility indicators for each field.
      * The Map key is the name of the news item field,
@@ -348,8 +352,8 @@ public class NewsItem {
             selectedNewsItem = newsItemFacade.save(selectedNewsItem);
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "Your changes were saved. If you want to pass on the assignment to the next person in the workflow, select the appropriate option and click 'Submit'", null);
         } catch (LockingException ex) {
-            log.log(Level.INFO, ex.getMessage());
-            log.log(Level.FINE, "", ex);
+            LOG.log(Level.INFO, ex.getMessage());
+            LOG.log(Level.FINE, "", ex);
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Could not save story. The story was locked by another user", null);
 
         }
@@ -379,7 +383,7 @@ public class NewsItem {
         } catch (LockingException ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Could not pullback story. The story was locked by another user", null);
         } catch (WorkflowStateTransitionException ex) {
-            log.log(Level.SEVERE, "", ex);
+            LOG.log(Level.SEVERE, "", ex);
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Could not pullback story. Contact IT department", null);
         }
     }
@@ -398,7 +402,6 @@ public class NewsItem {
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
             }
         }
-
     }
 
     public void onMediaFileUpload(UploadEvent event) {
@@ -406,8 +409,7 @@ public class NewsItem {
             return;
         }
         org.richfaces.model.UploadItem item = event.getUploadItem();
-        log.log(Level.INFO, "Processing media file upload ''{0}'' of content-type ''{1}''", new Object[]{item.getFileName(), item.getContentType()});
-
+        LOG.log(Level.INFO, "Processing media file upload ''{0}'' of content-type ''{1}''", new Object[]{item.getFileName(), item.getContentType()});
 
         if (item.isTempFile()) {
             java.io.File tempFile = item.getFile();
@@ -428,15 +430,14 @@ public class NewsItem {
                 }
 
                 if (mime.startsWith("image/")) {
-                    log.log(Level.INFO, "Processing ''{0}'' as photo", new Object[]{item.getFileName()});
+                    LOG.log(Level.INFO, "Processing ''{0}'' as photo", new Object[]{item.getFileName()});
                     MediaItem photoItem = new MediaItem();
-
-                    photoItem.setContentType(mime);
-                    photoItem.setFilename(item.getFileName());
+// TODO: Fix
+                    //photoItem.setContentType(mime);
+                    //photoItem.setFilename(item.getFileName());
                     photoItem.setDescription("");
                     photoItem.setCreated(java.util.Calendar.getInstance());
                     photoItem.setEditorialNote("");
-                    photoItem.setParent(null);
                     photoItem.setTitle(item.getFileName());
                     photoItem.setUpdated(photoItem.getCreated());
                     photoItem = newsItemFacade.create(photoItem);
@@ -445,6 +446,8 @@ public class NewsItem {
                     selectedAttachment.setCaption("");
                     selectedAttachment.setNewsItem(selectedNewsItem);
                     selectedAttachment.setMediaItem(photoItem);
+                    LOG.log(Level.INFO, "Next asset: " + selectedNewsItem.getNextAssetAttachmentDisplayOrder());
+                    selectedAttachment.setDisplayOrder(selectedNewsItem.getNextAssetAttachmentDisplayOrder());
                     selectedAttachment = newsItemFacade.create(selectedAttachment);
                     try {
                         selectedNewsItem = newsItemFacade.findNewsItemById(selectedNewsItem.getId());
@@ -452,14 +455,14 @@ public class NewsItem {
                         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
                     }
                 } else {
-                    log.log(Level.INFO, "Unknown media type (''{1}'') for ''{0}''", new Object[]{item.getFileName(), mime});
+                    LOG.log(Level.INFO, "Unknown media type (''{1}'') for ''{0}''", new Object[]{item.getFileName(), mime});
                     JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "The format of " + item.getFileName() + " was not recognised", null);
                 }
             } catch (Exception ex) {
-                log.severe("Could not read file");
+                LOG.severe("Could not read file");
             }
         } else {
-            log.severe("RichFaces is not set-up to use tempFiles " + "for storing file uploads");
+            LOG.severe("RichFaces is not set-up to use tempFiles for storing file uploads");
         }
 
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "profile_PHOTO_UPDATED_MSG");
@@ -884,19 +887,26 @@ public class NewsItem {
             this.selectedAttachment = new NewsItemMediaAttachment();
             this.selectedAttachment.setNewsItem(selectedNewsItem);
 
+            // TODO: If an item has been indexed in the search engine, but removed from the database, this will throw a DataNotFoundException
             try {
-                this.selectedAttachment.setMediaItem(mediaDatabase.findMediaItemById(this.selectedMediaItemId));
+                this.selectedAttachment.setMediaItem(catalogueFacade.findMediaItemById(this.selectedMediaItemId));
                 this.selectedAttachment.setCaption(this.selectedAttachment.getMediaItem().getDescription());
             } catch (DataNotFoundException ex) {
-                Logger.getLogger(NewsItem.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, null, ex);
             }
         }
     }
 
     public void onUseAttachment(ActionEvent event) {
-        selectedAttachment = newsItemFacade.create(selectedAttachment);
-        selectedNewsItem.getMediaAttachments().add(selectedAttachment);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "The media item was attached to the story", null);
+        this.selectedAttachment = newsItemFacade.create(selectedAttachment);
+        this.selectedNewsItem.getMediaAttachments().add(selectedAttachment);
+        this.selectedAttachment.setDisplayOrder(this.selectedNewsItem.getNextAssetAttachmentDisplayOrder());
+        
+        // Update caption in MediaItem
+        this.userSubmission.setDescription(selectedAttachment.getCaption());
+        this.userSubmission = catalogueFacade.update(userSubmission);
+        
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "ASSET_ATTACHED_TO_STORY");
         onPreAttachMediaFile(event);
     }
 
@@ -950,24 +960,51 @@ public class NewsItem {
     }
 
     public void onUploadMediaItem(UploadEvent event) {
-        log.log(Level.INFO, "Upload Media Item into New Item");
         if (event == null) {
             return;
         }
 
         userSubmission.setStatus(MediaItemStatus.SELF_UPLOAD);
-        userSubmission.setMediaRepository(selectedCatalogue);
+        userSubmission.setCatalogue(selectedCatalogue);
         if (userSubmission.getId() == null) {
-            userSubmission = mediaDatabase.create(userSubmission);
+            userSubmission = catalogueFacade.create(userSubmission);
         }
 
         org.richfaces.model.UploadItem item = event.getUploadItem();
 
         if (item.isTempFile()) {
             java.io.File tempFile = item.getFile();
-            userSubmission.setFilename(FileUtils.getFilename(item.getFileName()));
-            userSubmission.setContentType(item.getContentType());
-            Map<String, String> props = CatalogueHelper.getInstance().store(tempFile, userSubmission);
+
+            MediaItemRendition mir = new MediaItemRendition();
+            mir.setMediaItem(userSubmission);
+            mir.setRendition(selectedCatalogue.getOriginalRendition());
+            userSubmission.getRenditions().add(mir);
+
+            String filename = "unknown";
+            try {
+                filename = HttpUtils.getFilename(item.getFileName());
+                String fileExtension = ".ext";
+                try {
+                    int lastDot = filename.lastIndexOf(".");
+                    fileExtension = filename.substring(lastDot);
+                } catch (Exception ex) {
+                    LOG.log(Level.WARNING, "Could not get file extension. " + ex.getMessage());
+                }
+
+                // Create a rendition name following the format RENDITIONID-MEDIAITEMID.EXT
+                String renditionFilename = userSubmission.getCatalogue().getOriginalRendition().getId() + "-" + userSubmission.getId() + fileExtension;
+
+                String uploadedAt = catalogueFacade.archive(tempFile, selectedCatalogue, renditionFilename);
+                mir.setPath(uploadedAt);
+                mir.setFilename(renditionFilename);
+                mir.setContentType(item.getContentType());
+            } catch (IOException ioex) {
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Could not upload file. " + ioex.getMessage(), null);
+            }
+
+            Map<String, String> props = new HashMap<String, String>();
+
+            //CatalogueHelper.getInstance().store(tempFile, userSubmission);
             List<DiscoveredProperty> discoProps = new ArrayList<DiscoveredProperty>();
             for (String s : props.keySet()) {
                 discoProps.add(new DiscoveredProperty(s, props.get(s)));
@@ -978,7 +1015,8 @@ public class NewsItem {
             }
 
             if (userSubmission.getTitle().trim().isEmpty()) {
-                userSubmission.setTitle(userSubmission.getFilename());
+                // TODO: Fix
+                userSubmission.setTitle(filename);
             }
 
             if (props.containsKey("description")) {
@@ -988,9 +1026,10 @@ public class NewsItem {
 //                discovered = new ListDataModel(discoProps);
 
         } else {
-            log.log(Level.SEVERE, "RichFaces is not set-up to use tempFiles for storing file uploads");
+            LOG.log(Level.SEVERE, "RichFaces is not set-up to use tempFiles for storing file uploads");
         }
-        userSubmission = mediaDatabase.update(userSubmission);
+        
+        userSubmission = catalogueFacade.update(userSubmission);
 
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "Media item uploaded", null);
     }
@@ -1134,7 +1173,7 @@ public class NewsItem {
             try {
                 selectedNewsItemPlacement.setEdition(outletFacade.findEditionById(getEditionCandidate().getEditionId()));
             } catch (DataNotFoundException ex) {
-                log.log(Level.INFO, "Edition {0} could not be found in the database", getEditionCandidate().getEditionId());
+                LOG.log(Level.INFO, "Edition {0} could not be found in the database", getEditionCandidate().getEditionId());
             }
         } else {
             selectedNewsItemPlacement.setEdition(outletFacade.createEdition(getEditionCandidate()));
@@ -1157,7 +1196,7 @@ public class NewsItem {
             try {
                 selectedNewsItemPlacement.setEdition(outletFacade.findEditionById(getEditionCandidate().getEditionId()));
             } catch (DataNotFoundException ex) {
-                log.log(Level.INFO, "Edition {0} does not exist", getEditionCandidate().getEditionId());
+                LOG.log(Level.INFO, "Edition {0} does not exist", getEditionCandidate().getEditionId());
             }
         } else {
             selectedNewsItemPlacement.setEdition(outletFacade.createEdition(getEditionCandidate()));
@@ -1196,11 +1235,11 @@ public class NewsItem {
         this.editionCandidate = editionCandidate;
     }
 
-    public MediaRepository getSelectedCatalogue() {
+    public Catalogue getSelectedCatalogue() {
         return selectedCatalogue;
     }
 
-    public void setSelectedCatalogue(MediaRepository selectedCatalogue) {
+    public void setSelectedCatalogue(Catalogue selectedCatalogue) {
         this.selectedCatalogue = selectedCatalogue;
     }
 
@@ -1210,5 +1249,20 @@ public class NewsItem {
 
     public void setUserSubmission(MediaItem userSubmission) {
         this.userSubmission = userSubmission;
+    }
+
+    /**
+     * Gets the number of columns to display in the grid of attached media items.
+     * 
+     * @return Number of columns to display in the media attachment grid
+     */
+    public int getNumberOfMediaAttachmentsColumns() {
+        if (selectedNewsItem == null) {
+            return 0;
+        } else if (selectedNewsItem.getMediaAttachments().size() < 3) {
+            return selectedNewsItem.getMediaAttachments().size();
+        } else {
+            return 3;
+        }
     }
 }

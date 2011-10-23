@@ -46,18 +46,16 @@
                         <h:message for="frmPage" style="color: green; font-weight: bold;"  />
                     </a4j:outputPanel>
                     <div style="display:block;clear: both; "></div>
-                    
-                    
-                    <a4j:repeat value="#{newswireitem.selectedItem.imageAttachments}" var="attachment">
 
+                    <a4j:commandLink rendered="#{userSession.catalogueEditor &amp;&amp; userSession.user.defaultCatalogueSelected}" ajaxSingle="true" reRender="frmPage" onclick="#{newswireitem.onAddToCatelogue}">
+                        <h:outputText value="Add to catalogue (#{userSession.user.defaultMediaRepository.name})" />
+                    </a4j:commandLink>
+
+                    <a4j:repeat value="#{newswireitem.selectedItem.imageAttachments}" var="attachment">
                         <div class="imgAttachment">
                             <h:outputLink rendered="#{!attachment.storedInCatalogue}" target="_blank" value="#{facesContext.externalContext.request.contextPath}/NewswireItemAttachment?aid=#{attachment.id}&amp;nid=#{newswireitem.selectedItem.id}"><img style="border: 1px solid #333333; width: 250px;" src="#{facesContext.externalContext.request.contextPath}/NewswireItemAttachment?aid=#{attachment.id}&amp;nid=#{newswireitem.selectedItem.id}" alt="#{attachment.filename}" title="#{attachment.filename}" /></h:outputLink>
                             <h:outputLink rendered="#{attachment.storedInCatalogue}" target="_blank" value="#{attachment.catalogueUrl}"><img style="border: 1px solid #333333; width: 250px;" src="#{attachment.catalogueUrl}" alt="#{attachment.filename}" title="#{attachment.filename}" /></h:outputLink>
                             <div class="imgAttachmentDescription">#{attachment.description}</div>
-                            <a4j:commandLink rendered="#{userSession.catalogueEditor &amp;&amp; userSession.user.defaultCatalogueSelected}" ajaxSingle="true" reRender="frmPage">
-                                <f:setPropertyActionListener target="#{newswireitem.addToCatalogue}" value="#{attachment}" />
-                                <h:outputText value="Add to catalogue (#{userSession.user.defaultMediaRepository.name})" />
-                            </a4j:commandLink>
                         </div>
                     </a4j:repeat>
                     <div style="display:block;clear: both; "></div>
@@ -69,7 +67,7 @@
                         <ui:repeat value="#{newswireitem.selectedItem.attachments}" var="attachment">
                             <li><h:outputLink rendered="#{!attachment.storedInCatalogue}" target="_blank" value="#{facesContext.externalContext.request.contextPath}/NewswireItemAttachment?aid=#{attachment.id}&amp;nid=#{newswireitem.selectedItem.id}">#{attachment.filename}</h:outputLink>
                                 <h:outputLink rendered="#{attachment.storedInCatalogue}" target="_blank" value="#{attachment.catalogueUrl}">#{attachment.filename}</h:outputLink>&#160;&#160;(<h:outputText value="#{attachment.size/1024/1024}"><f:convertNumber maxFractionDigits="1" /></h:outputText> MB) #{attachment.description}</li>
-                        </ui:repeat>
+                            </ui:repeat>
                     </ul>
                 </c:if>
 

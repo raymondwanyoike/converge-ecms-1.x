@@ -16,7 +16,6 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.commons.BeanComparator;
 import dk.i2m.converge.core.workflow.NewsItemFieldVisible;
 import dk.i2m.converge.core.workflow.WorkflowActionException;
 import dk.i2m.converge.ejb.services.DirectoryException;
@@ -25,7 +24,7 @@ import dk.i2m.converge.core.plugin.WorkflowAction;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.content.ContentItemPermission;
-import dk.i2m.converge.core.content.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemActor;
 import dk.i2m.converge.core.content.NewsItemField;
@@ -37,6 +36,7 @@ import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
+import dk.i2m.converge.core.utils.BeanComparator;
 import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.converge.core.views.CurrentAssignment;
@@ -244,12 +244,13 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         if (!legalStep) {
             throw new WorkflowStateTransitionException("Illegal transition from " + state.getId() + " to " + nextState.getId());
         }
-
+        
         WorkflowStateTransition transition = new WorkflowStateTransition(newsItem, now, nextState, ua);
         transition.setStoryVersion(newsItem.getStory());
         transition.setHeadlineVersion(newsItem.getTitle());
         transition.setBriefVersion(newsItem.getBrief());
         transition.setComment(comment);
+        transition.setSubmitted(transitionStep.isTreatAsSubmitted());
         newsItem.setCurrentState(nextState);
         newsItem.getHistory().add(transition);
         newsItem.setUpdated(now);

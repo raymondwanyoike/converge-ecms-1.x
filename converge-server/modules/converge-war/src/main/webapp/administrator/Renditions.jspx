@@ -22,14 +22,14 @@
                         </a4j:commandButton>
                     </h:panelGrid>
 
-                    <rich:dataTable id="dtMediaItemVersionLabels" value="#{administrator_Renditions.labels}" var="label" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
+                    <rich:dataTable id="dtRenditions" value="#{administrator_Renditions.labels}" var="label" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
 
                         <rich:column styleClass="center columnIcon">
                             <f:facet name="header">&#160;</f:facet>
                             <a4j:commandLink reRender="frmMediaItemVersionLabelDetails" ajaxSingle="true">
                                 <f:setPropertyActionListener target="#{administrator_Renditions.selectedLabel}" value="#{label}" />
                                 <rich:componentControl for="mpMediaItemVersionLabelDetails" operation="show" event="oncomplete" />
-                                <h:graphicImage alt="#{msgs.mediaitem_RENDITION}" title="#{msgs.mediaitem_RENDITION}" value="#{res.MEDIA_ITEM_RENDITION_ICON}" />
+                                <h:graphicImage alt="#{msgs.mediaitem_RENDITION}" title="#{msgs.mediaitem_RENDITION}" value="#{res.RENDITION_ICON}" />
                             </a4j:commandLink>
                         </rich:column>
 

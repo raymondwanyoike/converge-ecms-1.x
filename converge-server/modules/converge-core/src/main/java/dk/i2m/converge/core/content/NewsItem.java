@@ -16,8 +16,6 @@
  */
 package dk.i2m.converge.core.content;
 
-import dk.i2m.commons.BeanComparator;
-import dk.i2m.commons.StringUtils;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.calendar.Event;
@@ -27,10 +25,13 @@ import dk.i2m.converge.core.workflow.Department;
 import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.metadata.Concept;
+import dk.i2m.converge.core.utils.BeanComparator;
+import dk.i2m.converge.core.utils.StringUtils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -67,7 +68,7 @@ import org.eclipse.persistence.annotations.PrivateOwned;
     @NamedQuery(name = NewsItem.VIEW_CURRENT_ASSIGNMENTS, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.CurrentAssignment(n.id, n.title, n.targetWordCount, n.deadline, n.assignmentBriefing, n.checkedOut, cob.fullName) FROM NewsItem n LEFT JOIN n.checkedOutBy cob JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
     @NamedQuery(name = NewsItem.VIEW_INBOX, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing) FROM NewsItem n LEFT JOIN n.checkedOutBy cob JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
     @NamedQuery(name = NewsItem.VIEW_OUTLET_BOX, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing) FROM NewsItemActor a JOIN a.newsItem n LEFT JOIN n.checkedOutBy cob WHERE (( a.user = :user) OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF n.currentState.actorRole.userAccounts)) AND n.currentState.workflow.endState <> n.currentState AND n.outlet = :outlet ORDER BY n.updated DESC"),
-    @NamedQuery(name = NewsItem.VIEW_OUTLET_BOX_STATE, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing) FROM NewsItem AS n JOIN n.actors AS a LEFT JOIN n.checkedOutBy cob WHERE n.outlet = :outlet AND n.currentState = :state AND (( a.user = :user) OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.updated DESC"),    
+    @NamedQuery(name = NewsItem.VIEW_OUTLET_BOX_STATE, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing) FROM NewsItem AS n JOIN n.actors AS a LEFT JOIN n.checkedOutBy cob WHERE n.outlet = :outlet AND n.currentState = :state AND (( a.user = :user) OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.updated DESC"),
     @NamedQuery(name = NewsItem.FIND_CHECKED_IN_NEWS_ITEM, query = "SELECT n FROM NewsItem AS n WHERE n.id = :id AND n.checkedOut IS NULL"),
     @NamedQuery(name = NewsItem.FIND_ASSIGNMENTS_BY_OUTLET, query = "SELECT n FROM NewsItem AS n WHERE n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND n.outlet = :outlet AND n.assigned = true ORDER BY n.created DESC"),
     @NamedQuery(name = NewsItem.FIND_BY_OUTLET_AND_STATE, query = "SELECT n FROM NewsItem AS n WHERE n.currentState = :state AND n.outlet = :outlet ORDER BY n.updated DESC"),
@@ -78,18 +79,20 @@ import org.eclipse.persistence.annotations.PrivateOwned;
     @NamedQuery(name = NewsItem.REVOKE_LOCK, query = "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.id = :id"),
     @NamedQuery(name = NewsItem.REVOKE_LOCKS, query = "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.checkedOutBy = :user"),
     @NamedQuery(name = NewsItem.REVOKE_ALL_LOCKS, query = "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.checkedOutBy IS NOT NULL"),
-    @NamedQuery(name = NewsItem.FIND_BY_USER_USER_ROLE_AND_DATE, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.user = :user AND a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.state = :state) ORDER BY ni.updated DESC")
+    @NamedQuery(name = NewsItem.FIND_BY_USER_USER_ROLE_AND_DATE, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.user = :user AND a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.state = :state) ORDER BY ni.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (h.user = :user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER_ROLE, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC")
 })
 public class NewsItem implements Serializable {
 
     private static final long serialVersionUID = 2L;
 
     public static final String VIEW_CURRENT_ASSIGNMENTS = "NewsItem.view.currentAssignments";
-    
+
     public static final String VIEW_INBOX = "NewsItem.view.inbox";
-    
+
     public static final String VIEW_OUTLET_BOX = "NewsItem.view.outlet.inbox";
-    
+
     public static final String VIEW_OUTLET_BOX_STATE = "NewsItem.view.outlet.inbox.state";
 
     public static final String FIND_CURRENT_ASSIGNMENTS = "NewsItem.findCurrentAssignments";
@@ -114,6 +117,10 @@ public class NewsItem implements Serializable {
     public static final String FIND_CHECKED_IN_NEWS_ITEM = "NewsItem.findCheckedInNewsItem";
 
     public static final String FIND_BY_USER_USER_ROLE_AND_DATE = "NewsItem.findByUserUserRoleAndDate";
+
+    public static final String FIND_SUBMITTED_BY_USER = "NewsItem.findBySubmittedUser";
+    
+    public static final String FIND_SUBMITTED_BY_USER_ROLE = "NewsItem.findBySubmittedAndUserRole";
 
     /** Query for revoking the lock of a news item. */
     public static final String REVOKE_LOCK = "NewsItem.revokeLock";
@@ -227,10 +234,10 @@ public class NewsItem implements Serializable {
 
     @Column(name = "target_word_count")
     private Integer targetWordCount = 0;
-    
+
     @Column(name = "precalc_word_count")
     private Long precalculatedWordCount = 0L;
-    
+
     @Column(name = "precalc_current_actor")
     private String precalculatedCurrentActor = "";
 
@@ -736,7 +743,14 @@ public class NewsItem implements Serializable {
         this.actors = actors;
     }
 
+    /**
+     * Gets a {@link List} of sorted asset attachments.
+     * 
+     * @return {@link List} of attached assets sorted by 
+     *         {@link NewsItemMediaAttachment#getDisplayOrder()}
+     */
     public List<NewsItemMediaAttachment> getMediaAttachments() {
+        Collections.sort(mediaAttachments, new BeanComparator("displayOrder"));
         return mediaAttachments;
     }
 
@@ -800,7 +814,7 @@ public class NewsItem implements Serializable {
     public void setPrecalculatedWordCount(Long precalculatedWordCount) {
         this.precalculatedWordCount = precalculatedWordCount;
     }
-    
+
     /**
      * Gets the version identifier of the entity. The purpose of the identifier
      * is to implement optimistic locking of the entity.
@@ -911,6 +925,43 @@ public class NewsItem implements Serializable {
      */
     public boolean isIntermediateState() {
         return !isEndState() && !isTrashState();
+    }
+
+    /**
+     * Gets the next available Display Order for attached assets.
+     * The next available display order is the highest display
+     * order of existing attachments plus one.
+     * 
+     * @return Next available Display Order for an attached asset.
+     */
+    public int getNextAssetAttachmentDisplayOrder() {
+        int i = 1;
+        for (NewsItemMediaAttachment attachment : getMediaAttachments()) {
+            if (attachment != null) {
+                if (attachment.getDisplayOrder() >= i) {
+                    i = attachment.getDisplayOrder() + 1;
+                }
+            }
+        }
+        return i;
+    }
+
+    public boolean isSubmitted() {
+        for (WorkflowStateTransition transition : getHistory()) {
+            if (transition.isSubmitted()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Date getSubmittedDate() {
+        for (WorkflowStateTransition transition : getHistory()) {
+            if (transition.isSubmitted()) {
+                return transition.getTimestamp().getTime();
+            }
+        }
+        return null;
     }
 
     @Override
