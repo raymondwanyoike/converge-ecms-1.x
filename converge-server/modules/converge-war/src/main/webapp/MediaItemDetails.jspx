@@ -104,7 +104,7 @@
                                 </h:column>
                             </rich:suggestionbox>
                         </h:column>
-                        <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.ADD}" actionListener="#{mediaItemDetails.onAddConcept}" reRender="dtConcepts,mpNewConcept,txtNewConcept,sbNewConcept" oncomplete="if (#{converge:isAllValid()}){ if (#{!mediaItemDetails.conceptAdded}){ #{rich:component('mpNewConcept')}.show(); return false; } }" />
+                        <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.ADD}" actionListener="#{mediaItemDetails.onAddConcept}" ajaxSingle="true" process="txtNewConcept" reRender="dtConcepts,mpNewConcept,txtNewConcept,sbNewConcept" oncomplete="if (#{converge:isAllValid()}){ if (#{!mediaItemDetails.conceptAdded}){ #{rich:component('mpNewConcept')}.show(); return false; } }" />
                         <a4j:commandButton styleClass="button dynamicButton" value="Subjects" reRender="pgConceptSelector" oncomplete="#{rich:component('mpConceptSelector')}.show();" />
                     </h:panelGrid>
 
@@ -422,7 +422,6 @@
                                                          addControlLabel="Select"
                                                          allowFlash="false" listHeight="60" listWidth="450" ajaxSingle="true">
                                             <a4j:support event="onuploadcomplete" ajaxSingle="true" reRender="pgRenditionDetails" />
-
                                             <f:facet name="label">
                                                 <h:outputText value="#{msgs.media_item_rendition_UPLOAD_INDICATOR}" />
                                             </f:facet>
@@ -547,14 +546,10 @@
                         </f:facet>
 
                         <h:panelGrid id="pgNewRendition" style="width: 480px;">
-                            <a4j:log popup="false" level="ERROR" width="400" height="200" />
-
                             <rich:tabPanel id="tpNewRendition" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
 
                                 <rich:tab id="tabNewRendition" label="#{msgs.media_item_rendition_UPLOAD}">
                                     <h:panelGrid id="pgRenditionUpload" columnClasses="tabSheet" style="padding: 10px; width: 100%">
-
-                                        <h:outputText value="#{msgs.media_item_rendition_UPLOAD}" />
                                         <rich:fileUpload fileUploadListener="#{mediaItemDetails.newRenditionUploadListener}"
                                                          id="fuNewRendition"
                                                          immediateUpload="true"
@@ -563,6 +558,7 @@
                                             <f:facet name="label">
                                                 <h:outputText value="#{msgs.media_item_rendition_UPLOAD_INDICATOR}" />
                                             </f:facet>
+                                            <a4j:support event="onuploadcomplete" oncomplete="#{rich:component('mpNewRendition')}.hide();" actionListener="#{mediaItemDetails.onSaveNewRendition}" ajaxSingle="true" reRender="dtRenditions, preview" />
                                         </rich:fileUpload>
                                     </h:panelGrid>
                                 </rich:tab>
@@ -575,7 +571,7 @@
                             </rich:tabPanel>
 
                             <h:panelGroup styleClass="dialogueButtons">
-                                <a4j:commandLink id="lnkSaveNewRendition" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{mediaItemDetails.onSaveNewRendition}" reRender="dtRenditions, preview" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpNewRendition')}.hide(); return false; }" />
+                                <a4j:commandLink id="lnkSaveNewRendition" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{mediaItemDetails.onSaveNewRendition}" ajaxSingle="true" reRender="dtRenditions, preview" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpNewRendition')}.hide(); return false; }" rendered="#{mediaItemDetails.selectedMediaItem.original.image}" />
                                 <h:commandLink id="lnkCloseNewRendition" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpNewRendition')}.hide(); return false;" />
                             </h:panelGroup>
                         </h:panelGrid>

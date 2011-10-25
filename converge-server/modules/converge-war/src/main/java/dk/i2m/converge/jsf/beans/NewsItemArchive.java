@@ -91,7 +91,7 @@ public class NewsItemArchive {
     public dk.i2m.converge.core.content.NewsItem getSelectedNewsItem() {
         return selectedNewsItem;
     }
-
+    
     private UserAccount getUser() {
         return (UserAccount) JsfUtils.getValueOfValueExpression("#{userSession.user}");
     }

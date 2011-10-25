@@ -45,6 +45,8 @@ public class CatalogueEvent {
      */
     public CatalogueEvent(Event type, MediaItem item, MediaItemRendition rendition) {
         this.type = type;
+        this.item = item;
+        this.rendition = rendition;
     }
 
     /**

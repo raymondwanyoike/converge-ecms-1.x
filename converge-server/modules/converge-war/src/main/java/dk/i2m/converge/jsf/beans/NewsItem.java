@@ -446,7 +446,6 @@ public class NewsItem {
                     selectedAttachment.setCaption("");
                     selectedAttachment.setNewsItem(selectedNewsItem);
                     selectedAttachment.setMediaItem(photoItem);
-                    LOG.log(Level.INFO, "Next asset: " + selectedNewsItem.getNextAssetAttachmentDisplayOrder());
                     selectedAttachment.setDisplayOrder(selectedNewsItem.getNextAssetAttachmentDisplayOrder());
                     selectedAttachment = newsItemFacade.create(selectedAttachment);
                     try {
@@ -466,6 +465,11 @@ public class NewsItem {
         }
 
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "profile_PHOTO_UPDATED_MSG");
+    }
+    
+    public void setUpdateAttachment(NewsItemMediaAttachment attachment) {
+        attachment = newsItemFacade.update(attachment);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "The attachment was updated", null);
     }
 
     public void onDeleteSelectedActor(ActionEvent event) {
@@ -892,15 +896,15 @@ public class NewsItem {
                 this.selectedAttachment.setMediaItem(catalogueFacade.findMediaItemById(this.selectedMediaItemId));
                 this.selectedAttachment.setCaption(this.selectedAttachment.getMediaItem().getDescription());
             } catch (DataNotFoundException ex) {
-                LOG.log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, ex.getMessage());
             }
         }
     }
 
     public void onUseAttachment(ActionEvent event) {
+        this.selectedAttachment.setDisplayOrder(this.selectedNewsItem.getNextAssetAttachmentDisplayOrder());
         this.selectedAttachment = newsItemFacade.create(selectedAttachment);
         this.selectedNewsItem.getMediaAttachments().add(selectedAttachment);
-        this.selectedAttachment.setDisplayOrder(this.selectedNewsItem.getNextAssetAttachmentDisplayOrder());
         
         // Update caption in MediaItem
         this.userSubmission.setDescription(selectedAttachment.getCaption());
@@ -980,26 +984,17 @@ public class NewsItem {
             mir.setRendition(selectedCatalogue.getOriginalRendition());
             userSubmission.getRenditions().add(mir);
 
-            String filename = "unknown";
+            String filename = HttpUtils.getFilename(item.getFileName());
             try {
-                filename = HttpUtils.getFilename(item.getFileName());
-                String fileExtension = ".ext";
-                try {
-                    int lastDot = filename.lastIndexOf(".");
-                    fileExtension = filename.substring(lastDot);
-                } catch (Exception ex) {
-                    LOG.log(Level.WARNING, "Could not get file extension. " + ex.getMessage());
-                }
-
-                // Create a rendition name following the format RENDITIONID-MEDIAITEMID.EXT
-                String renditionFilename = userSubmission.getCatalogue().getOriginalRendition().getId() + "-" + userSubmission.getId() + fileExtension;
-
-                String uploadedAt = catalogueFacade.archive(tempFile, selectedCatalogue, renditionFilename);
-                mir.setPath(uploadedAt);
-                mir.setFilename(renditionFilename);
-                mir.setContentType(item.getContentType());
+                mir = catalogueFacade.create(tempFile, userSubmission, mir.getRendition(), item.getFileName(), item.getContentType());
             } catch (IOException ioex) {
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Could not upload file. " + ioex.getMessage(), null);
+            }
+            
+            try {
+                userSubmission = catalogueFacade.findMediaItemById(userSubmission.getId());
+            } catch (DataNotFoundException ex) {
+                Logger.getLogger(NewsItem.class.getName()).log(Level.SEVERE, null, ex);
             }
 
             Map<String, String> props = new HashMap<String, String>();

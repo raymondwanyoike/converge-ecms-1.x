@@ -29,13 +29,16 @@
                         <ui:repeat var="attachment" value="#{newsItemArchive.selectedNewsItem.mediaAttachments}" >
                             <tr>
                                 <td>
-
-                                    <h:outputLink value="#{attachment.mediaItem.absoluteFilename}" target="_blank">
-                                        <h:outputText value="#{msgs.newsitem_archive_DOWNLOAD_MEDIA_FILE}" rendered="#{!attachment.mediaItem.thumbAvailable}" />
-                                        <h:graphicImage url="#{attachment.mediaItem.thumbURL}" rendered="#{attachment.mediaItem.thumbAvailable}" style="border: 1px solid black;" />
+                                    <h:outputLink value="#{attachment.mediaItem.original.absoluteFilename}" target="_blank">
+                                        <h:outputText value="#{msgs.newsitem_archive_DOWNLOAD_MEDIA_FILE}" rendered="#{!attachment.mediaItem.previewAvailable}" />
+                                        <h:graphicImage url="#{attachment.mediaItem.preview.absoluteFilename}" rendered="#{attachment.mediaItem.previewAvailable}" style="border: 1px solid black;" />
                                     </h:outputLink>
                                 </td>
                                 <td>
+                                    <h:outputText value="Credit" style="text-transform: uppercase; font-weight: bold; font-size: 0.8em; padding-right: 5px;" />
+                                    <h:outputText value="#{attachment.mediaItem.byLine}" rendered="#{attachment.mediaItem.byLine != ''}" style="font-size: 0.8em;" />
+                                    <h:outputText value="#{attachment.mediaItem.owner.fullName}" rendered="#{attachment.mediaItem.byLine == ''}" style="font-size: 0.8em;" />
+                                    <br/>
                                     <h:outputText value="#{attachment.caption}" />
                                 </td>
                             </tr>
@@ -50,7 +53,7 @@
                     <ul>
                         <ui:repeat var="concept" value="#{newsItemArchive.selectedNewsItem.concepts}">
                             <c:set var="key" value="#{concept.type}_NAME" />
-                            <li><h:outputText value="#{concept.name} (#{msgs[key]})" /></li>
+                            <li><h:outputText value="#{concept.fullTitle} (#{msgs[key]})" /></li>
                         </ui:repeat>
                     </ul>
                 </c:if>

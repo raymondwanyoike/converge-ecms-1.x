@@ -1693,7 +1693,6 @@ div.black h2 {
 .placementPositionInplace { background-color: transparent; background: transparent;}
 .placementPositionInplaceHover { background-color: transparent; background: transparent; text-decoration: underline; color: black; }
 
-
 .newsReaderTitle { font-family: Palatino, Georgia, Times, 'Times New Roman', serif; line-height: 25px; text-decoration: underline; font-size: 24px; font-style: normal; font-variant: normal; font-weight: bold; margin-top: 5px; margin-bottom: 5px;}
 .newsReaderTable { border: 0px;}
 .newsReaderTable td { border: 0px; }
@@ -1722,11 +1721,17 @@ div.black h2 {
 .mediaItemRenditionAvailable { padding: 2px; padding-left: 5px; padding-right: 5px; background-color: #00AA00; color: white; font-weight: bold; border: 1px solid black; text-transform: uppercase; }
 .mediaItemRenditionNotAvailable { padding: 2px;  padding-left: 5px; padding-right: 5px; background-color: #ff0000; color: white; font-weight: bold; border: 1px solid black; text-transform: uppercase; }
 .disabledCriteria { color: #cccccc;}
-.colMediaAttachment { width: 250px; vertical-align: bottom; }
 
+.colMediaAttachment { width: 250px; vertical-align: top; }
 .colMediaAttachmentCaptionLabel { vertical-align: top;  font-size: smaller; padding: 4px; margin:4px; font-weight: bold; background: #dddddd; text-transform: uppercase}
 
 .myActivityTitle { font-weight: bold; font-size: 1.2em; }
 .myActivityTable { border-top: 1px solid silver; margin-top: 2px; margin-bottom: 10px; margin-right: 10px; }
 .myActivityTableHeader { text-transform: uppercase; font-size: 0.9em; }
 .myActivityMonthLabel { padding-right: 5px; }
+
+.newsItemAttachmentCaptionInplace { white-space: normal; background-color: transparent; background: transparent; }
+.newsItemAttachmentCaptionInplaceHover { white-space: normal; background-color: transparent; background: transparent; text-decoration: underline; color: black; }
+.newsItemAttachmentLabel { font-weight: bold; text-transform: uppercase; font-size: 0.9em; vertical-align: top; width: 25% }
+.newsItemAttachmentInput { vertical-align: top; width: 75% }
+.newsItemAttachmentInfo { background: #dedede; border: 1px solid #aaaaaa; width: 100%; }

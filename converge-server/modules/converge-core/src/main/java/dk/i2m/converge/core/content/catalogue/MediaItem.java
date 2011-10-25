@@ -389,6 +389,7 @@ public class MediaItem implements Serializable {
      * @return {@code true} if one or more {@link Rendition}s 
      *         have been attached, otherwise {@code false}
      */
+
     public boolean isRenditionsAttached() {
         if (getRenditions() == null || getRenditions().isEmpty()) {
             return false;

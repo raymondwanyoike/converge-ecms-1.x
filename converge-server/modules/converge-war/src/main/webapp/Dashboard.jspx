@@ -34,7 +34,7 @@
 
                 </div>
             </h:form>
-            <div style="clear: both; padding-bottom: 12px;"></div>
+            <converge:moduleSpacer />
         </ui:define>
 
         <ui:define name="middleColumn">

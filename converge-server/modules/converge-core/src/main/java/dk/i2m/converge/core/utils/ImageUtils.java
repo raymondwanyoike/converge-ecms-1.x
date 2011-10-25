@@ -58,8 +58,7 @@ public class ImageUtils {
      * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
-    public static byte[] generateThumbnail(byte[] img, int width, int height,
-            int quality) throws InterruptedException, IOException {
+    public static byte[] generateThumbnail(byte[] img, int width, int height, int quality) throws InterruptedException, IOException {
         Image image = Toolkit.getDefaultToolkit().createImage(img);
         MediaTracker mediaTracker = new MediaTracker(new Container());
         mediaTracker.addImage(image, 0);
@@ -79,25 +78,14 @@ public class ImageUtils {
 
         // draw original image to thumbnail image object and
         // scale it to the new size on-the-fly
-        BufferedImage thumbImage = new BufferedImage(width, height,
-                BufferedImage.TYPE_INT_RGB);
+        BufferedImage thumbImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics2D = thumbImage.createGraphics();
-        graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         graphics2D.drawImage(image, 0, 0, width, height, null);
 
         // save thumbnail image to OUTFILE
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(thumbImage, "png", baos);
-
-//        BufferedOutputStream out = new BufferedOutputStream(baos);
-//        JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-//        JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(thumbImage);
-        //      quality = Math.max(0, Math.min(quality, 100));
-//        param.setQuality((float) quality / 100.0f, false);
-        //       encoder.setJPEGEncodeParam(param);
-        //      encoder.encode(thumbImage);
-        //      out.close();
 
         return baos.toByteArray();
     }

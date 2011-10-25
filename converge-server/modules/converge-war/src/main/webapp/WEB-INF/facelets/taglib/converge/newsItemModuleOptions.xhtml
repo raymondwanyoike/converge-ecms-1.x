@@ -5,6 +5,7 @@
         <converge:moduleHeader moduleTitle="#{msgs.newsitem_OPTIONS}" />
         <div>
             <h:panelGrid id="pgWorkflowOptions" style="margin-left: 2%; margin-right: 2%; width: 98%" rowClasses="left, left,center, center">
+                <a4j:poll actionListener="#{value.onApply}" ignoreDupResponses="true" interval="300000" />
 
                 <h:outputText value="#{msgs.newsitem_WORKFLOW_SELECT_INTRO}" style="font-size: 9px;" escape="false" />
 

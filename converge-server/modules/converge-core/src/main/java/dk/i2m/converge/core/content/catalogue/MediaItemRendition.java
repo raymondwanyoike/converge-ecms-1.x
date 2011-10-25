@@ -29,6 +29,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -528,16 +529,17 @@ public class MediaItemRendition implements Serializable {
      *         {@link String} is the extension could not be detected
      */
     public String getExtension() {
-        if (getFilename() == null || getFilename().trim().isEmpty()) {
-            return "";
-        } else {
-            int extIndex = getFilename().lastIndexOf(".");
-            if (extIndex != getFilename().length()) {
-                return getFilename().substring(extIndex + 1);
-            } else {
-                return "";
-            }
-        }
+        return FilenameUtils.getExtension(getFilename());
+//        if (getFilename() == null || getFilename().trim().isEmpty()) {
+//            return "";
+//        } else {
+//            int extIndex = getFilename().lastIndexOf(".");
+//            if (extIndex != getFilename().length()) {
+//                return getFilename().substring(extIndex + 1);
+//            } else {
+//                return "";
+//            }
+//        }
     }
 
     /**

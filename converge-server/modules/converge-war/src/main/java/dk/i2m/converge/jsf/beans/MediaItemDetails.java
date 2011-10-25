@@ -71,7 +71,7 @@ public class MediaItemDetails {
 
     private Long id;
 
-    private MediaItemRendition selectedRendition;
+    private MediaItemRendition selectedRendition = new MediaItemRendition();
 
     private DataModel discovered = new ListDataModel(new ArrayList());
 
@@ -199,7 +199,18 @@ public class MediaItemDetails {
         }
     }
 
+    /**
+     * Determine if the current user is authorised to
+     * view and work with the selected {@link MediaItem}.
+     * 
+     * @return {@code true} if the user is authorised,
+     *         otherwise {@code false}
+     */
     public boolean isAuthorized() {
+        if (selectedMediaItem == null) {
+            return false;
+        }
+        
         return isEditor() || isOwner();
     }
 
@@ -287,9 +298,19 @@ public class MediaItemDetails {
         this.selectedRendition = new MediaItemRendition();
         this.selectedRendition.setMediaItem(this.selectedMediaItem);
     }
+    
+    public void onSaveNewRendition(ActionEvent event) {
+        this.selectedMediaItem.getRenditions().add(selectedRendition);
+        this.selectedMediaItem = catalogueFacade.update(selectedMediaItem);
+        this.selectedMediaItem = null;
+        setId(getId());
+        
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "media_item_rendition_CREATED");
+    }
 
     public void onSaveRendition(ActionEvent event) {
         catalogueFacade.update(selectedRendition);
+        this.availableRenditions = null;
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "media_item_rendition_UPDATED");
     }
 
@@ -318,7 +339,7 @@ public class MediaItemDetails {
                 this.availableRenditions = null;
 
             } catch (DataNotFoundException ex) {
-                LOG.log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, ex.getMessage());
             }
         }
     }

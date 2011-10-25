@@ -60,6 +60,7 @@ import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * Stateless enterprise java bean providing a facade for interacting with
@@ -209,7 +210,9 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      */
     @Override
     public Rendition findRenditionByName(String name) throws DataNotFoundException {
-        List<Rendition> results = daoService.findWithNamedQuery(Rendition.FIND_BY_NAME, null, 1);
+        Map<String, Object> params = QueryBuilder.with("name", name).parameters();
+        
+        List<Rendition> results = daoService.findWithNamedQuery(Rendition.FIND_BY_NAME, params, 1);
         if (results.isEmpty()) {
             throw new DataNotFoundException();
         }
@@ -254,21 +257,33 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     public MediaItemRendition create(File file, MediaItem item, Rendition rendition, String filename, String contentType) throws IOException {
         Catalogue catalogue = item.getCatalogue();
 
+        LOG.log(Level.INFO, "Filename: {0}", filename);
+        
         // Remove path from filename if file was uploaded from Windows
-        String realFilename = HttpUtils.getFilename(filename);
+        String originalExtension = FilenameUtils.getExtension(filename);
+        LOG.log(Level.INFO, "Extension: {0}", originalExtension);
+        
+        StringBuilder realFilename = new StringBuilder();
+        realFilename.append(rendition.getId()).append(".");
+        realFilename.append(originalExtension);
+        
+        LOG.log(Level.INFO, "Real Filename: {0}", realFilename.toString());
 
-        // Store file
-        String path = archive(file, catalogue, realFilename);
-
+        // Set-up the media item rendition
         MediaItemRendition mediaItemRendition = new MediaItemRendition();
         mediaItemRendition.setMediaItem(item);
-        mediaItemRendition.setFilename(realFilename);
+        mediaItemRendition.setFilename(realFilename.toString());
         mediaItemRendition.setSize(file.length());
         mediaItemRendition.setContentType(contentType);
-        mediaItemRendition.setPath(path);
         mediaItemRendition.setRendition(rendition);
+        
+        // Store file and set path
+        String path = archive(file, catalogue, mediaItemRendition);
+        
+        // Load meta data into the rendition
         fillWithMetadata(mediaItemRendition);
 
+        // Execute hooks
         for (CatalogueHookInstance hookInstance : catalogue.getHooks()) {
             try {
                 CatalogueHook hook = hookInstance.getHook();
@@ -286,21 +301,26 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         return daoService.update(rendition);
     }
 
+    @Override
     public MediaItemRendition update(File file, String filename, String contentType, MediaItemRendition mediaItemRendition) throws IOException {
         Catalogue catalogue = mediaItemRendition.getMediaItem().getCatalogue();
 
         // Remove path from filename if file was uploaded from Windows
-        String realFilename = HttpUtils.getFilename(filename);
+        String originalExtension = FilenameUtils.getExtension(filename);
+        StringBuilder realFilename = new StringBuilder();
+        realFilename.append(mediaItemRendition.getRendition().getId()).append(".");
+        realFilename.append(originalExtension);
 
-        // Store file
-        String path = archive(file, catalogue, realFilename);
-
-        mediaItemRendition.setFilename(realFilename);
+        mediaItemRendition.setFilename(realFilename.toString());
         mediaItemRendition.setSize(file.length());
         mediaItemRendition.setContentType(contentType);
-        mediaItemRendition.setPath(path);
+        
+        // Store file
+        String path = archive(file, catalogue, mediaItemRendition);
+       
         fillWithMetadata(mediaItemRendition);
 
+        // Execute hooks
         for (CatalogueHookInstance hookInstance : catalogue.getHooks()) {
             try {
                 CatalogueHook hook = hookInstance.getHook();
@@ -611,6 +631,50 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 //                }
 //            }
 //        }
+    }
+
+    /**
+     * Archives a {@link MediaItemRendition} in a {@link Catalogue}.
+     * 
+     * @param file
+     *          File to archive
+     * @param catalogue
+     *          Catalogue used for archiving the file
+     * @param rendition
+     *          Rendition to store
+     * @param rendition
+     *          {@link MediaItemRendition} to archive
+     * @return Path where the rendition was stored on the {@link Catalogue}
+     * @throws IOException 
+     *          If the file could not be archived
+     */
+    public String archive(File file, Catalogue catalogue, MediaItemRendition rendition) throws IOException {
+        Calendar now = Calendar.getInstance();
+
+        StringBuilder cataloguePath = new StringBuilder();
+        cataloguePath.append(now.get(Calendar.YEAR)).append(File.separator).append(now.get(Calendar.MONTH) + 1).append(File.separator).append(now.get(Calendar.DAY_OF_MONTH)).append(File.separator).append(rendition.getMediaItem().getId());
+
+        StringBuilder catalogueLocation = new StringBuilder(catalogue.getLocation());
+        catalogueLocation.append(File.separator).append(cataloguePath.toString());
+
+        // Get the repository location
+        File dir = new File(catalogueLocation.toString());
+
+        // Check if it exist
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        // Determine the location and name of the file being uploaded
+        File mediaFile = new File(dir, rendition.getFilename());
+
+        // Move file to the new location
+        LOG.log(Level.INFO, "Archiving {0} at {1}", new Object[]{file.getAbsolutePath(), mediaFile.getAbsolutePath()});
+        copyFile(file, mediaFile);
+
+        rendition.setPath(cataloguePath.toString());
+        
+        return cataloguePath.toString();
     }
 
     /**

@@ -59,41 +59,6 @@ public class ReportingFacadeBean implements ReportingFacadeLocal {
 
     private static final Logger LOG = Logger.getLogger(ReportingFacadeBean.class.getName());
 
-    /**
-     * Generates an activity report for all user with a given {@link UserRole}.
-     * 
-     * @param start
-     *          Start of activities
-     * @param end
-     *          End of activities
-     * @param userRole
-     *          {@link UserRole} for which to capture activities
-     * @param state
-     *          {@link WorkflowState} to treat as the submitted state
-     * @return 
-     */
-    @Override
-    // TODO: Remove - got replaced by generateActivityReport
-    public ActivityReport generateActivityReport(Date start, Date end, UserRole userRole, WorkflowState state) {
-        ActivityReport report = new ActivityReport(start, end, userRole);
-
-        Map<String, Object> parameters = QueryBuilder.with("userRole", userRole).and("startDate", start).and("endDate", end).and("state", state).parameters();
-
-        List<UserAccount> users = daoService.findWithNamedQuery(UserAccount.FIND_ACTIVE_USERS_BY_ROLE, parameters);
-
-        for (UserAccount user : users) {
-            UserActivity activity = new UserActivity();
-            activity.setUser(user);
-            Map<String, Object> param = QueryBuilder.with("userRole", userRole).and("startDate", start).and("endDate", end).and("user", user).and("state", state).parameters();
-            List<NewsItem> items = daoService.findWithNamedQuery(NewsItem.FIND_BY_USER_USER_ROLE_AND_DATE, param);
-            activity.setSubmitted(items);
-
-            report.getUserActivity().add(activity);
-        }
-
-        return report;
-    }
-    
     @Override
     public ActivityReport generateActivityReport(Date start, Date end, UserRole userRole) {
         ActivityReport report = new ActivityReport(start, end, userRole);
@@ -128,7 +93,7 @@ public class ReportingFacadeBean implements ReportingFacadeLocal {
         UserActivity userActivity = new UserActivity();
         userActivity.setUser(user);
         userActivity.setSubmitted(items);
-       
+
         return userActivity;
     }
 
@@ -145,7 +110,7 @@ public class ReportingFacadeBean implements ReportingFacadeLocal {
 
         String sheetName = WorkbookUtil.createSafeSheetName("Overview");
         int overviewSheetRow = 0;
-   
+
         Font headerFont = wb.createFont();
         headerFont.setFontHeightInPoints((short) 14);
         headerFont.setBoldweight(Font.BOLDWEIGHT_BOLD);

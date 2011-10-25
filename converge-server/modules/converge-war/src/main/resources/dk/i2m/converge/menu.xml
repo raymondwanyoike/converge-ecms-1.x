@@ -53,12 +53,11 @@
         <privilege>CONTACTS_MANAGE</privilege>
         <privilege>CONTACTS_READ</privilege>
     </item>
-    
 
-    <!--item id="lnkHelp" type="submenu">
+    <item id="lnkHelp" type="submenu">
         <label>menu_HELP</label>
         <action>/help</action>
-    </item-->
+    </item>
 
     <item id="lnkMyProfile" type="submenu">
         <label>menu_MY_PROFILE</label>
@@ -142,9 +141,9 @@
             <label>CATALOGUES</label>
             <role>ADMINISTRATOR</role>
 
-            <children id="lnkMediaRepositories" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
-                <action>/administration/media_repositories</action>
-                <label>MEDIA_REPOSITORIES</label>
+            <children id="lnkCatalogues" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/catalogues</action>
+                <label>CATALOGUES</label>
                 <role>ADMINISTRATOR</role>
             </children>
 

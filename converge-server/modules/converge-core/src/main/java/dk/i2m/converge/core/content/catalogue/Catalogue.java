@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -114,7 +115,7 @@ public class Catalogue implements Serializable {
     @OneToMany(mappedBy = "catalogue")
     private List<NewswireItemAttachment> newswireItemAttachments;
 
-    @OneToMany(mappedBy = "catalogue")
+    @OneToMany(mappedBy = "catalogue", fetch= FetchType.EAGER)
     @PrivateOwned
     private List<CatalogueHookInstance> hooks = new ArrayList<CatalogueHookInstance>();
 

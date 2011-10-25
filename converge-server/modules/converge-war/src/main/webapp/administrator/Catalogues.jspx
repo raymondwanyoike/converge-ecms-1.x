@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
+<jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
 
     <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
 
@@ -9,7 +9,7 @@
             <a4j:keepAlive beanName="administrator_Catalogues" />
 
             <a4j:outputPanel ajaxRendered="true">
-                <converge:message for="frmPage" />
+                <v:message />
             </a4j:outputPanel>
 
             <h:form id="frmPage">
@@ -102,10 +102,16 @@
                             <h:outputText value="#{msgs.MEDIA_REPOSITORY_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage id="imgCloseCatalogueDetails" value="#{res.DIALOGUE_CLOSE_ICON}" style="link" />
+                            <rich:componentControl for="mpMediaRepositoryDetails" attachTo="imgCloseCatalogueDetails" operation="hide" event="onclick"/>
+                        </h:panelGroup>
+                    </f:facet>
+
                     <h:panelGrid id="pgMediaRepositoryDetails" style="width: 480px;">
 
                         <rich:tabPanel id="tpMediaRepository" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
-
                             <rich:tab id="tabMediaRepository" label="#{msgs.media_item_CATALOGUE}">
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:outputText value="#{msgs.MEDIA_REPOSITORY_NAME}:" />
@@ -123,7 +129,7 @@
                                     </h:selectBooleanCheckbox>
 
                                     <h:outputText value="#{msgs.catalogue_EDITOR_ROLE}" />
-                                    <h:selectOneMenu id="somUserRoles" value="#{administrator_Catalogues.selectedMediaRepository.editorRole}" converter="#{converters.userRoleConverter}" disabled="#{administrator_Catalogues.selectedMediaRepository.readOnly}">
+                                    <h:selectOneMenu id="somUserRoles" value="#{administrator_Catalogues.selectedMediaRepository.editorRole}" converter="#{converters.userRoleConverter}" disabled="#{administrator_Catalogues.selectedMediaRepository.readOnly}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_EDITOR_REQUIRED}">
                                         <f:selectItem itemLabel=""  />
                                         <f:selectItems value="#{common.userRoles}" />
                                     </h:selectOneMenu>
@@ -133,17 +139,25 @@
                             <rich:tab id="tabRendition" label="#{msgs.media_item_RENDITIONS}">
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:outputText value="#{msgs.catalogue_RENDITIONS}" title="#{msgs.catalogue_RENDITIONS_TOOLTIP}" />
-                                    <h:selectManyCheckbox id="somRenditions" value="#{administrator_Catalogues.selectedMediaRepository.renditions}" converter="#{converters.renditionConverter}">
+
+                                    <rich:pickList value="#{administrator_Catalogues.selectedMediaRepository.renditions}"
+                                                   converter="#{converters.renditionConverter}"
+                                                   copyAllControlLabel="#{i18n.pickList_ADD_ALL}"
+                                                   copyControlLabel="#{i18n.pickList_ADD}"
+                                                   removeAllControlLabel="#{i18n.pickList_REMOVE_ALL}"
+                                                   removeControlLabel="#{i18n.pickList_REMOVE}">
                                         <f:selectItems value="#{common.renditions}" />
-                                    </h:selectManyCheckbox>
+                                    </rich:pickList>
 
                                     <h:outputText value="#{msgs.catalogue_PREVIEW_RENDITION}" title="#{msgs.catalogue_PREVIEW_RENDITION_TOOLTIP}" />
-                                    <h:selectOneMenu id="somPreviewRendition" value="#{administrator_Catalogues.selectedMediaRepository.previewRendition}" converter="#{converters.renditionConverter}">
+                                    <h:selectOneMenu id="somPreviewRendition" value="#{administrator_Catalogues.selectedMediaRepository.previewRendition}" converter="#{converters.renditionConverter}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_PREVIEW_RENDITION_REQUIRED}">
+                                        <f:selectItem itemLabel="" />
                                         <f:selectItems value="#{common.renditions}" />
                                     </h:selectOneMenu>
 
                                     <h:outputText value="#{msgs.catalogue_ORIGINAL_RENDITION}" title="#{msgs.catalogue_ORIGINAL_RENDITION_TOOLTIP}" />
-                                    <h:selectOneMenu id="somOriginalRendition" value="#{administrator_Catalogues.selectedMediaRepository.originalRendition}" converter="#{converters.renditionConverter}">
+                                    <h:selectOneMenu id="somOriginalRendition" value="#{administrator_Catalogues.selectedMediaRepository.originalRendition}" converter="#{converters.renditionConverter}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_ORIGINAL_RENDITION_REQUIRED}">
+                                        <f:selectItem itemLabel="" />
                                         <f:selectItems value="#{common.renditions}" />
                                     </h:selectOneMenu>
                                 </h:panelGrid>
@@ -152,10 +166,10 @@
                             <rich:tab id="tabLocation" label="#{msgs.media_item_CATALOGUE_LOCATION}">
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:outputText value="#{msgs.MEDIA_REPOSITORY_LOCATION}:" />
-                                    <h:inputText id="txtLocation" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedMediaRepository.location}" title="#{msgs.MEDIA_REPOSITORY_LOCATION_TOOLTIP}" required="true" requiredMessage="#{msgs.MEDIA_REPOSITORY_LOCATION_REQUIRED}"/>
+                                    <h:inputText id="txtLocation" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedMediaRepository.location}" title="#{msgs.MEDIA_REPOSITORY_LOCATION_TOOLTIP}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_LOCATION_REQUIRED}"/>
 
                                     <h:outputText value="#{msgs.MEDIA_REPOSITORY_WEB_ACCESS}" />
-                                    <h:inputText id="txtWebAccess" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedMediaRepository.webAccess}" title="#{msgs.MEDIA_REPOSITORY_WEB_ACCESS_TOOLTIP}" required="true" requiredMessage="#{msgs.MEDIA_REPOSITORY_WEB_ACCESS_REQUIRED}"/>
+                                    <h:inputText id="txtWebAccess" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedMediaRepository.webAccess}" title="#{msgs.MEDIA_REPOSITORY_WEB_ACCESS_TOOLTIP}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_WEB_LOCATION_REQUIRED}"/>
 
                                     <h:outputText value="#{msgs.MEDIA_REPOSITORY_WATCH}:" />
                                     <h:inputText id="txtWatch" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedMediaRepository.watchLocation}" title="#{msgs.MEDIA_REPOSITORY_WATCH_TOOLTIP}" />
@@ -173,7 +187,7 @@
                                         </a4j:commandButton>
                                     </h:panelGrid>
 
-                                    <rich:dataTable id="dtActions" value="#{administrator_Catalogues.selectedMediaRepository.hooks}" var="action" styleClass="table pluginPropertiesList" headerClass="tableHeader" rowClasses="odd, even">
+                                    <rich:dataTable id="dtActions" value="#{administrator_Catalogues.selectedMediaRepository.hooks}" var="action" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
 
                                         <rich:column styleClass="columnIcon center">
                                             <f:facet name="header">&#160;</f:facet>
@@ -201,7 +215,7 @@
                                             <f:facet name="header">
                                                 <h:outputText value="#{msgs.media_item_CATALOGUE_ACTION_TYPE}" />
                                             </f:facet>
-                                            <h:outputText value="#{action.action.name}" />
+                                            <h:outputText value="#{action.hook.name}" />
                                         </rich:column>
 
                                     </rich:dataTable>
@@ -211,23 +225,17 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSave" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Catalogues.onSave}" reRender="frmPage">
-                                <rich:componentControl for="mpMediaRepositoryDetails" operation="hide" event="oncomplete" />
-                            </a4j:commandLink>
-
+                            <a4j:commandLink id="lnkSave" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Catalogues.onSave}" reRender="frmPage, pgMediaRepositoryDetails" oncomplete="if (#{converge:isAllValid()}) { Richfaces.hideModalPanel('mpMediaRepositoryDetails'); return false;}" />
                             <a4j:commandLink id="lnkApply" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{administrator_Catalogues.onSave}" reRender="frmPage, pgMediaRepositoryDetails" />
-
                             <a4j:commandLink id="lnkDelete" rendered="#{administrator_Catalogues.editMode}" onclick="if (confirm('#{msgs.mediaitem_MEDIA_REPOSITORY_DELETE_CONFIRM}') != true){ return false; };" actionListener="#{administrator_Catalogues.onDelete}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="frmPage">
                                 <rich:componentControl for="mpMediaRepositoryDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
-
                             <h:commandLink id="lnkCloseDialog" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpMediaRepositoryDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 
                 </rich:modalPanel>
             </h:form>
-
 
             <h:form id="frmCatalogueActionDetails">
                 <rich:modalPanel id="mpCatalogueActionDetails" autosized="true" domElementAttachment="parent" rendered="#{administrator_Catalogues.selectedCatalogueAction != null}">
@@ -300,7 +308,7 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveAction" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Catalogues.onSaveCatalogueAction}" reRender="dtEvents" oncomplete="#{rich:component('mpCatalogueActionDetails')}.hide(); return false;" />
+                            <a4j:commandLink id="lnkSaveAction" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Catalogues.onSaveCatalogueAction}" reRender="dtActions" oncomplete="#{rich:component('mpCatalogueActionDetails')}.hide(); return false;" />
                             <a4j:commandLink id="lnkApplyAction" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{administrator_Catalogues.onSaveCatalogueAction}" reRender="dtActions,pgCatalogueActionDetails" />
                             <a4j:commandLink id="lnkDeleteAction" ajaxSingle="true" rendered="#{administrator_Catalogues.actionEditMode}" onclick="if (confirm('#{msgs.media_item_CATALOGUE_ACTION_REMOVE_CONFIRMATION}') != true){ return false; };" actionListener="#{administrator_Catalogues.onDeleteCatalogueAction}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="dtActions">
                                 <rich:componentControl for="mpCatalogueActionDetails" operation="hide" event="oncomplete" />

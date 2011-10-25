@@ -59,6 +59,16 @@ CREATE TABLE `catalogue_hook` (
   KEY `FK_catalogue_hook_catalogue` (`catalogue_id`)
 );
 
+CREATE TABLE `catalogue_hook_property` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `property_key` varchar(255) DEFAULT NULL,
+  `property_value` varchar(255) DEFAULT NULL,
+  `catalogue_hook_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_catalogue_hook_property` (`catalogue_hook_id`)
+);
+
+
 ALTER TABLE news_item_media_attachment DROP COLUMN opt_lock;
 ALTER TABLE news_item_media_attachment ADD COLUMN display_order int(11) DEFAULT 0;
 

@@ -84,6 +84,12 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>1.6.0</version>
+        </dependency>
 
         <dependency>
             <groupId>dk.i2m.commons</groupId>

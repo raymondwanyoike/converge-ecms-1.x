@@ -21,6 +21,8 @@ import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.content.ContentTag;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.NewsItem;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.content.forex.Rate;
 import dk.i2m.converge.core.content.markets.MarketValue;
@@ -174,5 +176,21 @@ public class PluginContextBean implements PluginContextBeanLocal {
         } catch (IOException ex) {
             return null;
         }
+    }
+
+    @Override
+    public MediaItemRendition createMediaItemRendition(File file, Long mediaItemId, Long renditionId, String filename, String contentType) throws IllegalArgumentException, IOException {
+        try {
+            MediaItem mediaItem = catalogueFacade.findMediaItemById(mediaItemId);
+            Rendition rendition = catalogueFacade.findRenditionById(renditionId);
+            return catalogueFacade.create(file, mediaItem, rendition, filename, contentType);
+        } catch (DataNotFoundException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
+
+    @Override
+    public MediaItemRendition updateMediaItemRendition(java.io.File file, String filename, String contentType, dk.i2m.converge.core.content.catalogue.MediaItemRendition mediaItemRendition) throws IOException {
+        return catalogueFacade.update(file, filename, contentType, mediaItemRendition);
     }
 }

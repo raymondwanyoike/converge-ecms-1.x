@@ -146,4 +146,8 @@ public interface PluginContext {
      *          If the file could not be archived in the given catalogue
      */
     java.lang.String archive(java.io.File file, Long catalogueId, String fileName) throws ArchiveException;
+
+    dk.i2m.converge.core.content.catalogue.MediaItemRendition createMediaItemRendition(java.io.File file, java.lang.Long mediaItemId, java.lang.Long renditionId, java.lang.String filename, java.lang.String contentType) throws java.lang.IllegalArgumentException, java.io.IOException;
+
+    dk.i2m.converge.core.content.catalogue.MediaItemRendition updateMediaItemRendition(java.io.File file, String filename, String contentType, dk.i2m.converge.core.content.catalogue.MediaItemRendition mediaItemRendition) throws java.io.IOException;
 }
