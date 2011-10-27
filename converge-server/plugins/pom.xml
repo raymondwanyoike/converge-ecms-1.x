@@ -14,7 +14,6 @@
         <module>textoutput</module>
         <module>joomla</module>
         <module>indexedition</module>
-        <module>alertaction</module>
         <module>emailaction</module>
         <module>atomexport</module>
         <module>core-validators</module>
