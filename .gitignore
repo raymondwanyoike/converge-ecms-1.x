@@ -1,0 +1,15 @@
+/converge-server/modules/converge-core/target/
+/converge-server/plugins/core-decoders/target/
+/converge-server/modules/converge-ejb/target/
+/converge-server/modules/converge-i18n/target/
+/converge-server/plugins/alertaction/target/
+/converge-server/plugins/atomexport/target/
+/converge-server/plugins/core-actions/target/
+/converge-server/plugins/core-validators/target/
+/converge-server/plugins/emailaction/target/
+/converge-server/plugins/indexedition/target/
+/converge-server/plugins/joomla/target/
+/converge-server/plugins/textoutput/target/
+/converge-server/modules/converge-war/target/
+/converge-server/modules/converge-ws/target/
+/converge-server/modules/converge-ear/target/
