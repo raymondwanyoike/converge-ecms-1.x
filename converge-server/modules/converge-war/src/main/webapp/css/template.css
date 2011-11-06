@@ -1741,3 +1741,6 @@ div.black h2 {
 .newsItemWorkflowOptionsAvailable { margin-top: 5px; }
 
 .dlgBody { width: 450px; }
+
+.validOutlet { color: green; font-weight: bold; }
+.invalidOutlet { color: red; font-weight: bold; }
