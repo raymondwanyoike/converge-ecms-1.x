@@ -443,42 +443,6 @@ public class UserSession {
     }
 
     /**
-     * Event handler for subscribing to a newswire service.
-     *
-     * @param event
-     *          Event that invoked the handler
-     */
-    public void onSubscribeNewswireService(ActionEvent event) {
-        this.user.getNewswireServices().add(selectedNewswireService);
-        userFacade.update(this.user);
-        try {
-            fetchUser();
-        } catch (UserSessionException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
-        }
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "profile_NEWSWIRE_SERVICE_SUBSCRIBED_MSG", new Object[]{selectedNewswireService.getSource()});
-    }
-
-    /**
-     * Event handler for unsubscribing from a newswire service.
-     *
-     * @param event
-     *          Event that invoked the handler
-     */
-    public void onUnsubscribeNewswireService(ActionEvent event) {
-        this.user.getNewswireServices().remove(selectedNewswireService);
-        userFacade.update(this.user);
-        try {
-            fetchUser();
-        } catch (UserSessionException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
-        }
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "profile_NEWSWIRE_SERVICE_UNSUBSCRIBED_MSG", new Object[]{selectedNewswireService.getSource()});
-    }
-
-    /**
      * Event handler for updating the profile of the user.
      *
      * @param event
