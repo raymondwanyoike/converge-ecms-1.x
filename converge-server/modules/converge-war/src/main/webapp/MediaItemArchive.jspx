@@ -18,7 +18,7 @@
                 <h1 style="margin-bottom: 5px; padding-bottom: 0px;">#{mediaItemArchive.selectedMediaItem.title}</h1>
                 <h2 style="margin-top: 0px; padding-top: 0px;">#{mediaItemArchive.selectedMediaItem.byLine == '' ? mediaItemArchive.selectedMediaItem.owner.fullName : mediaItemArchive.selectedMediaItem.byLine}</h2>
 
-                <h:graphicImage styleClass="searchResultThumb" url="#{mediaItemArchive.selectedMediaItem.preview.absoluteFilename}" style="float: left; padding-right: 10px; padding-bottom: 5px;" />
+                <h:graphicImage styleClass="searchResultThumb" url="#{mediaItemArchive.selectedMediaItem.preview.absoluteFilename}" style="float: left; padding-right: 10px; padding-bottom: 5px;" rendered="#{mediaItemArchive.selectedMediaItem.previewAvailable}" />
                 <h:outputText value="#{mediaItemArchive.selectedMediaItem.description}" escape="false" style="float: left;" />
 
                 <div style="clear: both; padding-bottom: 12px;"></div>
