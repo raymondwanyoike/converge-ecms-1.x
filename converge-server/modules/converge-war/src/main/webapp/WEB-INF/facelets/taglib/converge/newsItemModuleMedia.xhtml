@@ -9,7 +9,6 @@
                 <h:outputText value="" />
                 <a4j:commandButton styleClass="button mediumButton" value="#{i18n.NewsItem_MEDIA_ATTACH}" ajaxSingle="true" actionListener="#{newsItem.onPreAttachMediaFile}"
                                    oncomplete="#{rich:component('mpMediaFileUpload')}.show();#{rich:element('frmNewsItem:txtSearchKeyword')}.focus()" />
-
             </h:panelGrid>
 
             <rich:dataGrid id="dtMediaFiles" value="#{value.selectedNewsItem.mediaAttachments}" var="attachment" columns="#{newsItem.numberOfMediaAttachmentsColumns}" columnClasses="colMediaAttachment"> 
@@ -83,15 +82,15 @@
 
                 </h:panelGrid>
             </rich:dataGrid>
-
         </div>
         <converge:moduleSpacer />
 
+        
         <a4j:region id="regMediaFileUpload">
             <rich:modalPanel id="mpMediaFileUpload" autosized="true" domElementAttachment="parent">
                 <f:facet name="header">
                     <h:panelGroup>
-                        <h:outputText value="#{msgs.newsitem_MEDIA_ATTACHMENT_DETAILS}"></h:outputText>
+                        <h:outputText value="#{i18n.NewsItem_MEDIA_FILE_SELECT_TITLE}"></h:outputText>
                     </h:panelGroup>
                 </f:facet>
                 <f:facet name="controls">
@@ -154,9 +153,9 @@
                             </h:panelGrid>
                         </rich:tab>
 
-                        <rich:tab label="#{msgs.UPLOAD}">
+                        <rich:tab label="#{i18n.NewsItem_MEDIA_FILE_UPLOAD}">
                             <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid" id="pgMediaItemUpload">
-                                <h:outputText value="#{msgs.MEDIA_REPOSITORY}" />
+                                <h:outputText value="#{i18n.NewsItem_MEDIA_FILE_UPLOAD_CATALOGUE}" />
                                 <h:selectOneMenu id="somCatalogue" styleClass="text mediumInput" value="#{newsItem.selectedCatalogue}" converter="#{converters.mediaRepositoryConverter}">
                                     <f:selectItem itemLabel="" />
                                     <f:selectItems value="#{common.writableMediaRepositories}" />
