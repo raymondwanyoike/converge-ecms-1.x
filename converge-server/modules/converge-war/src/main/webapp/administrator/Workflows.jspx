@@ -426,6 +426,9 @@
                                     <h:outputText value="#{msgs.WORKFLOW_STATE_TREAT_AS_SUBMITTED}:" title="#{msgs.WORKFLOW_STATE_TREAT_AS_SUBMITTED_TOOLTIP}" />
                                     <h:selectBooleanCheckbox id="sbcTreatAsSubmitted" value="#{administrator_Workflows.selectedWorkflowStep.treatAsSubmitted}" />
 
+
+
+
                                     <h:column>
                                         <h:outputText value="#{msgs.WORKFLOW_STATE_OPTION_DISPLAY_ORDER}:"
                                                       title="#{msgs.WORKFLOW_STATE_OPTION_DISPLAY_ORDER_TOOLTIP}" />
@@ -440,6 +443,23 @@
                                                              required="true"
                                                              requiredMessage="#{msgs.WORKFLOW_STATE_OPTION_DISPLAY_ORDER_REQUIRED}" />
                                 </h:panelGrid>
+                            </rich:tab>
+
+                            <rich:tab id="tabWorkflowStepRestriction" label="#{i18n.administrator_Workflows_WORKFLOW_STEP_RESTRICTION}">
+                                <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
+
+                                    <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALID_FOR}:"
+                                                  title="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALID_FOR_TOOLTIP}" />
+                                    <rich:pickList id="plWorkflowStepUserRoles"
+                                                   value="#{administrator_Workflows.selectedWorkflowStep.validFor}"
+                                                   showButtonsLabel="false"
+                                                   sourceListWidth="350"
+                                                   targetListWidth="350"
+                                                   converter="#{converters.userRoleConverter}">
+                                        <f:selectItems value="#{common.userRoles}" />
+                                    </rich:pickList>
+                                </h:panelGrid>
+
                             </rich:tab>
 
                             <rich:tab id="tabWorkflowStepValidators" label="#{msgs.WORKFLOW_STEP_VALIDATION}">

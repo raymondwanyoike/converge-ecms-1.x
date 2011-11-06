@@ -98,7 +98,15 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
     @Resource private SessionContext ctx;
 
-    /** {@inheritDoc } */
+    /**
+     * Starts a new {@link NewsItem}.
+     *
+     * @param newsItem
+     *          {@link NewsItem} to start.
+     * @return Started {@link NewsItem}
+     * @throws WorkflowStateTransitionException
+     *          If the workflow could not be started for the <code>newsItem</code>
+     */
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public NewsItem start(NewsItem newsItem) throws WorkflowStateTransitionException {
@@ -206,7 +214,19 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Promotes the {@link NewsItem} in the workflow.
+     *
+     * @param newsItem
+     *          {@link NewsItem} to promote
+     * @param step
+     *          Unique identifier of the next step
+     * @param comment
+     *          Comment from the sender
+     * @return Promoted {@link NewsItem}
+     * @throws WorkflowStateTransitionException
+     *          If the next step is not legal
+     */
     @Override
     public NewsItem step(NewsItem newsItem, Long step, String comment) throws WorkflowStateTransitionException {
         LOG.log(Level.INFO, "Promoting news item [{0}] to {1}", new Object[]{newsItem.getId(), step});
@@ -236,7 +256,12 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         for (WorkflowStep nextWorkflowStep : state.getNextStates()) {
 
             if (nextWorkflowStep.getToState().equals(nextState)) {
-                legalStep = true;
+
+                boolean isInRole = !Collections.disjoint(nextWorkflowStep.getValidFor(), ua.getUserRoles());
+
+                if (nextWorkflowStep.isValidForAll() || isInRole) {
+                    legalStep = true;
+                }
                 break;
             }
         }
@@ -244,7 +269,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         if (!legalStep) {
             throw new WorkflowStateTransitionException("Illegal transition from " + state.getId() + " to " + nextState.getId());
         }
-        
+
         WorkflowStateTransition transition = new WorkflowStateTransition(newsItem, now, nextState, ua);
         transition.setStoryVersion(newsItem.getStory());
         transition.setHeadlineVersion(newsItem.getTitle());

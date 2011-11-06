@@ -40,30 +40,8 @@ import javax.ejb.Local;
 @Local
 public interface NewsItemFacadeLocal {
 
-    /**
-     * Starts a new {@link NewsItem}.
-     *
-     * @param newsItem
-     *          {@link NewsItem} to start.
-     * @return Started {@link NewsItem}
-     * @throws WorkflowStateTransitionException
-     *          If the workflow could not be started for the <code>newsItem</code>
-     */
     NewsItem start(NewsItem newsItem) throws WorkflowStateTransitionException;
 
-    /**
-     * Promotes the {@link NewsItem} in the workflow.
-     *
-     * @param newsItem
-     *          {@link NewsItem} to promote
-     * @param step
-     *          Unique identifier of the next step
-     * @param comment
-     *          Comment from the sender
-     * @return Promoted {@link NewsItem}
-     * @throws WorkflowStateTransitionException
-     *          If the next step is not legal
-     */
     NewsItem step(NewsItem newsItem, Long step, String comment) throws WorkflowStateTransitionException;
 
     /**
@@ -350,17 +328,17 @@ public interface NewsItemFacadeLocal {
     NewsItemPlacement createPlacement(NewsItemPlacement placement);
 
     NewsItemPlacement updatePlacement(NewsItemPlacement placement);
-    
+
     NewsItemPlacement updatePlacement(Long placementId, Integer start, Integer position);
 
     void deletePlacementById(Long id);
-    
+
     void deletePlacement(NewsItemPlacement placement);
-    
+
     void updatePrecalculatedFields();
-    
+
     java.util.List<InboxView> findInbox(java.lang.String username, int start, int limit);
-    
+
     java.util.List<InboxView> findInbox(java.lang.String username);
 
     java.util.List<dk.i2m.converge.core.views.InboxView> findOutletBox(java.lang.String username, dk.i2m.converge.core.workflow.Outlet outlet);
@@ -368,5 +346,4 @@ public interface NewsItemFacadeLocal {
     java.util.List<dk.i2m.converge.core.views.InboxView> findOutletBox(java.lang.String username, dk.i2m.converge.core.workflow.Outlet outlet, dk.i2m.converge.core.workflow.WorkflowState state);
 
     java.util.List<dk.i2m.converge.core.views.InboxView> findOutletBox(java.lang.String username, dk.i2m.converge.core.workflow.Outlet outlet, dk.i2m.converge.core.workflow.WorkflowState state, int start, int results);
-    
 }

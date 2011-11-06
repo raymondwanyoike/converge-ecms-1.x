@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2011 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.core.workflow;
 
+import dk.i2m.converge.core.security.UserRole;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -51,7 +53,7 @@ public class WorkflowStep implements Serializable {
 
     public static final String FIND_BY_WORKFLOW_STATE = "WorkflowStep.findByWorkflowState";
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /** Unique ID of the next state. */
     @Id
@@ -83,6 +85,12 @@ public class WorkflowStep implements Serializable {
 
     @Column(name = "submitted")
     private boolean treatAsSubmitted = false;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "workflow_step_user_role",
+        joinColumns = {@JoinColumn(referencedColumnName = "id", name = "workflow_step_id", nullable = false)},
+        inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "user_role_id", nullable = false)})
+    private List<UserRole> validFor = new ArrayList<UserRole>();
 
     @OneToMany(mappedBy = "step", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @PrivateOwned
@@ -156,7 +164,8 @@ public class WorkflowStep implements Serializable {
      * on the {@link WorkflowStateTransition} if this method returns
      * {@code true}.
      * 
-     * @param {@link true} if {@link WorkflowStateTransition#submitted}
+     * @param treatAsSubmitted
+     *         {@link true} if {@link WorkflowStateTransition#submitted}
      *         should be set, otherwise {@link false}
      */
     public void setTreatAsSubmitted(boolean treatAsSubmitted) {
@@ -185,6 +194,42 @@ public class WorkflowStep implements Serializable {
 
     public void setValidators(List<WorkflowStepValidator> validators) {
         this.validators = validators;
+    }
+
+    /**
+     * Determine if the {@link WorkflowStep} is valid for
+     * all {@link UserRole}s.
+     * 
+     * @return {@link true} if the {@link WorkflowStep} is
+     *         valid for all, otherwise {@link false}
+     */
+    public boolean isValidForAll() {
+        return validFor.isEmpty();
+    }
+
+    /**
+     * Gets a {@link List} of {@link UserRole}s that can 
+     * execute this {@link WorkflowStep}. Note, if the
+     * {@link List} is empty, the step is valid for
+     * all {@link UserRole}s.
+     * 
+     * @return {@link List} of {@link UserRole}s that can
+     *         execute this {@link WorkflowStep}
+     */
+    public List<UserRole> getValidFor() {
+        return validFor;
+    }
+
+    /**
+     * Sets the {@link List} of {@link UserRole}s that can
+     * execute this {@link WorkflowStep}.
+     * 
+     * @param validFor 
+     *         {@link List} of {@link UserRole}s that can
+     *         execute this {@link WorkflowStep}
+     */
+    public void setValidFor(List<UserRole> validFor) {
+        this.validFor = validFor;
     }
 
     @Override

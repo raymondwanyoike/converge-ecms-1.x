@@ -147,6 +147,13 @@ public class WorkflowState implements Serializable {
         this.actorRole = actorRole;
     }
 
+    /**
+     * Gets a {@link List} of valid steps from this 
+     * {@link WorkflowState}.
+     * 
+     * @return {@link List} of valid {@link WorkflowStep}s from
+     *         this {@link WorkflowState}
+     */
     public List<WorkflowStep> getNextStates() {
         return nextStates;
     }
