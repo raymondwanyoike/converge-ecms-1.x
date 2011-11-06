@@ -4,12 +4,10 @@
 
         <converge:moduleHeader moduleTitle="#{msgs.newsitem_OPTIONS}" />
         <div>
-            <h:panelGrid id="pgWorkflowOptions" style="margin-left: 2%; margin-right: 2%; width: 98%" rowClasses="left, left,center, center">
-                <a4j:poll actionListener="#{value.onApply}" ignoreDupResponses="true" interval="300000" />
+            <h:panelGrid id="pgWorkflowOptions" styleClass="newsItemWorkflowOptions" rowClasses="left, left,center, center">
+                <h:outputText value="#{msgs.newsitem_WORKFLOW_SELECT_INTRO}" styleClass="newsItemWorkflowOptionsIntro" escape="false" />
 
-                <h:outputText value="#{msgs.newsitem_WORKFLOW_SELECT_INTRO}" style="font-size: 9px;" escape="false" />
-
-                <h:selectOneRadio style="margin-top: 5px;" layout="pageDirection" value="#{value.selectedStep}" converter="#{converters.workflowStepConverter}">
+                <h:selectOneRadio styleClass="newsItemWorkflowOptionsAvailable" layout="pageDirection" value="#{value.selectedStep}" converter="#{converters.workflowStepConverter}">
                     <f:selectItems value="#{value.availableWorkflowSteps}" />
                     <a4j:support event="onclick" reRender="btnSubmit, pgWorkflowComment" actionListener="#{value.onValidateWorkflowStep}" />
                 </h:selectOneRadio>
@@ -28,9 +26,10 @@
                 </h:column>
 
             </h:panelGrid>
+            <a4j:poll actionListener="#{value.onAutoSave}" ignoreDupResponses="true" interval="300000" />
         </div>
 
-        <div style="clear: both; padding-bottom: 12px;"></div>
+        <converge:moduleSpacer />
     </c:if>
 
     <c:if test="#{!value.editable &amp;&amp; value.pullbackAvailable}">
@@ -43,7 +42,7 @@
             </h:panelGrid>
         </div>
 
-        <div style="clear: both; padding-bottom: 12px;"></div>
+        <converge:moduleSpacer />
     </c:if>
 
 </ui:composition>

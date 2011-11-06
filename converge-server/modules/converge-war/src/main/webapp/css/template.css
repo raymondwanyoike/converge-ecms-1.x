@@ -1735,3 +1735,9 @@ div.black h2 {
 .newsItemAttachmentLabel { font-weight: bold; text-transform: uppercase; font-size: 0.9em; vertical-align: top; width: 25% }
 .newsItemAttachmentInput { vertical-align: top; width: 75% }
 .newsItemAttachmentInfo { background: #dedede; border: 1px solid #aaaaaa; width: 100%; }
+
+.newsItemWorkflowOptions { margin-left: 2%; margin-right: 2%; width: 98% }
+.newsItemWorkflowOptionsIntro { font-size: 9px; }
+.newsItemWorkflowOptionsAvailable { margin-top: 5px; }
+
+.dlgBody { width: 450px; }
