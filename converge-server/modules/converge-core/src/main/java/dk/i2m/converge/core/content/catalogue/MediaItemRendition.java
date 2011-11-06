@@ -42,7 +42,7 @@ import org.apache.commons.lang.StringUtils;
 @Table(name = "media_item_rendition")
 public class MediaItemRendition implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /** Unique identifier of the specific rendition. */
     @Id
@@ -570,6 +570,37 @@ public class MediaItemRendition implements Serializable {
      */
     public boolean isImage() {
         return getContentType().startsWith("image");
+    }
+
+    /**
+     * Determines if the {@link Rendition} is a document.
+     * 
+     * @return {@code true} if the {@ink Rendition}
+     *         is a document, otherwise {@code false}
+     */
+    public boolean isDocument() {
+        System.out.println(getContentType());
+        if (getContentType().startsWith("text")) {
+            return true;
+        }
+
+        if (getContentType().startsWith("application/xhtml")) {
+            return true;
+        }
+
+        if (getContentType().startsWith("application/pdf")) {
+            return true;
+        }
+
+        if (getContentType().startsWith("application/msword")) {
+            return true;
+        }
+
+        if (getContentType().startsWith("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

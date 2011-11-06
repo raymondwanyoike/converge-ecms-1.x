@@ -14,56 +14,14 @@
                 <converge:moduleHeader moduleTitle="#{msgs.CURRENT_ASSIGNMENTS}" />
                 <div class="moduleContent">
 
-                    <rich:dataTable var="assignment" value="#{dashboard.userAssignments}" style="border: 0px;">
-                        <rich:column style="border: 0px;">
-                            <h:graphicImage value="#{res.NEWS_ITEM_ICON}" rendered="#{!assignment.locked}" />
-                            <h:graphicImage value="#{res.LOCK_ICON}" rendered="#{assignment.locked}" />
-                        </rich:column>
-                        <rich:column style="border: 0px;">
-                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml">
-                                <f:param name="id" value="#{assignment.id}" />
-                                <h:outputText value="#{assignment.title}" />
-                            </h:outputLink><br/>
-
-                            <h:outputText value="#{assignment.deadline.time}" styleClass="currentAssignmentsDeadline">
-                                <f:convertDateTime pattern="#{msgs.FORMAT_SHORT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
-                            </h:outputText>
-                        </rich:column>
-
-                    </rich:dataTable>
-
+                    <h:panelGrid columns="2">
+                        <h:graphicImage value="#{res.NEWS_ITEM_ICON}" />
+                        <h:outputLink value="#{facesContext.externalContext.request.contextPath}/Inbox.xhtml">
+                            <h:outputText value="#{dashboard.userAssignments.rowCount} assignments in your inbox" styleClass="bold" />
+                        </h:outputLink>
+                    </h:panelGrid>
                 </div>
             </h:form>
-            <converge:moduleSpacer />
-        </ui:define>
-
-        <ui:define name="middleColumn">
-            <c:if test="#{common.announcementsAvailable}">
-                <converge:moduleHeader moduleTitle="#{msgs.dashboard_ANNOUNCEMENTS}" />
-                <div class="moduleContent">
-                    <rich:dataTable value="#{common.publishedAnnouncements}" var="announcement" styleClass="dashboardAnnouncementTable">
-                        <rich:column styleClass="dashboardAnnouncementColumn">
-                            <h:panelGrid columns="2" styleClass="dashboardAnnouncementTitleTable" columnClasses="left, right">
-                                <h:outputText styleClass="dashboardAnnouncementTitle" value="#{announcement.title}" />
-                                <h:outputText styleClass="dashboardAnnouncementDate" value="#{announcement.date.time}">
-                                    <f:convertDateTime pattern="#{msgs.FORMAT_SHORT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
-                                </h:outputText>
-                            </h:panelGrid>
-                            <h:panelGroup layout="block">
-                                <h:graphicImage value="#{announcement.thumb}" styleClass="dashboardAnnouncementThumb" rendered="#{announcement.thumb != ''}" />
-                                <h:outputText value="#{announcement.description}" styleClass="dashboardAnnouncementDescription"  escape="false" />
-                            </h:panelGroup>
-                        </rich:column>
-                    </rich:dataTable>
-                </div>
-                <converge:moduleSpacer />
-            </c:if>
-        </ui:define>
-
-        <ui:define name="rightColumn">
-            <converge:userProfileModule id="modUserProfile" user="#{userSession.user}" />
-            <converge:moduleSpacer />
-            <converge:userActivityModule id="modUserActivity" showMoreStatistics="true" />
             <converge:moduleSpacer />
 
             <h:form id="frmTodaysEvents">
@@ -95,6 +53,40 @@
                 </div>
             </h:form>
             <converge:moduleSpacer />
+
+        </ui:define>
+
+        <ui:define name="middleColumn">
+
+        </ui:define>
+
+        <ui:define name="rightColumn">
+            <converge:userProfileModule id="modUserProfile" user="#{userSession.user}" />
+            <converge:moduleSpacer />
+            <converge:userActivityModule id="modUserActivity" showMoreStatistics="true" />
+            <converge:moduleSpacer />
+
+            <c:if test="#{common.announcementsAvailable}">
+                <converge:moduleHeader moduleTitle="#{msgs.dashboard_ANNOUNCEMENTS}" />
+                <div class="moduleContent">
+                    <rich:dataTable value="#{common.publishedAnnouncements}" var="announcement" styleClass="dashboardAnnouncementTable">
+                        <rich:column styleClass="dashboardAnnouncementColumn">
+                            <h:panelGrid columns="2" styleClass="dashboardAnnouncementTitleTable" columnClasses="left, right">
+                                <h:outputText styleClass="dashboardAnnouncementTitle" value="#{announcement.title}" />
+                                <h:outputText styleClass="dashboardAnnouncementDate" value="#{announcement.date.time}">
+                                    <f:convertDateTime pattern="#{msgs.FORMAT_SHORT_DATE}" timeZone="#{userSession.user.timeZone}" />
+                                </h:outputText>
+                            </h:panelGrid>
+                            <h:panelGroup layout="block">
+                                <h:graphicImage value="#{announcement.thumb}" styleClass="dashboardAnnouncementThumb" rendered="#{announcement.thumb != ''}" />
+                                <h:outputText value="#{announcement.description}" styleClass="dashboardAnnouncementDescription"  escape="false" />
+                            </h:panelGroup>
+                        </rich:column>
+                    </rich:dataTable>
+                </div>
+                <converge:moduleSpacer />
+            </c:if>
+
 
         </ui:define>
     </ui:composition>

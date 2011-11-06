@@ -33,6 +33,7 @@ import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.content.NewsItemActor;
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.search.IndexQueueEntry;
 import dk.i2m.converge.core.search.QueueEntryOperation;
 import dk.i2m.converge.core.search.QueueEntryType;
@@ -44,6 +45,7 @@ import dk.i2m.converge.ejb.services.QueryBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -59,12 +61,22 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import net.sf.json.JSONObject;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.lang.StringUtils;
+import org.apache.pdfbox.cos.COSDocument;
+import org.apache.pdfbox.pdfparser.PDFParser;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.util.PDFTextStripper;
 import org.apache.poi.hssf.usermodel.HSSFHeader;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HeaderFooter;
-import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Footer;
 import org.apache.poi.ss.usermodel.Row;
@@ -91,6 +103,8 @@ public class SearchEngineBean implements SearchEngineLocal {
 
     private static final Logger LOG = Logger.getLogger(SearchEngineBean.class.getName());
 
+    private static final String OPEN_CALAIS_URL = "http://api.opencalais.com/tag/rs/enrich";
+
     @EJB private ConfigurationServiceLocal cfgService;
 
     @EJB private UserFacadeLocal userFacade;
@@ -100,9 +114,10 @@ public class SearchEngineBean implements SearchEngineLocal {
     @EJB private NewsItemFacadeLocal newsItemFacade;
 
     @EJB private CatalogueFacadeLocal catalogueFacade;
-    
-    private DateFormat solrDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
+    @EJB private MetaDataFacadeLocal metaDataFacade;
+
+    private DateFormat solrDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     @Override
     public IndexQueueEntry addToIndexQueue(QueueEntryType type, Long id, QueueEntryOperation operation) {
@@ -221,7 +236,7 @@ public class SearchEngineBean implements SearchEngineLocal {
 
             // Check if the query has date restrictions
             if (dateFrom != null || dateTo != null) {
-                
+
                 // Construct date query
                 if (!query.isEmpty()) {
                     queryString.append(" AND date:");
@@ -234,7 +249,7 @@ public class SearchEngineBean implements SearchEngineLocal {
                     queryString.append(solrDateFormat.format(dateFrom));
                     queryString.append(" TO ");
                 }
-                
+
                 if (dateTo == null) {
                     queryString.append("*]");
                 } else {
@@ -278,7 +293,7 @@ public class SearchEngineBean implements SearchEngineLocal {
             solrQuery.setParam("facet.date.start", "NOW/YEAR-10YEAR");
             solrQuery.setParam("facet.date.end", "NOW");
             solrQuery.setParam("facet.date.gap", "+1MONTH");
-            
+
             SolrServer srv = getSolrServer();
 
             // POST is used to support UTF-8
@@ -348,13 +363,13 @@ public class SearchEngineBean implements SearchEngineLocal {
 
         return searchResults;
     }
-    
+
     @Override
     public byte[] generateReport(SearchResults results) {
-        
+
         SimpleDateFormat format = new SimpleDateFormat("d MMMM yyyy");
         HSSFWorkbook wb = new HSSFWorkbook();
-        
+
         String sheetName = WorkbookUtil.createSafeSheetName("Results");
         int overviewSheetRow = 0;
 
@@ -365,7 +380,7 @@ public class SearchEngineBean implements SearchEngineLocal {
         Font userFont = wb.createFont();
         userFont.setFontHeightInPoints((short) 12);
         userFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
-        
+
         Font storyFont = wb.createFont();
         storyFont.setFontHeightInPoints((short) 12);
         storyFont.setBoldweight(Font.BOLDWEIGHT_NORMAL);
@@ -391,9 +406,7 @@ public class SearchEngineBean implements SearchEngineLocal {
         row.createCell(2).setCellValue("Outlet");
 
         for (int i = 0; i <= 2; i++) {
-  
 //                row.getCell(i).setCellStyle(headerStyle);
-  
         }
 
         overviewSheetRow++;
@@ -411,9 +424,9 @@ public class SearchEngineBean implements SearchEngineLocal {
             overviewSheet.autoSizeColumn(i);
         }
 
-        wb.setRepeatingRowsAndColumns(0,0,0,0,0);
+        wb.setRepeatingRowsAndColumns(0, 0, 0, 0, 0);
         //wb.setPrintArea(0, 0, 8, 0, overviewSheetRow);
-        overviewSheet.setFitToPage(true);        
+        overviewSheet.setFitToPage(true);
         overviewSheet.setAutobreaks(true);
 //        overviewSheet.getPrintSetup().setFitWidth((short)1);
 //        overviewSheet.getPrintSetup().setFitHeight((short)500);
@@ -428,10 +441,9 @@ public class SearchEngineBean implements SearchEngineLocal {
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
-        
+
         return baos.toByteArray();
     }
-    
 
     private void index(NewsItem ni, SolrServer solrServer) throws SearchEngineIndexingException {
 
@@ -515,30 +527,83 @@ public class SearchEngineBean implements SearchEngineLocal {
 
         if (mi.isOriginalAvailable()) {
 
+            MediaItemRendition mir = mi.getOriginal();
+
             SolrInputDocument solrDoc = new SolrInputDocument();
             solrDoc.addField(IndexField.ID.getName(), mi.getId(), 1.0f);
             solrDoc.addField(IndexField.TYPE.getName(), "Media");
 
             String mediaFormat;
             String contentType = mi.getOriginal().getContentType();
+            String story = "";
 
-            if (contentType.startsWith("audio")) {
+            if (mir.isAudio()) {
                 mediaFormat = "Audio";
-            } else if (contentType.startsWith("video")) {
+            } else if (mir.isVideo()) {
                 mediaFormat = "Video";
-            } else if (contentType.startsWith("image")) {
+            } else if (mir.isImage()) {
                 mediaFormat = "Image";
+            } else if (mir.isDocument()) {
+                mediaFormat = "Document";
+
+                if (contentType.equals("application/pdf")) {
+                    // Extract text in PDF
+                    try {
+                        URL originalFile = new URL(mir.getAbsoluteFilename());
+                        PDDocument doc = null;
+                        try {
+                            // Read PDF
+                            PDFParser parser = new PDFParser(originalFile.openStream());
+                            parser.parse();
+                            COSDocument cosDoc = parser.getDocument();
+                            PDDocument pdDoc = new PDDocument(cosDoc);
+
+                            PDFTextStripper stripper = new PDFTextStripper();
+                            story = stripper.getText(pdDoc);
+
+                        } catch (IOException ex) {
+                            LOG.log(Level.SEVERE, null, ex);
+                        } finally {
+                            if (doc != null) {
+                                try {
+                                    doc.close();
+                                } catch (IOException ex) {
+                                    LOG.log(Level.SEVERE, null, ex);
+                                }
+                            }
+                        }
+
+
+                    } catch (MalformedURLException ex) {
+                    }
+                } else if (contentType.equals("application/msword") || contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+                    try {
+                        URL originalFile = new URL(mir.getAbsoluteFilename());
+                        HWPFDocument doc = new HWPFDocument(originalFile.openStream());
+                        WordExtractor extractor = new WordExtractor(doc);
+                        story = extractor.getText();
+                    } catch (IOException ex) {
+                        LOG.log(Level.SEVERE, null, ex);
+                    }
+                }
             } else {
                 mediaFormat = "Unknown";
             }
 
-            solrDoc.addField(IndexField.MEDIA_FORMAT.getName(), mediaFormat);
+            boolean enrich = cfgService.getBoolean(ConfigurationKey.SEARCH_ENGINE_OPEN_CALAIS_ENABLED);
 
+            if (enrich) {
+                enrich(mi, story);
+            }
+
+            solrDoc.addField(IndexField.MEDIA_FORMAT.getName(), mediaFormat);
             solrDoc.addField(IndexField.TITLE.getName(), mi.getTitle(), 1.0f);
             solrDoc.addField(IndexField.BYLINE.getName(), mi.getByLine());
+            solrDoc.addField(IndexField.STORY.getName(), dk.i2m.converge.core.utils.StringUtils.stripHtml(mi.getDescription()) + " " + story);
             solrDoc.addField(IndexField.CAPTION.getName(), dk.i2m.converge.core.utils.StringUtils.stripHtml(mi.getDescription()));
             solrDoc.addField(IndexField.CONTENT_TYPE.getName(), mi.getOriginal().getContentType());
             solrDoc.addField(IndexField.REPOSITORY.getName(), mi.getCatalogue().getName());
+
             if (mi.getMediaDate() != null) {
                 solrDoc.addField(IndexField.DATE.getName(), mi.getMediaDate().getTime());
             }
@@ -585,6 +650,93 @@ public class SearchEngineBean implements SearchEngineLocal {
         }
     }
 
+    private void enrich(MediaItem mi, String story) {
+        PostMethod method = new PostMethod(OPEN_CALAIS_URL);
+        method.setRequestHeader("x-calais-licenseID", cfgService.getString(ConfigurationKey.OPEN_CALAIS_API_KEY));
+        method.setRequestHeader("Content-Type", "text/raw; charset=UTF-8");
+        method.setRequestHeader("Accept", "application/json");
+        method.setRequestHeader("enableMetadataType", "SocialTags");
+        method.setRequestEntity(new StringRequestEntity(mi.getDescription() + " " + story));
+        try {
+            HttpClient client = new HttpClient();
+            int returnCode = client.executeMethod(method);
+            if (returnCode == HttpStatus.SC_NOT_IMPLEMENTED) {
+                System.err.println("The Post method is not implemented by this URI");
+                // still consume the response body
+                method.getResponseBodyAsString();
+            } else if (returnCode == HttpStatus.SC_OK) {
+
+                JSONObject response = JSONObject.fromObject(method.getResponseBodyAsString());
+
+                for (Object key : response.keySet()) {
+                    String sKey = (String) key;
+
+                    if (sKey.startsWith("http://d.opencalais.com/")) {
+                        JSONObject entity = response.getJSONObject(sKey);
+
+                        if (((String) entity.get("_typeGroup")).equalsIgnoreCase("entities")) {
+                            String conceptType = (String) entity.get("_type");
+                            String conceptName = (String) entity.get("name");
+                            Concept match = null;
+                            try {
+                                match = metaDataFacade.findConceptByName(conceptName);
+                            } catch (DataNotFoundException dnfe) {
+                            }
+
+                            if (entity.containsKey("_type")) {
+                                if (conceptType.equalsIgnoreCase("company") || conceptType.equalsIgnoreCase("organization")) {
+                                    
+                                    if (match == null || (!(match instanceof Organisation))) {
+                                        match = new Organisation(conceptName, "");
+                                        match = metaDataFacade.create(match);
+                                    }
+
+                                    if (match instanceof Organisation) {
+                                        mi.getConcepts().add(match);
+                                    }
+                                } else if (conceptType.equalsIgnoreCase("person")) {
+                                    if (match == null || (!(match instanceof Person))) {
+                                        match = new Person(conceptName, "");
+                                        match = metaDataFacade.create(match);
+                                    }
+
+                                    if (match instanceof Person) {
+                                        mi.getConcepts().add(match);
+                                    }
+                                } else if (conceptType.equalsIgnoreCase("city") || conceptType.equalsIgnoreCase("country")  || conceptType.equalsIgnoreCase("continent") || conceptType.equalsIgnoreCase("ProvinceOrState") || conceptType.equalsIgnoreCase("region")) {
+                                    if (match == null || (!(match instanceof GeoArea))) {
+                                        match = new GeoArea(conceptName, "");
+                                        match = metaDataFacade.create(match);
+                                    }
+
+                                    if (match instanceof GeoArea) {
+                                        mi.getConcepts().add(match);
+                                    }
+                                } else if (conceptType.equalsIgnoreCase("facility")) {
+                                    if (match == null || (!(match instanceof PointOfInterest))) {
+                                        match = new PointOfInterest(conceptName, "");
+                                        match = metaDataFacade.create(match);
+                                    }
+
+                                    if (match instanceof PointOfInterest) {
+                                        mi.getConcepts().add(match);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                LOG.log(Level.WARNING, "Invalid response received from OpenCalais [{0}] {1}", new Object[]{returnCode, method.getResponseBodyAsString()});
+            }
+
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "", e);
+        } finally {
+            method.releaseConnection();
+        }
+    }
+
     @Override
     public void optimizeIndex() throws SearchEngineIndexingException {
         try {
@@ -616,12 +768,12 @@ public class SearchEngineBean implements SearchEngineLocal {
 
         boolean highlightingExist = highlighting != null;
 
-        if (highlightingExist && highlighting.get(IndexField.CAPTION.getName()) != null) {
-            for (String hl : highlighting.get(IndexField.CAPTION.getName())) {
+        if (highlightingExist && highlighting.get(IndexField.STORY.getName()) != null) {
+            for (String hl : highlighting.get(IndexField.STORY.getName())) {
                 caption.append(hl);
             }
         } else {
-            caption.append(StringUtils.abbreviate((String) values.get(IndexField.CAPTION.getName()), 500));
+            caption.append(StringUtils.abbreviate((String) values.get(IndexField.STORY.getName()), 500));
         }
 
         if (highlightingExist && highlighting.get(IndexField.TITLE.getName()) != null) {
