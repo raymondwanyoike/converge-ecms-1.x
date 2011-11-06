@@ -28,7 +28,7 @@
                         <h:outputText value="#{msgs.newsitem_SUBMITTED_NOT_SET}" rendered="#{!newsItem.selectedNewsItem.submitted}" />
                     </h:panelGrid>
                 </div>
-                <div style="clear: both; padding-bottom: 12px;"></div>
+                <converge:moduleSpacer />
 
                 <converge:newsItemModuleHistory value="#{newsItem.selectedNewsItem}" />
                 <converge:newsItemModuleActors value="#{newsItem}" />
