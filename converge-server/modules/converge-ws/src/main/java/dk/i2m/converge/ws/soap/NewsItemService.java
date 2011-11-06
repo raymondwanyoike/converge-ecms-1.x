@@ -51,6 +51,7 @@ public class NewsItemService {
     private static final Logger LOG = Logger.getLogger(NewsItemService.class.getName());
 
     @EJB private NewsItemFacadeLocal newsItemFacade;
+
     @EJB private CatalogueFacadeLocal mediaDatabaseFacade;
 
     @EJB private OutletFacadeLocal outletFacade;
@@ -58,6 +59,58 @@ public class NewsItemService {
     @EJB private UserFacadeLocal userFacade;
 
     @Resource private WebServiceContext context;
+
+    /**
+     * Starts the workflow of a new {@link dk.i2m.converge.core.content.NewsItem}.
+     * 
+     * @param outletId
+     *          Unique identifier of the Outlet where to place the news item
+     * @param title
+     *          Title of the news item
+     * @return Unique identifier of the new news item
+     * @throws WorkflowStateTransitionException 
+     *          If the workflow could not be started
+     */
+    @WebMethod(operationName = "start")
+    public Long start(@WebParam(name = "outletId") Long outletId, @WebParam(name = "title") String title) throws WorkflowStateTransitionException {
+        if (context.getUserPrincipal() == null) {
+            throw new WorkflowStateTransitionException("User is not authenticated");
+        }
+
+        String username = context.getUserPrincipal().getName();
+        UserAccount userAccount = null;
+        try {
+            userAccount = userFacade.findById(username);
+        } catch (DataNotFoundException ex) {
+            throw new WorkflowStateTransitionException(ex);
+        }
+
+        dk.i2m.converge.core.workflow.Outlet outlet = null;
+        try {
+            outlet = outletFacade.findOutletById(outletId);
+        } catch (DataNotFoundException ex) {
+            throw new WorkflowStateTransitionException(ex);
+        }
+
+        if (!outlet.isValid()) {
+            throw new WorkflowStateTransitionException("Outlet #" + outletId + " has not been configured properly");
+
+        }
+
+        dk.i2m.converge.core.content.NewsItem newsItem = new dk.i2m.converge.core.content.NewsItem();
+        dk.i2m.converge.core.workflow.Workflow workflow = outlet.getWorkflow();
+        dk.i2m.converge.core.content.NewsItemActor nia = new dk.i2m.converge.core.content.NewsItemActor();
+
+        nia.setRole(workflow.getStartState().getActorRole());
+        nia.setUser(userAccount);
+        nia.setNewsItem(newsItem);
+        newsItem.getActors().add(nia);
+        newsItem.setLanguage(outlet.getLanguage());
+        newsItem.setTitle(title);
+        newsItem = newsItemFacade.start(newsItem);
+
+        return newsItem.getId();
+    }
 
     /**
      * Gets all complete {@link NewsItem}s for a given edition.
@@ -74,7 +127,6 @@ public class NewsItemService {
             for (NewsItemPlacement placement : edition.getPlacements()) {
                 if (placement.getNewsItem().isEndState()) {
                     newsItems.add(ModelConverter.toNewsItem(placement));
-
                 }
             }
         } catch (DataNotFoundException ex) {
@@ -159,11 +211,13 @@ public class NewsItemService {
      * checking out the {@link NewsItem} it becomes locked for editing
      * by other users.
      * 
+     * @param id 
+     *          Unique identifier of the {@link NewsItem}
      * @return {@link dk.i2m.converge.ws.model.NewsItem} matching the
      *          unique identifier
      * @throws NewsItemNotFoundException
      *          If the requested {@link NewsItem} could not be found
-     * @throws NewsItemLockedException
+     * @throws NewsItemLockingException
      *          If the requested {@link NewsItem} is locked by another user
      * @throws NewsItemReadOnlyException
      *          If the requested {@link NewsItem} is not in a state for 
@@ -207,6 +261,8 @@ public class NewsItemService {
     /**
      * Checks in a {@link NewsItem}.
      * 
+     * @param newsItem
+     *          {@link dk.i2m.converge.ws.model.NewsItem} News item to check-in
      * @throws NewsItemNotFoundException
      *          If a corresponding {@link NewsItem} could not be found
      * @throws NewsItemLockingException
@@ -225,7 +281,7 @@ public class NewsItemService {
             ni.setByLine(newsItem.getByLine());
             ni.setStory(newsItem.getStory());
             ni.setBrief(newsItem.getBrief());
-            
+
             try {
                 newsItemFacade.checkin(ni);
             } catch (LockingException ex) {
@@ -235,10 +291,16 @@ public class NewsItemService {
             throw new NewsItemNotFoundException(newsItem.getId() + " does not exist in the database");
         }
     }
-    
+
     /**
      * Workflow step for the given NewsItem.
      * 
+     * @param newsItemId 
+     *          Unique identifier of the {@link NewsItem} to step
+     * @param workflowStep
+     *          Unique identifier of the workflow step to take
+     * @param comment
+     *          Comment to attach to the workflow step
      * @throws NewsItemNotFoundException
      *          If a corresponding {@link NewsItem} could not be found
      * @throws NewsItemWorkflowException
@@ -250,6 +312,7 @@ public class NewsItemService {
         if (context.getUserPrincipal() == null) {
             LOG.log(Level.WARNING, "User is not authenticated");
         }
+
         try {
             dk.i2m.converge.core.content.NewsItem ni = newsItemFacade.findNewsItemById(newsItemId);
             try {
@@ -257,8 +320,6 @@ public class NewsItemService {
             } catch (WorkflowStateTransitionException ex) {
                 throw new NewsItemWorkflowException(ex);
             }
-            
-            
         } catch (DataNotFoundException ex) {
             throw new NewsItemNotFoundException(newsItemId + " does not exist in the database");
         }
