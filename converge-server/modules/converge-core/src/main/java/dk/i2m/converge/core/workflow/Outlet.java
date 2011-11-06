@@ -52,7 +52,7 @@ import org.eclipse.persistence.annotations.PrivateOwned;
 @NamedQueries({})
 public class Outlet implements Serializable {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -261,6 +261,28 @@ public class Outlet implements Serializable {
      */
     public void setLanguage(Language language) {
         this.language = language;
+    }
+    
+    /**
+     * Determines if the {@link Outlet} is valid and operational.
+     * An {@link Outlet} is valid and operational if all the necessary 
+     * fields have been set.
+     * 
+     * @return {@code true} if the {@link Outlet} is valid, otherwise {@code false}
+     */
+    public boolean isValid() {
+        if (getWorkflow() == null) { 
+            return false;
+        }
+        if (getLanguage() == null) {
+            return false;
+        }
+        
+        if (!getWorkflow().isValid()) {
+            return false;
+        }
+        
+        return true;
     }
 
     @Override

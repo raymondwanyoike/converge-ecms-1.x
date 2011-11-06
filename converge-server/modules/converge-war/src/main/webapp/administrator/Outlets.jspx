@@ -85,6 +85,14 @@
                             </f:facet>
                             <h:outputText value="#{outlet.workflow.name}" title="#{outlet.workflow.description}" />
                         </rich:column>
+
+                        <rich:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{i18n.administrator_Outlets_OUTLET_STATUS}" title="#{i18n.administrator_Outlets_OUTLET_STATUS_TOOLTIP}" />
+                            </f:facet>
+                            <h:outputText value="#{i18n.administrator_Outlets_OUTLET_STATUS_VALID}" rendered="#{outlet.valid}" styleClass="validOutlet" />
+                            <h:outputText value="#{i18n.administrator_Outlets_OUTLET_STATUS_INVALID}" rendered="#{!outlet.valid}" styleClass="invalidOutlet" />
+                        </rich:column>
                     </rich:dataTable>
 
                     <rich:spacer height="30" />
@@ -488,7 +496,7 @@
                                 <h:panelGrid columns="2" columnClasses="dialogueFieldLabel nowrap, dialogueFieldValue" styleClass="dialogue">
                                     <h:outputText value="Label:" />
                                     <h:inputText styleClass="text mediumInput" value="#{administrator_Outlets.selectedOutletEditionAction.label}" />
-                                    
+
                                     <h:outputText value="Manual:" />
                                     <h:selectBooleanCheckbox value="#{administrator_Outlets.selectedOutletEditionAction.manualAction}" />
 

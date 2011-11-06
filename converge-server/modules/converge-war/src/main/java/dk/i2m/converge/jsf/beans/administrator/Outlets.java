@@ -198,6 +198,11 @@ public class Outlets extends BaseBean {
             selectedOutlet = outletFacade.updateOutlet(selectedOutlet);
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "OUTLET_UPDATED");
         }
+        
+        if (!selectedOutlet.isValid()) {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "administrator_Outlets_INVALID_OUTLET", null);
+        }
+        
         this.outlets = null;
     }
 

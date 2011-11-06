@@ -274,18 +274,20 @@ public class Inbox {
             List<Outlet> outlets = getUser().getPrivilegedOutlets(SystemPrivilege.MY_NEWS_ITEMS);
 
             for (Outlet outlet : outlets) {
-                TreeNode node = new TreeNodeImpl();
-                node.setData(new OutletNode(outlet, null, outlet.getClass().getName()));
+                if (outlet.isValid()) {
+                    TreeNode node = new TreeNodeImpl();
+                    node.setData(new OutletNode(outlet, null, outlet.getClass().getName()));
 
-                List<WorkflowState> states = outlet.getWorkflow().getStates();
+                    List<WorkflowState> states = outlet.getWorkflow().getStates();
 
-                for (WorkflowState state : states) {
-                    TreeNode subNode = new TreeNodeImpl();
-                    subNode.setData(new OutletNode(state, outlet, state.getClass().getName()));
-                    node.addChild(state.getId(), subNode);
+                    for (WorkflowState state : states) {
+                        TreeNode subNode = new TreeNodeImpl();
+                        subNode.setData(new OutletNode(state, outlet, state.getClass().getName()));
+                        node.addChild(state.getId(), subNode);
+                    }
+
+                    outletsNode.addChild("O" + outlet.getId(), node);
                 }
-
-                outletsNode.addChild("O" + outlet.getId(), node);
             }
 
 
@@ -348,7 +350,7 @@ public class Inbox {
                 this.catalogueEditor = true;
             }
             MediaItemStatus status = (MediaItemStatus) node.getData();
-            
+
             String catalogueStatus = JsfUtils.getResourceBundle().getString("MEDIA_ITEM_STATUS_" + status.name());
             inboxTitle = repository.getName() + " " + catalogueStatus;
             mediaItems = new ListDataModel(catalogueFacade.findCurrentMediaItems(getUser(), status, repository.getId()));
