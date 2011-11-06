@@ -43,7 +43,7 @@ import javax.persistence.TemporalType;
 @Table(name = "news_item_workflow_state_transition")
 public class WorkflowStateTransition implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -200,6 +200,21 @@ public class WorkflowStateTransition implements Serializable {
      */
     public void setComment(String comment) {
         this.comment = comment;
+    }
+    
+    /**
+     * Determine if there is a comment available in the
+     * {@link WorkflowStateTransition}.
+     * 
+     * @return {@code true} if there is a comment available,
+     *         otherwise {@code false}
+     */
+    public boolean isCommentAvailable() {
+        if (this.comment == null || this.comment.trim().isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
