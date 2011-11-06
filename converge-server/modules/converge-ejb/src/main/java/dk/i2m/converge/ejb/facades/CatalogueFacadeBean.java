@@ -257,18 +257,13 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     public MediaItemRendition create(File file, MediaItem item, Rendition rendition, String filename, String contentType) throws IOException {
         Catalogue catalogue = item.getCatalogue();
 
-        LOG.log(Level.INFO, "Filename: {0}", filename);
-        
         // Remove path from filename if file was uploaded from Windows
         String originalExtension = FilenameUtils.getExtension(filename);
-        LOG.log(Level.INFO, "Extension: {0}", originalExtension);
         
         StringBuilder realFilename = new StringBuilder();
         realFilename.append(rendition.getId()).append(".");
         realFilename.append(originalExtension);
         
-        LOG.log(Level.INFO, "Real Filename: {0}", realFilename.toString());
-
         // Set-up the media item rendition
         MediaItemRendition mediaItemRendition = new MediaItemRendition();
         mediaItemRendition.setMediaItem(item);
