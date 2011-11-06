@@ -324,6 +324,24 @@ public class Newswire {
         }
     }
 
+    /**
+     * Event handler for saving selected newswire subscriptions.
+     * 
+     * @param event 
+     *          Event that invoked the handler
+     */
+    public void onSaveSubscriptions(ActionEvent event) {
+        userFacade.update(getUserAccount());
+        
+        // Reset list of current subscriptions
+        newsService = null;
+        
+        // Refresh todays news
+        onShowTodaysNews(event);
+        
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n", "Newswire_MY_NEWSWIRE_SUBSCRIPTIONS_UPDATED", new Object[]{});
+    }
+
     public void onAssign(ActionEvent event) {
         dialogAssignment = new DialogAssignment(outletFacade, workflowFacade, userFacade, newsItemFacade, calendarFacade, getOutlets());
         dialogAssignment.showStoryTab();

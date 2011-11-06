@@ -6,21 +6,21 @@
         <ui:define name="leftColumnTop">
 
             <h:form id="frmOptions">
-                <converge:moduleHeader moduleTitle="Options" />
+                <converge:moduleHeader moduleTitle="#{i18n.Newswire_OPTIONS}" />
                 <div class="moduleContent">
                     <h:panelGrid columns="2">
                         <h:graphicImage value="#{res.BULLET_ICON}" alt="" title="" />
                         <a4j:commandLink ajaxSingle="true">
                             <a4j:support event="oncomplete" actionListener="#{newswire.onShowTodaysNews}" reRender="frmPage,frmQuery" />
-                            <h:outputText value="Show Lastest News" />
+                            <h:outputText value="#{i18n.Newswire_OPTION_SHOW_LATEST_NEWS}" />
                         </a4j:commandLink>
                         <h:graphicImage value="#{res.BULLET_ICON}" alt="" title="" />
-                        <h:commandLink action="/myprofile">
-                            <h:outputText value="Subscribe to Newswires" />
-                        </h:commandLink>
+                        <a4j:commandLink ajaxSingle="true" reRender="frmMyNewswireSubscriptions" oncomplete="#{rich:component('mpMyNewswireSubscriptions')}.show();">
+                            <h:outputText value="#{i18n.Newswire_OPTION_SUBSCRIBE_TO_NEWSWIRES}" />
+                        </a4j:commandLink>
                         <h:graphicImage value="#{res.BULLET_ICON}" alt="" title="" />
                         <a4j:commandLink ajaxSingle="true" reRender="frmBasketDetail" actionListener="#{newswire.onNewBasket}" oncomplete="#{rich:component('mpBasketDetail')}.show();">
-                            <h:outputText value="Create Basket" />
+                            <h:outputText value="#{i18n.Newswire_OPTION_CREATE_BASKET}Create Basket" />
                         </a4j:commandLink>
                     </h:panelGrid>
                 </div>
@@ -29,11 +29,10 @@
             <converge:moduleSpacer />
 
             <h:form id="frmBaskets">
-
-                <converge:moduleHeader moduleTitle="Baskets" />
+                <converge:moduleHeader moduleTitle="#{i18n.Newswire_BASKETS}" />
                 <div class="moduleContent">
 
-                    <h:dataTable value="#{newswire.baskets}" var="basket" rendered="#{newswire.baskets.rowCount&gt;0}">
+                    <h:dataTable value="#{newswire.baskets}" var="basket" rendered="#{newswire.baskets.rowCount &gt; 0}">
                         <h:column>
                             <h:graphicImage value="#{res.BASKET_ICON}" alt="" title="" />
                         </h:column>
@@ -47,14 +46,14 @@
                         <h:column>
                             <a4j:commandLink ajaxSingle="true" reRender="frmBasketDetail" oncomplete="#{rich:component('mpBasketDetail')}.show();">
                                 <f:setPropertyActionListener value="#{basket}" target="#{newswire.selectedBasket}" />
-                                <h:outputText value="(#{msgs.EDIT})" />
+                                <h:outputText value="(#{i18n.Generic_EDIT})" />
                             </a4j:commandLink>
                         </h:column>
                     </h:dataTable>
 
                     <h:panelGrid columns="2" rendered="#{newswire.baskets.rowCount&lt;1}">
                         <h:graphicImage value="#{res.BULLET_ICON}" alt="" title="" />
-                        <h:outputText value="None" />                        
+                        <h:outputText value="#{i18n.Newswire_BASKETS_NONE}" />                        
                     </h:panelGrid>
                 </div>
             </h:form>
@@ -62,7 +61,7 @@
             <converge:moduleSpacer />
 
             <h:form id="frmSubscriptions">
-                <converge:moduleHeader moduleTitle="Subscriptions" />
+                <converge:moduleHeader moduleTitle="#{i18n.Newswire_SUBSCRIPTIONS}" />
                 <div class="moduleContent">
                     <h:dataTable value="#{newswire.services}" var="service">
                         <h:column>
@@ -236,6 +235,50 @@
                         </h:column>
                     </h:panelGrid>
                 </div>
+            </h:form>
+
+
+            <h:form id="frmMyNewswireSubscriptions">
+
+                <rich:modalPanel id="mpMyNewswireSubscriptions" autosized="true" domElementAttachment="parent" >
+                    <f:facet name="header">
+                        <h:panelGroup>
+                            <h:outputText value="#{i18n.Newswire_MY_NEWSWIRE_SUBSCRIPTIONS}" />
+                        </h:panelGroup>
+                    </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage id="imgCloseMyNewswireSubscriptions" value="#{res.DIALOGUE_CLOSE_ICON}" style="link" />
+                            <rich:componentControl for="mpMyNewswireSubscriptions" attachTo="imgCloseMyNewswireSubscriptions" operation="hide" event="onclick"/>
+                        </h:panelGroup>
+                    </f:facet>
+
+                    <h:panelGrid id="pgMyNewswireSubscriptions" styleClass="dlgBody">
+                        <rich:tabPanel switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+                            <rich:tab label="#{i18n.Newswire_MY_NEWSWIRE_SUBSCRIPTIONS_SERVICES}">
+                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
+                                    <rich:pickList value="#{userSession.user.newswireServices}" 
+                                                   converter="#{converters.newswireServiceConverter}" 
+                                                   listsHeight="280" 
+                                                   sourceListWidth="200" 
+                                                   targetListWidth="200" 
+                                                   copyAllControlLabel="#{i18n.Newswire_MY_NEWSWIRE_SUBSCRIPTIONS_SUBSCRIBE_TO_ALL}" 
+                                                   copyControlLabel="#{i18n.Newswire_MY_NEWSWIRE_SUBSCRIPTIONS_SUBSCRIBE}" 
+                                                   removeAllControlLabel="#{i18n.Newswire_MY_NEWSWIRE_SUBSCRIPTIONS_UNSUBSCRIBE_ALL}" 
+                                                   removeControlLabel="#{i18n.Newswire_MY_NEWSWIRE_SUBSCRIPTIONS_UNSUBSCRIBE}">
+                                        <f:selectItems value="#{newswire.availableServices}" />
+                                    </rich:pickList>
+                                </h:panelGrid>
+                            </rich:tab>
+                        </rich:tabPanel>
+                        <h:panelGroup styleClass="dialogueButtons">
+                            <a4j:commandLink id="lnkSaveSubscriptions" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{newswire.onSaveSubscriptions}" reRender="frmPage,frmQuery,frmSubscriptions">
+                                <rich:componentControl for="mpMyNewswireSubscriptions" operation="hide" event="oncomplete" />
+                            </a4j:commandLink>
+                            <h:commandLink id="lnkClose" styleClass="dialogButton" value="#{i18n.Generic_CLOSE}" onclick="#{rich:component('mpMyNewswireSubscriptions')}.hide(); return false;" />
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </rich:modalPanel>
             </h:form>
 
             <h:form id="frmNewswireItemDetail">

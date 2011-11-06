@@ -9,7 +9,6 @@
                 <converge:moduleHeader moduleTitle="#{msgs.profile_PHOTO}" />
                 <div class="moduleContent">
                     <h:panelGrid columns="2">
-
                         <h:graphicImage id="imgProfilePhoto" styleClass="profilePhoto"
                                         value="#{userSession.photoUrl}"
                                         alt="#{userSession.user.fullName}"
@@ -25,16 +24,17 @@
                                          autoclear="true"
                                          fileUploadListener="#{userSession.onUploadProfilePhoto}"
                                          ajaxSingle="true"
-                                         addControlLabel="Change Photo">
+                                         addControlLabel="#{i18n.MyProfile_CHANGE_PHOTO}">
                             <a4j:support event="onuploadcomplete"  reRender="frmProfilePhoto"/>
                         </rich:fileUpload>
 
                     </h:panelGrid>
-                    <h:outputText value="#{msgs.profile_PHOTO_SPECIFICATION}" styleClass="small"/>
+                    <h:outputText value="#{i18n.MyProfile_PHOTO_SPECIFICATION}" styleClass="small"/>
                 </div>
             </h:form>
 
-            <div style="clear: both; padding-bottom: 12px;"></div>
+            <converge:moduleSpacer />
+
             <h:form id="frmProfileSettings">
                 <converge:moduleHeader moduleTitle="#{msgs.profile_SETTINGS}"  />
                 <div class="moduleContent">
@@ -86,7 +86,7 @@
                 </div>
             </h:form>
 
-            <div style="clear: both; padding-bottom: 12px;"></div>
+            <converge:moduleSpacer />
 
             <converge:moduleHeader moduleTitle="#{msgs.profile_DETAILS}"  />
             <div class="moduleContent">
@@ -129,44 +129,29 @@
 
             <h:form id="frmPage">
 
-                <converge:moduleHeader moduleTitle="#{msgs.profile_MY_NEWSWIRE_SUBSCRIPTIONS}" />
+                <converge:moduleHeader moduleTitle="Privileges" />
                 <div class="moduleContent">
-
-                    <rich:dataTable id="dtNewswireServices" value="#{common.newswireServicesList}" var="newswireService" width="100%" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
+                    <rich:dataTable id="dtPrivileges" value="#{userSession.user.userRoles}" var="userRole" width="100%" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
                         <rich:column styleClass="columnIcon center">
-                            <h:graphicImage value="#{res.NEWSWIRE_ICON}" title="#{msgs.NEWSWIRE}" />
+                            <h:graphicImage value="#{res.USER_ROLE_ICON}" />
                         </rich:column>
-
-                        <rich:column sortBy="#{newswireService.source}" sortOrder="ASCENDING">
+                        <rich:column>
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.profile_NEWSWIRE_SERVICE}" />
+                                <h:outputText value="Role" />
                             </f:facet>
-                            <h:outputText value="#{newswireService.source}" />
+                            <h:outputText value="#{userRole.name}" />
                         </rich:column>
-
-                        <rich:column style="width: 150px;">
+                        <rich:column>
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.profile_NEWSWIRE_SERVICE_SUBSCRIPTION_STATUS}" />
+                                <h:outputText value="Outlet" />
                             </f:facet>
-                            <h:outputText value="#{msgs.profile_NEWSWIRE_SERVICE_SUBSCRIBED}" rendered="#{converge:contains(userSession.user.newswireServices, newswireService)}" style="color: green; font-weight: bold;" />
-                            <h:outputText value="#{msgs.profile_NEWSWIRE_SERVICE_NOT_SUBSCRIBED}" rendered="#{!converge:contains(userSession.user.newswireServices, newswireService)}" style="color: red; font-weight: bold;" />
+                            <rich:dataList value="#{userRole.outlets}" var="outlet">
+                                <h:outputText value="#{outlet.title}" />&#160;
+                            </rich:dataList>
                         </rich:column>
-
-                        <rich:column style="width: 150px;" styleClass="center">
-                            <a4j:commandButton styleClass="button mediumButton" value="#{msgs.profile_NEWSWIRE_SERVICE_UNSUBSCRIBE}" rendered="#{converge:contains(userSession.user.newswireServices, newswireService)}">
-                                <f:setPropertyActionListener target="#{userSession.selectedNewswireService}" value="#{newswireService}" />
-                                <a4j:support event="oncomplete" actionListener="#{userSession.onUnsubscribeNewswireService}" reRender="dtNewswireServices" />
-                            </a4j:commandButton>
-                            <a4j:commandButton styleClass="button mediumButton" value="#{msgs.profile_NEWSWIRE_SERVICE_SUBSCRIBE}" rendered="#{!converge:contains(userSession.user.newswireServices, newswireService)}">
-                                <f:setPropertyActionListener target="#{userSession.selectedNewswireService}" value="#{newswireService}" />
-                                <a4j:support event="oncomplete" actionListener="#{userSession.onSubscribeNewswireService}" reRender="dtNewswireServices" />
-                            </a4j:commandButton>
-                        </rich:column>
-
                     </rich:dataTable>
-
-
                 </div>
+
             </h:form>
 
         </ui:define>
