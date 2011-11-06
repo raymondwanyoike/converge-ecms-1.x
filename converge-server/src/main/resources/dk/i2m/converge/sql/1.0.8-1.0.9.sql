@@ -91,3 +91,9 @@ CREATE TABLE `app_version` (
 
 INSERT INTO `app_version` (from_version, to_version, migrated, migrated_date) VALUES ('', '1.0.8', 1, '2011-07-25');
 INSERT INTO `app_version` (from_version, to_version) VALUES ('1.0.8', '1.0.9');
+
+CREATE TABLE `workflow_step_user_role` (
+  `workflow_step_id` bigint(20) NOT NULL,
+  `user_role_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`workflow_step_id`, `user_role_id`)
+);
