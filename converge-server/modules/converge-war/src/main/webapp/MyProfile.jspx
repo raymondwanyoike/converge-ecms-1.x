@@ -35,59 +35,6 @@
 
             <converge:moduleSpacer />
 
-            <h:form id="frmProfileSettings">
-                <converge:moduleHeader moduleTitle="#{msgs.profile_SETTINGS}"  />
-                <div class="moduleContent">
-                    <h:panelGrid>
-
-                        <h:outputText value="#{msgs.profile_TIME_ZONE}" styleClass="bold"  />
-                        <h:selectOneMenu value="#{userSession.user.timeZoneAsString}" style="width: 160px;">
-                            <f:selectItems value="#{common.timeZones}" />
-                        </h:selectOneMenu>
-
-                        <h:outputText value="#{msgs.profile_LANGUAGE}" styleClass="bold" />
-                        <h:selectOneMenu  value="#{userSession.user.preferredLanguage}" style="width: 160px;">
-                            <f:selectItems value="#{common.availableLanguages}" />
-                        </h:selectOneMenu>
-
-                        <h:outputText value="#{msgs.profile_DEFAULT_SEARCH_ENGINE_TAGS}" styleClass="bold" />
-                        <h:selectBooleanCheckbox value="#{userSession.user.defaultSearchEngineTags}" />
-
-                        <h:outputText value="#{msgs.profile_DEFAULT_ASSIGNMENT_TYPE}" styleClass="bold" />
-                        <h:selectOneMenu id="somDefaultAssignmentType" value="#{userSession.user.defaultAssignmentType}" style="width: 160px;" converter="#{converters.enumTypeConverter}">
-                            <f:selectItem itemLabel="" />
-                            <f:selectItems value="#{common.assignmentTypes}" />
-                        </h:selectOneMenu>
-
-                        <h:outputText value="#{msgs.profile_DEFAULT_ADD_TO_NEXT_EDITION}" styleClass="bold" />
-                        <h:selectBooleanCheckbox value="#{userSession.user.defaultAddNextEdition}" />
-
-                        <h:outputText value="#{msgs.profile_OUTLET}" styleClass="bold" />
-                        <h:selectOneMenu value="#{userSession.user.defaultOutlet}" style="width: 160px;" converter="#{converters.outletConverter}">
-                            <f:selectItem itemLabel="" />
-                            <f:selectItems value="#{userSession.myNewsItemsOutlets}" />
-                            <a4j:support event="onchange" reRender="somDefaultSection" />
-                        </h:selectOneMenu>
-
-                        <h:outputText value="#{msgs.profile_SECTION}" styleClass="bold" />
-                        <h:selectOneMenu id="somDefaultSection" value="#{userSession.user.defaultSection}" style="width: 160px;" converter="#{converters.sectionConverter}">
-                            <f:selectItem itemLabel="" />
-                            <f:selectItems value="#{userSession.myNewsItemsOutletSections}" />
-                        </h:selectOneMenu>
-
-                        <h:outputText value="#{msgs.profile_DEFAULT_CATALGUE}" styleClass="bold" />
-                        <h:selectOneMenu value="#{userSession.user.defaultMediaRepository}" style="width: 160px;" converter="#{converters.mediaRepositoryConverter}">
-                            <f:selectItem itemLabel="" />
-                            <f:selectItems value="#{common.writableMediaRepositories}" />
-                        </h:selectOneMenu>
-
-                        <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.SAVE}" actionListener="#{userSession.onUpdateProfile}" reRender="frmPage" />
-                    </h:panelGrid>
-                </div>
-            </h:form>
-
-            <converge:moduleSpacer />
-
             <converge:moduleHeader moduleTitle="#{msgs.profile_DETAILS}"  />
             <div class="moduleContent">
                 <h:panelGrid>
@@ -128,6 +75,84 @@
             </a4j:outputPanel>
 
             <h:form id="frmPage">
+
+                <h:form id="frmProfileSettings">
+                    <converge:moduleHeader moduleTitle="Settings"  />
+                    <div class="moduleContent">
+                        <h:panelGrid columns="2">
+                            <h:outputText value="Localisation" styleClass="bold"/>
+                            <h:outputText value="&#160;" />
+                            <h:outputText value="#{msgs.profile_TIME_ZONE}"/>
+                            <h:selectOneMenu value="#{userSession.user.timeZoneAsString}" style="width: 100%;">
+                                <f:selectItems value="#{common.timeZones}" />
+                            </h:selectOneMenu>
+
+                            <h:outputText value="#{msgs.profile_LANGUAGE}" />
+                            <h:selectOneMenu  value="#{userSession.user.preferredLanguage}" style="width: 100%;">
+                                <f:selectItems value="#{common.availableLanguages}" />
+                            </h:selectOneMenu>
+                            <h:outputText value="&#160;" />
+                            <h:outputText value="&#160;" />
+                            <h:outputText value="Search Engine" styleClass="bold"/>
+                            <h:outputText value="&#160;" />
+
+                            <h:outputText value="Show tags"/>
+                            <h:selectBooleanCheckbox value="#{userSession.user.defaultSearchEngineTags}" />
+
+                            <h:outputText value="Sort by"/>
+                            <h:selectOneMenu value="#{userSession.user.defaultSearchResultsSortBy}">
+                                <f:selectItem  itemLabel="Score" itemValue="score" />
+                                <f:selectItem  itemLabel="Date" itemValue="date" />
+                            </h:selectOneMenu>
+
+                            <h:outputText value="Sort ascending"/>
+                            <h:selectOneMenu id="somSearchSortOrder" value="#{userSession.user.defaultSearchResultsOrder}">
+                                <f:selectItem  itemLabel="Ascending" itemValue="true" />
+                                <f:selectItem  itemLabel="Descending" itemValue="false" />
+                            </h:selectOneMenu>
+
+                            <h:outputText value="&#160;" />
+                            <h:outputText value="&#160;" />
+                            <h:outputText value="Assignments" styleClass="bold"/>
+                            <h:outputText value="&#160;" />
+                            <h:outputText value="#{msgs.profile_DEFAULT_ASSIGNMENT_TYPE}" />
+                            <h:selectOneMenu id="somDefaultAssignmentType" value="#{userSession.user.defaultAssignmentType}" style="width: 100%;" converter="#{converters.enumTypeConverter}">
+                                <f:selectItem itemLabel="" />
+                                <f:selectItems value="#{common.assignmentTypes}" />
+                            </h:selectOneMenu>
+
+                            <h:outputText value="#{msgs.profile_DEFAULT_ADD_TO_NEXT_EDITION}" />
+                            <h:selectBooleanCheckbox value="#{userSession.user.defaultAddNextEdition}" />
+
+                            <h:outputText value="#{msgs.profile_OUTLET}" />
+                            <h:selectOneMenu value="#{userSession.user.defaultOutlet}" style="width: 100%;" converter="#{converters.outletConverter}">
+                                <f:selectItem itemLabel="" />
+                                <f:selectItems value="#{userSession.myNewsItemsOutlets}" />
+                                <a4j:support event="onchange" reRender="somDefaultSection" />
+                            </h:selectOneMenu>
+
+                            <h:outputText value="#{msgs.profile_SECTION}" />
+                            <h:selectOneMenu id="somDefaultSection" value="#{userSession.user.defaultSection}" style="width: 100%;" converter="#{converters.sectionConverter}">
+                                <f:selectItem itemLabel="" />
+                                <f:selectItems value="#{userSession.myNewsItemsOutletSections}" />
+                            </h:selectOneMenu>
+
+                            <h:outputText value="#{msgs.profile_DEFAULT_CATALGUE}" />
+                            <h:selectOneMenu value="#{userSession.user.defaultMediaRepository}" style="width: 100%;" converter="#{converters.mediaRepositoryConverter}">
+                                <f:selectItem itemLabel="" />
+                                <f:selectItems value="#{common.writableMediaRepositories}" />
+                            </h:selectOneMenu>
+                            <h:outputText value="&#160;" />
+                            <h:outputText value="&#160;" />
+                            <h:outputText value="&#160;" />
+                            <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.SAVE}" actionListener="#{userSession.onUpdateProfile}" reRender="frmPage" />
+                        </h:panelGrid>
+                    </div>
+
+                </h:form>
+
+                <converge:moduleSpacer />
+
 
                 <converge:moduleHeader moduleTitle="Privileges" />
                 <div class="moduleContent">

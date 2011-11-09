@@ -57,7 +57,13 @@
         </ui:define>
 
         <ui:define name="middleColumn">
-
+            <h:form id="frmActivityStream">
+                <converge:moduleHeader moduleTitle="#{i18n.activityStreamModule_TITLE}" />
+                <div class="moduleContent">
+                
+                </div>
+            </h:form>
+            <converge:moduleSpacer />
         </ui:define>
 
         <ui:define name="rightColumn">

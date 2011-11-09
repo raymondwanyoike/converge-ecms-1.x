@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.jsf.beans;
 
+import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.domain.search.SearchResult;
 import dk.i2m.converge.domain.search.SearchResults;
 import dk.i2m.converge.ejb.facades.SearchEngineLocal;
@@ -75,20 +76,26 @@ public class Search {
 
     public Search() {
     }
-    
+
     @PostConstruct
     public void onInit() {
         reset();
     }
-    
+
     private void reset() {
         this.keyword = "";
         this.searchResults = new ListDataModel();
         this.pages = new ListDataModel(new ArrayList());
         this.showResults = false;
         this.resultsFound = 0;
-        this.sortField = "score";
-        this.sortOrder = "false";
+        
+        this.sortField = getUser().getDefaultSearchResultsSortBy();
+        if (this.sortField == null) {
+            this.sortField = "score";
+        }
+        
+        this.sortOrder = Boolean.toString(getUser().isDefaultSearchResultsOrder());
+
         this.searchType = "type:Story";
         this.results = new SearchResults();
         this.filterQueries = new ArrayList<String>();
@@ -178,7 +185,7 @@ public class Search {
         filterQueries = new ArrayList<String>();
         conductSearch(keyword, 0, 10);
     }
-    
+
     public void onClear(ActionEvent event) {
         reset();
     }
@@ -340,6 +347,10 @@ public class Search {
 
     public void setCriteriaType(boolean criteriaType) {
         this.criteriaType = criteriaType;
+    }
+
+    private UserAccount getUser() {
+        return (UserAccount) JsfUtils.getValueOfValueExpression("#{userSession.user}");
     }
 
     public class SearchPage {

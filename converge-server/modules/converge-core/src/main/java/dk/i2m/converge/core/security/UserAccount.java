@@ -66,12 +66,13 @@ import javax.persistence.UniqueConstraint;
     @NamedQuery(name = UserAccount.FIND_BY_UID, query = "SELECT u FROM UserAccount u WHERE u.username=:username"),
     @NamedQuery(name = UserAccount.FIND_BY_USER_ROLE, query = "SELECT u FROM UserRole r JOIN r.userAccounts u WHERE r.name=:roleName"),
     @NamedQuery(name = UserAccount.FIND_USERS_WITH_PUBLICATIONS, query = "SELECT u FROM NewsItemActor n JOIN n.newsItem ni JOIN ni.placements p JOIN n.user u WHERE (n.role = :userRole AND p.edition.publicationDate >= :startDate AND p.edition.publicationDate <= :endDate) GROUP BY u"),
-    @NamedQuery(name = UserAccount.FIND_ACTIVE_USERS_BY_ROLE, query = "SELECT DISTINCT u FROM NewsItem AS ni JOIN ni.actors AS a JOIN a.user AS u JOIN ni.history AS h WHERE (a.role = :userRole AND h.user = a.user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY a.user.username DESC")
+    @NamedQuery(name = UserAccount.FIND_ACTIVE_USERS_BY_ROLE, query =
+    "SELECT DISTINCT u FROM NewsItem AS ni JOIN ni.actors AS a JOIN a.user AS u JOIN ni.history AS h WHERE (a.role = :userRole AND h.user = a.user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY a.user.username DESC")
 })
 public class UserAccount implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    
+    private static final long serialVersionUID = 2L;
+
     /** Query for finding a user account by its unique user identifier. */
     public static final String FIND_BY_UID = "UserAccount.findByUid";
 
@@ -119,6 +120,12 @@ public class UserAccount implements Serializable {
 
     @Column(name = "default_search_engine_tags")
     private boolean defaultSearchEngineTags;
+
+    @Column(name = "default_search_results_order_by")
+    private String defaultSearchResultsSortBy;
+
+    @Column(name = "default_search_results_order")
+    private boolean defaultSearchResultsOrder;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "clearance_level")
@@ -734,6 +741,49 @@ public class UserAccount implements Serializable {
      */
     public void setDefaultSearchEngineTags(boolean defaultSearchEngineTags) {
         this.defaultSearchEngineTags = defaultSearchEngineTags;
+    }
+
+    /**
+     * Determines if the search results should be ordered descending 
+     * ({@code false}) or ascending ({@code true}) by default.
+     * 
+     * @return {@code true} if the search results should be ordered in 
+     *         ascending order by default or {@code false} for descending
+     *         order
+     */
+    public boolean isDefaultSearchResultsOrder() {
+        return defaultSearchResultsOrder;
+    }
+
+    /**
+     * Sets the default sort order for search results.
+     * 
+     * @param defaultSearchResultsOrder
+     *          {@code true} if the search results should be ordered in 
+     *          ascending order by default or {@code false} for descending
+     *          order
+     */
+    public void setDefaultSearchResultsOrder(boolean defaultSearchResultsOrder) {
+        this.defaultSearchResultsOrder = defaultSearchResultsOrder;
+    }
+
+    /**
+     * Gets the default field for which to sort search results.
+     * 
+     * @return Default field for which to sort search results
+     */
+    public String getDefaultSearchResultsSortBy() {
+        return defaultSearchResultsSortBy;
+    }
+
+    /**
+     * Sets the default field for which to sort search results.
+     * 
+     * @param defaultSearchResultsSortBy 
+     *          Default field for which to sort search results
+     */
+    public void setDefaultSearchResultsSortBy(String defaultSearchResultsSortBy) {
+        this.defaultSearchResultsSortBy = defaultSearchResultsSortBy;
     }
 
     /**

@@ -97,3 +97,7 @@ CREATE TABLE `workflow_step_user_role` (
   `user_role_id` bigint(20) NOT NULL,
   PRIMARY KEY (`workflow_step_id`, `user_role_id`)
 );
+
+
+ALTER TABLE user_account ADD COLUMN default_search_results_order_by varchar(255);
+ALTER TABLE user_account ADD COLUMN default_search_results_order tinyint(1) NOT NULL DEFAULT '0';
