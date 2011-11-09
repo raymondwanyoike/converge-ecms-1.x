@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.ejb.facades;
 
+import com.google.common.base.Splitter;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.domain.search.IndexField;
 import dk.i2m.converge.domain.search.SearchResult;
@@ -650,13 +651,16 @@ public class SearchEngineBean implements SearchEngineLocal {
         }
     }
 
-    private void enrich(MediaItem mi, String story) {
+    private List<Concept> enrich(String story) {
+        List<Concept> concepts = new ArrayList<Concept>();
+
         PostMethod method = new PostMethod(OPEN_CALAIS_URL);
         method.setRequestHeader("x-calais-licenseID", cfgService.getString(ConfigurationKey.OPEN_CALAIS_API_KEY));
         method.setRequestHeader("Content-Type", "text/raw; charset=UTF-8");
         method.setRequestHeader("Accept", "application/json");
         method.setRequestHeader("enableMetadataType", "SocialTags");
-        method.setRequestEntity(new StringRequestEntity(mi.getDescription() + " " + story));
+        method.setRequestEntity(new StringRequestEntity(story));
+
         try {
             HttpClient client = new HttpClient();
             int returnCode = client.executeMethod(method);
@@ -685,14 +689,14 @@ public class SearchEngineBean implements SearchEngineLocal {
 
                             if (entity.containsKey("_type")) {
                                 if (conceptType.equalsIgnoreCase("company") || conceptType.equalsIgnoreCase("organization")) {
-                                    
+
                                     if (match == null || (!(match instanceof Organisation))) {
                                         match = new Organisation(conceptName, "");
                                         match = metaDataFacade.create(match);
                                     }
 
                                     if (match instanceof Organisation) {
-                                        mi.getConcepts().add(match);
+                                        concepts.add(match);
                                     }
                                 } else if (conceptType.equalsIgnoreCase("person")) {
                                     if (match == null || (!(match instanceof Person))) {
@@ -701,16 +705,16 @@ public class SearchEngineBean implements SearchEngineLocal {
                                     }
 
                                     if (match instanceof Person) {
-                                        mi.getConcepts().add(match);
+                                        concepts.add(match);
                                     }
-                                } else if (conceptType.equalsIgnoreCase("city") || conceptType.equalsIgnoreCase("country")  || conceptType.equalsIgnoreCase("continent") || conceptType.equalsIgnoreCase("ProvinceOrState") || conceptType.equalsIgnoreCase("region")) {
+                                } else if (conceptType.equalsIgnoreCase("city") || conceptType.equalsIgnoreCase("country") || conceptType.equalsIgnoreCase("continent") || conceptType.equalsIgnoreCase("ProvinceOrState") || conceptType.equalsIgnoreCase("region")) {
                                     if (match == null || (!(match instanceof GeoArea))) {
                                         match = new GeoArea(conceptName, "");
                                         match = metaDataFacade.create(match);
                                     }
 
                                     if (match instanceof GeoArea) {
-                                        mi.getConcepts().add(match);
+                                        concepts.add(match);
                                     }
                                 } else if (conceptType.equalsIgnoreCase("facility")) {
                                     if (match == null || (!(match instanceof PointOfInterest))) {
@@ -719,7 +723,7 @@ public class SearchEngineBean implements SearchEngineLocal {
                                     }
 
                                     if (match instanceof PointOfInterest) {
-                                        mi.getConcepts().add(match);
+                                        concepts.add(match);
                                     }
                                 }
                             }
@@ -735,6 +739,26 @@ public class SearchEngineBean implements SearchEngineLocal {
         } finally {
             method.releaseConnection();
         }
+        return concepts;
+    }
+
+    private void enrich(MediaItem mi, String story) {
+
+        StringBuilder enrich = new StringBuilder();
+        enrich.append(story).append(" ").append(mi.getDescription()).append(" ").append(mi.getTitle());
+
+        int chunkSize = 100000;
+        Iterable<String> chunks = Splitter.fixedLength(chunkSize).split(enrich.toString());
+
+        List<Concept> concepts = new ArrayList<Concept>();
+        for (Iterator<String> i = chunks.iterator(); i.hasNext();) {
+            LOG.log(Level.INFO, "Sending chunk");
+            String chunk = i.next();
+            concepts.addAll(enrich(chunk));
+            LOG.log(Level.INFO, "Concepts total " + concepts.size());
+        }
+
+        mi.getConcepts().addAll(concepts);
     }
 
     @Override

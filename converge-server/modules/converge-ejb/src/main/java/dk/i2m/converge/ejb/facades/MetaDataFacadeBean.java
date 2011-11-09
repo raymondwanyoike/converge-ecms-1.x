@@ -21,7 +21,9 @@ import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.core.metadata.Subject;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
+import dk.i2m.converge.ejb.services.DirectoryException;
 import dk.i2m.converge.ejb.services.QueryBuilder;
+import dk.i2m.converge.ejb.services.UserNotFoundException;
 import dk.i2m.converge.ejb.services.UserServiceLocal;
 import dk.i2m.converge.nar.newsml.g2.power.Concept;
 import dk.i2m.converge.nar.newsml.g2.power.ConceptNameType;
@@ -54,7 +56,7 @@ import javax.xml.bind.Unmarshaller;
 @Stateless
 public class MetaDataFacadeBean implements MetaDataFacadeLocal {
 
-    private static final Logger logger = Logger.getLogger(MetaDataFacadeBean.class.getName());
+    private static final Logger LOG = Logger.getLogger(MetaDataFacadeBean.class.getName());
 
     @EJB private DaoServiceLocal daoService;
 
@@ -73,8 +75,11 @@ public class MetaDataFacadeBean implements MetaDataFacadeLocal {
         try {
             UserAccount updaterUser = userService.findById(ctx.getCallerPrincipal().getName());
             concept.setUpdatedBy(updaterUser);
-        } catch (Exception ex) {
-            logger.log(Level.SEVERE, "Unknown user", ex);
+        } catch (UserNotFoundException ex) {
+            // Concept was created through automated service, e.g. OpenCalais
+            LOG.log(Level.FINE, "Updating user is unknown {0}", ctx.getCallerPrincipal().getName());
+        } catch (DirectoryException ex) {
+            LOG.log(Level.SEVERE, "Could not connect to directory server.", ex);
         }
 
         return daoService.create(concept);
@@ -102,7 +107,7 @@ public class MetaDataFacadeBean implements MetaDataFacadeLocal {
             UserAccount updaterUser = userService.findById(ctx.getCallerPrincipal().getName());
             concept.setUpdatedBy(updaterUser);
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, "Unknown user", ex);
+            LOG.log(Level.SEVERE, "Unknown user", ex);
         }
 
         return daoService.update(concept);
@@ -240,7 +245,7 @@ public class MetaDataFacadeBean implements MetaDataFacadeLocal {
                         Subject parent = (Subject) findConceptByCode(parentCode);
                         subject.getBroader().add(parent);
                     } catch (DataNotFoundException dnfe) {
-                        logger.log(Level.WARNING, "Specify broader concept (parent) with qcode: {0} could not be found", parentCode);
+                        LOG.log(Level.WARNING, "Specify broader concept (parent) with qcode: {0} could not be found", parentCode);
                     }
                 }
 
@@ -253,7 +258,7 @@ public class MetaDataFacadeBean implements MetaDataFacadeLocal {
             }
             return imported;
         } catch (JAXBException ex) {
-            logger.log(Level.SEVERE, "Could not import KnowledgeItem", ex);
+            LOG.log(Level.SEVERE, "Could not import KnowledgeItem", ex);
             return 0;
         }
     }
@@ -277,7 +282,7 @@ public class MetaDataFacadeBean implements MetaDataFacadeLocal {
                 break;
             }
         } catch (JAXBException ex) {
-            logger.log(Level.SEVERE, "Could not import KnowledgeItem", ex);
+            LOG.log(Level.SEVERE, "Could not import KnowledgeItem", ex);
         }
         return availableLanguages.toArray(new String[availableLanguages.size()]);
     }

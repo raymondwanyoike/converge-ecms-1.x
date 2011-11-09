@@ -280,13 +280,6 @@ public class UserSession {
         } else {
             throw new UserSessionException("User is not logged in");
         }
-
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "{0} has the following roles:", user.getUsername());
-            for (UserRole ur : user.getUserRoles()) {
-                LOG.log(Level.FINE, "{0} associated with {1} outlets", new Object[]{ur.getName(), ur.getOutlets().size()});
-            }
-        }
     }
 
     private void generateMenu() {
