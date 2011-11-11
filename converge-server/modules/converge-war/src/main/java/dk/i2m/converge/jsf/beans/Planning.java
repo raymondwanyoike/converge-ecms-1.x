@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2011 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -460,6 +460,7 @@ public class Planning implements UIEventListener {
      */
     public String getEditionTitle() {
         String pattern;
+        
         if (selectedDate != null) {
             pattern = JsfUtils.getResourceBundle().getString("planning_EDITION_TITLE");
             return MessageFormat.format(pattern, selectedOutlet.getTitle(), selectedDate);
