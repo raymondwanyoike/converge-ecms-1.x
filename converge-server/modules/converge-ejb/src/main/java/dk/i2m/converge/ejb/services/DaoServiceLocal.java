@@ -188,4 +188,6 @@ public interface DaoServiceLocal {
      * @return Number of affected records
      */
     int executeQuery(String namedQueryName);
+
+    void commit();
 }

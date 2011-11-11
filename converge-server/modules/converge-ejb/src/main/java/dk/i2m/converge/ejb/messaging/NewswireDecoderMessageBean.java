@@ -65,7 +65,7 @@ public class NewswireDecoderMessageBean implements MessageListener {
     @EJB private DaoServiceLocal daoService;
 
     @EJB private PluginContextBeanLocal pluginContext;
-
+    
     @Override
     public void onMessage(Message msg) {
         try {
@@ -77,7 +77,7 @@ public class NewswireDecoderMessageBean implements MessageListener {
                  LOG.log(Level.INFO, "Fetching all newswire services");
             }
             SolrServer solrServer = getSolrServer();
-
+   
             if (newswireServiceId == null) {
                 Map<String, Object> parameters = QueryBuilder.with("active", true).parameters();
                 List<NewswireService> services = daoService.findWithNamedQuery(NewswireService.FIND_BY_STATUS, parameters);

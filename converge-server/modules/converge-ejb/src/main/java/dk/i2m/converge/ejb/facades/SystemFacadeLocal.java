@@ -181,4 +181,10 @@ public interface SystemFacadeLocal {
     boolean upgrade(dk.i2m.converge.core.AppVersion version);
 
     java.util.List<dk.i2m.converge.core.AppVersion> getVersionsForMigration();
+
+    Long createBackgroundTask(String name);
+
+    void removeBackgroundTask(Long id);
+    
+    java.util.List<dk.i2m.converge.core.BackgroundTask> getBackgroundTasks();
 }

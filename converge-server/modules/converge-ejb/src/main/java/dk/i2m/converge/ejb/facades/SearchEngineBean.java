@@ -16,7 +16,6 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import com.google.common.base.Splitter;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.domain.search.IndexField;
 import dk.i2m.converge.domain.search.SearchResult;
@@ -42,11 +41,11 @@ import dk.i2m.converge.core.utils.BeanComparator;
 import dk.i2m.converge.ejb.services.ConfigurationServiceLocal;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.ejb.services.MetaDataServiceLocal;
 import dk.i2m.converge.ejb.services.QueryBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,22 +61,11 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import net.sf.json.JSONObject;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.lang.StringUtils;
-import org.apache.pdfbox.cos.COSDocument;
-import org.apache.pdfbox.pdfparser.PDFParser;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
 import org.apache.poi.hssf.usermodel.HSSFHeader;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HeaderFooter;
-import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Footer;
 import org.apache.poi.ss.usermodel.Row;
@@ -104,8 +92,6 @@ public class SearchEngineBean implements SearchEngineLocal {
 
     private static final Logger LOG = Logger.getLogger(SearchEngineBean.class.getName());
 
-    private static final String OPEN_CALAIS_URL = "http://api.opencalais.com/tag/rs/enrich";
-
     @EJB private ConfigurationServiceLocal cfgService;
 
     @EJB private UserFacadeLocal userFacade;
@@ -116,7 +102,7 @@ public class SearchEngineBean implements SearchEngineLocal {
 
     @EJB private CatalogueFacadeLocal catalogueFacade;
 
-    @EJB private MetaDataFacadeLocal metaDataFacade;
+    @EJB private MetaDataServiceLocal metaDataService;
 
     private DateFormat solrDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
@@ -546,55 +532,8 @@ public class SearchEngineBean implements SearchEngineLocal {
                 mediaFormat = "Image";
             } else if (mir.isDocument()) {
                 mediaFormat = "Document";
-
-                if (contentType.equals("application/pdf")) {
-                    // Extract text in PDF
-                    try {
-                        URL originalFile = new URL(mir.getAbsoluteFilename());
-                        PDDocument doc = null;
-                        try {
-                            // Read PDF
-                            PDFParser parser = new PDFParser(originalFile.openStream());
-                            parser.parse();
-                            COSDocument cosDoc = parser.getDocument();
-                            PDDocument pdDoc = new PDDocument(cosDoc);
-
-                            PDFTextStripper stripper = new PDFTextStripper();
-                            story = stripper.getText(pdDoc);
-
-                        } catch (IOException ex) {
-                            LOG.log(Level.SEVERE, null, ex);
-                        } finally {
-                            if (doc != null) {
-                                try {
-                                    doc.close();
-                                } catch (IOException ex) {
-                                    LOG.log(Level.SEVERE, null, ex);
-                                }
-                            }
-                        }
-
-
-                    } catch (MalformedURLException ex) {
-                    }
-                } else if (contentType.equals("application/msword") || contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
-                    try {
-                        URL originalFile = new URL(mir.getAbsoluteFilename());
-                        HWPFDocument doc = new HWPFDocument(originalFile.openStream());
-                        WordExtractor extractor = new WordExtractor(doc);
-                        story = extractor.getText();
-                    } catch (IOException ex) {
-                        LOG.log(Level.SEVERE, null, ex);
-                    }
-                }
             } else {
                 mediaFormat = "Unknown";
-            }
-
-            boolean enrich = cfgService.getBoolean(ConfigurationKey.SEARCH_ENGINE_OPEN_CALAIS_ENABLED);
-
-            if (enrich) {
-                enrich(mi, story);
             }
 
             solrDoc.addField(IndexField.MEDIA_FORMAT.getName(), mediaFormat);
@@ -649,116 +588,6 @@ public class SearchEngineBean implements SearchEngineLocal {
         } else {
             LOG.log(Level.FINE, "Ignoring MediaItem #{0}. Missing original {1} rendition", new Object[]{mi.getId(), mi.getCatalogue().getOriginalRendition().getName()});
         }
-    }
-
-    private List<Concept> enrich(String story) {
-        List<Concept> concepts = new ArrayList<Concept>();
-
-        PostMethod method = new PostMethod(OPEN_CALAIS_URL);
-        method.setRequestHeader("x-calais-licenseID", cfgService.getString(ConfigurationKey.OPEN_CALAIS_API_KEY));
-        method.setRequestHeader("Content-Type", "text/raw; charset=UTF-8");
-        method.setRequestHeader("Accept", "application/json");
-        method.setRequestHeader("enableMetadataType", "SocialTags");
-        method.setRequestEntity(new StringRequestEntity(story));
-
-        try {
-            HttpClient client = new HttpClient();
-            int returnCode = client.executeMethod(method);
-            if (returnCode == HttpStatus.SC_NOT_IMPLEMENTED) {
-                System.err.println("The Post method is not implemented by this URI");
-                // still consume the response body
-                method.getResponseBodyAsString();
-            } else if (returnCode == HttpStatus.SC_OK) {
-
-                JSONObject response = JSONObject.fromObject(method.getResponseBodyAsString());
-
-                for (Object key : response.keySet()) {
-                    String sKey = (String) key;
-
-                    if (sKey.startsWith("http://d.opencalais.com/")) {
-                        JSONObject entity = response.getJSONObject(sKey);
-
-                        if (((String) entity.get("_typeGroup")).equalsIgnoreCase("entities")) {
-                            String conceptType = (String) entity.get("_type");
-                            String conceptName = (String) entity.get("name");
-                            Concept match = null;
-                            try {
-                                match = metaDataFacade.findConceptByName(conceptName);
-                            } catch (DataNotFoundException dnfe) {
-                            }
-
-                            if (entity.containsKey("_type")) {
-                                if (conceptType.equalsIgnoreCase("company") || conceptType.equalsIgnoreCase("organization")) {
-
-                                    if (match == null || (!(match instanceof Organisation))) {
-                                        match = new Organisation(conceptName, "");
-                                        match = metaDataFacade.create(match);
-                                    }
-
-                                    if (match instanceof Organisation) {
-                                        concepts.add(match);
-                                    }
-                                } else if (conceptType.equalsIgnoreCase("person")) {
-                                    if (match == null || (!(match instanceof Person))) {
-                                        match = new Person(conceptName, "");
-                                        match = metaDataFacade.create(match);
-                                    }
-
-                                    if (match instanceof Person) {
-                                        concepts.add(match);
-                                    }
-                                } else if (conceptType.equalsIgnoreCase("city") || conceptType.equalsIgnoreCase("country") || conceptType.equalsIgnoreCase("continent") || conceptType.equalsIgnoreCase("ProvinceOrState") || conceptType.equalsIgnoreCase("region")) {
-                                    if (match == null || (!(match instanceof GeoArea))) {
-                                        match = new GeoArea(conceptName, "");
-                                        match = metaDataFacade.create(match);
-                                    }
-
-                                    if (match instanceof GeoArea) {
-                                        concepts.add(match);
-                                    }
-                                } else if (conceptType.equalsIgnoreCase("facility")) {
-                                    if (match == null || (!(match instanceof PointOfInterest))) {
-                                        match = new PointOfInterest(conceptName, "");
-                                        match = metaDataFacade.create(match);
-                                    }
-
-                                    if (match instanceof PointOfInterest) {
-                                        concepts.add(match);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                LOG.log(Level.WARNING, "Invalid response received from OpenCalais [{0}] {1}", new Object[]{returnCode, method.getResponseBodyAsString()});
-            }
-
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "", e);
-        } finally {
-            method.releaseConnection();
-        }
-        return concepts;
-    }
-
-    private void enrich(MediaItem mi, String story) {
-
-        StringBuilder enrich = new StringBuilder();
-        enrich.append(story).append(" ").append(mi.getDescription()).append(" ").append(mi.getTitle());
-
-        int chunkSize = 100000;
-        Iterable<String> chunks = Splitter.fixedLength(chunkSize).split(enrich.toString());
-
-        List<Concept> concepts = new ArrayList<Concept>();
-        for (Iterator<String> i = chunks.iterator(); i.hasNext();) {
-            LOG.log(Level.INFO, "Sending chunk");
-            String chunk = i.next();
-            concepts.addAll(enrich(chunk));
-            LOG.log(Level.INFO, "Concepts total " + concepts.size());
-        }
-
-        mi.getConcepts().addAll(concepts);
     }
 
     @Override

@@ -522,6 +522,26 @@ public class Common {
         return actions;
     }
 
+    /**
+     * Gets a {@link Map} of discovered {@link NewsItem} actions.
+     * 
+     * @return {@link Map} of discovered {@link NewsItem} actions
+     */
+    public Map<String, String> getNewsItemActions() {
+        Map<String, String> actions = new LinkedHashMap<String, String>();
+
+        Map<String, Plugin> plugins = systemFacade.getPlugins();
+
+        for (Plugin plugin : plugins.values()) {
+            if (plugin instanceof CatalogueHook) {
+                CatalogueHook action = (CatalogueHook) plugin;
+                actions.put(action.getName(), action.getClass().getName());
+            }
+        }
+
+        return actions;
+    }
+
     public Map<String, AssignmentType> getAssignmentTypes() {
         Map<String, AssignmentType> types = new LinkedHashMap<String, AssignmentType>();
 

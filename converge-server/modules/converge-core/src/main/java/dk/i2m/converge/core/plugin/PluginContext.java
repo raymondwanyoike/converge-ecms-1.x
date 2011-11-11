@@ -16,9 +16,11 @@
  */
 package dk.i2m.converge.core.plugin;
 
+import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.NewsItem;
+import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.content.forex.Rate;
 import dk.i2m.converge.core.content.markets.FinancialMarket;
@@ -150,4 +152,19 @@ public interface PluginContext {
     dk.i2m.converge.core.content.catalogue.MediaItemRendition createMediaItemRendition(java.io.File file, java.lang.Long mediaItemId, java.lang.Long renditionId, java.lang.String filename, java.lang.String contentType) throws java.lang.IllegalArgumentException, java.io.IOException;
 
     dk.i2m.converge.core.content.catalogue.MediaItemRendition updateMediaItemRendition(java.io.File file, String filename, String contentType, dk.i2m.converge.core.content.catalogue.MediaItemRendition mediaItemRendition) throws java.io.IOException;
+
+    /**
+     * Discover {@link Concept}s matching the given story.
+     * 
+     * @param story
+     *          Story for which to discover {@link Concept}s
+     * @return {@link List} of {@link Concept}s discovered by
+     *         OpenCalais for the given story
+     * @throws EnrichException 
+     *          If the story could not be enriched due to
+     *          connectivity or overload to the OpenCalais server
+     */
+    List<dk.i2m.converge.core.metadata.Concept> enrich(String story) throws EnrichException;
+    
+    String extractContent(MediaItemRendition mediaItemRendition);
 }

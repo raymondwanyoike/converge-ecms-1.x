@@ -51,6 +51,8 @@ public final class PluginManager {
 
     private Map<String, CatalogueHook> catalogueActions = new HashMap<String, CatalogueHook>();
 
+    private Map<String, NewsItemAction> newsItemActions = new HashMap<String, NewsItemAction>();
+
     private PluginManager() {
         discover();
     }
@@ -74,6 +76,7 @@ public final class PluginManager {
         plugins.putAll(outletActions);
         plugins.putAll(workflowValidators);
         plugins.putAll(catalogueActions);
+        plugins.putAll(newsItemActions);
         return plugins;
     }
 
@@ -92,9 +95,13 @@ public final class PluginManager {
     public Map<String, WorkflowValidator> getWorkflowValidators() {
         return workflowValidators;
     }
-    
+
     public Map<String, CatalogueHook> getCatalogueActions() {
         return catalogueActions;
+    }
+    
+    public Map<String, NewsItemAction> getNewsItemActions() {
+        return newsItemActions;
     }
 
     /**
@@ -134,6 +141,7 @@ public final class PluginManager {
             discoveredPlugins += discoverPlugins(db, dk.i2m.converge.core.annotations.OutletAction.class, outletActions);
             discoveredPlugins += discoverPlugins(db, dk.i2m.converge.core.annotations.WorkflowValidator.class, workflowValidators);
             discoveredPlugins += discoverPlugins(db, dk.i2m.converge.core.annotations.CatalogueAction.class, catalogueActions);
+            discoveredPlugins += discoverPlugins(db, dk.i2m.converge.core.annotations.NewsItemAction.class, newsItemActions);
             LOG.log(Level.INFO, "{0} {0, choice, 0#plugins|1#plugin|2#plugins} discovered", discoveredPlugins);
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, "", ex);

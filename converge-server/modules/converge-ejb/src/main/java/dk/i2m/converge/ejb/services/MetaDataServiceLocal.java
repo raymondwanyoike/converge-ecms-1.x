@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.ejb.services;
 
+import dk.i2m.converge.core.EnrichException;
 import javax.ejb.Local;
 
 /**
@@ -35,4 +36,8 @@ public interface MetaDataServiceLocal {
     java.util.Map<java.lang.String, java.lang.String> extractIPTC(java.lang.String location) throws dk.i2m.converge.ejb.services.CannotExtractMetaDataException;
 
     java.util.Map<java.lang.String, java.lang.String> extractImageInfo(java.lang.String location) throws dk.i2m.converge.ejb.services.CannotExtractMetaDataException;
+
+    java.util.List<dk.i2m.converge.core.metadata.Concept> enrich(java.lang.String story) throws EnrichException;
+
+    java.lang.String extractContent(dk.i2m.converge.core.content.catalogue.MediaItemRendition mir);
 }

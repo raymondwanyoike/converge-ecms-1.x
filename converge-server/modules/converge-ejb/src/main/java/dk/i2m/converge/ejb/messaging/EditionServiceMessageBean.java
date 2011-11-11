@@ -21,6 +21,7 @@ import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.EditionActionException;
 import dk.i2m.converge.core.workflow.OutletEditionAction;
 import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
+import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.PluginContextBeanLocal;
@@ -52,14 +53,18 @@ public class EditionServiceMessageBean implements MessageListener {
 
     @EJB private PluginContextBeanLocal pluginContext;
 
+    @EJB private SystemFacadeLocal systemFacade;
+
     @Override
     public void onMessage(Message msg) {
+        Long id = 0L;
         try {
             Long editionId = msg.getLongProperty("editionId");
             Long actionId = msg.getLongProperty("actionId");
 
             try {
                 OutletEditionAction action = daoService.findById(OutletEditionAction.class, actionId);
+                id = systemFacade.createBackgroundTask(action.getAction().getName() + " - " + action.getLabel());
                 EditionAction editionAction = action.getAction();
                 Edition edition = outletFacade.findEditionById(editionId);
                 // Fetch Placements
@@ -70,8 +75,11 @@ public class EditionServiceMessageBean implements MessageListener {
             } catch (EditionActionException ex) {
                 LOG.log(Level.SEVERE, null, ex);
             }
+
         } catch (JMSException ex) {
             LOG.log(Level.SEVERE, null, ex);
+        } finally {
+            systemFacade.removeBackgroundTask(id);
         }
     }
 }

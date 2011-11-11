@@ -19,6 +19,7 @@ package dk.i2m.converge.ejb.facades;
 import dk.i2m.converge.domain.Property;
 import dk.i2m.converge.core.Announcement;
 import dk.i2m.converge.core.AppVersion;
+import dk.i2m.converge.core.BackgroundTask;
 import dk.i2m.converge.core.content.Language;
 import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.content.NewsItem;
@@ -35,6 +36,7 @@ import dk.i2m.converge.ejb.services.QueryBuilder;
 import dk.i2m.converge.ejb.services.TimerServiceLocal;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 /**
  * Session bean providing access to information about the system.
@@ -50,17 +54,17 @@ import javax.ejb.Stateless;
  */
 @Stateless
 public class SystemFacadeBean implements SystemFacadeLocal {
-
+    
     private static final Logger LOG = Logger.getLogger(SystemFacadeBean.class.getName());
-
+    
     @EJB private UserServiceLocal userService;
-
+    
     @EJB private ConfigurationServiceLocal cfgService;
-
+    
     @EJB private DaoServiceLocal daoService;
-
+    
     @EJB private NewsItemFacadeLocal newsItemFacade;
-
+    
     @EJB private TimerServiceLocal timerService;
 
     /**
@@ -77,16 +81,18 @@ public class SystemFacadeBean implements SystemFacadeLocal {
      */
     @Override
     public boolean sanityCheck() {
+        removeAllBackgroundTasks();
+        
         int userCount = userService.findAll().size();
         LOG.log(Level.INFO, "{0} user {0, choice, 0#accounts|1#account|2#accounts} in the system", userCount);
         getPlugins();
-
+        
         LOG.log(Level.INFO, "{0} stale {0, choice, 0#locks|1#lock|2#locks} removed", newsItemFacade.revokeAllLocks());
-
+        
         String userPhotoDirectory = cfgService.getString(ConfigurationKey.WORKING_DIRECTORY) + System.getProperty("file.separator") + "users" + System.getProperty("file.separator");
-
+        
         LOG.log(Level.INFO, "Checking if user photo directory ({0}) exists", new Object[]{userPhotoDirectory});
-
+        
         File file = new File(userPhotoDirectory);
         if (!file.exists()) {
             LOG.log(Level.INFO, "{0} does not exist. Creating  directory", new Object[]{userPhotoDirectory});
@@ -94,9 +100,9 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         } else {
             LOG.log(Level.INFO, "{0} exists", new Object[]{userPhotoDirectory});
         }
-
+        
         timerService.startTimers();
-
+        
         return true;
     }
 
@@ -208,15 +214,15 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     public Language findLanguageById(Long id) throws DataNotFoundException {
         return daoService.findById(Language.class, id);
     }
-
+    
     @Override
     public List<AppVersion> getVersionsForMigration() {
         try {
             AppVersion lastMigration = daoService.findObjectWithNamedQuery(AppVersion.class, AppVersion.FIND_LATEST_MIGRATIONS, Collections.EMPTY_MAP);
-
+            
             Map<String, Object> parameters = QueryBuilder.with("fromVersion", lastMigration.getToVersion()).parameters();
             return daoService.findWithNamedQuery(AppVersion.FIND_BY_MIGRATION_AVAILABLE, parameters);
-
+            
         } catch (DataNotFoundException ex) {
             LOG.log(Level.WARNING, "Unable to find migration history. Latest migration is missing");
             return Collections.EMPTY_LIST;
@@ -235,32 +241,32 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         if (version == null) {
             return false;
         }
-
+        
         if (version.getFromVersion().equals("1.0.8") && version.getToVersion().equals("1.0.9")) {
             // Update the submitted status
             Number numberOfNewsItems = daoService.count(NewsItem.class, "id");
-
+            
             LOG.log(Level.INFO, "Migrating {0}", numberOfNewsItems.intValue());
-
+            
             int page = 1000;
             for (int i = 0; i < numberOfNewsItems.intValue(); i += page) {
                 LOG.log(Level.INFO, "Migrating records {0} to {1}", new Object[]{i, i + page});
                 List<NewsItem> newsItems = daoService.findAll(NewsItem.class, i, page);
-
-
+                
+                
                 for (NewsItem newsItem : newsItems) {
                     List<WorkflowStateTransition> history = newsItem.getHistory();
                     if (history.size() > 1) {
                         Collections.sort(history, new BeanComparator("id"));
-                        
+
                         // Get the second state
                         WorkflowStateTransition candidate = history.get(1);
-
+                        
                         try {
                             // If the second state is not trash, mark it as the submitted state
                             WorkflowState candidateState = candidate.getState();
                             WorkflowState trashState = newsItem.getOutlet().getWorkflow().getTrashState();
-
+                            
                             if (candidateState == null) {
                                 LOG.log(Level.WARNING, "The submitted workflow state of {0} no longer exist", newsItem.getId());
                             } else {
@@ -282,7 +288,52 @@ public class SystemFacadeBean implements SystemFacadeLocal {
             
             return true;
         }
-
+        
         return false;
+    }
+
+    /**
+     * Indicate that a {@link BackgroundTask} is running.
+     * 
+     * @param name
+     *          Name of the {@link BackgroundTask}
+     * @return Unique identifier of the {@link BackgroundTask}
+     */
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public Long createBackgroundTask(String name) {
+        BackgroundTask task = new BackgroundTask();
+        task.setTaskStart(Calendar.getInstance().getTime());
+        task.setName(name);
+        task = daoService.create(task);
+        return task.getId();
+    }
+
+    /**
+     * Indicate that a {@link BackgroundTask} has completed.
+     * 
+     * @param id 
+     *          Unique identifier of the {@link BackgroundTask}
+     */
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void removeBackgroundTask(Long id) {
+        daoService.delete(BackgroundTask.class, id);
+    }
+
+    /**
+     * Gets all running {@link BackgroundTask}s.
+     * 
+     * @return {@link List} of running {@link BackgroundTask}s
+     */
+    @Override
+    public List<BackgroundTask> getBackgroundTasks() {
+        return daoService.findAll(BackgroundTask.class);
+    }
+    
+    private void removeAllBackgroundTasks() {
+        for (BackgroundTask t : getBackgroundTasks()) {
+            removeBackgroundTask(t.getId());
+        }
     }
 }

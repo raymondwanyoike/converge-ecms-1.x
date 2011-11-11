@@ -96,11 +96,11 @@
                             <h:inputText id="txtNewConcept" value="#{mediaItemDetails.newConcept}" styleClass="text mediumInput" />
                             <rich:suggestionbox id="sbNewConcept" for="txtNewConcept" var="result" suggestionAction="#{mediaItemDetails.onConceptSuggestion}" ajaxSingle="true" fetchValue="#{result.name}" minChars="2" nothingLabel="No match">
                                 <h:column>
-                                    <h:outputText value="#{result.name}" />
-                                </h:column>
-                                <h:column>
                                     <c:set var="key" value="#{result.type}_ICON" />
                                     <h:graphicImage value="#{res[key]}" />
+                                </h:column>
+                                <h:column>
+                                    <h:outputText value="#{result.name}" />
                                 </h:column>
                             </rich:suggestionbox>
                         </h:column>
@@ -558,7 +558,7 @@
                                             <f:facet name="label">
                                                 <h:outputText value="#{msgs.media_item_rendition_UPLOAD_INDICATOR}" />
                                             </f:facet>
-                                            <a4j:support event="onuploadcomplete" oncomplete="#{rich:component('mpNewRendition')}.hide();" actionListener="#{mediaItemDetails.onSaveNewRendition}" ajaxSingle="true" reRender="dtRenditions, preview" />
+                                            <a4j:support event="onuploadcomplete" oncomplete="#{rich:component('mpNewRendition')}.hide();" actionListener="#{mediaItemDetails.onSaveNewRendition}" ajaxSingle="true" reRender="dtRenditions, preview, dtConcepts" />
                                         </rich:fileUpload>
                                     </h:panelGrid>
                                 </rich:tab>

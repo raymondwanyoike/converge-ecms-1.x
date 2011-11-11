@@ -40,6 +40,7 @@ import dk.i2m.converge.core.metadata.PointOfInterest;
 import dk.i2m.converge.core.metadata.Subject;
 import dk.i2m.converge.core.plugin.WorkflowValidatorException;
 import dk.i2m.converge.core.utils.HttpUtils;
+import dk.i2m.converge.core.utils.StringUtils;
 import dk.i2m.converge.core.workflow.EditionCandidate;
 import dk.i2m.converge.domain.search.SearchResults;
 import dk.i2m.converge.core.workflow.WorkflowStateTransition;
@@ -55,6 +56,7 @@ import dk.i2m.converge.ejb.facades.SearchEngineLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
 import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.ejb.services.MetaDataServiceLocal;
 import dk.i2m.jsf.JsfUtils;
 import java.io.IOException;
@@ -64,13 +66,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.DataModel;
@@ -169,6 +175,10 @@ public class NewsItem {
     private MediaItem userSubmission = null;
 
     private boolean showClosedEditions = false;
+
+    private Map<String, Concept> suggestedConcepts = new LinkedHashMap<String, Concept>();
+
+    private List<Concept> selectedConcepts = new ArrayList<Concept>();
 
     /**
      * Creates a new instance of {@link NewsItem}.
@@ -1286,5 +1296,41 @@ public class NewsItem {
         } else {
             return 3;
         }
+    }
+
+    public void onSuggestConcepts(ActionEvent event) {
+        try {
+            List<Concept> concepts = metaDataService.enrich(StringUtils.stripHtml(getSelectedNewsItem().getStory()));
+            suggestedConcepts = new LinkedHashMap<String, Concept>();
+            this.selectedConcepts = new ArrayList<Concept>();
+            ResourceBundle bundle = JsfUtils.getResourceBundle(FacesContext.getCurrentInstance(), "i18n");
+            for (Concept concept : concepts) {
+                String type = bundle.getString("Generic_" + concept.getType() + "_NAME");
+                suggestedConcepts.put(concept.getName() + " (" + type + ")", concept);
+            }
+        } catch (EnrichException ex) {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "NewsItem_CONCEPTS_SUGGEST_FAILED", null);
+        }
+    }
+
+    public void onSaveConceptSuggestions(ActionEvent event) {
+        getSelectedNewsItem().getConcepts().addAll(getSelectedConcepts());
+
+        List<Concept> allConcepts = getSelectedNewsItem().getConcepts();
+        Set<Concept> uniqueConcepts = new HashSet<Concept>(allConcepts);
+        allConcepts = new ArrayList<Concept>(uniqueConcepts);
+        getSelectedNewsItem().setConcepts(allConcepts);
+    }
+
+    public Map<String, Concept> getSuggestedConcepts() {
+        return suggestedConcepts;
+    }
+
+    public List<Concept> getSelectedConcepts() {
+        return selectedConcepts;
+    }
+
+    public void setSelectedConcepts(List<Concept> selectedConcepts) {
+        this.selectedConcepts = selectedConcepts;
     }
 }

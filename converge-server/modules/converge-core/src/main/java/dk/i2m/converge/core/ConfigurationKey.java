@@ -81,6 +81,5 @@ public enum ConfigurationKey implements Serializable {
     NEWSWIRE_BASKET_MAIL,
     CONVERGE_HOME_URL,
     SEARCH_ENGINE_ALLOW_COMPRESSION,
-    SEARCH_ENGINE_OPEN_CALAIS_ENABLED,
     OPEN_CALAIS_API_KEY
 }

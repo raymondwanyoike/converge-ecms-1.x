@@ -32,6 +32,7 @@ import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.domain.search.SearchFacet;
 import dk.i2m.converge.domain.search.SearchResult;
 import dk.i2m.converge.domain.search.SearchResults;
+import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.DateFormat;
@@ -95,6 +96,8 @@ public class NewswireServiceBean implements NewswireServiceLocal {
     @EJB private PluginContextBeanLocal pluginContext;
 
     @EJB private NotificationServiceLocal notificationService;
+
+    @EJB private SystemFacadeLocal systemFacade;
 
     @Resource private SessionContext ctx;
 
@@ -279,8 +282,10 @@ public class NewswireServiceBean implements NewswireServiceLocal {
     }
 
     private void fetchNewswire(Long newswireServiceId, SolrServer solrServer) {
+        Long taskId = 0L;
         try {
             NewswireService service = daoService.findById(NewswireService.class, newswireServiceId);
+            taskId = systemFacade.createBackgroundTask("Downloading newswire service " + service.getSource());
             LOG.log(Level.INFO, "Newswire Service {0}", service.getSource());
             NewswireDecoder decoder = service.getDecoder();
 
@@ -301,6 +306,8 @@ public class NewswireServiceBean implements NewswireServiceLocal {
             LOG.log(Level.WARNING, ex.getMessage());
         } catch (NewswireDecoderException ex) {
             LOG.log(Level.SEVERE, null, ex);
+        } finally {
+            systemFacade.removeBackgroundTask(taskId);
         }
     }
 
@@ -711,6 +718,8 @@ public class NewswireServiceBean implements NewswireServiceLocal {
 
     @Override
     public void dispatchBaskets() {
+        Long taskId = 0L;
+        taskId = systemFacade.createBackgroundTask("Dispatching newswire baskets by e-mail");
         SimpleDateFormat dateFormat = new SimpleDateFormat(msgs.getString("FORMAT_DATE_AND_TIME"));
         final String NL = System.getProperty("line.separator");
         final String SENDER = cfgService.getString(ConfigurationKey.NEWSWIRE_BASKET_MAIL);
@@ -726,7 +735,7 @@ public class NewswireServiceBean implements NewswireServiceLocal {
 
         Calendar now = Calendar.getInstance();
         List<NewswireBasket> baskets = daoService.findWithNamedQuery(NewswireBasket.FIND_BY_EMAIL_DISPATCH);
-        LOG.log(Level.INFO, "Preparing dispatch of {0} baskets", baskets.size());
+        LOG.log(Level.FINE, "Preparing dispatch of {0} baskets", baskets.size());
 
         for (NewswireBasket basket : baskets) {
             Calendar lastDelivery = (Calendar) now.clone();
@@ -825,9 +834,10 @@ public class NewswireServiceBean implements NewswireServiceLocal {
                 // Dispatch mail
                 notificationService.dispatchMail(basket.getOwner().getEmail(), SENDER, subject, htmlContent.toString(), plainContent.toString());
             } else {
-                LOG.log(Level.INFO, "No hits in basket [{0}] for [{1}]", new Object[]{basket.getTitle(), basket.getOwner().getFullName()});
+                LOG.log(Level.FINEST, "No hits in basket [{0}] for [{1}]", new Object[]{basket.getTitle(), basket.getOwner().getFullName()});
             }
         }
+        systemFacade.removeBackgroundTask(taskId);
     }
 
     private String compileMsg(String pattern, Object[] arguments, Locale userLocale) {

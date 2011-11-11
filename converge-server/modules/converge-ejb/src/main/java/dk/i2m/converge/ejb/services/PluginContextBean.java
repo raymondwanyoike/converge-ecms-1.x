@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.ejb.services;
 
+import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.content.ContentTag;
@@ -72,6 +73,8 @@ public class PluginContextBean implements PluginContextBeanLocal {
     @EJB private DaoServiceLocal daoService;
 
     @EJB private CatalogueFacadeLocal catalogueFacade;
+
+    @EJB private MetaDataServiceLocal metaDataService;
 
     @Override
     public String getWorkingDirectory() {
@@ -192,5 +195,15 @@ public class PluginContextBean implements PluginContextBeanLocal {
     @Override
     public MediaItemRendition updateMediaItemRendition(java.io.File file, String filename, String contentType, dk.i2m.converge.core.content.catalogue.MediaItemRendition mediaItemRendition) throws IOException {
         return catalogueFacade.update(file, filename, contentType, mediaItemRendition);
+    }
+
+    @Override
+    public List<dk.i2m.converge.core.metadata.Concept> enrich(String story) throws EnrichException {
+        return metaDataService.enrich(story);
+    }
+    
+    @Override
+    public String extractContent(MediaItemRendition mediaItemRendition) {
+        return metaDataService.extractContent(mediaItemRendition);
     }
 }

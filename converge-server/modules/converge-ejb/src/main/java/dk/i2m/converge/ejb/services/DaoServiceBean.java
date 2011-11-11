@@ -57,6 +57,10 @@ public class DaoServiceBean implements DaoServiceLocal {
         this.em.refresh(t);
         return t;
     }
+    
+    public void commit() {
+        this.em.getTransaction().commit();
+    }
 
     /**
      * Finds a given entity in the data store.

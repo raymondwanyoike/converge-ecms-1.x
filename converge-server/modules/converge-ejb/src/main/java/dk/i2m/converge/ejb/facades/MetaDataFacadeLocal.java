@@ -224,4 +224,14 @@ public interface MetaDataFacadeLocal {
     dk.i2m.converge.core.content.ContentTag findOrCreateContentTag(java.lang.String name);
 
     java.util.List<dk.i2m.converge.core.content.ContentTag> findContentTagLikeName(java.lang.String name);
+
+    java.util.List<dk.i2m.converge.core.metadata.OpenCalaisMapping> getOpenCalaisMappings();
+
+    dk.i2m.converge.core.metadata.OpenCalaisMapping create(dk.i2m.converge.core.metadata.OpenCalaisMapping mapping);
+
+    dk.i2m.converge.core.metadata.OpenCalaisMapping update(dk.i2m.converge.core.metadata.OpenCalaisMapping mapping);
+
+    void deleteOpenCalaisMapping(java.lang.Long id);
+
+    dk.i2m.converge.core.metadata.Concept findOpenCalaisMapping(java.lang.String typeGroup, java.lang.String field, java.lang.String value) throws dk.i2m.converge.ejb.services.DataNotFoundException;
 }

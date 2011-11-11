@@ -7,10 +7,9 @@ ALTER TABLE catalogue ADD COLUMN preview_rendition BIGINT;
 ALTER TABLE catalogue ADD COLUMN original_rendition BIGINT;
 
 ALTER TABLE `media_item` CHANGE COLUMN `media_repository_id` `catalogue_id` BIGINT(20) NULL DEFAULT NULL, 
-DROP INDEX `FK_media_item_media_repository_id`, 
-ADD INDEX `FK_media_item_media_repository_id` (`catalogue_id` ASC) ;
 
 INSERT INTO rendition (name, label, description) VALUES ('highRes', 'High Resolution', 'Original rendition');
+INSERT INTO rendition (name, label, description) VALUES ('thumbnail', 'Thumbnail', 'Thumbnail of original rendition');
 
 CREATE  TABLE `media_item_rendition` (
   `id` BIGINT NOT NULL AUTO_INCREMENT ,
@@ -101,3 +100,19 @@ CREATE TABLE `workflow_step_user_role` (
 
 ALTER TABLE user_account ADD COLUMN default_search_results_order_by varchar(255);
 ALTER TABLE user_account ADD COLUMN default_search_results_order tinyint(1) NOT NULL DEFAULT '0';
+
+CREATE TABLE `background_task` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `task_start` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `open_calais_mapping` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `type_group` varchar(255) NOT NULL,
+  `field` varchar(255) NOT NULL,
+  `field_value` varchar(255) NOT NULL,
+  `concept_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`)
+);

@@ -40,6 +40,14 @@
             <to-view-id>/administrator/Languages.xhtml</to-view-id>
         </navigation-case>
         <navigation-case>
+            <from-outcome>/administration/system</from-outcome>
+            <to-view-id>/administrator/System.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>/administration/processes</from-outcome>
+            <to-view-id>/administrator/Processes.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
             <from-outcome>/administration/timers</from-outcome>
             <to-view-id>/administrator/Timers.xhtml</to-view-id>
         </navigation-case>
@@ -82,6 +90,10 @@
         <navigation-case>
             <from-outcome>/administration/search_engine</from-outcome>
             <to-view-id>/administrator/SearchEngine.xhtml</to-view-id>
+        </navigation-case>
+                <navigation-case>
+            <from-outcome>/administration/open_calais</from-outcome>
+            <to-view-id>/administrator/OpenCalais.xhtml</to-view-id>
         </navigation-case>
     </navigation-rule>
 
@@ -330,6 +342,18 @@
     <managed-bean>
         <managed-bean-name>administrator_Administration</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Administration</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>administrator_OpenCalais</managed-bean-name>
+        <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.OpenCalais</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>administrator_Processes</managed-bean-name>
+        <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Processes</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
 

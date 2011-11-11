@@ -8,7 +8,7 @@
             <converge:loading for="regMainContent" />
             <a4j:region id="regMainContent">
                 <h:form id="frmTimers">
-
+                    <a4j:poll reRender="dtTimers" ajaxSingle="true" interval="60000" ignoreDupResponses="true" limitToList="true" actionListener="#{administrator_Timers.onRefreshTimers}" />
                     <converge:moduleHeader moduleTitle="#{msgs.administrator_timer_TIMERS}" />
                     <div class="moduleContent">
                         <rich:dataTable id="dtTimers" value="#{administrator_Timers.systemTimers}" var="timer" styleClass="table" headerClass="tableHeader">
@@ -58,7 +58,6 @@
                     </div>
                 </h:form>
             </a4j:region>
-
         </ui:define>
     </ui:composition>
 </jsp:root>

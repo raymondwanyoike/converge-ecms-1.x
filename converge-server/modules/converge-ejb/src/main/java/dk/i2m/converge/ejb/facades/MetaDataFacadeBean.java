@@ -17,6 +17,7 @@
 package dk.i2m.converge.ejb.facades;
 
 import dk.i2m.converge.core.content.ContentTag;
+import dk.i2m.converge.core.metadata.OpenCalaisMapping;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.core.metadata.Subject;
@@ -338,5 +339,44 @@ public class MetaDataFacadeBean implements MetaDataFacadeLocal {
     public List<ContentTag> findContentTagLikeName(String name) {
         Map<String, Object> params = QueryBuilder.with("name", "%" + name + "%").parameters();
         return daoService.findWithNamedQuery(ContentTag.FIND_LIKE_NAME, params);
+    }
+
+    /**
+     * Gets all the mappings between Open Calais and Concepts.
+     * 
+     * @return {@link List} of mappings between Open Calais and Concepts
+     */
+    @Override
+    public List<OpenCalaisMapping> getOpenCalaisMappings() {
+        return daoService.findAll(OpenCalaisMapping.class);
+    }
+
+    @Override
+    public OpenCalaisMapping create(OpenCalaisMapping mapping) {
+        return daoService.create(mapping);
+    }
+
+    @Override
+    public OpenCalaisMapping update(OpenCalaisMapping mapping) {
+        return daoService.update(mapping);
+    }
+
+    @Override
+    public void deleteOpenCalaisMapping(Long id) {
+        daoService.delete(OpenCalaisMapping.class, id);
+    }
+
+    @Override
+    public dk.i2m.converge.core.metadata.Concept findOpenCalaisMapping(String typeGroup, String field, String value) throws DataNotFoundException {
+        Map<String, Object> params = QueryBuilder.with("typeGroup", typeGroup).and("field", field).and("value", value).parameters();
+        List<OpenCalaisMapping> mappings = daoService.findWithNamedQuery(OpenCalaisMapping.FIND_BY_TYPE_GROUP_FIELD_AND_VALUE, params);
+
+        if (mappings.isEmpty()) {
+            throw new DataNotFoundException("No mapping for " + typeGroup + " with field " + field + " equal to " + value);
+        }
+
+        OpenCalaisMapping firstMatch = mappings.iterator().next();
+
+        return firstMatch.getConcept();
     }
 }

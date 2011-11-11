@@ -16,17 +16,17 @@
                 <h:dataTable value="#{menuItems}" var="menuItem">
                     <h:column>
                         <h:graphicImage value="/images/template/bullet.gif" 
-                                        alt="#{msgs[menuItem.label]}"
-                                        title="#{msgs[menuItem.label]}" />
+                                        alt="#{i18n[menuItem.label]}"
+                                        title="#{i18n[menuItem.label]}" />
                     </h:column>
                     <h:column>
                         <h:commandLink action="#{menuItem.action}" immediate="true">
-                            <h:outputText value="#{msgs[menuItem.label]}" />
+                            <h:outputText value="#{i18n[menuItem.label]}" />
                         </h:commandLink>
                     </h:column>
                 </h:dataTable>
             </div>
-            <div style="clear: both; padding-bottom: 12px;"></div>
+            <converge:moduleSpacer />
         </h:form>
 
     </ui:composition>

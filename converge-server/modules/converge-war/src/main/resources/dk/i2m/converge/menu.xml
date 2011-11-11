@@ -4,30 +4,30 @@
   xsi:noNamespaceSchemaLocation="menu.xsd">
 
     <item id="lnkDashboard" active="true">
-        <label>DASHBOARD</label>
+        <label>menu_DASHBOARD</label>
         <action>/index</action>
     </item>
 
     <item id="lnkInbox">
-        <label>INBOX</label>
+        <label>menu_INBOX</label>
         <action>/inbox</action>
         <privilege>MY_NEWS_ITEMS</privilege>
         <privilege>MY_PHOTOS</privilege>
     </item>
 
     <item id="lnkCalendar">
-        <label>CALENDAR</label>
+        <label>menu_CALENDAR</label>
         <action>/calendar</action>
     </item>
 
     <item id="lnkPlanning">
-        <label>PLANNING</label>
+        <label>menu_PLANNING</label>
         <action>/planning/editions</action>
         <privilege>OUTLET_PLANNING</privilege>
     </item>
 
     <item id="lnkNewswires">
-        <label>NEWSWIRES</label>
+        <label>menu_NEWSWIRES</label>
         <action>/newswires</action>
     </item>
     
@@ -43,12 +43,12 @@
     </item>
 
     <item id="lnkConcepts">
-        <label>CONCEPTS</label>
+        <label>menu_CONCEPTS</label>
         <action>/concepts</action>
     </item>
     
     <item id="lnkContacts">
-        <label>CONTACTS</label>
+        <label>menu_CONTACTS</label>
         <action>/contacts</action>
         <privilege>CONTACTS_MANAGE</privilege>
         <privilege>CONTACTS_READ</privilege>
@@ -69,7 +69,6 @@
         <action>/reporting</action>
         <privilege>REPORTING</privilege>
     </item>
-
     
     <item id="lnkNewsreader" type="submenu">
         <label>menu_NEWS_READER</label>
@@ -78,126 +77,149 @@
     </item>
 
     <item id="lnkAdministration" type="admin">
-        <label>ADMINISTRATION</label>
+        <label>menu_ADMINISTRATION</label>
         <action>/administration/administration</action>
         <role>ADMINISTRATOR</role>
 
-        <children id="lnkAdministrationConfiguration" resetOnClick="false">
-            <action>/administration/configuration</action>
-            <label>CONFIGURATION</label>
+        <children id="lnkAdministrationSystem" resetOnClick="false" sectionMenu="true">
+            <action>/administration/system</action>
+            <label>menu_SYSTEM</label>
             <role>ADMINISTRATOR</role>
+            
+            <children id="lnkAdministrationSystemSystem" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/system</action>
+                <label>menu_SYSTEM</label>
+                <role>ADMINISTRATOR</role>
+            </children>
+            
+            <children id="lnkAdministrationConfiguration" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/configuration</action>
+                <label>menu_SYSTEM_CONFIGURATION</label>
+                <role>ADMINISTRATOR</role>
+            </children>
+            
+            <children id="lnkAdministrationPlugins" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/plugins</action>
+                <label>menu_SYSTEM_PLUGINS</label>
+                <role>ADMINISTRATOR</role>
+            </children>
+            
+            <children id="lnkAdministrationTimers" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/timers</action>
+                <label>menu_SYSTEM_TIMERS</label>
+                <role>ADMINISTRATOR</role>
+            </children>
+            
+            <children id="lnkAdministrationProcesses" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/processes</action>
+                <label>menu_SYSTEM_PROCESSES</label>
+                <role>ADMINISTRATOR</role>
+            </children>
         </children>
         
         <children id="lnkAdministrationUsers" resetOnClick="false" sectionMenu="true">
             <action>/administration/user_sessions</action>
-            <label>USERS</label>
+            <label>menu_USER_MANAGEMENT</label>
             <role>ADMINISTRATOR</role>
 
             <children id="lnkAdministrationUserSessions" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/user_sessions</action>
-                <label>ADMIN_MENU_USER_SESSIONS</label>
+                <label>menu_USER_MANAGEMENT_USER_SESSIONS</label>
                 <role>ADMINISTRATOR</role>
             </children>
 
             <children id="lnkAdministrationUserList" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/users</action>
-                <label>ADMIN_MENU_USERS</label>
+                <label>menu_USER_MANAGEMENT_USER_USERS</label>
                 <role>ADMINISTRATOR</role>
             </children>
 
             <children id="lnkAdministrationUserrole" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/user_roles</action>
-                <label>ADMIN_MENU_USER_ROLES</label>
+                <label>menu_USER_MANAGEMENT_USER_USER_ROLES</label>
                 <role>ADMINISTRATOR</role>
             </children>
         </children>
 
         <children id="lnkAdministrationOutlets" resetOnClick="false" sectionMenu="true">
             <action>/administration/outlets</action>
-            <label>OUTLETS</label>
+            <label>menu_OUTLETS</label>
             <role>ADMINISTRATOR</role>
 
             <children id="lnkOutlets" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/outlets</action>
-                <label>OUTLETS</label>
+                <label>menu_OUTLETS</label>
+                <role>ADMINISTRATOR</role>
+            </children>
+            
+            <children id="lnkAdministrationWorkflows" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/workflows</action>
+                <label>menu_OUTLETS_WORKFLOWS</label>
                 <role>ADMINISTRATOR</role>
             </children>
         </children>
 
-        <children id="lnkAdministrationWorkflows" sectionMenu="false" resetOnClick="false">
-            <action>/administration/workflows</action>
-            <label>WORKFLOWS</label>
-            <role>ADMINISTRATOR</role>
-        </children>
-
         <children id="lnkAdministrationNewswires" sectionMenu="false" resetOnClick="false">
             <action>/administration/newswires</action>
-            <label>NEWSWIRES</label>
+            <label>menu_ADMINISTRATION_NEWSWIRES</label>
             <role>ADMINISTRATOR</role>
         </children>
 
         <children id="lnkAdministrationCatalogues" resetOnClick="false" sectionMenu="true">
             <action>/administration/catalogues</action>
-            <label>CATALOGUES</label>
+            <label>menu_CATALOGUES</label>
             <role>ADMINISTRATOR</role>
 
             <children id="lnkCatalogues" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/catalogues</action>
-                <label>CATALOGUES</label>
+                <label>menu_CATALOGUES</label>
                 <role>ADMINISTRATOR</role>
             </children>
 
             <children id="lnkRenditions" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/renditions</action>
-                <label>mediaitem_RENDITIONS</label>
+                <label>menu_CATALOGUES_RENDTIONS</label>
                 <role>ADMINISTRATOR</role>
             </children>
         </children>
 
         <children id="lnkAdministrationCalendar" resetOnClick="false" sectionMenu="true">
             <action>/administration/calendar_categories</action>
-            <label>calendar_CALENDAR</label>
+            <label>menu_ADMINISTRATION_CALENDAR</label>
             <role>ADMINISTRATOR</role>
 
             <children id="lnkAdministrationCalendarCategories" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/calendar_categories</action>
-                <label>calendar_CATEGORIES</label>
+                <label>menu_ADMINISTRATION_CALENDAR_CATEGORIES</label>
                 <role>ADMINISTRATOR</role>
             </children>
 
         </children>
-
-        <children id="lnkAdministrationTimers" resetOnClick="false">
-            <action>/administration/timers</action>
-            <label>administrator_timer_PAGE_TITLE</label>
-            <role>ADMINISTRATOR</role>
-        </children>
         
         <children id="lnkAdministrationSearchEngine" resetOnClick="false">
             <action>/administration/search_engine</action>
-            <label>administrator_search_engine_PAGE_TITLE</label>
-            <role>ADMINISTRATOR</role>
-        </children>
-
-
-        <children id="lnkAdministrationPlugins" resetOnClick="false">
-            <action>/administration/plugins</action>
-            <label>administrator_plugins_PAGE_TITLE</label>
+            <label>menu_ADMINISTRATION_SEARCH_ENGINE</label>
             <role>ADMINISTRATOR</role>
         </children>
 
         <children id="lnkAdministrationAnnouncements" resetOnClick="false">
             <action>/administration/announcements</action>
-            <label>announcements_ANNOUNCEMENTS</label>
+            <label>menu_ANNOUNCEMENTS</label>
             <role>ADMINISTRATOR</role>
         </children>
 
         <children id="lnkAdministrationLanguages" resetOnClick="false">
             <action>/administration/languages</action>
-            <label>language_LANGUAGES</label>
+            <label>menu_LANGUAGES</label>
             <role>ADMINISTRATOR</role>
         </children>
 
+        <children id="lnkAdministrationOpenCalais" resetOnClick="false">
+            <action>/administration/open_calais</action>
+            <label>menu_OPEN_CALAIS</label>
+            <role>ADMINISTRATOR</role>
+        </children>
 
+        
     </item>
 </menuItems>
