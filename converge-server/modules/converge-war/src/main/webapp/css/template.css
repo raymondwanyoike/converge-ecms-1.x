@@ -1744,3 +1744,12 @@ div.black h2 {
 
 .validOutlet { color: green; font-weight: bold; }
 .invalidOutlet { color: red; font-weight: bold; }
+
+.activityStream { border: 0px; border-spacing: 0px; width: 100% }
+.activityStreamSender, .activityStreamMessage { border: 0px; border-bottom: 1px solid #cccccc; }
+.activityStreamSenderName { color: #7D7D7D; font-weight: bold; }
+.activityStreamMessageText {}
+.activityStreamTime { color: #7D7D7D; text-transform: uppercase; font-size: 0.8em; }
+.activityStreamSeparator { color: #7D7D7D; padding-left: 5px;padding-right: 5px; }
+.activityStreamLink { color: #0000FF; text-transform: uppercase; font-size: 0.8em; }
+

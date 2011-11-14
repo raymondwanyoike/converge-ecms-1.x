@@ -118,23 +118,6 @@ public class UserSession {
         return isUserInRole("ADMINISTRATOR");
     }
 
-    /**
-     * Gets the number of awaiting notifications.
-     *
-     * @return Number of awaiting notifications
-     */
-    public Long getNotificationCount() {
-        return userFacade.getNotificationCount(getUser().getUsername());
-    }
-
-    /**
-     * Gets awaiting notifications.
-     *
-     * @return {@link List} of awaiting {@link Notification}s
-     */
-    public List<Notification> getNotifications() {
-        return userFacade.getNotifications(getUser().getUsername());
-    }
 
     /**
      * Gets the current user, or <code>null</code> if the user is not logged in.

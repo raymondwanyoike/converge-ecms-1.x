@@ -9,6 +9,7 @@
 
         <ui:define name="leftColumn">
             <a4j:keepAlive beanName="dashboard" />
+            <a4j:keepAlive beanName="activityStream" />
 
             <h:form id="frmMyAssignments">
                 <converge:moduleHeader moduleTitle="#{msgs.CURRENT_ASSIGNMENTS}" />
@@ -17,7 +18,9 @@
                     <h:panelGrid columns="2">
                         <h:graphicImage value="#{res.NEWS_ITEM_ICON}" />
                         <h:outputLink value="#{facesContext.externalContext.request.contextPath}/Inbox.xhtml">
-                            <h:outputText value="#{dashboard.userAssignments.rowCount} assignments in your inbox" styleClass="bold" />
+                            <h:outputFormat value="#{i18n.Dashboard_X_ASSIGNMENTS_IN_INBOX}">
+                                <f:param value="#{dashboard.userAssignments.rowCount}" />
+                            </h:outputFormat>
                         </h:outputLink>
                     </h:panelGrid>
                 </div>
@@ -57,13 +60,7 @@
         </ui:define>
 
         <ui:define name="middleColumn">
-            <h:form id="frmActivityStream">
-                <converge:moduleHeader moduleTitle="#{i18n.activityStreamModule_TITLE}" />
-                <div class="moduleContent">
-                
-                </div>
-            </h:form>
-            <converge:moduleSpacer />
+            <converge:activityStreamModule />
         </ui:define>
 
         <ui:define name="rightColumn">
@@ -80,7 +77,7 @@
                             <h:panelGrid columns="2" styleClass="dashboardAnnouncementTitleTable" columnClasses="left, right">
                                 <h:outputText styleClass="dashboardAnnouncementTitle" value="#{announcement.title}" />
                                 <h:outputText styleClass="dashboardAnnouncementDate" value="#{announcement.date.time}">
-                                    <f:convertDateTime pattern="#{msgs.FORMAT_SHORT_DATE}" timeZone="#{userSession.user.timeZone}" />
+                                    <f:converter converterId="com.ocpsoft.PrettyTimeConverter"/>
                                 </h:outputText>
                             </h:panelGrid>
                             <h:panelGroup layout="block">

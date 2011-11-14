@@ -7,6 +7,11 @@
     
     <!-- Verified -->
     <tag>
+        <tag-name>activityStreamModule</tag-name>
+        <source>taglib/converge/activityStreamModule.xhtml</source>
+    </tag>
+
+    <tag>
         <tag-name>appInfo</tag-name>
         <source>taglib/converge/appInfo.jspx</source>
     </tag>

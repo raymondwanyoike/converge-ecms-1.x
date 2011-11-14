@@ -60,6 +60,8 @@ public class AlertAction implements WorkflowAction {
 
     private static final String PROPERTY_MESSAGE = "message";
 
+    private static final String PROPERTY_LINK = "link";
+
     private Map<String, String> availableProperties = null;
 
     private static final Logger logger = Logger.getLogger(AlertAction.class.getName());
@@ -100,13 +102,23 @@ public class AlertAction implements WorkflowAction {
             sendToRole = true;
             sendToRoleRole = properties.get(AlertAction.PROPERTY_RECIPIENT_ROLE);
         }
+        
+        String link = "";
+        if (properties.containsKey(AlertAction.PROPERTY_LINK)) {
+            link = properties.get(AlertAction.PROPERTY_LINK);
+        }
 
         StringTemplate template = new StringTemplate(properties.get(AlertAction.PROPERTY_MESSAGE), DefaultTemplateLexer.class);
-
         template.setAttribute("newsitem", item);
         template.setAttribute("html-newsitem-title", StringEscapeUtils.escapeHtml(item.getTitle()));
         template.setAttribute("initiator", user);
         String notificationMessage = template.toString();
+        
+        template = new StringTemplate(link, DefaultTemplateLexer.class);
+        template.setAttribute("newsitem", item);
+        template.setAttribute("html-newsitem-title", StringEscapeUtils.escapeHtml(item.getTitle()));
+        template.setAttribute("initiator", user);
+        link = template.toString();
 
         List<UserAccount> usersToNotify = new ArrayList<UserAccount>();
 
@@ -127,6 +139,8 @@ public class AlertAction implements WorkflowAction {
             notification.setMessage(notificationMessage);
             notification.setAdded(Calendar.getInstance());
             notification.setRecipient(ua);
+            notification.setSender(user);
+            notification.setLink(link);
             ctx.createNotification(notification);
         }
     }
@@ -138,6 +152,7 @@ public class AlertAction implements WorkflowAction {
             availableProperties.put(msgs.getString("PROPERTY_RECIPIENT_USER"), PROPERTY_RECIPIENT_USER);
             availableProperties.put(msgs.getString("PROPERTY_RECIPIENT_ROLE"), PROPERTY_RECIPIENT_ROLE);
             availableProperties.put(msgs.getString("PROPERTY_MESSAGE"), PROPERTY_MESSAGE);
+            availableProperties.put(msgs.getString("PROPERTY_LINK"), PROPERTY_LINK);
         }
         return availableProperties;
     }

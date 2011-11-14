@@ -46,8 +46,6 @@
 
         <!-- Sub header start -->
         <h:form id="frmSubHeader">
-            <a4j:poll ajaxSingle="true" ignoreDupResponses="true" limitToList="true" interval="300000" reRender="notificationCount" />
-
             <div id="subheader_spacer">
 
                 <h:outputLink id="btnSignOut" value=""></h:outputLink>
@@ -76,21 +74,6 @@
                         <div class="right"></div>
                     </div>
                 </c:if>
-
-                <a4j:outputPanel id="notificationCount">
-                    <c:if test="#{userSession.notificationCount > 0}">
-                        <h:commandLink id="lnkNotifications" action="#{userSession.onNotifications}"/>
-                        <div class="notification_tabs" onclick="document.getElementById('frmSubHeader:lnkNotifications').onclick();">
-                            <div class="left"></div>
-                            <div class="middle">
-                                <h:outputFormat value="#{i18n.menu_NOTIFICATION}">
-                                    <f:param value="#{userSession.notificationCount}" />
-                                </h:outputFormat>
-                            </div>
-                            <div class="right"></div>
-                        </div>
-                    </c:if>
-                </a4j:outputPanel>
             </div>
         </h:form>
 

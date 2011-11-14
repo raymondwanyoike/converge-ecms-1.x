@@ -173,11 +173,34 @@ public class UserFacadeBean implements UserFacadeLocal {
         return members;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Gets all the {@Link Notification}S awaiting a given user.
+     *
+     * @param username
+     *          Username of the {@link UserAccount}
+     * @return {@link List} of awaiting {@link Notification}s
+     */
     @Override
     public List<Notification> getNotifications(String username) {
         Map<String, Object> params = QueryBuilder.with("username", username).parameters();
         return daoService.findWithNamedQuery(Notification.FIND_BY_USERNAME, params);
+    }
+
+    /**
+     * Gets user {@Link Notification}s in the given interval
+     *
+     * @param username
+     *          Username of the {@link UserAccount}
+     * @param start
+     *          First record to fetch
+     * @param count
+     *          Number of records to fetch
+     * @return {@link List} of awaiting {@link Notification}s
+     */
+    @Override
+    public List<Notification> getNotifications(String username, int start, int count) {
+        Map<String, Object> params = QueryBuilder.with("username", username).parameters();
+        return daoService.findWithNamedQuery(Notification.FIND_BY_USERNAME, params, start, count);
     }
 
     /**

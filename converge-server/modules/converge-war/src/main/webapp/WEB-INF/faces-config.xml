@@ -91,7 +91,7 @@
             <from-outcome>/administration/search_engine</from-outcome>
             <to-view-id>/administrator/SearchEngine.xhtml</to-view-id>
         </navigation-case>
-                <navigation-case>
+        <navigation-case>
             <from-outcome>/administration/open_calais</from-outcome>
             <to-view-id>/administrator/OpenCalais.xhtml</to-view-id>
         </navigation-case>
@@ -212,6 +212,13 @@
         <managed-bean-class>dk.i2m.converge.jsf.beans.Dashboard</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>activityStream</managed-bean-name>
+        <managed-bean-class>dk.i2m.converge.jsf.beans.ActivityStream</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+
     
     <managed-bean>
         <managed-bean-name>myActivity</managed-bean-name>

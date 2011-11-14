@@ -116,3 +116,8 @@ CREATE TABLE `open_calais_mapping` (
   `concept_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
 );
+
+
+# Activity Stream
+ALTER TABLE notification ADD COLUMN link varchar(255);
+ALTER TABLE notification ADD COLUMN sender_id bigint(20);

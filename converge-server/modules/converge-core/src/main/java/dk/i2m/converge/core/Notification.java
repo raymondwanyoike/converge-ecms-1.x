@@ -43,14 +43,16 @@ import javax.persistence.Temporal;
 @Entity
 @Table(name = "notification")
 @NamedQueries({
-    @NamedQuery(name = Notification.FIND_BY_USERNAME, query = "SELECT n FROM Notification n WHERE n.recipient.username = :username"),
+    @NamedQuery(name = Notification.FIND_BY_USERNAME, query = "SELECT n FROM Notification n WHERE n.recipient.username = :username ORDER BY n.added DESC"),
     @NamedQuery(name = Notification.COUNT_BY_USERNAME, query = "SELECT COUNT(n) FROM Notification n WHERE n.recipient.username = :username")
 })
 public class Notification implements Serializable {
-    
+
+    private static final long serialVersionUID = 1L;
+
     /** Query for finding all notifications for a particular user by {@code username}. */
     public static final String FIND_BY_USERNAME = "Notification.findByUsername";
-    
+
     /** Query for getting the count of notifications for a particular user by {@code username}. */
     public static final String COUNT_BY_USERNAME = "Notification.countByUsername";
 
@@ -69,7 +71,14 @@ public class Notification implements Serializable {
     @ManyToOne
     @JoinColumn(name = "recipient_id")
     private UserAccount recipient;
-    
+
+    @ManyToOne
+    @JoinColumn(name = "sender_id")
+    private UserAccount sender;
+
+    @Column(name = "link")
+    private String link;
+
     public Notification() {
         this("", null);
     }
@@ -94,6 +103,30 @@ public class Notification implements Serializable {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+    
+    public boolean isLinkSet() {
+        if (link == null || link.trim().isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public UserAccount getSender() {
+        return sender;
+    }
+
+    public void setSender(UserAccount sender) {
+        this.sender = sender;
     }
 
     public UserAccount getRecipient() {

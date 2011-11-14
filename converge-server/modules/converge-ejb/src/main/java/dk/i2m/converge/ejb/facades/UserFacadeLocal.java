@@ -154,13 +154,6 @@ public interface UserFacadeLocal {
      */
     List<UserAccount> getMembers(Long departmentId);
 
-    /**
-     * Gets all the {@Link Notification}S awaiting a given user.
-     *
-     * @param username
-     *          Username of the {@link UserAccount}
-     * @return {@link List} of awaiting {@link Notification}s
-     */
     List<Notification> getNotifications(String username);
 
     /**
@@ -188,4 +181,6 @@ public interface UserFacadeLocal {
     Long getNotificationCount(java.lang.String username);
 
     boolean isCatalogueEditor(String username);
+
+    java.util.List<dk.i2m.converge.core.Notification> getNotifications(java.lang.String username, int start, int count);
 }
