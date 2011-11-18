@@ -11,11 +11,6 @@
     <name>Converge Plug-ins</name>
 
     <modules>
-        <module>textoutput</module>
-        <module>joomla</module>
-        <module>indexedition</module>
-        <module>emailaction</module>
-        <module>atomexport</module>
         <module>core-validators</module>
         <module>core-decoders</module>
         <module>core-actions</module>

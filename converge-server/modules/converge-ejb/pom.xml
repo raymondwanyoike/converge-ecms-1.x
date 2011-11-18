@@ -42,42 +42,7 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-                
-        <dependency>
-            <artifactId>textoutput</artifactId>
-            <groupId>dk.i2m.converge.plugins</groupId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
 
-        <dependency>
-            <artifactId>joomla</artifactId>
-            <groupId>dk.i2m.converge.plugins</groupId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <artifactId>indexedition</artifactId>
-            <groupId>dk.i2m.converge.plugins</groupId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <artifactId>emailaction</artifactId>
-            <groupId>dk.i2m.converge.plugins</groupId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        
-        <dependency>
-            <artifactId>atomexport</artifactId>
-            <groupId>dk.i2m.converge.plugins</groupId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
