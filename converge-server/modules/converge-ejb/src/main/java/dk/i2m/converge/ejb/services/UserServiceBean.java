@@ -1,18 +1,11 @@
 /*
  * Copyright (C) 2010 - 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.ejb.services;
 
@@ -138,7 +131,6 @@ public class UserServiceBean implements UserServiceLocal {
     /** {@inheritDoc }*/
     @Override
     public List<UserAccount> getMembers(String groupDn) throws NamingException {
-        LOG.info("getMembers(groupDn)");
         // Field containing the user unique identifier
         String uid = getFieldMapping(LdapFieldMapping.USER_MAPPING_USERNAME);
         // Field containinf the "member of" a group
@@ -167,28 +159,32 @@ public class UserServiceBean implements UserServiceLocal {
                     String userDn = (String) vals.nextElement();
 
                     // Get all the attributes of the given user
-                    Attributes attrs = dirCtx.getAttributes(userDn);
+                    try {
+                        Attributes attrs = dirCtx.getAttributes(userDn);
 
-                    // Get the UID of the user
-                    String username = (String) attrs.get(uid).get();
+                        // Get the UID of the user
+                        String username = (String) attrs.get(uid).get();
 
-                    // Look up user by UID in local database
-                    Map<String, Object> params = QueryBuilder.with("username", username).parameters();
-                    List<UserAccount> result = daoService.findWithNamedQuery(UserAccount.FIND_BY_UID, params);
+                        // Look up user by UID in local database
+                        Map<String, Object> params = QueryBuilder.with("username", username).parameters();
+                        List<UserAccount> result = daoService.findWithNamedQuery(UserAccount.FIND_BY_UID, params);
 
-                    if (result.isEmpty()) {
-                        LOG.log(Level.FINE, "User {0} has not been setup in the local database, using information from directory", username);
-                        ua = new UserAccount();
-                    } else {
-                        ua = result.iterator().next();
+                        if (result.isEmpty()) {
+                            LOG.log(Level.FINE, "User {0} has not been setup in the local database, using information from directory", username);
+                            ua = new UserAccount();
+                        } else {
+                            ua = result.iterator().next();
+                        }
+
+                        // Add LDAP directory attributes to user
+                        updateUser(ua, attrs);
+                        ua.setDistinguishedName(userDn);
+
+                        // Add to results list
+                        members.add(ua);
+                    } catch (NamingException ex) {
+                        LOG.log(Level.WARNING, "User {0} does not exist in LDAP", userDn);
                     }
-
-                    // Add LDAP directory attributes to user
-                    updateUser(ua, attrs);
-                    ua.setDistinguishedName(userDn);
-
-                    // Add to results list
-                    members.add(ua);
                 }
             }
         } else {
