@@ -1,23 +1,17 @@
 /*
  * Copyright (C) 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.core.reporting.activity;
 
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemMediaAttachment;
+import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.security.UserAccount;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +45,12 @@ public class UserActivity {
         int used = 0;
         for (NewsItem item : submitted) {
             if (!item.getPlacements().isEmpty()) {
-                used++;
+                for (NewsItemPlacement p : item.getPlacements()) {
+                    if (!p.getEdition().isOpen()) {
+                        used++;
+                        break;
+                    }
+                }
             }
         }
         return used;
@@ -61,10 +60,13 @@ public class UserActivity {
         int used = 0;
         for (NewsItem item : submitted) {
             for (NewsItemMediaAttachment attachment : item.getMediaAttachments()) {
-                    if (!item.getPlacements().isEmpty()) {
+                for (NewsItemPlacement p : item.getPlacements()) {
+                    if (!p.getEdition().isOpen()) {
                         used++;
+                        break;
                     }
-                    break;
+                }
+                break;
             }
         }
         return used;
@@ -79,8 +81,8 @@ public class UserActivity {
         for (NewsItem item : submitted) {
             for (NewsItemMediaAttachment attachment : item.getMediaAttachments()) {
 //                if (attachment.getMediaItem().getOwner().equals(user)) {
-                    used.add(item);
-                    break;
+                used.add(item);
+                break;
 //                }
             }
         }
@@ -105,11 +107,18 @@ public class UserActivity {
         List<NewsItem> used = new ArrayList<NewsItem>();
         for (NewsItem item : submitted) {
             for (NewsItemMediaAttachment attachment : item.getMediaAttachments()) {
-  //              if (attachment.getMediaItem().getOwner().equals(user)) {
-                    if (!item.getPlacements().isEmpty()) {
-                        used.add(item);
+                //              if (attachment.getMediaItem().getOwner().equals(user)) {
+                if (!item.getPlacements().isEmpty()) {
+
+                    for (NewsItemPlacement p : item.getPlacements()) {
+                        if (!p.getEdition().isOpen()) {
+                            used.add(item);
+                            break;
+                        }
                     }
-                    break;
+
+                }
+                break;
 //                }
             }
         }
@@ -139,7 +148,7 @@ public class UserActivity {
             return (double) getNumberOfNewsItemsUsedWithMedia() / (double) getNumberOfNewsItemsSubmittedWithMediaItems();
         }
     }
-    
+
     public long getTotalWordCount() {
         long wordCount = 0L;
         for (NewsItem item : getSubmitted()) {

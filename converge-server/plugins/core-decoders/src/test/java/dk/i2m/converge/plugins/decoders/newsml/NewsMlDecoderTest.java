@@ -53,8 +53,8 @@ public class NewsMlDecoderTest {
         NewsMLDecoder decoder = new NewsMLDecoder();
         NewswireService service = new NewswireService();
         service.setId(999L);
-        service.getProperties().add(new NewswireServiceProperty(service, NewsMLDecoder.PROPERTY_NEWSWIRE_LOCATION, newsDir));
-        service.getProperties().add(new NewswireServiceProperty(service, NewsMLDecoder.PROPERTY_NEWSWIRE_PROCESSED_LOCATION, newsDir));
+        service.getProperties().add(new NewswireServiceProperty(service, NewsMLDecoder.Property.PROPERTY_NEWSWIRE_LOCATION.name(), newsDir));
+        service.getProperties().add(new NewswireServiceProperty(service, NewsMLDecoder.Property.PROPERTY_NEWSWIRE_PROCESSED_LOCATION.name(), newsDir));
         List<NewswireItem> items = decoder.decode(mockCtx, service);
 
         assertEquals(numResults, items.size());
@@ -78,8 +78,8 @@ public class NewsMlDecoderTest {
         NewsMLDecoder decoder = new NewsMLDecoder();
         NewswireService service = new NewswireService();
         service.setId(999L);
-        service.getProperties().add(new NewswireServiceProperty(service, NewsMLDecoder.PROPERTY_NEWSWIRE_LOCATION, newsDir));
-        service.getProperties().add(new NewswireServiceProperty(service, NewsMLDecoder.PROPERTY_NEWSWIRE_PROCESSED_LOCATION, newsDir));
+        service.getProperties().add(new NewswireServiceProperty(service, NewsMLDecoder.Property.PROPERTY_NEWSWIRE_LOCATION.name(), newsDir));
+        service.getProperties().add(new NewswireServiceProperty(service, NewsMLDecoder.Property.PROPERTY_NEWSWIRE_PROCESSED_LOCATION.name(), newsDir));
         List<NewswireItem> items = decoder.decode(mockCtx, service);
 
         assertEquals(numResults, items.size());
@@ -103,8 +103,8 @@ public class NewsMlDecoderTest {
         NewsMLDecoder decoder = new NewsMLDecoder();
         NewswireService service = new NewswireService();
         service.setId(999L);
-        service.getProperties().add(new NewswireServiceProperty(service, NewsMLDecoder.PROPERTY_NEWSWIRE_LOCATION, newsDir));
-        service.getProperties().add(new NewswireServiceProperty(service, NewsMLDecoder.PROPERTY_NEWSWIRE_PROCESSED_LOCATION, newsDir));
+        service.getProperties().add(new NewswireServiceProperty(service, NewsMLDecoder.Property.PROPERTY_NEWSWIRE_LOCATION.name(), newsDir));
+        service.getProperties().add(new NewswireServiceProperty(service, NewsMLDecoder.Property.PROPERTY_NEWSWIRE_PROCESSED_LOCATION.name(), newsDir));
         List<NewswireItem> items = decoder.decode(mockCtx, service);
 
         assertEquals(numResults, items.size());

@@ -218,6 +218,18 @@
                                             <h:outputText value="#{action.hook.name}" />
                                         </rich:column>
 
+                                        <rich:column styleClass="columnIcon center">
+                                            <f:facet name="header">
+                                                <a4j:commandLink id="lnkBatch" title="#{i18n.administrator_Catalogues_ACTIONS_BATCH_ALL}" actionListener="#{administrator_Catalogues.onActionBatchAll}" reRender="frmPage" >
+                                                    <h:graphicImage value="#{res.RUN_ALL_ICON}" />
+                                                </a4j:commandLink>
+                                            </f:facet>
+                                            <a4j:commandLink ajaxSingle="true" title="#{i18n.administrator_Catalogues_ACTIONS_BATCH}" rendered="#{action.hook.supportBatch}">
+                                                <f:setPropertyActionListener target="#{administrator_Catalogues.actionBatch}" value="#{action}" />
+                                                <h:graphicImage value="#{res.RUN_ICON}" />
+                                            </a4j:commandLink>
+                                        </rich:column>
+
                                     </rich:dataTable>
                                     <rich:spacer width="450" height="1" />
                                 </h:panelGrid>
@@ -258,8 +270,14 @@
                                     <h:outputText value="#{msgs.media_item_CATALOGUE_ACTION_TYPE_LABEL}" />
                                     <h:selectOneMenu id="somActions" value="#{administrator_Catalogues.selectedCatalogueAction.hookClass}">
                                         <f:selectItems value="#{common.catalogueActions}" />
-                                        <a4j:support event="onchange" reRender="pgActionProperties" />
+                                        <a4j:support event="onchange" reRender="pgActionProperties, aboutAction" />
                                     </h:selectOneMenu>
+
+                                    <h:outputText value="#{i18n.administrator_Catalogues_CATALOGUE_ACTION_ABOUT}" />
+                                    <h:panelGroup id="aboutAction" styleClass="pluginInstanceAbout mediumInput" layout="block">
+                                        <h:outputText value="#{administrator_Catalogues.selectedCatalogueAction.hook.about}" escape="false" />
+                                    </h:panelGroup>
+
                                 </h:panelGrid>
                             </rich:tab>
 
@@ -271,7 +289,12 @@
                                             <h:selectOneMenu id="somActionProperties" value="#{administrator_Catalogues.selectedCatalogueActionProperty.key}" styleClass="text mediumInput">
                                                 <f:selectItems value="#{administrator_Catalogues.selectedCatalogueAction.hook.availableProperties}" />
                                             </h:selectOneMenu>
-                                            <h:outputText value="&#160;" />
+                                            <h:panelGroup id="colHelp">
+                                                <c:set var="help_key" value="#{administrator_Catalogues.selectedCatalogueActionProperty.key}_HELP" />
+                                                <c:set var="help_text" value="#{converge:message(administrator_Catalogues.selectedCatalogueAction.hook.bundle, help_key)}" />
+                                                <h:graphicImage url="#{res.HELP_ICON}" title="#{help_text}" rendered="#{help_text != ''}" />
+                                                <h:outputText value="&#160;" rendered="#{help_text == ''}" />
+                                            </h:panelGroup>
 
                                             <h:outputText value="#{msgs.media_item_CATALOGUE_ACTION_PROPERTY_VALUE}" />
                                             <h:inputText styleClass="text mediumInput" value="#{administrator_Catalogues.selectedCatalogueActionProperty.value}" />
@@ -284,14 +307,15 @@
                                             <f:facet name="header">
                                                 <h:outputText value="#{msgs.media_item_CATALOGUE_ACTION_PROPERTY}" />
                                             </f:facet>
-                                            <h:outputText value="#{property.key}" />
+                                            <c:set var="help_key" value="#{property.key}_HELP" />
+                                            <h:outputText value="#{converge:message(administrator_Catalogues.selectedCatalogueAction.hook.bundle, property.key)}" title="#{converge:message(administrator_Catalogues.selectedCatalogueAction.hook.bundle, help_key)}" />
                                         </rich:column>
 
                                         <rich:column sortyBy="#{property.value}">
                                             <f:facet name="header">
                                                 <h:outputText value="#{msgs.media_item_CATALOGUE_ACTION_PROPERTY_VALUE}" />
                                             </f:facet>
-                                            <h:outputText value="#{property.value}" />
+                                            <rich:inplaceInput required="true" value="#{property.value}" viewClass="propertyInplace" viewHoverClass="propertyInplaceHover" />
                                         </rich:column>
 
                                         <rich:column styleClass="center columnIcon">

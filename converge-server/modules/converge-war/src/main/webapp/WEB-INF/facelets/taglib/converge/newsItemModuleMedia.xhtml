@@ -77,7 +77,12 @@
                         <h:outputText value="#{attachment.mediaItem.owner.fullName}" rendered="#{attachment.mediaItem.byLine == ''}" />
 
                         <h:outputText value="ID" />
-                        <h:outputText value="#{attachment.mediaItem.id}" />
+                        <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{attachment.mediaItem.id}">
+                            <h:outputText value="#{attachment.mediaItem.id}">
+                                <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                            </h:outputText>
+                        </h:outputLink>
+
                     </h:panelGrid>
 
                 </h:panelGrid>
@@ -85,7 +90,7 @@
         </div>
         <converge:moduleSpacer />
 
-        
+
         <a4j:region id="regMediaFileUpload">
             <rich:modalPanel id="mpMediaFileUpload" autosized="true" domElementAttachment="parent">
                 <f:facet name="header">

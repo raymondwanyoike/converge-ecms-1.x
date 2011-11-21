@@ -439,7 +439,7 @@ public class Common {
         Map<String, UserAccount> users = new LinkedHashMap<String, UserAccount>();
 
         for (UserAccount userAccount : userFacade.getUsers()) {
-            users.put(userAccount.getFullName(), userAccount);
+            users.put(userAccount.getFullName() + " (" + userAccount.getUsername() +  ")", userAccount);
         }
 
         return users;

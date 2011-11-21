@@ -1,24 +1,18 @@
 /*
  * Copyright (C) 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.plugins.actions.resizeimage;
 
 import dk.i2m.converge.core.annotations.CatalogueAction;
 import dk.i2m.converge.core.content.catalogue.CatalogueHookInstance;
-import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.plugin.CatalogueEvent;
@@ -33,23 +27,15 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.*;
 
 /**
- * {@link CatalogueHook} resizing an uploaded image and saves
- * the resized image as a {@link Rendition} of the {@link MediaItem}.
+ * {@link CatalogueHook} resizing an uploaded image and saves the resized image as a {@link Rendition} of the {@link MediaItem}.
  *
  * @author Allan Lykke Christensen
  */
 @CatalogueAction
-public class ResizeImageHook implements CatalogueHook {
+public class ResizeImageHook extends CatalogueHook {
 
     public static final String ORIGINAL_RENDITION = "rendition_original";
 
@@ -60,6 +46,8 @@ public class ResizeImageHook implements CatalogueHook {
     public static final String RESIZE_HEIGHT = "height";
 
     public static final String RESIZE_QUALITY = "quality";
+
+    public static final String ENABLE_ON_UPDATE = "ENABLE_ON_UPDATE";
 
     private Map<String, String> instanceProperties = new HashMap<String, String>();
 
@@ -75,23 +63,37 @@ public class ResizeImageHook implements CatalogueHook {
 
     private Integer quality;
 
-    private ResourceBundle msgs = ResourceBundle.getBundle("dk.i2m.converge.plugins.actions.resizeimage.Messages");
+    private ResourceBundle bundle = ResourceBundle.getBundle("dk.i2m.converge.plugins.actions.resizeimage.Messages");
 
     @Override
     public void execute(PluginContext ctx, CatalogueEvent event, CatalogueHookInstance instance) throws CatalogueEventException {
 
-        // Check that we only re-act to the Upload of new renditions
-        if (event.getType() != CatalogueEvent.Event.UploadRendition) {
+        instanceProperties = instance.getPropertiesAsMap();
+
+        validateProperties();
+
+        boolean executeOnUpdate = false;
+
+        if (instanceProperties.containsKey(ENABLE_ON_UPDATE)) {
+            executeOnUpdate = Boolean.parseBoolean(instanceProperties.get(ENABLE_ON_UPDATE));
+
+        }
+
+        // Check that we only re-act to the Upload of new or update renditions
+        if (event.getType() != CatalogueEvent.Event.UploadRendition && event.getType() != CatalogueEvent.Event.UpdateRendition) {
             return;
         }
 
-        instanceProperties = instance.getPropertiesAsMap();
-        validateProperties();
+        // Check that we only re-act to the Upload of updated renditions if the ENABLE_ON_UPDATE was set
+        if (!executeOnUpdate && event.getType() == CatalogueEvent.Event.UpdateRendition) {
+            return;
+        }
+
 
         // Determine if we need to act on the uploaded rendition
         MediaItemRendition uploadRendition = event.getRendition();
         Rendition rendition = uploadRendition.getRendition();
-        
+
         if (!rendition.getName().equalsIgnoreCase(originalRendition)) {
             return;
         }
@@ -99,10 +101,10 @@ public class ResizeImageHook implements CatalogueHook {
         if (!uploadRendition.isImage()) {
             return;
         }
-         
+
         // Which rendition should be generated
         Rendition generateRendition = ctx.findRenditionByName(resizeRendition);
-        
+
         if (generateRendition == null) {
             throw new CatalogueEventException("Rendition " + resizeRendition + " does not exist");
         }
@@ -117,9 +119,11 @@ public class ResizeImageHook implements CatalogueHook {
         try {
             // Generate thumbnail
             byte[] filedata = ImageUtils.generateThumbnail(FileUtils.getBytes(originalFile), width, height, quality);
-        
+
             // Create temporary file to store the thumbnail
-            File tempFile = File.createTempFile("" + uploadRendition.getMediaItem().getId(), "" + generateRendition.getId());
+            String prefix = "xxx-" + uploadRendition.getMediaItem().getId();
+            String suffix = "" + generateRendition.getId();
+            File tempFile = File.createTempFile(prefix, suffix);
 
             // Output thumbnail into temporary file
             FileOutputStream fos = new FileOutputStream(tempFile);
@@ -127,11 +131,16 @@ public class ResizeImageHook implements CatalogueHook {
             fos.close();
 
             // Create the Media Item Rendition
-            MediaItemRendition mir = ctx.createMediaItemRendition(tempFile, event.getItem().getId(), generateRendition.getId(), tempFile.getName() + "." + uploadRendition.getExtension(), uploadRendition.getContentType());
+            MediaItemRendition mir = ctx.createMediaItemRendition(tempFile,
+                    event.getItem().getId(), generateRendition.getId(),
+                    tempFile.getName() + "." + uploadRendition.getExtension(),
+                    uploadRendition.getContentType());
         } catch (InterruptedException ex) {
             throw new CatalogueEventException(ex);
         } catch (IOException ex) {
             throw new CatalogueEventException(ex);
+        } catch (IllegalArgumentException ex) {
+            throw new CatalogueEventException("Could not resize image", ex);
         }
     }
 
@@ -194,37 +203,53 @@ public class ResizeImageHook implements CatalogueHook {
     public Map<String, String> getAvailableProperties() {
         if (availableProperties == null) {
             availableProperties = new LinkedHashMap<String, String>();
-            availableProperties.put(msgs.getString(ORIGINAL_RENDITION), ORIGINAL_RENDITION);
-            availableProperties.put(msgs.getString(RESIZED_RENDITION), RESIZED_RENDITION);
-            availableProperties.put(msgs.getString(RESIZE_WIDTH), RESIZE_WIDTH);
-            availableProperties.put(msgs.getString(RESIZE_HEIGHT), RESIZE_HEIGHT);
-            availableProperties.put(msgs.getString(RESIZE_QUALITY), RESIZE_QUALITY);
+            availableProperties.put(bundle.getString(ORIGINAL_RENDITION), ORIGINAL_RENDITION);
+            availableProperties.put(bundle.getString(RESIZED_RENDITION), RESIZED_RENDITION);
+            availableProperties.put(bundle.getString(RESIZE_WIDTH), RESIZE_WIDTH);
+            availableProperties.put(bundle.getString(RESIZE_HEIGHT), RESIZE_HEIGHT);
+            availableProperties.put(bundle.getString(RESIZE_QUALITY), RESIZE_QUALITY);
+            availableProperties.put(bundle.getString(ENABLE_ON_UPDATE), ENABLE_ON_UPDATE);
         }
         return availableProperties;
     }
 
     @Override
     public String getName() {
-        return msgs.getString("PLUGIN_NAME");
+        return bundle.getString("PLUGIN_NAME");
+    }
+
+    @Override
+    public String getAbout() {
+        return bundle.getString("PLUGIN_ABOUT");
     }
 
     @Override
     public String getDescription() {
-        return msgs.getString("PLUGIN_DESCRIPTION");
+        return bundle.getString("PLUGIN_DESCRIPTION");
     }
 
     @Override
     public String getVendor() {
-        return msgs.getString("PLUGIN_VENDOR");
+        return bundle.getString("PLUGIN_VENDOR");
     }
 
     @Override
     public Date getDate() {
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            return format.parse(msgs.getString("PLUGIN_BUILD_TIME"));
+            return format.parse(bundle.getString("PLUGIN_BUILD_TIME"));
         } catch (Exception ex) {
             return Calendar.getInstance().getTime();
         }
+    }
+
+    @Override
+    public ResourceBundle getBundle() {
+        return bundle;
+    }
+
+    @Override
+    public boolean isSupportBatch() {
+        return true;
     }
 }

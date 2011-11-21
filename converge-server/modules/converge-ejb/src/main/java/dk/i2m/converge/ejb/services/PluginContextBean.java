@@ -206,4 +206,9 @@ public class PluginContextBean implements PluginContextBeanLocal {
     public String extractContent(MediaItemRendition mediaItemRendition) {
         return metaDataService.extractContent(mediaItemRendition);
     }
+    
+    @Override
+    public String getConfiguration(ConfigurationKey key) {
+        return cfgService.getString(key);
+    }
 }

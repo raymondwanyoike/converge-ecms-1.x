@@ -1,59 +1,34 @@
 /*
- *  Copyright (C) 2010 - 2011 Interactive Media Manangement
- * 
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- * 
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2010 - 2011 Interactive Media Manangement
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.plugins.decoders.dailymail;
 
-import dk.i2m.converge.core.plugin.NewswireDecoder;
 import dk.i2m.converge.core.content.ContentTag;
 import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.newswire.NewswireService;
+import dk.i2m.converge.core.plugin.NewswireDecoder;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.utils.FileUtils;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ResourceBundle;
+import java.io.*;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import javax.mail.Address;
-import javax.mail.Flags;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Part;
-import javax.mail.Session;
+import javax.mail.*;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.WordUtils;
 
@@ -66,7 +41,9 @@ import org.apache.commons.lang.WordUtils;
 @dk.i2m.converge.core.annotations.NewswireDecoder
 public class DailyMailDecoder implements NewswireDecoder {
 
-    /** IMAP transport. Possible value for {@link DailyMailDecoder#TRANSPORT}. */
+    /**
+     * IMAP transport. Possible value for {@link DailyMailDecoder#TRANSPORT}.
+     */
     public static final String TRANSPORT_IMAP = "imap";
 
     /** IMAPS transport (secure). Possible value for {@link DailyMailDecoder#TRANSPORT}. */
@@ -82,34 +59,42 @@ public class DailyMailDecoder implements NewswireDecoder {
     public static final String TRANSPORT_IMAP_PORT = "TRANSPORT.IMAP.PORT";
 
     /** IMAP user name. */
-    public static final String TRANSPORT_IMAP_USERNAME = "TRANSPORT.IMAP.USERNAME";
+    public static final String TRANSPORT_IMAP_USERNAME =
+            "TRANSPORT.IMAP.USERNAME";
 
     /** IMAP password. */
-    public static final String TRANSPORT_IMAP_PASSWORD = "TRANSPORT.IMAP.PASSWORD";
+    public static final String TRANSPORT_IMAP_PASSWORD =
+            "TRANSPORT.IMAP.PASSWORD";
 
     /** IMAP folder containing the newswire mails. */
-    public static final String TRANSPORT_IMAP_FOLDER_NEWSWIRE = "TRANSPORT.IMAP.FOLDER.NEWSWIRE";
+    public static final String TRANSPORT_IMAP_FOLDER_NEWSWIRE =
+            "TRANSPORT.IMAP.FOLDER.NEWSWIRE";
 
     /** IMAP folder to move the newswire once processed. */
-    public static final String TRANSPORT_IMAP_FOLDER_PROCESSED = "TRANSPORT.IMAP.FOLDER.PROCESSED";
+    public static final String TRANSPORT_IMAP_FOLDER_PROCESSED =
+            "TRANSPORT.IMAP.FOLDER.PROCESSED";
 
     /** Should IMAP mails be deleted after being processed or moved to the processed directory. */
-    public static final String TRANSPORT_IMAP_DELETE_PROCESSED = "TRANSPORT.IMAP.DELETE_PROCESSED";
+    public static final String TRANSPORT_IMAP_DELETE_PROCESSED =
+            "TRANSPORT.IMAP.DELETE_PROCESSED";
 
     /** Should IMAP mails be deleted after being processed or moved to the processed directory. */
     public static final String CHARSET = "Charset";
 
     private static final String SCHEDULE_FILE_PREFIX = "schedule/dm";
 
-    private static final Logger LOG = Logger.getLogger(DailyMailDecoder.class.getName());
+    private static final Logger LOG = Logger.getLogger(DailyMailDecoder.class.
+            getName());
 
-    private ResourceBundle pluginMessages = ResourceBundle.getBundle("dk.i2m.converge.plugins.decoders.dailymail.Messages");
+    private ResourceBundle bundle = ResourceBundle.getBundle(
+            "dk.i2m.converge.plugins.decoders.dailymail.Messages");
 
     private Map<String, String> availableProperties = null;
 
     private Map<String, String> properties = null;
 
-    private Calendar releaseDate = new GregorianCalendar(2011, Calendar.APRIL, 27, 7, 00);
+    private Calendar releaseDate = new GregorianCalendar(2011, Calendar.APRIL,
+            27, 7, 00);
 
     private PluginContext pluginContext;
 
@@ -123,17 +108,17 @@ public class DailyMailDecoder implements NewswireDecoder {
 
     @Override
     public String getName() {
-        return pluginMessages.getString("PLUGIN_NAME");
+        return bundle.getString("PLUGIN_NAME");
     }
 
     @Override
     public String getDescription() {
-        return pluginMessages.getString("PLUGIN_DESCRIPTION");
+        return bundle.getString("PLUGIN_DESCRIPTION");
     }
 
     @Override
     public String getVendor() {
-        return pluginMessages.getString("PLUGIN_VENDOR");
+        return bundle.getString("PLUGIN_VENDOR");
     }
 
     @Override
@@ -142,29 +127,48 @@ public class DailyMailDecoder implements NewswireDecoder {
     }
 
     @Override
+    public ResourceBundle getBundle() {
+        return bundle;
+    }
+
+    @Override
+    public String getAbout() {
+        return bundle.getString("PLUGIN_ABOUT");
+    }
+
+    @Override
     public Map<String, String> getAvailableProperties() {
         if (availableProperties == null) {
             availableProperties = new LinkedHashMap<String, String>();
-            availableProperties.put(pluginMessages.getString("PROPERTY_TRANSPORT"), TRANSPORT);
-            availableProperties.put(pluginMessages.getString("PROPERTY_IMAP_SERVER"), TRANSPORT_IMAP_SERVER);
-            availableProperties.put(pluginMessages.getString("PROPERTY_IMAP_PORT"), TRANSPORT_IMAP_PORT);
-            availableProperties.put(pluginMessages.getString("PROPERTY_IMAP_USERNAME"), TRANSPORT_IMAP_USERNAME);
-            availableProperties.put(pluginMessages.getString("PROPERTY_IMAP_PASSWORD"), TRANSPORT_IMAP_PASSWORD);
-            availableProperties.put(pluginMessages.getString("PROPERTY_IMAP_FOLDER_NEWSWIRE"), TRANSPORT_IMAP_FOLDER_NEWSWIRE);
-            availableProperties.put(pluginMessages.getString("PROPERTY_IMAP_FOLDER_PROCESSED"), TRANSPORT_IMAP_FOLDER_PROCESSED);
-            availableProperties.put(pluginMessages.getString("PROPERTY_IMAP_DELETE_PROCESSED"), TRANSPORT_IMAP_DELETE_PROCESSED);
-            availableProperties.put(CHARSET, CHARSET);
+            availableProperties.put(bundle.getString(TRANSPORT), TRANSPORT);
+            availableProperties.put(bundle.getString(TRANSPORT_IMAP_SERVER), TRANSPORT_IMAP_SERVER);
+            availableProperties.put(bundle.getString(TRANSPORT_IMAP_PORT), TRANSPORT_IMAP_PORT);
+            availableProperties.put(bundle.getString(TRANSPORT_IMAP_USERNAME), TRANSPORT_IMAP_USERNAME);
+            availableProperties.put(bundle.getString(TRANSPORT_IMAP_PASSWORD), TRANSPORT_IMAP_PASSWORD);
+            availableProperties.put(bundle.getString(
+                    TRANSPORT_IMAP_FOLDER_NEWSWIRE),
+                    TRANSPORT_IMAP_FOLDER_NEWSWIRE);
+            availableProperties.put(bundle.getString(
+                    TRANSPORT_IMAP_FOLDER_PROCESSED),
+                    TRANSPORT_IMAP_FOLDER_PROCESSED);
+            availableProperties.put(bundle.getString(
+                    TRANSPORT_IMAP_DELETE_PROCESSED),
+                    TRANSPORT_IMAP_DELETE_PROCESSED);
+            availableProperties.put(bundle.getString(CHARSET), CHARSET);
         }
         return this.availableProperties;
     }
 
     @Override
-    public List<NewswireItem> decode(PluginContext ctx, NewswireService newswire) {
-        LOG.log(Level.INFO, "Processing newswire service {0}", newswire.getSource());
+    public List<NewswireItem> decode(PluginContext ctx,
+            NewswireService newswire) {
+        LOG.log(Level.INFO, "Processing newswire service {0}", newswire.
+                getSource());
         Map<String, Calendar> filesToProcess = new HashMap<String, Calendar>();
         pluginContext = ctx;
 
-        StringBuilder workingDirectory = new StringBuilder(ctx.getWorkingDirectory());
+        StringBuilder workingDirectory = new StringBuilder(ctx.
+                getWorkingDirectory());
         workingDirectory.append(File.separator);
         workingDirectory.append("newswires");
         workingDirectory.append(File.separator);
@@ -182,15 +186,19 @@ public class DailyMailDecoder implements NewswireDecoder {
         if (properties.containsKey(TRANSPORT)) {
             String transport = properties.get(TRANSPORT);
 
-            if (transport.equalsIgnoreCase(TRANSPORT_IMAP) || transport.equalsIgnoreCase(TRANSPORT_IMAPS)) {
+            if (transport.equalsIgnoreCase(TRANSPORT_IMAP) || transport.
+                    equalsIgnoreCase(TRANSPORT_IMAPS)) {
                 String host = properties.get(TRANSPORT_IMAP_SERVER);
                 String port = properties.get(TRANSPORT_IMAP_PORT);
                 String username = properties.get(TRANSPORT_IMAP_USERNAME);
                 String password = properties.get(TRANSPORT_IMAP_PASSWORD);
-                String folder_newswire = properties.get(TRANSPORT_IMAP_FOLDER_NEWSWIRE);
-                String folder_processed = properties.get(TRANSPORT_IMAP_FOLDER_PROCESSED);
+                String folder_newswire = properties.get(
+                        TRANSPORT_IMAP_FOLDER_NEWSWIRE);
+                String folder_processed = properties.get(
+                        TRANSPORT_IMAP_FOLDER_PROCESSED);
 
-                boolean deleteAfterProcess = Boolean.parseBoolean(properties.get(TRANSPORT_IMAP_DELETE_PROCESSED));
+                boolean deleteAfterProcess = Boolean.parseBoolean(properties.
+                        get(TRANSPORT_IMAP_DELETE_PROCESSED));
 
                 Properties props = new Properties();
                 Session session = Session.getDefaultInstance(props, null);
@@ -198,7 +206,8 @@ public class DailyMailDecoder implements NewswireDecoder {
                 javax.mail.Store store;
                 try {
                     store = session.getStore(transport);
-                    store.connect(host, Integer.valueOf(port), username, password);
+                    store.connect(host, Integer.valueOf(port), username,
+                            password);
 
                     Folder folder = store.getFolder(folder_newswire);
                     folder.open(Folder.READ_WRITE);
@@ -208,12 +217,15 @@ public class DailyMailDecoder implements NewswireDecoder {
                         Calendar msgSent = Calendar.getInstance();
                         if (msg.getSentDate() != null) {
                             msgSent.setTime(msg.getSentDate());
-                            LOG.log(Level.FINEST, "Sent date was not set on the mail");
+                            LOG.log(Level.FINEST,
+                                    "Sent date was not set on the mail");
                         } else if (msg.getReceivedDate() != null) {
                             msgSent.setTime(msg.getReceivedDate());
-                            LOG.log(Level.FINEST, "Received date was not set on the mail");
+                            LOG.log(Level.FINEST,
+                                    "Received date was not set on the mail");
                         } else {
-                            LOG.log(Level.FINEST, "Using current timestamp as newswire item date");
+                            LOG.log(Level.FINEST,
+                                    "Using current timestamp as newswire item date");
                         }
 
                         Address[] recipients = msg.getFrom();
@@ -225,30 +237,39 @@ public class DailyMailDecoder implements NewswireDecoder {
                             }
                         }
 
-                        LOG.log(Level.FINE, "Processing mail from {0} with subject ''{1}''", new Object[]{fromString.toString(), msg.getSubject()});
+                        LOG.log(Level.FINE,
+                                "Processing mail from {0} with subject ''{1}''",
+                                new Object[]{fromString.toString(), msg.
+                                    getSubject()});
 
                         if (msg.getContent() instanceof Multipart) {
                             Multipart multipart = (Multipart) msg.getContent();
-                            for (String attachment : processMultipart(multipart, workingDirectory.toString())) {
+                            for (String attachment : processMultipart(
+                                    multipart, workingDirectory.toString())) {
                                 filesToProcess.put(attachment, msgSent);
                             }
                         } else {
-                            LOG.log(Level.FINE, "Mail does not contain attachments. Skipping");
+                            LOG.log(Level.FINE,
+                                    "Mail does not contain attachments. Skipping");
                         }
 
                         // Don't delete or move if nothing was found in the mail, hence the format probably wasn't recognised
                         if (!filesToProcess.isEmpty()) {
                             if (!deleteAfterProcess) {
-                                LOG.log(Level.FINE, "Copying mail to {0}", folder_processed);
-                                Folder processedFolder = store.getFolder(folder_processed);
+                                LOG.log(Level.FINE, "Copying mail to {0}",
+                                        folder_processed);
+                                Folder processedFolder = store.getFolder(
+                                        folder_processed);
                                 processedFolder.open(Folder.READ_WRITE);
-                                processedFolder.appendMessages(new Message[]{msg});
+                                processedFolder.appendMessages(new Message[]{
+                                            msg});
                                 processedFolder.close(true);
                             }
                             LOG.log(Level.FINE, "Deleting original mail");
                             msg.setFlag(Flags.Flag.DELETED, true);
                         } else {
-                            LOG.log(Level.FINE, "No Daily Mail newswire items found in mail. Mail left in folder");
+                            LOG.log(Level.FINE,
+                                    "No Daily Mail newswire items found in mail. Mail left in folder");
                         }
                     }
                     folder.close(true);
@@ -261,7 +282,8 @@ public class DailyMailDecoder implements NewswireDecoder {
                     LOG.log(Level.SEVERE, null, ex);
                 }
 
-                LOG.log(Level.FINE, "Starting to process attachments {0}", filesToProcess.size());
+                LOG.log(Level.FINE, "Starting to process attachments {0}",
+                        filesToProcess.size());
 
                 for (String file : filesToProcess.keySet()) {
                     LOG.log(Level.FINE, "Processing {0}", file);
@@ -303,7 +325,8 @@ public class DailyMailDecoder implements NewswireDecoder {
             }
         }
 
-        throw new ScheduleNotFoundException("Schedule could not be found in ZipFile '" + zf.getName());
+        throw new ScheduleNotFoundException("Schedule could not be found in ZipFile '"
+                + zf.getName());
     }
 
     /**
@@ -314,7 +337,8 @@ public class DailyMailDecoder implements NewswireDecoder {
      * @return {@link List} of decoded newswire items.
      */
     private Map<String, NewswireItem> decodeZip(String file) {
-        Map<String, NewswireItem> foundItems = new HashMap<String, NewswireItem>();
+        Map<String, NewswireItem> foundItems =
+                new HashMap<String, NewswireItem>();
         if (file.endsWith(".zip")) {
             ZipFile zf;
             try {
@@ -329,7 +353,8 @@ public class DailyMailDecoder implements NewswireDecoder {
                 }
 
             } catch (IOException ex) {
-                Logger.getLogger(DailyMailDecoder.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(DailyMailDecoder.class.getName()).log(
+                        Level.SEVERE, null, ex);
             }
         } else {
             LOG.log(Level.FINE, "{0} in not a zip file", file);
@@ -338,23 +363,32 @@ public class DailyMailDecoder implements NewswireDecoder {
         return foundItems;
     }
 
-    private List<String> processMultipart(Multipart multipart, String workingDirectory) {
+    private List<String> processMultipart(Multipart multipart,
+            String workingDirectory) {
         List<String> filesToProcess = new ArrayList<String>();
         try {
-            LOG.log(Level.FINE, "Processing {0} with {1} parts", new Object[]{multipart.getContentType(), multipart.getCount()});
+            LOG.log(Level.FINE, "Processing {0} with {1} parts",
+                    new Object[]{multipart.getContentType(), multipart.
+                        getCount()});
             for (int i = 0, n = multipart.getCount(); i < n; i++) {
                 Part part = multipart.getBodyPart(i);
 
                 if (part.getContent() instanceof Multipart) {
                     LOG.log(Level.FINE, "Part is multipart");
-                    filesToProcess.addAll(processMultipart((Multipart) part.getContent(), workingDirectory));
+                    filesToProcess.addAll(processMultipart((Multipart) part.
+                            getContent(), workingDirectory));
                 }
                 String disposition = part.getDisposition();
-                LOG.log(Level.FINE, "Disposition {0} Content Type {1}", new Object[]{disposition, part.getContentType()});
+                LOG.log(Level.FINE, "Disposition {0} Content Type {1}",
+                        new Object[]{disposition, part.getContentType()});
 
-                if ((disposition != null) && ((disposition.equals(Part.ATTACHMENT) || (disposition.equals(Part.INLINE))))) {
-                    LOG.log(Level.FINE, "Contained attachment: {0}", part.getFileName());
-                    filesToProcess.add(saveFile(workingDirectory, part.getFileName(), part.getInputStream()));
+                if ((disposition != null)
+                        && ((disposition.equals(Part.ATTACHMENT)
+                        || (disposition.equals(Part.INLINE))))) {
+                    LOG.log(Level.FINE, "Contained attachment: {0}", part.
+                            getFileName());
+                    filesToProcess.add(saveFile(workingDirectory, part.
+                            getFileName(), part.getInputStream()));
                 }
             }
 
@@ -366,9 +400,11 @@ public class DailyMailDecoder implements NewswireDecoder {
         return filesToProcess;
     }
 
-    private static String saveFile(String path, String filename, InputStream input) throws IOException {
+    private static String saveFile(String path, String filename,
+            InputStream input) throws IOException {
         if (filename == null) {
-            filename = File.createTempFile("" + Calendar.getInstance().getTimeInMillis(), ".out").getName();
+            filename = File.createTempFile("" + Calendar.getInstance().
+                    getTimeInMillis(), ".out").getName();
         } // Do no overwrite existing file
         File folder = new File(path);
         if (!folder.exists()) {
@@ -376,7 +412,8 @@ public class DailyMailDecoder implements NewswireDecoder {
             if (folder.mkdirs()) {
                 LOG.log(Level.INFO, "Temporary directory created");
             } else {
-                throw new IOException("Temporary directory COULD NOT be created");
+                throw new IOException(
+                        "Temporary directory COULD NOT be created");
             }
         }
 
@@ -412,10 +449,12 @@ public class DailyMailDecoder implements NewswireDecoder {
      * @throws ScheduleProcessingException
      *          If the schedule file could not be read and processed correctly
      */
-    private void readSchedule(Map<String, NewswireItem> scheduleContent, ZipFile file, ZipEntry entry) throws ScheduleProcessingException {
+    private void readSchedule(Map<String, NewswireItem> scheduleContent,
+            ZipFile file, ZipEntry entry) throws ScheduleProcessingException {
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new InputStreamReader(file.getInputStream(entry), charset));
+            br = new BufferedReader(new InputStreamReader(file.getInputStream(
+                    entry), charset));
 
             String line = null;
 
@@ -431,7 +470,8 @@ public class DailyMailDecoder implements NewswireDecoder {
                         if (line.trim().isEmpty()) {
                             readStatus = ScheduleRead.START;
                         } else {
-                            scheduleContent.get(itemId).addSummary(StringEscapeUtils.escapeXml(line.trim()));
+                            scheduleContent.get(itemId).addSummary(StringEscapeUtils.
+                                    escapeXml(line.trim()));
                             scheduleContent.get(itemId).addSummary(" ");
                         }
                         break;
@@ -473,15 +513,18 @@ public class DailyMailDecoder implements NewswireDecoder {
             ZipEntry ze = files.nextElement();
 
             if (foundItems.containsKey(FileUtils.getFilename(ze.getName()))) {
-                NewswireItem item = foundItems.get(FileUtils.getFilename(ze.getName()));
+                NewswireItem item = foundItems.get(FileUtils.getFilename(ze.
+                        getName()));
                 String section = FileUtils.getFolder(ze.getName());
-                item.setTitle(WordUtils.capitalizeFully(item.getTitle().toLowerCase()));
+                item.setTitle(WordUtils.capitalizeFully(item.getTitle().
+                        toLowerCase()));
                 ContentTag tag = pluginContext.findOrCreateContentTag(section);
                 item.getTags().add(tag);
 
                 BufferedReader br = null;
                 try {
-                    br = new BufferedReader(new InputStreamReader(zf.getInputStream(ze), charset));
+                    br = new BufferedReader(new InputStreamReader(zf.
+                            getInputStream(ze), charset));
                     String line = null;
                     while ((line = br.readLine()) != null) {
                         item.addContent(StringEscapeUtils.escapeXml(line));
@@ -498,7 +541,9 @@ public class DailyMailDecoder implements NewswireDecoder {
                     }
                 }
             } else {
-                LOG.log(Level.WARNING, "Ignoring {0} as it was not detected in the schedule", ze.getName());
+                LOG.log(Level.WARNING,
+                        "Ignoring {0} as it was not detected in the schedule",
+                        ze.getName());
             }
         }
     }

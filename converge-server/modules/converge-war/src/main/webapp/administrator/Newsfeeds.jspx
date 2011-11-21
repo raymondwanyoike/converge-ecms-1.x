@@ -121,7 +121,7 @@
                                 <a4j:support event="oncomplete" actionListener="#{administrator_Newsfeeds.onEmptyNewswireService}" reRender="dtNewsfeeds" />
                             </a4j:commandLink>
                         </rich:column>
-                        
+
                         <rich:column styleClass="subColumnIcon">
                             <f:facet name="header">                                
                                 <a4j:commandLink ajaxSingle="true" reRender="dtNewsfeeds" actionListener="#{administrator_Newsfeeds.onDownloadFeeds}">
@@ -157,16 +157,26 @@
                                     <h:outputText value="#{msgs.newswire_ACTIVE}:" />
                                     <h:selectBooleanCheckbox value="#{administrator_Newsfeeds.selectedNewsfeed.active}" />
 
-                                    <h:outputText value="#{msgs.newswire_DECODER}:" />
-                                    <h:selectOneMenu id="somDecoders" value="#{administrator_Newsfeeds.selectedNewsfeed.decoderClass}">
-                                        <f:selectItems value="#{common.newswireDecoders}" />
-                                        <a4j:support event="onchange" reRender="pgProperties" />
-                                    </h:selectOneMenu>
+                                    <h:outputText value="#{i18n.administrator_Newsfeeds_NEWSWIRE_DAYS_TO_KEEP}:" />
+                                    <h:inputText styleClass="text shortInput" value="#{administrator_Newsfeeds.selectedNewsfeed.daysToKeep}">
+                                        <f:convertNumber />
+                                    </h:inputText>
 
-                                    <h:outputText value="Restrict to:" />
+                                    <h:outputText value="#{i18n.administrator_Newsfeeds_NEWSWIRE_RESTRICT_TO}" />
                                     <h:selectManyListbox id="somUserRole" value="#{administrator_Newsfeeds.selectedNewsfeed.restrictedTo}" converter="#{converters.userRoleConverter}" size="8">
                                         <f:selectItems value="#{common.userRoles}" />
                                     </h:selectManyListbox>
+
+                                    <h:outputText value="#{msgs.newswire_DECODER}:" />
+                                    <h:selectOneMenu id="somDecoders" value="#{administrator_Newsfeeds.selectedNewsfeed.decoderClass}">
+                                        <f:selectItems value="#{common.newswireDecoders}" />
+                                        <a4j:support event="onchange" reRender="pgProperties, aboutDecoder" />
+                                    </h:selectOneMenu>
+
+                                    <h:outputText value="#{i18n.administrator_Newsfeeds_NEWSWIRE_ABOUT}" />
+                                    <h:panelGroup id="aboutDecoder" styleClass="pluginInstanceAbout mediumInput" layout="block">
+                                        <h:outputText value="#{administrator_Newsfeeds.selectedNewsfeed.decoder.about}" escape="false" />
+                                    </h:panelGroup>
                                 </h:panelGrid>
                             </rich:tab>
 
@@ -176,9 +186,16 @@
                                         <h:panelGrid columns="3">
                                             <h:outputText value="#{msgs.newswire_PROPERTY}:" />
                                             <h:selectOneMenu id="somDecoderProperties" value="#{administrator_Newsfeeds.selectedNewswireProperty.key}" styleClass="text mediumInput">
+                                                <f:selectItem itemLabel="#{i18n.administrator_Newsfeeds_NEWSWIRE_SELECT_PROPERTY}" />
                                                 <f:selectItems value="#{administrator_Newsfeeds.selectedNewsfeed.decoder.availableProperties}" />
+                                                <a4j:support event="onchange" reRender="colHelp" ajaxSingle="true" />
                                             </h:selectOneMenu>
-                                            <h:outputText value="&#160;" />
+                                            <h:panelGroup id="colHelp">
+                                                <c:set var="help_key" value="#{administrator_Newsfeeds.selectedNewswireProperty.key}_HELP" />
+                                                <c:set var="help_text" value="#{converge:message(administrator_Newsfeeds.selectedNewsfeed.decoder.bundle, help_key)}" />
+                                                <h:graphicImage url="#{res.HELP_ICON}" title="#{help_text}" rendered="#{help_text != ''}" />
+                                                <h:outputText value="&#160;" rendered="#{help_text == ''}" />
+                                            </h:panelGroup>
 
                                             <h:outputText value="#{msgs.newswire_PROPERTY_VALUE}:" />
                                             <h:inputText styleClass="text mediumInput" value="#{administrator_Newsfeeds.selectedNewswireProperty.value}" />
@@ -191,14 +208,15 @@
                                             <f:facet name="header">
                                                 <h:outputText value="#{msgs.newswire_PROPERTY}" />
                                             </f:facet>
-                                            <h:outputText value="#{newswireProperty.key}" />
+                                            <c:set var="help_key" value="#{newswireProperty.key}_HELP" />
+                                            <h:outputText value="#{converge:message(administrator_Newsfeeds.selectedNewsfeed.decoder.bundle, newswireProperty.key)}" title="#{converge:message(administrator_Newsfeeds.selectedNewsfeed.decoder.bundle, help_key)}" />
                                         </rich:column>
 
                                         <rich:column>
                                             <f:facet name="header">
                                                 <h:outputText value="#{msgs.newswire_PROPERTY_VALUE}" />
                                             </f:facet>
-                                            <h:outputText value="#{newswireProperty.value}" />
+                                            <rich:inplaceInput required="true" value="#{newswireProperty.value}" viewClass="propertyInplace" viewHoverClass="propertyInplaceHover" />
                                         </rich:column>
 
                                         <rich:column styleClass="center columnIcon">

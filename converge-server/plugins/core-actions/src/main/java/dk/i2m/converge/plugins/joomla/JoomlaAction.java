@@ -1,18 +1,13 @@
 /*
- *  Copyright (C) 2010 - 2011 Interactive Media Management
- * 
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- * 
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2010 - 2011 Interactive Media Management
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.plugins.joomla;
 
@@ -40,9 +35,9 @@ import java.util.logging.Logger;
 @dk.i2m.converge.core.annotations.WorkflowAction
 public class JoomlaAction extends JoomlaPlugin implements WorkflowAction {
 
-    private static final Logger logger = Logger.getLogger(JoomlaAction.class.getName());
+    private static final Logger LOG = Logger.getLogger(JoomlaAction.class.getName());
 
-    private ResourceBundle msgs = ResourceBundle.getBundle("dk.i2m.converge.plugins.joomla.JoomlaAction");
+    private ResourceBundle bundle = ResourceBundle.getBundle("dk.i2m.converge.plugins.joomla.JoomlaAction");
 
     /**
      * Creates a new instance of {@link JoomlaAction}.
@@ -51,7 +46,8 @@ public class JoomlaAction extends JoomlaPlugin implements WorkflowAction {
     }
 
     @Override
-    public void execute(PluginContext ctx, NewsItem item, WorkflowStepAction stepAction, UserAccount user) {
+    public void execute(PluginContext ctx, NewsItem item,
+            WorkflowStepAction stepAction, UserAccount user) {
         this.properties = stepAction.getPropertiesAsMap();
         this.categoryMapping = new HashMap<String, String>();
 
@@ -65,76 +61,89 @@ public class JoomlaAction extends JoomlaPlugin implements WorkflowAction {
                     try {
                         categoryPublish.put(catMap[0], Integer.valueOf(catMap[2]));
                     } catch (NumberFormatException ex) {
-                        logger.log(Level.INFO, "Invalid category publish delay: {0}", catMap[2]);
+                        LOG.log(Level.INFO, "Invalid category publish delay: {0}", catMap[2]);
                     }
                 } else if (catMap.length == 4) {
                     categoryMapping.put(catMap[0], catMap[1]);
                     try {
                         categoryPublish.put(catMap[0], Integer.valueOf(catMap[2]));
                     } catch (NumberFormatException ex) {
-                        logger.log(Level.INFO, "Invalid category publish delay: {0}", catMap[2]);
+                        LOG.log(Level.INFO, "Invalid category publish delay: {0}", catMap[2]);
                     }
                     try {
                         categoryExpire.put(catMap[0], Integer.valueOf(catMap[3]));
                     } catch (NumberFormatException ex) {
-                        logger.log(Level.INFO, "Invalid category expire delay [{0}] for category [{1}]", new Object[]{catMap[3],catMap[0]});
+                        LOG.log(Level.INFO, "Invalid category expire delay [{0}] for category [{1}]", new Object[]{catMap[3], catMap[0]});
                     }
                 } else {
-                    logger.log(Level.INFO, "Invalid category mapping: {0}", prop.getValue());
+                    LOG.log(Level.INFO, "Invalid category mapping: {0}", prop.getValue());
                 }
-            } else if (prop.getKey().equalsIgnoreCase(PROPERTY_CATEGORY_IMAGE_RESIZE)) {
+            } else if (prop.getKey().equalsIgnoreCase(
+                    PROPERTY_CATEGORY_IMAGE_RESIZE)) {
 
                 String[] imgCat = prop.getValue().split(";");
                 if (imgCat.length == 4) {
                     categoryMapping.put(imgCat[0], prop.getValue());
                 } else {
-                    logger.log(Level.INFO, "Invalid image category settings: {0}", prop.getValue());
+                    LOG.log(Level.INFO,
+                            "Invalid image category settings: {0}", prop.getValue());
                 }
             }
 
         }
 
         if (!properties.containsKey(JoomlaAction.PROPERTY_URL)) {
-            logger.log(Level.WARNING, "{0} property missing from action properties", JoomlaAction.PROPERTY_URL);
+            LOG.log(Level.WARNING, "{0} property missing from action properties",
+                    JoomlaAction.PROPERTY_URL);
             return;
         }
 
         String method = "";
         if (!properties.containsKey(JoomlaAction.PROPERTY_METHOD)) {
-            logger.log(Level.WARNING, "{0} property missing from action properties", JoomlaAction.PROPERTY_METHOD);
+            LOG.log(Level.WARNING, "{0} property missing from action properties",
+                    JoomlaAction.PROPERTY_METHOD);
             return;
         } else {
             method = properties.get(JoomlaAction.PROPERTY_METHOD);
         }
 
         if (!properties.containsKey(JoomlaAction.PROPERTY_USERNAME)) {
-            logger.log(Level.WARNING, "{0} property missing from action properties", JoomlaAction.PROPERTY_USERNAME);
+            LOG.log(Level.WARNING, "{0} property missing from action properties",
+                    JoomlaAction.PROPERTY_USERNAME);
             return;
         }
 
         if (!properties.containsKey(JoomlaAction.PROPERTY_PASSWORD)) {
-            logger.log(Level.WARNING, "{0} property missing from action properties", JoomlaAction.PROPERTY_PASSWORD);
+            LOG.log(Level.WARNING, "{0} property missing from action properties",
+                    JoomlaAction.PROPERTY_PASSWORD);
             return;
         }
-        
+
         int timeout = DEFAULT_TIMEOUT;
         if (properties.containsKey(PROPERTY_XMLRPC_TIMEOUT)) {
             try {
-                timeout = Integer.valueOf(properties.get(PROPERTY_XMLRPC_TIMEOUT));
+                timeout = Integer.valueOf(properties.get(
+                        PROPERTY_XMLRPC_TIMEOUT));
             } catch (NumberFormatException ex) {
-                logger.log(Level.WARNING, "Invalid value contained in property ({0}): {1}", new Object[]{PROPERTY_XMLRPC_TIMEOUT, properties.get(PROPERTY_XMLRPC_TIMEOUT)});
+                LOG.log(Level.WARNING,
+                        "Invalid value contained in property ({0}): {1}",
+                        new Object[]{PROPERTY_XMLRPC_TIMEOUT, properties.get(
+                            PROPERTY_XMLRPC_TIMEOUT)});
             }
         }
-        
+
         int replyTimeout = DEFAULT_REPLY_TIMEOUT;
         if (properties.containsKey(PROPERTY_XMLRPC_REPLY_TIMEOUT)) {
             try {
-                replyTimeout = Integer.valueOf(properties.get(PROPERTY_XMLRPC_REPLY_TIMEOUT));
+                replyTimeout = Integer.valueOf(properties.get(
+                        PROPERTY_XMLRPC_REPLY_TIMEOUT));
             } catch (NumberFormatException ex) {
-                logger.log(Level.WARNING, "Invalid value contained in property ({0}): {1}", new Object[]{PROPERTY_XMLRPC_REPLY_TIMEOUT, properties.get(PROPERTY_XMLRPC_REPLY_TIMEOUT)});
+                LOG.log(Level.WARNING,
+                        "Invalid value contained in property ({0}): {1}",
+                        new Object[]{PROPERTY_XMLRPC_REPLY_TIMEOUT,
+                            properties.get(PROPERTY_XMLRPC_REPLY_TIMEOUT)});
             }
         }
-        
 
         JoomlaConnection connection = new JoomlaConnection();
         connection.setUrl(properties.get(JoomlaAction.PROPERTY_URL));
@@ -145,18 +154,8 @@ public class JoomlaAction extends JoomlaPlugin implements WorkflowAction {
         connection.setTimeZone(user.getTimeZone());
 
         if (!connection.isConnectionValid()) {
-            logger.log(Level.WARNING, "Connection invalid");
+            LOG.log(Level.WARNING, "Connection invalid");
             return;
-        }
-
-        // Default Width
-        if (!properties.containsKey(JoomlaAction.PROPERTY_IMAGE_RESIZE_WIDTH)) {
-            properties.put(JoomlaAction.PROPERTY_IMAGE_RESIZE_WIDTH, "640");
-        }
-
-        // Default Height
-        if (!properties.containsKey(JoomlaAction.PROPERTY_IMAGE_RESIZE_HEIGHT)) {
-            properties.put(JoomlaAction.PROPERTY_IMAGE_RESIZE_HEIGHT, "480");
         }
 
         if (method.equalsIgnoreCase(JoomlaAction.XMLRPC_METHOD_NEW_ARTICLE)) {
@@ -164,42 +163,53 @@ public class JoomlaAction extends JoomlaPlugin implements WorkflowAction {
                 try {
                     newArticle(connection, placement);
                 } catch (JoomlaActionException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage());
-                    logger.log(Level.FINE, "", ex);
+                    LOG.log(Level.SEVERE, ex.getMessage());
+                    LOG.log(Level.FINE, "", ex);
                 }
             }
-        } else if (method.equalsIgnoreCase(JoomlaAction.XMLRPC_METHOD_DELETE_ARTICLE)) {
+        } else if (method.equalsIgnoreCase(
+                JoomlaAction.XMLRPC_METHOD_DELETE_ARTICLE)) {
             try {
                 deleteArticle(connection, item);
             } catch (JoomlaActionException ex) {
-                logger.log(Level.SEVERE, ex.getMessage());
-                logger.log(Level.FINE, "", ex);
+                LOG.log(Level.SEVERE, ex.getMessage());
+                LOG.log(Level.FINE, "", ex);
             }
         }
     }
 
     @Override
     public String getName() {
-        return msgs.getString("PLUGIN_NAME");
+        return bundle.getString("PLUGIN_NAME");
+    }
+
+    @Override
+    public String getAbout() {
+        return bundle.getString("PLUGIN_ABOUT");
     }
 
     @Override
     public String getDescription() {
-        return msgs.getString("PLUGIN_DESCRIPTION");
+        return bundle.getString("PLUGIN_DESCRIPTION");
     }
 
     @Override
     public String getVendor() {
-        return msgs.getString("PLUGIN_VENDOR");
+        return bundle.getString("PLUGIN_VENDOR");
     }
 
     @Override
     public Date getDate() {
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            return format.parse(msgs.getString("PLUGIN_BUILD_TIME"));
+            return format.parse(bundle.getString("PLUGIN_BUILD_TIME"));
         } catch (Exception ex) {
             return Calendar.getInstance().getTime();
         }
+    }
+
+    @Override
+    public ResourceBundle getBundle() {
+        return bundle;
     }
 }

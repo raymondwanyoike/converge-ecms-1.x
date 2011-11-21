@@ -2,8 +2,8 @@
 
 /**
  * @package Converge API for Joomla! 1.5.x
- * @version 1.0.0
- * @copyright Copyright(c) 2010 Interactive Media Management All Rights Reserved.
+ * @version 1.0.9
+ * @copyright Copyright(c) 2010 - 2011 Interactive Media Management All Rights Reserved.
  * @license http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
  */
 // no direct access
@@ -11,7 +11,7 @@ defined('_JEXEC') or die('Restricted access');
 
 jimport('joomla.plugin.plugin');
 
-define("CONVERGE_VERSION", "1.0");
+define("CONVERGE_VERSION", "1.0.9");
 
 class plgXMLRPCConverge extends JPlugin {
 

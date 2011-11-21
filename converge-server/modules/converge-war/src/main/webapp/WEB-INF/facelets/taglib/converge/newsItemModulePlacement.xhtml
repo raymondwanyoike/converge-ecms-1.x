@@ -70,9 +70,11 @@
 
                     <rich:column styleClass="columnOneButton center">
                         <f:facet name="header">
-                            <a4j:commandButton styleClass="button smallButton" value="#{msgs.OUTLET_PLACEMENT_CHOOSE}" ajaxSingle="true" reRender="frmPlacementDialog" actionListener="#{newsItem.onNewPlacement}" oncomplete="#{rich:component('mpPlacement')}.show();" />
+                            <a4j:commandButton styleClass="button smallButton" value="#{msgs.OUTLET_PLACEMENT_CHOOSE}" ajaxSingle="true" reRender="frmPlacementDialog" actionListener="#{newsItem.onNewPlacement}" oncomplete="#{rich:component('mpPlacement')}.show();"
+                                               rendered="#{value.currentActor &amp;&amp; !value.readOnly}" />
                         </f:facet>
-                        <a4j:commandButton styleClass="button smallButton" value="#{msgs.MODIFY}" ajaxSingle="true" reRender="frmPlacementDialog" oncomplete="#{rich:component('mpPlacement')}.show();">
+                        <a4j:commandButton styleClass="button smallButton" value="#{msgs.MODIFY}" ajaxSingle="true" reRender="frmPlacementDialog" oncomplete="#{rich:component('mpPlacement')}.show();"
+                                           rendered="#{value.currentActor &amp;&amp; !value.readOnly}">
                             <f:setPropertyActionListener target="#{newsItem.selectedNewsItemPlacement}" value="#{placement}" />
                             <f:setPropertyActionListener target="#{newsItem.editionDate}" value="#{placement.edition.publicationDate.time}" />
                         </a4j:commandButton>

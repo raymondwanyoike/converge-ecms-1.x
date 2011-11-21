@@ -52,6 +52,7 @@ import javax.persistence.Temporal;
 @Entity()
 @Table(name = "media_item")
 @NamedQueries({
+    @NamedQuery(name = MediaItem.FIND_BY_CATALOGUE, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.catalogue = :catalogue ORDER BY m.id ASC"),    
     @NamedQuery(name = MediaItem.FIND_BY_STATUS, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.status = :status ORDER BY m.updated DESC"),
     @NamedQuery(name = MediaItem.FIND_BY_OWNER, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.owner = :owner ORDER BY m.id DESC"),
     @NamedQuery(name = MediaItem.FIND_CURRENT_AS_OWNER, query = "SELECT DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :mediaRepository AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.APPROVED AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.REJECTED AND m.owner = :user ORDER BY m.updated DESC"),
@@ -60,6 +61,8 @@ import javax.persistence.Temporal;
 })
 public class MediaItem implements Serializable {
 
+    public static final String FIND_BY_CATALOGUE = "MediaItem.FindByCatalogue";
+    
     public static final String FIND_BY_STATUS = "MediaItem.FindByStatus";
 
     public static final String FIND_BY_OWNER = "MediaItem.FindByOwner";
@@ -70,7 +73,7 @@ public class MediaItem implements Serializable {
 
     public static final String FIND_BY_OWNER_AND_STATUS = "MediaItem.FindByOwnerAndStatus";
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -123,7 +126,7 @@ public class MediaItem implements Serializable {
     inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "concept_id", nullable = false)})
     private List<Concept> concepts = new ArrayList<Concept>();
 
-    @OneToMany(mappedBy = "mediaItem")
+    @OneToMany(mappedBy = "mediaItem", fetch= FetchType.EAGER)
     private List<MediaItemRendition> renditions = new ArrayList<MediaItemRendition>();
 
     @javax.persistence.Version
@@ -375,6 +378,7 @@ public class MediaItem implements Serializable {
      *          given {@link Rendition}
      */
     public MediaItemRendition findRendition(String rendition) throws RenditionNotFoundException {
+        
         for (MediaItemRendition mir : getRenditions()) {
             if (mir.getRendition().getName().equalsIgnoreCase(rendition)) {
                 return mir;

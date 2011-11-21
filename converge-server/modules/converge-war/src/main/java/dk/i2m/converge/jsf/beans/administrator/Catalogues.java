@@ -1,18 +1,11 @@
 /*
- *  Copyright (C) 2010 - 2011 Interactive Media Management
- * 
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- * 
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2010 - 2011 Interactive Media Management
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.jsf.beans.administrator;
 
@@ -101,6 +94,24 @@ public class Catalogues {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "mediaitem_MEDIA_REPOSITORY_DELETED_FAILED");
         }
         this.repositories = null;
+    }
+
+    public void onActionBatchAll(ActionEvent event) {
+        for (CatalogueHookInstance instance : selectedMediaRepository.getHooks()) {
+            try {
+                catalogueFacade.executeBatchHook(instance, selectedMediaRepository.getId());
+            } catch (DataNotFoundException ex) {
+                return;
+            }
+        }
+    }
+
+    public void setActionBatch(CatalogueHookInstance instance) {
+        try {
+            catalogueFacade.executeBatchHook(instance, selectedMediaRepository.getId());
+        } catch (DataNotFoundException ex) {
+            return;
+        }
     }
 
     public DataModel getRepositories() {
@@ -260,7 +271,7 @@ public class Catalogues {
         selectedCatalogueActionProperty.setCatalogueHook(selectedCatalogueAction);
         selectedCatalogueAction.getProperties().add(selectedCatalogueActionProperty);
         selectedCatalogueActionProperty = new CatalogueHookInstanceProperty();
-        
+
         // Refresh list of properties
         this.catalogueActionProperties = null;
     }

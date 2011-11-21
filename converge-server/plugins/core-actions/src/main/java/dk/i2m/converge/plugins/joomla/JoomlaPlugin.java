@@ -1,44 +1,31 @@
 /*
  * Copyright (C) 2010 - 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.plugins.joomla;
 
-import dk.i2m.converge.core.content.catalogue.MediaItem;
-import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemActor;
 import dk.i2m.converge.core.content.NewsItemMediaAttachment;
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.content.catalogue.RenditionNotFoundException;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.utils.FileUtils;
 import dk.i2m.converge.core.utils.StringUtils;
 import dk.i2m.converge.plugins.joomla.client.JoomlaConnection;
 import dk.i2m.converge.plugins.joomla.client.JoomlaException;
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.ArrayUtils;
@@ -50,7 +37,7 @@ import org.apache.commons.lang.ArrayUtils;
  */
 public abstract class JoomlaPlugin {
 
-    private static final Logger logger = Logger.getLogger(JoomlaPlugin.class.getName());
+    private static final Logger LOG = Logger.getLogger(JoomlaPlugin.class.getName());
 
     protected static final String IMAGE_PATTERN = "<p><img class=\"caption\" src=\"{0}\" border=\"0\" alt=\"{1}\" title=\"{1}\" align=\"left\" /></p>";
 
@@ -88,10 +75,6 @@ public abstract class JoomlaPlugin {
     public static final String PROPERTY_MEDIA_TAG = "media.tag";
 
     public static final String PROPERTY_IMAGE_UPLOAD = "image.upload";
-
-    public static final String PROPERTY_IMAGE_RESIZE_WIDTH = "image.resize.width";
-
-    public static final String PROPERTY_IMAGE_RESIZE_HEIGHT = "image.resize.height";
 
     public static final String PROPERTY_CATEGORY_IMAGE_RESIZE = "category.image.resize";
 
@@ -145,30 +128,34 @@ public abstract class JoomlaPlugin {
 
     protected static final int DEFAULT_REPLY_TIMEOUT = 0;
 
+    public abstract ResourceBundle getBundle();
+
     public Map<String, String> getAvailableProperties() {
         if (availableProperties == null) {
             availableProperties = new LinkedHashMap<String, String>();
-            availableProperties.put("Joomla XML-RPC URL", PROPERTY_URL);
-            availableProperties.put("Method to execute", PROPERTY_METHOD);
-            availableProperties.put("Joomla username", PROPERTY_USERNAME);
-            availableProperties.put("Joomla password", PROPERTY_PASSWORD);
-            availableProperties.put("Category mapping (Converge Section ID;Joomla Category ID;<Delay Posting>;<Expire after>)", PROPERTY_CATEGORY_MAPPING);
-            availableProperties.put("Front page mapping", PROPERTY_FRONTPAGE_MAPPING);
-            availableProperties.put("Undisclosed author label", PROPERTY_UNDISCLOSED_AUTHOR_LABEL);
-            availableProperties.put("Post immediately (disregard edition)", PROPERTY_POST_IMMEDIATELY);
-            availableProperties.put("Expire after", PROPERTY_EXPIRE_AFTER);
-            availableProperties.put("Never expire", PROPERTY_EXPIRE_NEVER);
-            availableProperties.put("Delay posting (hours)", PROPERTY_POST_DELAY);
-            availableProperties.put("Rendition", PROPERTY_MEDIA_TAG);
-            availableProperties.put("Upload images", PROPERTY_IMAGE_UPLOAD);
-            availableProperties.put("XML-RPC service connection timeout", PROPERTY_XMLRPC_TIMEOUT);
-            availableProperties.put("XML-RPC service reply timeout", PROPERTY_XMLRPC_REPLY_TIMEOUT);
-            availableProperties.put("Image resize (width)", PROPERTY_IMAGE_RESIZE_WIDTH);
-            availableProperties.put("Image resize (height)", PROPERTY_IMAGE_RESIZE_HEIGHT);
-            availableProperties.put("Category image resize (Joomla Category ID;Rendition;Width;Height)", PROPERTY_CATEGORY_IMAGE_RESIZE);
-            availableProperties.put("Exclude media item content type", PROPERTY_EXCLUDE_MEDIA_ITEM_CONTENT_TYPE);
+            addProperty(PROPERTY_URL);
+            addProperty(PROPERTY_METHOD);
+            addProperty(PROPERTY_USERNAME);
+            addProperty(PROPERTY_PASSWORD);
+            addProperty(PROPERTY_CATEGORY_MAPPING);
+            addProperty(PROPERTY_FRONTPAGE_MAPPING);
+            addProperty(PROPERTY_UNDISCLOSED_AUTHOR_LABEL);
+            addProperty(PROPERTY_POST_IMMEDIATELY);
+            addProperty(PROPERTY_EXPIRE_AFTER);
+            addProperty(PROPERTY_EXPIRE_NEVER);
+            addProperty(PROPERTY_POST_DELAY);
+            addProperty(PROPERTY_MEDIA_TAG);
+            addProperty(PROPERTY_IMAGE_UPLOAD);
+            addProperty(PROPERTY_XMLRPC_TIMEOUT);
+            addProperty(PROPERTY_XMLRPC_REPLY_TIMEOUT);
+            addProperty(PROPERTY_CATEGORY_IMAGE_RESIZE);
+            addProperty(PROPERTY_EXCLUDE_MEDIA_ITEM_CONTENT_TYPE);
         }
         return availableProperties;
+    }
+
+    private void addProperty(String key) {
+        availableProperties.put(getBundle().getString(key), key);
     }
 
     /**
@@ -191,7 +178,7 @@ public abstract class JoomlaPlugin {
                 try {
                     return joomlaCategories.containsKey(Integer.valueOf(catId));
                 } catch (Exception ex) {
-                    logger.log(Level.WARNING, ex.getMessage(), ex);
+                    LOG.log(Level.WARNING, ex.getMessage(), ex);
                     return false;
                 }
             } else {
@@ -204,7 +191,7 @@ public abstract class JoomlaPlugin {
             try {
                 return joomlaCategories.containsKey(Integer.valueOf(catId));
             } catch (Exception ex) {
-                logger.log(Level.WARNING, ex.getMessage(), ex);
+                LOG.log(Level.WARNING, ex.getMessage(), ex);
                 return false;
             }
         } else {
@@ -409,7 +396,7 @@ public abstract class JoomlaPlugin {
         try {
             this.joomlaCategories = connection.listCategories();
         } catch (JoomlaException ex) {
-            logger.log(Level.WARNING, "Could not fetch Joomla categories", ex);
+            LOG.log(Level.WARNING, "Could not fetch Joomla categories", ex);
         }
     }
 
@@ -437,19 +424,19 @@ public abstract class JoomlaPlugin {
 
             List<UploadedMediaFile> mediaFiles = new ArrayList<UploadedMediaFile>();
             if (imageUpload) {
-                logger.log(Level.INFO, "Uploading media files for news item #{0}", new Object[]{newsItem.getId()});
+                LOG.log(Level.INFO, "Uploading media files for news item #{0}", new Object[]{newsItem.getId()});
                 mediaFiles = uploadMediaItems(connection, newsItem, joomlaCategoryId);
             }
 
             Date publishDate = generatePublishDate(placement);
             Date expireDate = generateExpireDate(placement);
 
-            logger.log(Level.INFO, "Original publish date for {0} set to {1}", new Object[]{newsItem.getId(), dateFormat.format(placement.getEdition().getPublicationDate().getTime())});
-            logger.log(Level.INFO, "Publish date for {0} set to {1}", new Object[]{newsItem.getId(), dateFormat.format(publishDate.getTime())});
+            LOG.log(Level.INFO, "Original publish date for {0} set to {1}", new Object[]{newsItem.getId(), dateFormat.format(placement.getEdition().getPublicationDate().getTime())});
+            LOG.log(Level.INFO, "Publish date for {0} set to {1}", new Object[]{newsItem.getId(), dateFormat.format(publishDate.getTime())});
             if (expireDate != null) {
-                logger.log(Level.INFO, "Expire date for {0} set to {1}", new Object[]{newsItem.getId(), dateFormat.format(expireDate.getTime())});
+                LOG.log(Level.INFO, "Expire date for {0} set to {1}", new Object[]{newsItem.getId(), dateFormat.format(expireDate.getTime())});
             } else {
-                logger.log(Level.INFO, "Expire date for {0} set to {1}", new Object[]{newsItem.getId(), "null"});
+                LOG.log(Level.INFO, "Expire date for {0} set to {1}", new Object[]{newsItem.getId(), "null"});
             }
 
             Integer foreignId = connection.newArticle(String.valueOf(newsItem.getId()),
@@ -461,9 +448,9 @@ public abstract class JoomlaPlugin {
                     publishDate, expireDate);
 
             if (foreignId != null) {
-                logger.log(Level.INFO, "News item #{0} created or updated in Joomla with article id #{1}", new Object[]{newsItem.getId(), foreignId});
+                LOG.log(Level.INFO, "News item #{0} created or updated in Joomla with article id #{1}", new Object[]{newsItem.getId(), foreignId});
             } else {
-                logger.log(Level.WARNING, "Foreign key was not received from Converge Joomla API");
+                LOG.log(Level.WARNING, "Foreign key was not received from Converge Joomla API");
             }
 
         } catch (JoomlaException ex) {
@@ -473,7 +460,7 @@ public abstract class JoomlaPlugin {
 
     protected void deleteArticle(JoomlaConnection connection, NewsItem newsItem) throws JoomlaActionException {
         try {
-            logger.log(Level.INFO, "Deleting news item #{0} from Joomla", new Object[]{newsItem.getId()});
+            LOG.log(Level.INFO, "Deleting news item #{0} from Joomla", new Object[]{newsItem.getId()});
             connection.deleteArticle(String.valueOf(newsItem.getId()));
         } catch (JoomlaException ex) {
             throw new JoomlaActionException(ex);
@@ -481,30 +468,10 @@ public abstract class JoomlaPlugin {
     }
 
     protected List<UploadedMediaFile> uploadMediaItems(JoomlaConnection connection, NewsItem newsItem, String joomlaCategoryId) {
-        String mediaLabel = properties.get(PROPERTY_MEDIA_TAG);
+        String renditionName = properties.get(PROPERTY_MEDIA_TAG);
         String[] excludeContentTypes = new String[]{};
         if (properties.containsKey(PROPERTY_EXCLUDE_MEDIA_ITEM_CONTENT_TYPE)) {
             excludeContentTypes = properties.get(PROPERTY_EXCLUDE_MEDIA_ITEM_CONTENT_TYPE).split(";");
-        }
-
-        // Read image width resize parameter from the plug-in properties
-        int imgWidth = 640;
-        if (properties.containsKey(PROPERTY_IMAGE_RESIZE_WIDTH)) {
-            try {
-                imgWidth = Integer.valueOf(properties.get(PROPERTY_IMAGE_RESIZE_WIDTH));
-            } catch (NumberFormatException ex) {
-                logger.log(Level.WARNING, "Invalid value contained in property ({0}): {1}", new Object[]{PROPERTY_IMAGE_RESIZE_WIDTH, properties.get(PROPERTY_IMAGE_RESIZE_WIDTH)});
-            }
-        }
-
-        // Read image height resize parameter from the plug-in properties
-        int imgHeight = 480;
-        if (properties.containsKey(PROPERTY_IMAGE_RESIZE_HEIGHT)) {
-            try {
-                imgHeight = Integer.valueOf(properties.get(PROPERTY_IMAGE_RESIZE_HEIGHT));
-            } catch (NumberFormatException ex) {
-                logger.log(Level.WARNING, "Invalid value contained in property ({0}): {1}", new Object[]{PROPERTY_IMAGE_RESIZE_HEIGHT, properties.get(PROPERTY_IMAGE_RESIZE_HEIGHT)});
-            }
         }
 
         MediaItemRendition webVersion = null;
@@ -520,33 +487,35 @@ public abstract class JoomlaPlugin {
 
             // Check if there is a category setting for this media item
             if (this.categoryImageMapping.containsKey(joomlaCategoryId)) {
-                logger.log(Level.FINE, "Special settings for Joomla Category {0}", new Object[]{joomlaCategoryId});
+                LOG.log(Level.FINE, "Special settings for Joomla Category {0}", new Object[]{joomlaCategoryId});
                 String imgCat = this.categoryImageMapping.get(joomlaCategoryId);
                 String[] imgCatSettings = imgCat.split(";");
-                mediaLabel = imgCatSettings[1];
+                renditionName = imgCatSettings[1];
             }
 
             // Check if a rendition of the image exist
+            String renditionFile = "";
             try {
-                webVersion = item.findRendition(mediaLabel);
+                webVersion = item.findRendition(renditionName);
 
                 // Check if the file should be excluded
                 if (ArrayUtils.contains(excludeContentTypes, webVersion.getContentType())) {
-                    logger.log(Level.FINE, "Ignoring media item #{0} with content type {1}", new Object[]{item.getId(), webVersion.getContentType()});
+                    LOG.log(Level.FINE, "Ignoring media item #{0} with content type {1}", new Object[]{item.getId(), webVersion.getContentType()});
                     continue;
                 }
 
                 String filename = newsItem.getId() + "-" + webVersion.getId() + "." + webVersion.getExtension();
-                byte[] filedata = FileUtils.getBytes(new File(webVersion.getAbsoluteFilename()));
+                renditionFile = webVersion.getAbsoluteFilename();
+                byte[] filedata = FileUtils.getBytes(new URL(renditionFile));
                 String webImgLocation = connection.uploadMediaFile(String.valueOf(newsItem.getId()), filename, filedata);
                 uploadedImages.add(new UploadedMediaFile(webImgLocation, attachment.getCaption()));
 
             } catch (RenditionNotFoundException ex) {
-                logger.log(Level.WARNING, "Rendition ({0}) missing for Media Item #{1}. Ignoring Media Item.", new Object[]{mediaLabel, item.getId()});
+                LOG.log(Level.WARNING, "Rendition ({0}) missing for Media Item #{1}. Ignoring Media Item.", new Object[]{renditionName, item.getId()});
             } catch (IOException ex) {
-                logger.log(Level.WARNING, "Rendition ({0}) could not be retrieved for Media Item #{1}. Ignoring Media Item.", new Object[]{mediaLabel, item.getId()});
+                LOG.log(Level.WARNING, "Rendition ({0} / {2}) could not be retrieved for Media Item #{1}. Ignoring Media Item.", new Object[]{renditionName, item.getId(), renditionFile});
             } catch (JoomlaException ex) {
-                logger.log(Level.WARNING, "Could not upload media file to Joomla", ex);
+                LOG.log(Level.WARNING, "Could not upload media file to Joomla", ex);
             }
         }
 

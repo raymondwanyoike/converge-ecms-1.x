@@ -277,7 +277,33 @@ public class NewswireServiceBean implements NewswireServiceLocal {
         List<NewswireService> services = daoService.findWithNamedQuery(NewswireService.FIND_BY_STATUS, parameters);
 
         for (NewswireService service : services) {
+            deleteExpiredItems(service.getId(), solrServer);
             fetchNewswire(service.getId(), solrServer);
+        }
+    }
+    
+    private void deleteExpiredItems(Long newswireServiceId, SolrServer solrServer) {
+        Long taskId = 0L;
+        try {
+            NewswireService service = daoService.findById(NewswireService.class, newswireServiceId);
+            taskId = systemFacade.createBackgroundTask("Expiring items from newswire service " + service.getSource());
+            List<NewswireItem> expired = service.getExpiredItems();
+
+            for (NewswireItem newswireItem : expired) {
+                try {
+                    solrServer.deleteById(String.valueOf(newswireItem.getId()));
+                    daoService.delete(NewswireItem.class, newswireItem.getId());
+                } catch (SolrServerException ex) {
+                    LOG.log(Level.SEVERE, "Could not remove newswire item #{0} from index. {1} ", new Object[]{newswireItem.getId(), ex.getMessage()});
+                } catch (IOException ex) {
+                    LOG.log(Level.SEVERE, "Could not remove newswire item #{0} from index. {1} ", new Object[]{newswireItem.getId(), ex.getMessage()});
+                }
+            }
+
+        } catch (DataNotFoundException ex) {
+            LOG.log(Level.WARNING, ex.getMessage());
+        } finally {
+            systemFacade.removeBackgroundTask(taskId);
         }
     }
 
@@ -286,7 +312,6 @@ public class NewswireServiceBean implements NewswireServiceLocal {
         try {
             NewswireService service = daoService.findById(NewswireService.class, newswireServiceId);
             taskId = systemFacade.createBackgroundTask("Downloading newswire service " + service.getSource());
-            LOG.log(Level.INFO, "Newswire Service {0}", service.getSource());
             NewswireDecoder decoder = service.getDecoder();
 
             List<NewswireItem> items = decoder.decode(pluginContext, service);

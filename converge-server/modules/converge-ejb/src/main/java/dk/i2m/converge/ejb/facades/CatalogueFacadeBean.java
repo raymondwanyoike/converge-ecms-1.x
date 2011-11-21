@@ -1,30 +1,17 @@
 /*
  * Copyright (C) 2010 - 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.core.content.catalogue.MediaItem;
-import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
-import dk.i2m.converge.core.content.catalogue.MediaItemUsage;
-import dk.i2m.converge.core.content.catalogue.Rendition;
-import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.NewsItemMediaAttachment;
 import dk.i2m.converge.core.content.NewsItemPlacement;
-import dk.i2m.converge.core.content.catalogue.CatalogueHookInstance;
-import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
+import dk.i2m.converge.core.content.catalogue.*;
 import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.newswire.NewswireItemAttachment;
 import dk.i2m.converge.core.plugin.CatalogueEvent;
@@ -33,27 +20,14 @@ import dk.i2m.converge.core.plugin.CatalogueHook;
 import dk.i2m.converge.core.search.QueueEntryOperation;
 import dk.i2m.converge.core.search.QueueEntryType;
 import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.core.utils.HttpUtils;
 import dk.i2m.converge.core.utils.StringUtils;
-import dk.i2m.converge.ejb.services.DaoServiceLocal;
-import dk.i2m.converge.ejb.services.InvalidMediaRepositoryException;
-import dk.i2m.converge.ejb.services.MediaRepositoryIndexingException;
-import dk.i2m.converge.ejb.services.QueryBuilder;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
-import dk.i2m.converge.ejb.services.MetaDataServiceLocal;
-import dk.i2m.converge.ejb.services.PluginContextBeanLocal;
+import dk.i2m.converge.ejb.services.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
@@ -63,8 +37,7 @@ import javax.ejb.Stateless;
 import org.apache.commons.io.FilenameUtils;
 
 /**
- * Stateless enterprise java bean providing a facade for interacting with
- * catalogues.
+ * Stateless enterprise java bean providing a facade for interacting with catalogues.
  *
  * @author Allan Lykke Christensen
  */
@@ -82,6 +55,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     @EJB private PluginContextBeanLocal pluginContext;
 
     @EJB private MetaDataServiceLocal metaDataService;
+
+    @EJB private SystemFacadeLocal systemFacade;
 
     @Resource private SessionContext ctx;
 
@@ -211,7 +186,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     @Override
     public Rendition findRenditionByName(String name) throws DataNotFoundException {
         Map<String, Object> params = QueryBuilder.with("name", name).parameters();
-        
+
         List<Rendition> results = daoService.findWithNamedQuery(Rendition.FIND_BY_NAME, params, 1);
         if (results.isEmpty()) {
             throw new DataNotFoundException();
@@ -259,11 +234,11 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
         // Remove path from filename if file was uploaded from Windows
         String originalExtension = FilenameUtils.getExtension(filename);
-        
+
         StringBuilder realFilename = new StringBuilder();
         realFilename.append(rendition.getId()).append(".");
         realFilename.append(originalExtension);
-        
+
         // Set-up the media item rendition
         MediaItemRendition mediaItemRendition = new MediaItemRendition();
         mediaItemRendition.setMediaItem(item);
@@ -271,10 +246,10 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         mediaItemRendition.setSize(file.length());
         mediaItemRendition.setContentType(contentType);
         mediaItemRendition.setRendition(rendition);
-        
+
         // Store file and set path
         String path = archive(file, catalogue, mediaItemRendition);
-        
+
         // Load meta data into the rendition
         fillWithMetadata(mediaItemRendition);
 
@@ -297,6 +272,46 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     }
 
     @Override
+    public void executeBatchHook(CatalogueHookInstance hookInstance, Long catalogueId) throws DataNotFoundException {
+        LOG.log(Level.INFO, "Executing Batch Hook");
+        CatalogueHook hook;
+        try {
+            hook = hookInstance.getHook();
+        } catch (CatalogueEventException ex) {
+            LOG.log(Level.SEVERE, "Could not instantiate hook", ex);
+            return;
+        }
+
+        if (!hook.isSupportBatch()) {
+            LOG.log(Level.INFO, "{0} doesn''t support batch execution", hook.getName());
+            return;
+        }
+
+        Long taskId = systemFacade.createBackgroundTask("Batch hook " + hookInstance.getLabel() + " (" + hook.getName() + ")");
+
+        Catalogue catalogue = findCatalogueById(catalogueId);
+        Map<String, Object> params = QueryBuilder.with("catalogue", catalogue).parameters();
+        List<MediaItem> mediaItems = daoService.findWithNamedQuery(MediaItem.FIND_BY_CATALOGUE, params);
+
+        for (MediaItem item : mediaItems) {
+            LOG.log(Level.INFO, "Executing Batch Hook for Media Item #" + item.getId());
+            Long innerTaskId = systemFacade.createBackgroundTask("Executing " + hookInstance.getLabel() + " for Media Item #" + item.getId());
+            for (MediaItemRendition mir : item.getRenditions()) {
+                CatalogueEvent event = new CatalogueEvent(CatalogueEvent.Event.UpdateRendition, item, mir);
+                try {
+                    hook.execute(pluginContext, event, hookInstance);
+                } catch (CatalogueEventException ex) {
+                    LOG.log(Level.WARNING, ex.getMessage());
+                    LOG.log(Level.FINE, "Could not execute hook", ex);
+                }
+            }
+            systemFacade.removeBackgroundTask(innerTaskId);
+        }
+
+        systemFacade.removeBackgroundTask(taskId);
+    }
+
+    @Override
     public MediaItemRendition update(File file, String filename, String contentType, MediaItemRendition mediaItemRendition) throws IOException {
         Catalogue catalogue = mediaItemRendition.getMediaItem().getCatalogue();
 
@@ -309,10 +324,10 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         mediaItemRendition.setFilename(realFilename.toString());
         mediaItemRendition.setSize(file.length());
         mediaItemRendition.setContentType(contentType);
-        
+
         // Store file
         String path = archive(file, catalogue, mediaItemRendition);
-       
+
         fillWithMetadata(mediaItemRendition);
 
         // Execute hooks
@@ -668,7 +683,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         copyFile(file, mediaFile);
 
         rendition.setPath(cataloguePath.toString());
-        
+
         return cataloguePath.toString();
     }
 

@@ -16,13 +16,9 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.ejb.services.DataNotFoundException;
-import dk.i2m.converge.core.workflow.Workflow;
-import dk.i2m.converge.core.workflow.WorkflowState;
-import dk.i2m.converge.core.workflow.WorkflowStep;
-import dk.i2m.converge.core.workflow.WorkflowStepAction;
-import dk.i2m.converge.core.workflow.WorkflowStepValidator;
+import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
+import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.QueryBuilder;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +37,7 @@ import javax.ejb.Stateless;
 @Stateless
 public class WorkflowFacadeBean implements WorkflowFacadeLocal {
 
-    private static final Logger log = Logger.getLogger(WorkflowFacadeBean.class.getName());
+    private static final Logger LOG = Logger.getLogger(WorkflowFacadeBean.class.getName());
 
     @EJB private DaoServiceLocal daoService;
 
@@ -72,7 +68,7 @@ public class WorkflowFacadeBean implements WorkflowFacadeLocal {
             Map params = QueryBuilder.with("workflow", wf).parameters();
             states = daoService.findWithNamedQuery(WorkflowState.FIND_BY_WORKFLOW, params);
         } catch (DataNotFoundException ex) {
-            log.log(Level.WARNING, "Couldn't find workflow", ex);
+            LOG.log(Level.WARNING, "Couldn't find workflow", ex);
             states = new ArrayList<WorkflowState>();
         }
 
@@ -143,7 +139,7 @@ public class WorkflowFacadeBean implements WorkflowFacadeLocal {
 
             steps = daoService.findWithNamedQuery(WorkflowStep.FIND_BY_WORKFLOW_STATE, params);
         } catch (DataNotFoundException ex) {
-            log.log(Level.WARNING, "Could not find workflow state", ex);
+            LOG.log(Level.WARNING, "Could not find workflow state", ex);
             steps = new ArrayList<WorkflowStep>();
         }
         return steps;

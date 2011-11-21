@@ -483,63 +483,78 @@
 
 
             <h:form id="frmOutletEventDetails">
+
                 <rich:modalPanel id="mpOutletEventDetails" autosized="true" domElementAttachment="parent" rendered="#{administrator_Outlets.selectedOutletEditionAction != null}">
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="Event Details" />
+                            <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgOutletEventDetails">
-
                         <rich:tabPanel id="tpOutletEventDetails" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive" selectedTab="#{administrator_Outlets.selectedOutletEditionDetailsTab}">
-                            <rich:tab id="tabOutletEvent" label="Event">
+                            <rich:tab id="tabOutletEvent" label="#{i18n.administrator_Outlets_EDITION_ACTION_ACTION}">
                                 <h:panelGrid columns="2" columnClasses="dialogueFieldLabel nowrap, dialogueFieldValue" styleClass="dialogue">
-                                    <h:outputText value="Label:" />
+                                    <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_LABEL}" />
                                     <h:inputText styleClass="text mediumInput" value="#{administrator_Outlets.selectedOutletEditionAction.label}" />
 
-                                    <h:outputText value="Manual:" />
+                                    <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_MANUAL}" />
                                     <h:selectBooleanCheckbox value="#{administrator_Outlets.selectedOutletEditionAction.manualAction}" />
 
-                                    <h:outputText value="Order of execution:" />
+                                    <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_ORDER_OF_EXECUTION}" />
                                     <rich:inputNumberSpinner id="insExecutionOrder" value="#{administrator_Outlets.selectedOutletEditionAction.executeOrder}" disableBrowserAutoComplete="true" enableManualInput="true" minValue="1" step="1" required="true" requiredMessage="#{msgs.workflows_WORKFLOW_STEP_ACTION_EXECUTION_ORDER_REQUIRED}" />
 
-                                    <h:outputText value="Type:" />
+                                    <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_TYPE}" />
                                     <h:selectOneMenu id="somActions" value="#{administrator_Outlets.selectedOutletEditionAction.actionClass}">
                                         <f:selectItems value="#{common.outletActions}" />
-                                        <a4j:support event="onchange" reRender="pgActionProperties" />
+                                        <a4j:support event="onchange" reRender="pgActionProperties, aboutAction" />
                                     </h:selectOneMenu>
+                                    
+                                    <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_ABOUT}" />
+                                    <h:panelGroup id="aboutAction" styleClass="pluginInstanceAbout mediumInput" layout="block">
+                                        <h:outputText value="#{administrator_Outlets.selectedOutletEditionAction.action.about}" escape="false" />
+                                    </h:panelGroup>
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabOutletEventProperties" label="Properties">
+                            <rich:tab id="tabOutletEventProperties" label="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTIES}">
                                 <h:panelGrid id="pgActionProperties" columns="1" styleClass="dialogue">
                                     <h:column>
                                         <h:panelGrid columns="3">
-                                            <h:outputText value="Property:" />
-                                            <h:selectOneMenu id="somActionProperties" value="#{administrator_Outlets.selectedOutletEditionActionProperty.key}" styleClass="text mediumInput">
-                                                <f:selectItems value="#{administrator_Outlets.selectedOutletEditionAction.action.availableProperties}" />
-                                            </h:selectOneMenu>
-                                            <h:outputText value="&#160;" />
 
-                                            <h:outputText value="Value:" />
+                                            <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTY_INPUT}" />
+                                            <h:selectOneMenu id="somActionProperties" value="#{administrator_Outlets.selectedOutletEditionActionProperty.key}" styleClass="text mediumInput">
+                                                <f:selectItem itemLabel="#{i18n.administrator_Outlets_EDITION_ACTION_SELECT_PROPERTY}" />
+                                                <f:selectItems value="#{administrator_Outlets.selectedOutletEditionAction.action.availableProperties}" />
+                                                <a4j:support event="onchange" reRender="colHelp" />
+                                            </h:selectOneMenu>
+                                            
+                                            <h:panelGroup id="colHelp">
+                                                <c:set var="help_key" value="#{administrator_Outlets.selectedOutletEditionActionProperty.key}_HELP" />
+                                                <c:set var="help_text" value="#{converge:message(administrator_Outlets.selectedOutletEditionAction.action.bundle, help_key)}" />
+                                                <h:graphicImage url="#{res.HELP_ICON}" title="#{help_text}" rendered="#{help_text != ''}" />
+                                                <h:outputText value="&#160;" rendered="#{help_text == ''}" />
+                                            </h:panelGroup>
+                                            
+                                            <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTY_VALUE_INPUT}" />
                                             <h:inputText styleClass="text mediumInput" value="#{administrator_Outlets.selectedOutletEditionActionProperty.value}" />
-                                            <a4j:commandButton id="btnAdd" value="Add" actionListener="#{administrator_Outlets.onAddActionProperty}" reRender="pgActionProperties" styleClass="button dynamicButton" />
+                                            <a4j:commandButton id="btnAdd" value="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTY_ADD}" actionListener="#{administrator_Outlets.onAddActionProperty}" reRender="pgActionProperties" styleClass="button dynamicButton" />
                                         </h:panelGrid>
                                     </h:column>
 
                                     <rich:dataTable value="#{administrator_Outlets.outletEditionActionProperties}" var="property" styleClass="table pluginPropertiesList" headerClass="tableHeader" rowClasses="odd, even">
                                         <rich:column sortBy="#{property.key}" sortOrder="ASCENDING">
                                             <f:facet name="header">
-                                                <h:outputText value="Property" />
+                                                <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTY}" />
                                             </f:facet>
-                                            <h:outputText value="#{property.key}" />
+                                            <c:set var="help_key" value="#{property.key}_HELP" />
+                                            <h:outputText value="#{converge:message(administrator_Outlets.selectedOutletEditionAction.action.bundle, property.key)}" title="#{converge:message(administrator_Outlets.selectedOutletEditionAction.action.bundle, help_key)}" />
                                         </rich:column>
 
                                         <rich:column sortyBy="#{property.value}">
                                             <f:facet name="header">
-                                                <h:outputText value="Value" />
+                                                <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTY_VALUE}" />
                                             </f:facet>
-                                            <h:outputText value="#{property.value}" />
+                                            <rich:inplaceInput required="true" value="#{property.value}" viewClass="propertyInplace" viewHoverClass="propertyInplaceHover" />
                                         </rich:column>
 
                                         <rich:column styleClass="center columnIcon">

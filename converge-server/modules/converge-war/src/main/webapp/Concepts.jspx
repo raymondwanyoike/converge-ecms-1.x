@@ -525,7 +525,7 @@
                             <h:commandLink id="lnkCloseImportSubjects"
                                            styleClass="dialogButton"
                                            value="#{msgs.CANCEL}"
-                                           onclick="#{rich:component('mpSubjectsImport')}.hide(); return false;" />
+                                           onclick="#{rich:component('mpImport')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
                 </rich:modalPanel>

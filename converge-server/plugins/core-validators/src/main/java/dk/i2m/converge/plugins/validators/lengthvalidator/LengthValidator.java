@@ -1,18 +1,11 @@
 /*
  * Copyright (C) 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.plugins.validators.lengthvalidator;
 
@@ -23,11 +16,7 @@ import dk.i2m.converge.core.plugin.WorkflowValidatorException;
 import dk.i2m.converge.core.workflow.WorkflowStep;
 import dk.i2m.converge.core.workflow.WorkflowStepValidator;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -46,11 +35,11 @@ public class LengthValidator implements WorkflowValidator {
 
     public static final String PROPERTY_MESSAGE = "Message";
 
-    private static final Logger logger = Logger.getLogger(LengthValidator.class.getName());
+    private static final Logger LOG = Logger.getLogger(LengthValidator.class.getName());
 
     private Map<String, String> availableProperties = null;
 
-    private ResourceBundle msgs = ResourceBundle.getBundle("dk.i2m.converge.plugins.validators.lengthvalidator.Messages");
+    private ResourceBundle bundle = ResourceBundle.getBundle("dk.i2m.converge.plugins.validators.lengthvalidator.Messages");
 
     @Override
     public void execute(NewsItem item, WorkflowStep step, WorkflowStepValidator validator) throws WorkflowValidatorException {
@@ -81,7 +70,7 @@ public class LengthValidator implements WorkflowValidator {
 
         String fieldValue = "";
         try {
-            field = NewsItemField.valueOf(fieldName);
+            field = NewsItemField.valueOf(fieldName.toUpperCase());
             int length = Integer.valueOf(fieldLength);
 
             switch (field) {
@@ -129,36 +118,46 @@ public class LengthValidator implements WorkflowValidator {
     public Map<String, String> getAvailableProperties() {
         if (availableProperties == null) {
             availableProperties = new LinkedHashMap<String, String>();
-            availableProperties.put(msgs.getString(PROPERTY_FIELD), PROPERTY_FIELD);
-            availableProperties.put(msgs.getString(PROPERTY_OPERATION), PROPERTY_OPERATION);
-            availableProperties.put(msgs.getString(PROPERTY_LENGTH), PROPERTY_LENGTH);
-            availableProperties.put(msgs.getString(PROPERTY_MESSAGE), PROPERTY_MESSAGE);
+            availableProperties.put(bundle.getString(PROPERTY_FIELD), PROPERTY_FIELD);
+            availableProperties.put(bundle.getString(PROPERTY_OPERATION), PROPERTY_OPERATION);
+            availableProperties.put(bundle.getString(PROPERTY_LENGTH), PROPERTY_LENGTH);
+            availableProperties.put(bundle.getString(PROPERTY_MESSAGE), PROPERTY_MESSAGE);
         }
         return availableProperties;
     }
 
     @Override
     public String getName() {
-        return msgs.getString("PLUGIN_NAME");
+        return bundle.getString("PLUGIN_NAME");
     }
 
     @Override
     public String getDescription() {
-        return msgs.getString("PLUGIN_DESCRIPTION");
+        return bundle.getString("PLUGIN_DESCRIPTION");
     }
 
     @Override
     public String getVendor() {
-        return msgs.getString("PLUGIN_VENDOR");
+        return bundle.getString("PLUGIN_VENDOR");
     }
 
     @Override
     public Date getDate() {
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            return format.parse(msgs.getString("PLUGIN_BUILD_TIME"));
+            return format.parse(bundle.getString("PLUGIN_BUILD_TIME"));
         } catch (Exception ex) {
             return Calendar.getInstance().getTime();
         }
+    }
+
+    @Override
+    public ResourceBundle getBundle() {
+        return bundle;
+    }
+
+    @Override
+    public String getAbout() {
+        return bundle.getString("PLUGIN_ABOUT");
     }
 }

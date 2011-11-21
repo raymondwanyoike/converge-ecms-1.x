@@ -1,18 +1,11 @@
 /*
  * Copyright (C) 2010 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.jsf.beans.administrator;
 
@@ -43,7 +36,8 @@ import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 
 /**
- * Managed backing bean for <code>/administrator/Workflows.jspx</code>.
+ * Managed backing bean for
+ * <code>/administrator/Workflows.jspx</code>.
  *
  * @author Allan Lykke Christensen
  */
@@ -598,15 +592,19 @@ public class Workflows extends BaseBean {
     }
 
     public void onAddWorkflowStepActionProperty(ActionEvent event) {
-        selectedWorkflowStepActionProperty.setWorkflowStepAction(selectedWorkflowStepAction);
-        selectedWorkflowStepAction.getProperties().add(selectedWorkflowStepActionProperty);
-        selectedWorkflowStepActionProperty = new WorkflowStepActionProperty();
+        if (selectedWorkflowStepActionProperty.getKey() != null) {
+            selectedWorkflowStepActionProperty.setWorkflowStepAction(selectedWorkflowStepAction);
+            selectedWorkflowStepAction.getProperties().add(selectedWorkflowStepActionProperty);
+            selectedWorkflowStepActionProperty = new WorkflowStepActionProperty();
+        }
     }
 
     public void onAddWorkflowStepValidatorProperty(ActionEvent event) {
-        selectedWorkflowStepValidatorProperty.setWorkflowStepValidator(selectedWorkflowStepValidator);
-        selectedWorkflowStepValidator.getProperties().add(selectedWorkflowStepValidatorProperty);
-        selectedWorkflowStepValidatorProperty = new WorkflowStepValidatorProperty();
+        if (selectedWorkflowStepValidatorProperty.getKey() != null) {
+            selectedWorkflowStepValidatorProperty.setWorkflowStepValidator(selectedWorkflowStepValidator);
+            selectedWorkflowStepValidator.getProperties().add(selectedWorkflowStepValidatorProperty);
+            selectedWorkflowStepValidatorProperty = new WorkflowStepValidatorProperty();
+        }
     }
 
     public void onSaveWorkflowStepAction(ActionEvent event) {

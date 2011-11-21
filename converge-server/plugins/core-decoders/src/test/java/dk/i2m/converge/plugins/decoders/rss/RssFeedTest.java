@@ -16,18 +16,18 @@
  */
 package dk.i2m.converge.plugins.decoders.rss;
 
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import java.util.ArrayList;
-import java.util.Iterator;
 import dk.i2m.converge.core.newswire.NewswireItem;
-import java.util.List;
-import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.newswire.NewswireServiceProperty;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import dk.i2m.converge.core.plugin.PluginContext;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;
+import org.easymock.IAnswer;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Testing the RSS decoder with a valid feed.
@@ -56,7 +56,7 @@ public class RssFeedTest {
         service.setDecoderClass(RssDecoder.class.getName());
 
         service.setSource("CNN Top News");
-        service.getProperties().add(new NewswireServiceProperty(service, RssDecoder.URL, "file:src/test/resources/dk/i2m/converge/plugins/decoders/rss/edition.rss"));
+        service.getProperties().add(new NewswireServiceProperty(service, RssDecoder.Property.URL.name(), "file:src/test/resources/dk/i2m/converge/plugins/decoders/rss/edition.rss"));
         //service.getProperties().add(new NewswireServiceProperty(service, RssDecoder.OPENCALAIS_ENABLE, "true"));
         //service.getProperties().add(new NewswireServiceProperty(service, RssDecoder.OPENCALAIS_ID, "vtptfh9uztqxy66rdp8q7sts"));
 
@@ -85,7 +85,7 @@ public class RssFeedTest {
         service.setDecoderClass(RssDecoder.class.getName());
 
         service.setSource("CNN Top News");
-        service.getProperties().add(new NewswireServiceProperty(service, RssDecoder.URL, "file:src/test/resources/notfound.rss"));
+        service.getProperties().add(new NewswireServiceProperty(service, RssDecoder.Property.URL.name(), "file:src/test/resources/notfound.rss"));
 
         List<NewswireItem> results = service.getDecoder().decode(mockCtx, service);
 

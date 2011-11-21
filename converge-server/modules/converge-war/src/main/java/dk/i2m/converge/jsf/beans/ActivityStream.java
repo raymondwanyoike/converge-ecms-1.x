@@ -20,9 +20,7 @@ import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
 import dk.i2m.jsf.JsfUtils;
-import java.io.IOException;
 import javax.ejb.EJB;
-import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
@@ -49,6 +47,11 @@ public class ActivityStream {
             total = userFacade.getNotificationCount(getUser().getUsername());
         }
         return notifications;
+    }
+    
+    public void onDismissAll(ActionEvent event) {
+        userFacade.dismiss(getUser());
+        this.notifications = null;
     }
     
     public void onCheckForUpdates(ActionEvent event) {

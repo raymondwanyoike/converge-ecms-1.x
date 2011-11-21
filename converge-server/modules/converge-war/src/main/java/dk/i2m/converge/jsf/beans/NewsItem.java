@@ -1,18 +1,11 @@
 /*
- *  Copyright (C) 2010 - 2011 Interactive Media Management
- * 
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- * 
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2010 - 2011 Interactive Media Management
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.jsf.beans;
 
@@ -57,6 +50,8 @@ import dk.i2m.converge.ejb.facades.UserFacadeLocal;
 import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.core.EnrichException;
+import dk.i2m.converge.core.search.QueueEntryOperation;
+import dk.i2m.converge.core.search.QueueEntryType;
 import dk.i2m.converge.ejb.services.MetaDataServiceLocal;
 import dk.i2m.jsf.JsfUtils;
 import java.io.IOException;
@@ -87,9 +82,7 @@ import org.richfaces.event.NodeSelectedEvent;
 import org.richfaces.event.UploadEvent;
 
 /**
- * Managed backing bean for {@code /NewsItem.jspx}. The backing bean is kept
- * alive by the JSF file. Loading a news item is done by setting the ID of the
- * item using {@link NewsItem#setId(java.lang.Long)}.
+ * Managed backing bean for {@code /NewsItem.jspx}. The backing bean is kept alive by the JSF file. Loading a news item is done by setting the ID of the item using {@link NewsItem#setId(java.lang.Long)}.
  *
  * @author Allan Lykke Christensen
  */
@@ -920,12 +913,12 @@ public class NewsItem {
             this.selectedAttachment = new NewsItemMediaAttachment();
             this.selectedAttachment.setNewsItem(selectedNewsItem);
 
-            // TODO: If an item has been indexed in the search engine, but removed from the database, this will throw a DataNotFoundException
             try {
                 this.selectedAttachment.setMediaItem(catalogueFacade.findMediaItemById(this.selectedMediaItemId));
                 this.selectedAttachment.setCaption(this.selectedAttachment.getMediaItem().getDescription());
             } catch (DataNotFoundException ex) {
-                LOG.log(Level.SEVERE, ex.getMessage());
+                LOG.log(Level.WARNING, "Media Item #" + this.selectedMediaItemId + " does not exist in the database. Schedule removal from search engine");
+                searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, this.selectedMediaItemId, QueueEntryOperation.REMOVE);
             }
         }
     }
@@ -936,8 +929,11 @@ public class NewsItem {
         this.selectedNewsItem.getMediaAttachments().add(selectedAttachment);
 
         // Update caption in MediaItem
-        this.userSubmission.setDescription(selectedAttachment.getCaption());
-        this.userSubmission = catalogueFacade.update(userSubmission);
+        if (this.userSubmission.getId() != null) {
+            this.userSubmission.setDescription(selectedAttachment.getCaption());
+            this.userSubmission.setByLine(selectedAttachment.getMediaItem().getByLine());
+            this.userSubmission = catalogueFacade.update(userSubmission);
+        }
 
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "ASSET_ATTACHED_TO_STORY");
         onPreAttachMediaFile(event);

@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.core.plugin;
 
+import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
@@ -167,4 +168,6 @@ public interface PluginContext {
     List<dk.i2m.converge.core.metadata.Concept> enrich(String story) throws EnrichException;
     
     String extractContent(MediaItemRendition mediaItemRendition);
+    
+    String getConfiguration(ConfigurationKey key);
 }

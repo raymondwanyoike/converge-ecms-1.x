@@ -8,8 +8,8 @@ ALTER TABLE catalogue ADD COLUMN original_rendition BIGINT;
 
 ALTER TABLE `media_item` CHANGE COLUMN `media_repository_id` `catalogue_id` BIGINT(20) NULL DEFAULT NULL, 
 
-INSERT INTO rendition (name, label, description) VALUES ('highRes', 'High Resolution', 'Original rendition');
-INSERT INTO rendition (name, label, description) VALUES ('thumbnail', 'Thumbnail', 'Thumbnail of original rendition');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:highRes', 'High Resolution', 'Original rendition');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:thumbnail', 'Thumbnail', 'Thumbnail of original rendition');
 
 CREATE  TABLE `media_item_rendition` (
   `id` BIGINT NOT NULL AUTO_INCREMENT ,
@@ -40,7 +40,7 @@ CREATE  TABLE `media_item_rendition` (
   PRIMARY KEY (`id`));
 
 INSERT INTO media_item_rendition (rendition_id, filename, content_type, media_item_id)
- SELECT (SELECT id FROM rendition WHERE name LIKE "highRes"), media_item.filename, media_item.contentType, media_item.id FROM media_item;
+ SELECT (SELECT id FROM rendition WHERE name LIKE "rnd:highRes"), media_item.filename, media_item.contentType, media_item.id FROM media_item;
 
 CREATE TABLE `catalogue_rendition` (
   `catalogue_id` BIGINT NOT NULL ,
@@ -121,3 +121,20 @@ CREATE TABLE `open_calais_mapping` (
 # Activity Stream
 ALTER TABLE notification ADD COLUMN link varchar(255);
 ALTER TABLE notification ADD COLUMN sender_id bigint(20);
+
+# Fix NewsML properties
+UPDATE newswire_service_property SET property_key = 'PROPERTY_NEWSWIRE_LOCATION' WHERE property_key='Location of newswires';
+UPDATE newswire_service_property SET property_key = 'PROPERTY_ATTACHMENT_CATALOGUE' WHERE property_key='Attachment catalogue';
+UPDATE newswire_service_property SET property_key = 'PROPERTY_NEWSWIRE_PROCESSED_LOCATION' WHERE property_key='Location of processed newswires';
+UPDATE newswire_service_property SET property_key = 'PROPERTY_NEWSWIRE_DELETE_AFTER_PROCESS' WHERE property_key='Delete processed newswires';
+UPDATE newswire_service_property SET property_key = 'PROPERTY_RENDITION_MAPPING' WHERE property_key='Attachment rendition mapping (converge name;attachment description)';
+
+# Fix RSS properties
+UPDATE newswire_service_property SET property_key = 'ENABLE_OPEN_CALAIS' WHERE property_key='Enable OpenCalais';
+
+# Fix URL Callback properties
+UPDATE outlet_edition_action_property SET property_key = 'TIMEOUT' WHERE property_key='Timeout';
+UPDATE outlet_edition_action_property SET property_key = 'CALLBACK_URL' WHERE property_key='Callback URL';
+
+# Expiration of newswire items
+ALTER TABLE `newswire_service` ADD COLUMN `days_to_keep` int(11) DEFAULT '0';
