@@ -1,32 +1,22 @@
 /*
  * Copyright (C) 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.ws.soap;
 
+import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.views.InboxView;
 import dk.i2m.converge.core.workflow.Edition;
-import dk.i2m.converge.ejb.facades.LockingException;
-import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
-import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
-import dk.i2m.converge.ejb.facades.NewsItemHolder;
-import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
-import dk.i2m.converge.ejb.facades.UserFacadeLocal;
-import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
+import dk.i2m.converge.core.workflow.Section;
+import dk.i2m.converge.ejb.facades.*;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ws.model.ModelConverter;
 import java.util.ArrayList;
@@ -35,13 +25,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
-import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 
 /**
- * {@link WebService} for retrieving news items. 
+ * {@link WebService} for retrieving news items.
  *
  * @author Allan Lykke Christensen
  */
@@ -57,6 +47,8 @@ public class NewsItemService {
     @EJB private OutletFacadeLocal outletFacade;
 
     @EJB private UserFacadeLocal userFacade;
+    
+    @EJB private MetaDataFacadeLocal metaDataFacade;
 
     @Resource private WebServiceContext context;
 
@@ -206,6 +198,49 @@ public class NewsItemService {
         return output;
     }
 
+    @WebMethod(operationName = "addNewsItemToEdition")
+    public void addNewsItemToEdition(@WebParam(name = "newsItemId") Long newsItemId, @WebParam(name = "editionId") Long editionId, @WebParam(name = "sectionId") Long sectionId, @WebParam(name = "start") Integer start, @WebParam(name = "position") Integer position) throws DataNotFoundException {
+        Edition edition = null;
+        NewsItem newsItem = null;
+        Section section = null;
+
+        edition = outletFacade.findEditionById(editionId);
+        newsItem = newsItemFacade.findNewsItemById(newsItemId);
+
+        try {
+            section = outletFacade.findSectionById(sectionId);
+        } catch (DataNotFoundException ex) {
+        }
+
+        NewsItemPlacement placement = new NewsItemPlacement();
+        placement.setEdition(edition);
+        placement.setNewsItem(newsItem);
+        placement.setSection(section);
+        placement.setStart(start);
+        placement.setPosition(position);
+
+        newsItemFacade.createPlacement(placement);
+    }
+
+    @WebMethod(operationName = "addConceptToNewsItem")
+    public void addConceptToNewsItem(@WebParam(name = "newsItemId") Long newsItemId, @WebParam(name = "conceptId") Long conceptId) {
+        try {
+            NewsItemHolder newsItemHolder = newsItemFacade.checkout(newsItemId);
+            
+            Concept concept = metaDataFacade.findConceptById(conceptId);
+            newsItemHolder.getNewsItem().getConcepts().add(concept);
+            //newsItemFacade.save(newsItemHolder.getNewsItem());
+            newsItemFacade.checkin(newsItemHolder.getNewsItem());
+            
+        } catch (LockingException ex) {
+            Logger.getLogger(NewsItemService.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (DataNotFoundException ex) {
+            Logger.getLogger(NewsItemService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+
+    
     /**
      * Checks out a {@link NewsItem} using its unique identifier. Upon
      * checking out the {@link NewsItem} it becomes locked for editing
@@ -307,7 +342,7 @@ public class NewsItemService {
      *          If the workflow step is illegal
      */
     @WebMethod(operationName = "step")
-    public void step(Long newsItemId, Long workflowStep, String comment) throws NewsItemNotFoundException, NewsItemWorkflowException {
+    public void step(@WebParam(name = "newsItemId") Long newsItemId, @WebParam(name = "workflowStepId") Long workflowStep, @WebParam(name = "comment") String comment) throws NewsItemNotFoundException, NewsItemWorkflowException {
 
         if (context.getUserPrincipal() == null) {
             LOG.log(Level.WARNING, "User is not authenticated");

@@ -1,18 +1,11 @@
 /*
  * Copyright (C) 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.ws.soap;
 
@@ -21,9 +14,8 @@ import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ws.model.Edition;
 import dk.i2m.converge.ws.model.ModelConverter;
-import dk.i2m.converge.ws.model.NewsItem;
 import dk.i2m.converge.ws.model.Outlet;
-import dk.i2m.converge.ws.model.Section;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -42,6 +34,36 @@ public class OutletService {
     private static final Logger LOG = Logger.getLogger(OutletService.class.getName());
 
     @EJB private OutletFacadeLocal outletFacade;
+
+    @WebMethod(operationName = "getEditions")
+    public List<dk.i2m.converge.ws.model.Edition> getEditions(@WebParam(name = "outletId") Long outletId, @WebParam(name = "date") Date date) {
+        Calendar editionDate = Calendar.getInstance();
+        editionDate.setTime(date);
+        List<dk.i2m.converge.core.workflow.Edition> editions = outletFacade.findEditionByOutletAndDate(outletId, editionDate);
+        List<Edition> outputEditions = new ArrayList<Edition>();
+
+        for (dk.i2m.converge.core.workflow.Edition edition : editions) {
+            Edition output = new Edition();
+            output.setId(edition.getId());
+            output.setCloseDate(edition.getCloseDate());
+            output.setExpirationDate(edition.getExpirationDate().getTime());
+            output.setPublicationDate(edition.getPublicationDate().getTime());
+            outputEditions.add(output);
+        }
+
+        return outputEditions;
+    }
+
+    @WebMethod(operationName = "createEdition")
+    public Edition createEdition(@WebParam(name = "outletId") Long outletId, @WebParam(name = "open") boolean open, @WebParam(name = "publicationDate") Date publicationDate, @WebParam(name = "expirationDate") Date expirationDate, @WebParam(name = "closeDate") Date closeDate) {
+        dk.i2m.converge.core.workflow.Edition edition = outletFacade.createEdition(outletId, open, publicationDate, expirationDate, closeDate);
+        Edition output = new Edition();
+        output.setId(edition.getId());
+        output.setCloseDate(edition.getCloseDate());
+        output.setExpirationDate(edition.getExpirationDate().getTime());
+        output.setPublicationDate(edition.getPublicationDate().getTime());
+        return output;
+    }
 
     /**
      * Obtains a given {@link Outlet} and its {@link Section}s.
