@@ -16,19 +16,13 @@
  */
 package dk.i2m.converge.jsf.beans;
 
-import dk.i2m.commons.StringUtils;
-import dk.i2m.converge.core.content.catalogue.MediaItem;
-import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
-import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
-import dk.i2m.converge.core.helpers.CatalogueHelper;
-import dk.i2m.converge.core.newswire.NewswireItemAttachment;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.NewswireServiceLocal;
 import dk.i2m.jsf.JsfUtils;
-import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -60,7 +54,6 @@ public class NewswireItem {
     }
 
     public void setId(Long id) {
-        LOG.log(Level.FINE, "Setting Newswire Item #{0}", id);
         this.id = id;
 
         if (selectedItem == null || (selectedItem.getId() != id)) {

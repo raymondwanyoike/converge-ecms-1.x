@@ -18,9 +18,8 @@ package dk.i2m.converge.ejb.services;
 
 import dk.i2m.converge.core.newswire.NewswireBasket;
 import dk.i2m.converge.core.newswire.NewswireItem;
-import dk.i2m.converge.core.newswire.NewswireService;
-import dk.i2m.converge.core.newswire.NewswireDecoderException;
 import dk.i2m.converge.core.newswire.NewswireItemAttachment;
+import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.domain.search.SearchResults;
 import java.util.List;
 import javax.ejb.Local;
@@ -193,5 +192,7 @@ public interface NewswireServiceLocal {
     void dispatchBaskets();
 
     NewswireItemAttachment findNewswireItemAttachmentById(Long id) throws DataNotFoundException;
+
+    void removeItem(Long id);
 
 }

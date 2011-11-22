@@ -1,18 +1,11 @@
 /*
  * Copyright 2010 - 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.ejb.services;
 
@@ -281,7 +274,7 @@ public class NewswireServiceBean implements NewswireServiceLocal {
             fetchNewswire(service.getId(), solrServer);
         }
     }
-    
+
     private void deleteExpiredItems(Long newswireServiceId, SolrServer solrServer) {
         Long taskId = 0L;
         try {
@@ -876,5 +869,25 @@ public class NewswireServiceBean implements NewswireServiceLocal {
     @Override
     public NewswireItemAttachment findNewswireItemAttachmentById(Long id) throws DataNotFoundException {
         return daoService.findById(NewswireItemAttachment.class, id);
+    }
+
+    /**
+     * Removes a given item from the newswire service and the search engine.
+     * 
+     * @param id 
+     *          Unique identifier of the newswire item
+     */
+    @Override
+    public void removeItem(Long id) {
+        daoService.delete(NewswireItem.class, id);
+        SolrServer solr = getSolrServer();
+        try {
+            solr.deleteById(String.valueOf(id));
+        } catch (SolrServerException ex) {
+            LOG.log(Level.SEVERE, "Could not remove newswire item from SolrServer", ex);
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, "Could not remove newswire item from SolrServer", ex);
+        }
+
     }
 }

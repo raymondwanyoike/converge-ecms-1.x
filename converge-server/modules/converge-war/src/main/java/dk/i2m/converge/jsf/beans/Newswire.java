@@ -323,6 +323,10 @@ public class Newswire {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Couldn't find newswire story in the database", new Object[]{});
         }
     }
+    
+    public void setRemoveItem(SearchResult searchResult) {
+        newswireService.removeItem(searchResult.getId());
+    }
 
     /**
      * Event handler for saving selected newswire subscriptions.
