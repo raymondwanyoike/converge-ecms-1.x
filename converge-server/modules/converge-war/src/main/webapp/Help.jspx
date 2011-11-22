@@ -3,26 +3,10 @@
 
     <ui:composition template="/WEB-INF/facelets/templates/help.xhtml">
 
-        <ui:define name="left">
-            <converge:moduleHeader moduleTitle="#{msgs.help_TOPICS}"  />
-            <div class="moduleContent">
-            </div>
-        </ui:define>
-
         <ui:define name="body">
-            <a4j:keepAlive beanName="help" />
-
-            <a4j:outputPanel ajaxRendered="true">
-                <v:message />
-            </a4j:outputPanel>
-
-            <h:form id="frmPage">
-                <converge:moduleHeader moduleTitle="#{help.title}" />
-                <div class="moduleContent">
-                    <converge:appInfo />
-                </div>
-            </h:form>
-
+            <iframe style="width: 100%; height: 100%;" frameBorder="0" src="http://rs1.i2m.dk/converge-help/#{common.shortApplicationVersion}/">
+            Browser not compatible
+            </iframe>
         </ui:define>
 
     </ui:composition>

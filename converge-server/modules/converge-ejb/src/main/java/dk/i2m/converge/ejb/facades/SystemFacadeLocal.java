@@ -187,4 +187,6 @@ public interface SystemFacadeLocal {
     void removeBackgroundTask(Long id);
     
     java.util.List<dk.i2m.converge.core.BackgroundTask> getBackgroundTasks();
+
+    java.lang.String getShortApplicationVersion();
 }

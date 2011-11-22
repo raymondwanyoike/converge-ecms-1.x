@@ -147,6 +147,11 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     public String getApplicationVersion() {
         return cfgService.getLongVersion();
     }
+    
+    @Override
+    public String getShortApplicationVersion() {
+        return cfgService.getVersion();
+    }
 
     /** {@inheritDoc } */
     @Override
