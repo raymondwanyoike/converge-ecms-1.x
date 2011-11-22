@@ -27,7 +27,7 @@
                     <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.ADD}" actionListener="#{newsItem.onAddConcept}" reRender="dtConcepts,mpNewConcept,txtNewConcept,sbNewConcept" oncomplete="if (#{!newsItem.conceptAdded}){ #{rich:component('mpNewConcept')}.show(); return false; }" />
                     <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.SUBJECTS}" reRender="pgConceptSelector" oncomplete="#{rich:component('mpConceptSelector')}.show();" />
                     <h:column>
-                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.NewsItem_CONCEPTS_SUGGEST}" reRender="pgConceptSuggestion" actionListener="#{newsItem.onSuggestConcepts}" onclick="document.getElementById('frmNewsItem:btnSave').click()" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpConceptSuggestion')}.show(); return false; }">
+                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.NewsItem_CONCEPTS_SUGGEST}" reRender="pgConceptSuggestion" actionListener="#{newsItem.onSuggestConcepts}" onclick="document.getElementById('frmNewsItem:btnSilentSave').click()" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpConceptSuggestion')}.show(); return false; }">
                             
                         </a4j:commandButton>
                         <a4j:status>
