@@ -1295,6 +1295,11 @@ public class NewsItem {
     }
 
     public void onSuggestConcepts(ActionEvent event) {
+        if (getSelectedNewsItem().getStory().trim().isEmpty()) {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "NewsItem_CONCEPTS_SUGGEST_FAILED_NO_STORY", null);
+            return;
+        }
+        
         try {
             List<Concept> concepts = metaDataService.enrich(StringUtils.stripHtml(getSelectedNewsItem().getStory()));
             suggestedConcepts = new LinkedHashMap<String, Concept>();
@@ -1304,6 +1309,11 @@ public class NewsItem {
                 String type = bundle.getString("Generic_" + concept.getType() + "_NAME");
                 suggestedConcepts.put(concept.getName() + " (" + type + ")", concept);
             }
+            
+            if (suggestedConcepts.isEmpty()) {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "NewsItem_CONCEPTS_SUGGEST_NO_RESULTS", null);
+            }
+            
         } catch (EnrichException ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "NewsItem_CONCEPTS_SUGGEST_FAILED", null);
         }
