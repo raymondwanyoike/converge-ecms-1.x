@@ -928,6 +928,8 @@ public class NewsItem {
         this.selectedAttachment = newsItemFacade.create(selectedAttachment);
         this.selectedNewsItem.getMediaAttachments().add(selectedAttachment);
 
+        System.out.println("Byline" + getSelectedAttachment().getMediaItem().getByLine());
+        
         // Update caption in MediaItem
         if (this.userSubmission.getId() != null) {
             this.userSubmission.setDescription(selectedAttachment.getCaption());

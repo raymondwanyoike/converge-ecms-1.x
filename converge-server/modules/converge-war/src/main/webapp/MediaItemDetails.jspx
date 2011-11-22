@@ -234,7 +234,10 @@
                             <f:facet name="header">
                                 <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
                             </f:facet>
-                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItemArchive.xhtml?id=#{usage.newsItemId}" target="_blank">
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItemArchive.xhtml?id=#{usage.newsItemId}" target="_blank" rendered="#{usage.published}">
+                                <h:graphicImage value="#{res.NEWS_ITEM_ICON}" />
+                            </h:outputLink>
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{usage.newsItemId}" target="_blank" rendered="#{!usage.published}">
                                 <h:graphicImage value="#{res.NEWS_ITEM_ICON}" />
                             </h:outputLink>
                         </rich:column>
@@ -243,7 +246,12 @@
                             <f:facet name="header">
                                 <h:outputText value="#{msgs.ID}" title="#{msgs.ARTICLE_ID_TOOLTIP}" />
                             </f:facet>
-                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItemArchive.xhtml?id=#{usage.newsItemId}" target="_blank">
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItemArchive.xhtml?id=#{usage.newsItemId}" target="_blank" rendered="#{usage.published}">
+                                <h:outputText value="#{usage.newsItemId}">
+                                    <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                                </h:outputText>
+                            </h:outputLink>
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{usage.newsItemId}" target="_blank" rendered="#{!usage.published}">
                                 <h:outputText value="#{usage.newsItemId}">
                                     <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
                                 </h:outputText>

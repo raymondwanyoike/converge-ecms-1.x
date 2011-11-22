@@ -632,6 +632,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
                     usage.setSection(placement.getSection().getFullName());
                     usage.setStart(placement.getStart());
                     usage.setPosition(placement.getPosition());
+                    usage.setPublished(!placement.getEdition().isOpen());
                     output.add(usage);
                 }
             } else {
@@ -644,6 +645,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
                 usage.setSection("");
                 usage.setStart(0);
                 usage.setPosition(0);
+                usage.setPublished(false);
                 output.add(usage);
             }
         }

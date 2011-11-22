@@ -40,10 +40,9 @@
                         jwplayer("container#{attachment.id}").setup({
                             flashplayer: "#{facesContext.externalContext.request.contextPath}/scripts/jwplayer/player.swf", 
                             file: "#{attachment.mediaItem.original.absoluteFilename}", 
-                            plugins: {
-                            sharing: { link: false }},
+                            plugins: {},
                             height: 60, 
-                            width: 480,
+                            width: 250,
                             volume: 100
                     });
                         </script>
@@ -55,9 +54,8 @@
                         jwplayer("container#{attachment.id}").setup({
                             flashplayer: "#{facesContext.externalContext.request.contextPath}/scripts/jwplayer/player.swf", 
                             file: "#{attachment.mediaItem.original.absoluteFilename}", 
-                            plugins: {
-                            sharing: { link: false }},
-                            width: 480,
+                            plugins: {},
+                            width: 250,
                             volume: 100
                     });
                         </script>

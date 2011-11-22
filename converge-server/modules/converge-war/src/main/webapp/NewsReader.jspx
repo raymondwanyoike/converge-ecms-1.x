@@ -33,18 +33,17 @@
 
                         <h:outputText value="Media" styleClass="newsReaderLabel" rendered="#{!empty placement.newsItem.mediaAttachments}" /><br/>
                         <ui:repeat value="#{placement.newsItem.mediaAttachments}" var="attachment">
-                            <h:outputLink value="#{attachment.mediaItem.absoluteFilename}" target="_blank" rendered="#{!attachment.mediaItem.video &amp;&amp; !attachment.mediaItem.audio}">
-                                <h:graphicImage url="#{attachment.mediaItem.thumbURL}" rendered="#{attachment.mediaItem.fileAttached}" />
+                            <h:outputLink value="#{attachment.mediaItem.original.absoluteFilename}" target="_blank" rendered="#{!attachment.mediaItem.original.video &amp;&amp; !attachment.mediaItem.original.audio}">
+                                <h:graphicImage url="#{attachment.mediaItem.preview.absoluteFilename}" rendered="#{attachment.mediaItem.previewAvailable}" />
                             </h:outputLink><br/>
 
-                            <h:panelGroup rendered="#{attachment.mediaItem.audio}" layout="block">
+                            <h:panelGroup rendered="#{attachment.mediaItem.original.audio}" layout="block">
                                 <div id="container#{attachment.id}">Loading the player ...</div>
                                 <script type="text/javascript"> 
                                     jwplayer("container#{attachment.id}").setup({
                                         flashplayer: "#{facesContext.externalContext.request.contextPath}/scripts/jwplayer/player.swf", 
-                                        file: "#{attachment.mediaItem.absoluteFilename}", 
-                                        plugins: {
-                                            sharing: { link: false }},
+                                        file: "#{attachment.mediaItem.original.absoluteFilename}", 
+                                        plugins: {},
                                         height: 60, 
                                         width: 300,
                                         volume: 100
@@ -52,14 +51,13 @@
                                 </script>
                             </h:panelGroup>
 
-                            <h:panelGroup rendered="#{attachment.mediaItem.video}" layout="block">
+                            <h:panelGroup rendered="#{attachment.mediaItem.original.video}" layout="block">
                                 <div id="container#{attachment.id}">Loading the player ...</div>
                                 <script type="text/javascript"> 
                                     jwplayer("container#{attachment.id}").setup({
                                         flashplayer: "#{facesContext.externalContext.request.contextPath}/scripts/jwplayer/player.swf", 
-                                        file: "#{attachment.mediaItem.absoluteFilename}", 
-                                        plugins: {
-                                            sharing: { link: false }},
+                                        file: "#{attachment.mediaItem.original.absoluteFilename}", 
+                                        plugins: {},
                                         width: 300,
                                         volume: 100
                                     });
