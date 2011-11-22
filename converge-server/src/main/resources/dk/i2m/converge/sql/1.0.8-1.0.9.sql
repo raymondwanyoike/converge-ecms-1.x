@@ -68,6 +68,8 @@ CREATE TABLE `catalogue_hook_property` (
 );
 
 
+ALTER TABLE newswire_item_attachment ADD COLUMN rendition_id bigint(20) DEFAULT null;
+
 ALTER TABLE news_item_media_attachment DROP COLUMN opt_lock;
 ALTER TABLE news_item_media_attachment ADD COLUMN display_order int(11) DEFAULT 0;
 
