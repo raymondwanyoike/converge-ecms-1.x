@@ -92,12 +92,12 @@
                                 <f:convertDateTime type="both" pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
                         </rich:column>
-                        
+
                     </rich:dataTable>
                     <rich:datascroller id="scNewsItems" for="dtInbox" align="center" maxPages="99" renderIfSinglePage="false" reRender="scNewsItems" rendered="#{inbox.showNewsItem}"  />
 
-                    
-                    
+
+
                     <rich:dataTable id="dtInboxMedia" value="#{inbox.mediaItems}" var="item" styleClass="table" headerClass="tableHeader" rowClasses="odd, even" rendered="#{inbox.showMediaItem}" rows="20">
                         <rich:column styleClass="center columnThumbnail">
                             <f:facet name="header">
@@ -194,18 +194,14 @@
                     </f:facet>
                     <h:panelGrid style="width: 480px;">
 
-                        <rich:tabPanel id="tpNewAssignment" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+                        <rich:tabPanel id="tpNewAssignment" switchType="ajax" immediate="true" activeTabClass="tabActive" inactiveTabClass="tabInactive"
+                                       selectedTab="#{inbox.newAssignmentType}">
 
-                            <rich:tab label="#{msgs.ASSIGNMENT}">
+                            <rich:tab id="tabStory" label="Story">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
-                                    <h:outputText value="#{msgs.assignment_ASSIGNMENT_TYPE}" />
-                                    <h:selectOneRadio converter="#{converters.enumTypeConverter}" value="#{inbox.newAssignment.assignment.type}">
-                                        <f:selectItems value="#{common.assignmentTypes}" />
-                                    </h:selectOneRadio>
-
                                     <h:outputText value="#{msgs.assignment_ASSIGNMENT_TITLE}" />
-                                    <h:inputText id="txtNewsItemTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" required="true" requiredMessage="#{msgs.inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
+                                    <h:inputText id="txtStoryTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" required="true" requiredMessage="#{msgs.inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
 
                                     <h:outputText value="#{msgs.assignment_ASSIGNMENT_DEADLINE}" />
                                     <rich:calendar popup="true" required="true" requiredMessage="#{msgs.inbox_NEWS_ITEM_DEADLINE_REQUIRED}" value="#{inbox.newAssignment.assignment.deadline.time}" datePattern="#{msgs.FORMAT_DATE_AND_TIME}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}"/>
@@ -218,6 +214,14 @@
 
                                     <h:outputText value="#{msgs.assignment_ADD_TO_NEXT_EDITION}" />
                                     <h:selectBooleanCheckbox value="#{inbox.newAssignment.nextEdition}" />
+                                </h:panelGrid>
+
+                            </rich:tab>
+                            <rich:tab id="tabMedia" label="Media">
+
+                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
+                                    <h:outputText value="#{msgs.assignment_ASSIGNMENT_TITLE}" />
+                                    <h:inputText id="txtMediaTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" required="true" requiredMessage="#{msgs.inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
 
                                     <h:outputText value="#{msgs.assignment_ASSIGNMENT_MEDIA_REPOSITORY}" />
                                     <h:selectOneMenu id="somMediaRepository" styleClass="text mediumInput" value="#{inbox.newAssignment.mediaItem.catalogue}" converter="#{converters.mediaRepositoryConverter}">
@@ -238,7 +242,7 @@
                                          value="#{msgs.assignment_CREATE}"
                                          actionListener="#{inbox.onAddAssignment}"
                                          reRender="frmInbox"
-                                         oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpNewAssignment')}.hide(); return false; }" />
+                                         oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpNewAssignment')}.hide(); window.location='#{facesContext.externalContext.request.contextPath}/#{inbox.createdItemLink}'; return false; }" />
 
                         <h:commandLink id="lnkCancelAssignment" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpNewAssignment')}.hide(); return false;" />
                     </h:panelGroup>

@@ -1,21 +1,15 @@
 /*
- *  Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2011 Interactive Media Management
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.jsf.beans;
 
+import dk.i2m.converge.core.content.AssignmentType;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemActor;
@@ -53,7 +47,8 @@ import org.richfaces.model.TreeNode;
 import org.richfaces.model.TreeNodeImpl;
 
 /**
- * Managed bean for <code>/Inbox.jspx</code>.
+ * Managed bean for
+ * <code>/Inbox.jspx</code>.
  *
  * @author Allan Lykke Christensen
  */
@@ -85,6 +80,10 @@ public class Inbox {
 
     private boolean catalogueEditor = false;
 
+    private String newAssignmentType = "tabStory";
+
+    private String createdItemLink;
+
     /**
      * Creates a new instance of {@link Inbox}.
      */
@@ -104,6 +103,14 @@ public class Inbox {
      */
     public String getInboxTitle() {
         return JsfUtils.getResourceBundle().getString("INBOX") + " - " + inboxTitle;
+    }
+
+    public String getNewAssignmentType() {
+        return newAssignmentType;
+    }
+
+    public void setNewAssignmentType(String newAssignmentType) {
+        this.newAssignmentType = newAssignmentType;
     }
 
     /**
@@ -132,6 +139,16 @@ public class Inbox {
      *          {@link ActionEvent} that invoked the listener.
      */
     public void onNewAssignment(ActionEvent event) {
+        //this.newAssignmentType
+        switch (getUser().getDefaultAssignmentType()) {
+            case MEDIA_ITEM:
+                this.newAssignmentType = "tabMedia";
+                break;
+            case NEWS_ITEM:
+                this.newAssignmentType = "tabStory";
+                break;
+        }
+        
         newAssignment = new DialogSelfAssignment();
 
         newAssignment.getAssignment().setDeadline(java.util.Calendar.getInstance());
@@ -152,6 +169,14 @@ public class Inbox {
     }
 
     public void onAddAssignment(ActionEvent event) {
+        
+        if (newAssignmentType.equalsIgnoreCase("tabStory")) {
+            newAssignment.getAssignment().setType(AssignmentType.NEWS_ITEM);
+        } else {
+            newAssignment.getAssignment().setType(AssignmentType.MEDIA_ITEM);
+        }
+        
+        // Not necessary with the above
         if (newAssignment.getAssignment().getType() == null) {
             JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_ERROR, "inbox_ASSIGNMENT_TYPE_REQUIRED");
             return;
@@ -178,6 +203,7 @@ public class Inbox {
                     }
                     selectedNewsItem.setTitle(newAssignment.getTitle());
                     selectedNewsItem = newsItemFacade.start(selectedNewsItem);
+                    this.createdItemLink = "NewsItem.xhtml?id=" + selectedNewsItem.getId();
 
                     if (newAssignment.isNextEdition()) {
                         try {
@@ -208,7 +234,8 @@ public class Inbox {
                 newAssignment.getMediaItem().setTitle(newAssignment.getTitle());
                 newAssignment.getMediaItem().setOwner(getUser());
                 newAssignment.getMediaItem().setByLine(getUser().getFullName());
-                catalogueFacade.create(newAssignment.getMediaItem());
+                MediaItem newItem = catalogueFacade.create(newAssignment.getMediaItem());
+                this.createdItemLink = "MediaItemDetails.xhtml?id=" + newItem.getId();
                 JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_INFO, "inbox_ASSIGNMENT_CREATED");
                 showNewsItem = false;
                 newsItems = new ListDataModel();
@@ -216,6 +243,10 @@ public class Inbox {
                 mediaItems = new ListDataModel(catalogueFacade.findMediaItemsByOwner(getUser()));
                 break;
         }
+    }
+    
+    public String getCreatedItemLink() {
+        return this.createdItemLink;
     }
 
     /**
