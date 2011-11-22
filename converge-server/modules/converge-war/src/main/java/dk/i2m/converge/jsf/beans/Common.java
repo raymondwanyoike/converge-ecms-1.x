@@ -399,6 +399,10 @@ public class Common {
     public String getApplicationVersion() {
         return systemFacade.getApplicationVersion();
     }
+    
+    public String getShortApplicationVersion() {
+        return systemFacade.getShortApplicationVersion();
+    }
 
     public List<NewswireService> getNewswireServicesList() {
         return newswireService.findActiveNewswireServices();
