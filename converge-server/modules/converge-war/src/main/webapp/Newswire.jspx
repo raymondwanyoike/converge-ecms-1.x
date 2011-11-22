@@ -194,8 +194,16 @@
                                         <h:panelGroup layout="block" rendered="#{userSession.privileged['OUTLET_PLANNING']}">
                                             <span class="searchResultDescription" style="text-transform: uppercase;">
                                                 <a4j:commandLink ajaxSingle="true" reRender="frmNewswireItemDetail" oncomplete="#{rich:component('mpNewswireItemDetail')}.show();">
-                                                    <h:outputText value="ASSIGN" escape="false" />
+                                                    <h:outputText value="#{i18n.Newswire_ASSIGN}" escape="false" style="text-decoration: uppercase;" />
                                                     <f:setPropertyActionListener target="#{newswire.selectedSearchResult}" value="#{item}" />
+                                                </a4j:commandLink>  
+                                            </span>
+                                        </h:panelGroup>
+                                        <h:panelGroup layout="block" rendered="#{userSession.administrator}">
+                                            <span class="searchResultDescription" style="text-transform: uppercase;">
+                                                <a4j:commandLink ajaxSingle="true" reRender="frmPage" oncomplete="alert('#{i18n.Newswire_REMOVE_CONFIRM}');">
+                                                    <h:outputText value="#{i18n.Newswire_REMOVE}" escape="false" style="text-decoration: uppercase;" />
+                                                    <f:setPropertyActionListener target="#{newswire.removeItem}" value="#{item}" />
                                                 </a4j:commandLink>  
                                             </span>
                                         </h:panelGroup>
