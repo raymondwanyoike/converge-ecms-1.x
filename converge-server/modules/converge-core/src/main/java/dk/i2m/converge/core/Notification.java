@@ -88,6 +88,14 @@ public class Notification implements Serializable {
         this.recipient = recipient;
         this.added = Calendar.getInstance();
     }
+    
+    public Notification(String message, String link, UserAccount recipient, UserAccount sender) {
+        this.message = message;
+        this.link = link;
+        this.recipient = recipient;
+        this.sender = sender;
+        this.added = Calendar.getInstance();
+    }
 
     public Long getId() {
         return id;

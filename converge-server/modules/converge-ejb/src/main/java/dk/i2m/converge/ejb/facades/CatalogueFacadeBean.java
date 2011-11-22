@@ -9,6 +9,7 @@
  */
 package dk.i2m.converge.ejb.facades;
 
+import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.content.NewsItemMediaAttachment;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.content.catalogue.*;
@@ -57,6 +58,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     @EJB private MetaDataServiceLocal metaDataService;
 
     @EJB private SystemFacadeLocal systemFacade;
+
+    @EJB private NotificationServiceLocal notificationService;
 
     @Resource private SessionContext ctx;
 
@@ -408,6 +411,51 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         } else {
             searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, mediaItem.getId(), QueueEntryOperation.UPDATE);
         }
+
+        // TODO: Set-up as workflow
+        
+        if (mediaItem.getStatus() != null) {
+            UserAccount user = null;
+            try {
+                user = userFacade.findById(ctx.getCallerPrincipal().getName());
+            } catch (DataNotFoundException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+            }
+            Notification notification;
+            switch (mediaItem.getStatus()) {
+                case APPROVED:
+                    notification = new Notification("<b>" + mediaItem.getTitle() + "</b> was approved", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), mediaItem.getOwner(), user);
+                    notificationService.create(notification);
+                    if (!mediaItem.getOwner().equals(user)) {
+                        notification = new Notification("Approved <b>" + mediaItem.getTitle() + "</b>", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), user, user);
+                        notificationService.create(notification);
+                    }
+                    break;
+                case REJECTED:
+                    notification = new Notification("<b>" + mediaItem.getTitle() + "</b> was rejected", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), mediaItem.getOwner(), user);
+                    notificationService.create(notification);
+                    notification = new Notification("Rejected <b>" + mediaItem.getTitle() + "</b>", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), user, user);
+                    notificationService.create(notification);
+                    break;
+                case SUBMITTED:
+                    for (UserAccount editor : mediaItem.getCatalogue().getEditorRole().getUserAccounts()) {
+                        notification = new Notification("<b>" + mediaItem.getTitle() + "</b> was submitted for approval", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), editor, mediaItem.getOwner());
+                        notificationService.create(notification);
+                    }
+                    notification = new Notification("Submitted <b>" + mediaItem.getTitle() + "</b> for approval", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), user, user);
+                    notificationService.create(notification);
+                    break;
+                case SELF_UPLOAD:
+                    for (UserAccount editor : mediaItem.getCatalogue().getEditorRole().getUserAccounts()) {
+                        notification = new Notification("<b>" + mediaItem.getTitle() + "</b> was self-uploaded for approval", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), editor, mediaItem.getOwner());
+                        notificationService.create(notification);
+                    }
+                    notification = new Notification("Submitted <b>" + mediaItem.getTitle() + "</b> for approval", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), user, user);
+                    notificationService.create(notification);
+                    break;
+            }
+        }
+
 
         return mediaItem;
     }
