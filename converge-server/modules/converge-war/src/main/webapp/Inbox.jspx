@@ -11,7 +11,6 @@
             </a4j:outputPanel>
 
             <h:form id="frmInbox">
-
                 <converge:moduleHeader moduleTitle="#{inbox.inboxTitle}" />
                 <div class="moduleContent">
 
@@ -22,11 +21,8 @@
                             </f:facet>
                             <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
                                 <h:graphicImage value="#{res.NEWS_ITEM_ICON}" rendered="#{!item.locked}" title="#{item.status}" alt="#{item.status}"  />
-                                <h:graphicImage value="#{res.LOCK_ICON}" rendered="#{item.locked}" title="" />
+                                <h:graphicImage value="#{res.LOCK_ICON}" rendered="#{item.locked}" title="#{converge:messagePattern('i18n', 'Inbox_ITEM_LOCKED', item.checkedOutBy, item.checkedOut, null, null, null)}" />
                             </h:outputLink>
-                            <rich:toolTip styleClass="tooltip" style="width: 300px; background: #ffcc66; border: 1px solid #cc9933;" rendered="#{item.locked}">
-                                <h:outputText value="This item is was checked-out by&lt;br/&gt; &lt;b&gt;#{item.checkedOutBy}&lt;/b&gt; on &lt;b&gt;#{item.checkedOut}&lt;/b&gt;" escape="false" />
-                            </rich:toolTip>
                         </rich:column>
 
                         <rich:column sortBy="#{item.id}" sortOrder="DESCENDING" styleClass="right columnId">

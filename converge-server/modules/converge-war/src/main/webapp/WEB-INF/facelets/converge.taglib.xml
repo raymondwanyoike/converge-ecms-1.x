@@ -213,6 +213,13 @@
     </function>
 
     <function>
+        <function-name>messagePattern</function-name>
+        <function-class>dk.i2m.converge.jsf.functions.StringFunctions</function-class>
+        <function-signature>java.lang.String message(java.lang.String, java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+
+    <function>
         <function-name>displaySize</function-name>
         <function-class>dk.i2m.converge.jsf.functions.FileSpaceFunctions</function-class>
         <function-signature>java.lang.String displaySize(java.lang.Long)</function-signature>
