@@ -99,6 +99,7 @@ public class NewsItemService {
         newsItem.getActors().add(nia);
         newsItem.setLanguage(outlet.getLanguage());
         newsItem.setTitle(title);
+        newsItem.setOutlet(outlet);
         newsItem = newsItemFacade.start(newsItem);
 
         return newsItem.getId();
@@ -218,6 +219,7 @@ public class NewsItemService {
         placement.setSection(section);
         placement.setStart(start);
         placement.setPosition(position);
+        placement.setOutlet(edition.getOutlet());
 
         newsItemFacade.createPlacement(placement);
     }
@@ -349,9 +351,9 @@ public class NewsItemService {
         }
 
         try {
-            dk.i2m.converge.core.content.NewsItem ni = newsItemFacade.findNewsItemById(newsItemId);
+            NewsItemHolder checkout = newsItemFacade.checkout(newsItemId);
             try {
-                newsItemFacade.step(ni, workflowStep, comment);
+                newsItemFacade.step(checkout.getNewsItem(), workflowStep, comment);
             } catch (WorkflowStateTransitionException ex) {
                 throw new NewsItemWorkflowException(ex);
             }
