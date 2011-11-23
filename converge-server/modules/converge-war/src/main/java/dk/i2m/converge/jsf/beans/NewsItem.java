@@ -10,63 +10,34 @@
 package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.commons.BeanComparator;
-import dk.i2m.converge.core.workflow.Edition;
-import dk.i2m.converge.core.workflow.Outlet;
-import dk.i2m.converge.domain.search.SearchResult;
-import dk.i2m.converge.core.workflow.Section;
+import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.content.ContentItemPermission;
-import dk.i2m.converge.core.content.catalogue.MediaItem;
-import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
-import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.NewsItemActor;
-import dk.i2m.converge.core.content.NewsItemField;
 import dk.i2m.converge.core.content.NewsItemMediaAttachment;
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
-import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.core.security.UserRole;
-import dk.i2m.converge.core.metadata.Concept;
-import dk.i2m.converge.core.metadata.GeoArea;
-import dk.i2m.converge.core.metadata.Organisation;
-import dk.i2m.converge.core.metadata.Person;
-import dk.i2m.converge.core.metadata.PointOfInterest;
-import dk.i2m.converge.core.metadata.Subject;
+import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
+import dk.i2m.converge.core.metadata.*;
 import dk.i2m.converge.core.plugin.WorkflowValidatorException;
-import dk.i2m.converge.core.utils.HttpUtils;
-import dk.i2m.converge.core.utils.StringUtils;
-import dk.i2m.converge.core.workflow.EditionCandidate;
-import dk.i2m.converge.domain.search.SearchResults;
-import dk.i2m.converge.core.workflow.WorkflowStateTransition;
-import dk.i2m.converge.core.workflow.WorkflowStep;
-import dk.i2m.converge.core.workflow.WorkflowStepValidator;
-import dk.i2m.converge.ejb.facades.LockingException;
-import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
-import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
-import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
-import dk.i2m.converge.ejb.facades.NewsItemHolder;
-import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
-import dk.i2m.converge.ejb.facades.SearchEngineLocal;
-import dk.i2m.converge.ejb.facades.UserFacadeLocal;
-import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
-import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.search.QueueEntryOperation;
 import dk.i2m.converge.core.search.QueueEntryType;
+import dk.i2m.converge.core.security.UserAccount;
+import dk.i2m.converge.core.security.UserRole;
+import dk.i2m.converge.core.utils.HttpUtils;
+import dk.i2m.converge.core.utils.StringUtils;
+import dk.i2m.converge.core.workflow.*;
+import dk.i2m.converge.domain.search.SearchResult;
+import dk.i2m.converge.domain.search.SearchResults;
+import dk.i2m.converge.ejb.facades.*;
+import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.MetaDataServiceLocal;
 import dk.i2m.jsf.JsfUtils;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -906,7 +877,6 @@ public class NewsItem {
     }
 
     public void setSelectedMediaItemId(Long selectedMediaItemId) {
-
         this.selectedMediaItemId = selectedMediaItemId;
 
         if (this.selectedMediaItemId != null) {
@@ -917,28 +887,29 @@ public class NewsItem {
                 this.selectedAttachment.setMediaItem(catalogueFacade.findMediaItemById(this.selectedMediaItemId));
                 this.selectedAttachment.setCaption(this.selectedAttachment.getMediaItem().getDescription());
             } catch (DataNotFoundException ex) {
-                LOG.log(Level.WARNING, "Media Item #" + this.selectedMediaItemId + " does not exist in the database. Schedule removal from search engine");
+                LOG.log(Level.WARNING, "Media Item #{0} does not exist in the database. Schedule removal from search engine", this.selectedMediaItemId);
                 searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, this.selectedMediaItemId, QueueEntryOperation.REMOVE);
             }
         }
     }
 
     public void onUseAttachment(ActionEvent event) {
+        if (this.userSubmission.getId() != null) {
+            this.userSubmission.setDescription(selectedAttachment.getCaption());
+            this.userSubmission.setByLine(selectedAttachment.getMediaItem().getByLine());
+        }
+
         this.selectedAttachment.setDisplayOrder(this.selectedNewsItem.getNextAssetAttachmentDisplayOrder());
         this.selectedAttachment = newsItemFacade.create(selectedAttachment);
         this.selectedNewsItem.getMediaAttachments().add(selectedAttachment);
 
-        System.out.println("Byline" + getSelectedAttachment().getMediaItem().getByLine());
-        
         // Update caption in MediaItem
         if (this.userSubmission.getId() != null) {
-            this.userSubmission.setDescription(selectedAttachment.getCaption());
-            this.userSubmission.setByLine(selectedAttachment.getMediaItem().getByLine());
             this.userSubmission = catalogueFacade.update(userSubmission);
+            onPreAttachMediaFile(event);
         }
 
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "ASSET_ATTACHED_TO_STORY");
-        onPreAttachMediaFile(event);
     }
 
     public void onUpdateAttachment(ActionEvent event) {
@@ -1005,6 +976,7 @@ public class NewsItem {
         // Create placeholder (MediaItem)
         userSubmission.setStatus(MediaItemStatus.SELF_UPLOAD);
         userSubmission.setCatalogue(selectedCatalogue);
+        userSubmission.setByLine("");
         if (userSubmission.getId() == null) {
             userSubmission = catalogueFacade.create(userSubmission);
         }
@@ -1301,7 +1273,7 @@ public class NewsItem {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "NewsItem_CONCEPTS_SUGGEST_FAILED_NO_STORY", null);
             return;
         }
-        
+
         try {
             List<Concept> concepts = metaDataService.enrich(StringUtils.stripHtml(getSelectedNewsItem().getStory()));
             suggestedConcepts = new LinkedHashMap<String, Concept>();
@@ -1311,11 +1283,11 @@ public class NewsItem {
                 String type = bundle.getString("Generic_" + concept.getType() + "_NAME");
                 suggestedConcepts.put(concept.getName() + " (" + type + ")", concept);
             }
-            
+
             if (suggestedConcepts.isEmpty()) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "NewsItem_CONCEPTS_SUGGEST_NO_RESULTS", null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "NewsItem_CONCEPTS_SUGGEST_NO_RESULTS", null);
             }
-            
+
         } catch (EnrichException ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "NewsItem_CONCEPTS_SUGGEST_FAILED", null);
         }
