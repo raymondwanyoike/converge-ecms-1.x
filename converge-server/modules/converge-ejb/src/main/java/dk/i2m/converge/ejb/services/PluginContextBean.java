@@ -1,18 +1,11 @@
 /*
  * Copyright (C) 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.ejb.services;
 
@@ -22,9 +15,7 @@ import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.content.ContentTag;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.content.catalogue.MediaItem;
-import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
-import dk.i2m.converge.core.content.catalogue.Rendition;
+import dk.i2m.converge.core.content.catalogue.*;
 import dk.i2m.converge.core.content.forex.Rate;
 import dk.i2m.converge.core.content.markets.MarketValue;
 import dk.i2m.converge.core.content.weather.Forecast;
@@ -186,6 +177,14 @@ public class PluginContextBean implements PluginContextBeanLocal {
         try {
             MediaItem mediaItem = catalogueFacade.findMediaItemById(mediaItemId);
             Rendition rendition = catalogueFacade.findRenditionById(renditionId);
+
+            try {
+                // Delete existing rendition
+                MediaItemRendition mir = mediaItem.findRendition(rendition);
+                catalogueFacade.deleteMediaItemRenditionById(mir.getId());
+            } catch (RenditionNotFoundException rex) {
+            }
+
             return catalogueFacade.create(file, mediaItem, rendition, filename, contentType);
         } catch (DataNotFoundException ex) {
             throw new IllegalArgumentException(ex);
@@ -201,12 +200,12 @@ public class PluginContextBean implements PluginContextBeanLocal {
     public List<dk.i2m.converge.core.metadata.Concept> enrich(String story) throws EnrichException {
         return metaDataService.enrich(story);
     }
-    
+
     @Override
     public String extractContent(MediaItemRendition mediaItemRendition) {
         return metaDataService.extractContent(mediaItemRendition);
     }
-    
+
     @Override
     public String getConfiguration(ConfigurationKey key) {
         return cfgService.getString(key);
