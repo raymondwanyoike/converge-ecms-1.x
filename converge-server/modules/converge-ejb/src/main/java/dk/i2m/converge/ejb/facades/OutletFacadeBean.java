@@ -505,6 +505,13 @@ public class OutletFacadeBean implements OutletFacadeLocal {
     public Section findSectionById(Long id) throws DataNotFoundException {
         return daoService.findById(Section.class, id);
     }
+    
+    @Override
+    public List<Section> findSectionByName(Long outletId, String sectionName) throws DataNotFoundException {
+        Outlet outlet = findOutletById(outletId);
+        Map<String, Object> params = QueryBuilder.with("outlet", outlet).and("sectionName", sectionName).parameters();
+        return daoService.findWithNamedQuery(Section.FIND_BY_OUTLET_AND_NAME, params);
+    }
 
     /** {@inheritDoc } */
     @Override

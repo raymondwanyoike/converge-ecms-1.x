@@ -350,4 +350,6 @@ public interface OutletFacadeLocal {
     java.util.List<dk.i2m.converge.core.dto.EditionView> findEditionViewsByDate(java.lang.Long outletId, java.util.Date date, boolean includeOpen, boolean includeClosed);
 
     java.util.List<dk.i2m.converge.core.dto.OutletActionView> findOutletActions(java.lang.Long id) throws DataNotFoundException;
+
+    List<Section> findSectionByName(Long outletId, String sectionName) throws DataNotFoundException;
 }

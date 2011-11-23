@@ -10,12 +10,16 @@
 package dk.i2m.converge.ws.soap;
 
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ws.model.Edition;
 import dk.i2m.converge.ws.model.ModelConverter;
 import dk.i2m.converge.ws.model.Outlet;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -82,6 +86,34 @@ public class OutletService {
             LOG.log(Level.WARNING, "Unknown outlet requested");
         }
         return outlet;
+    }
+
+    @WebMethod(operationName = "createSection")
+    public Long createSection(@WebParam(name = "outletId") Long outletId, @WebParam(name = "parentId") Long parentSectionId, @WebParam(name = "name") String name, @WebParam(name = "description") String description, @WebParam(name = "active") boolean active) throws DataNotFoundException {
+        Section section = new Section();
+        section.setActive(true);
+        section.setDescription(description);
+        section.setName(name);
+        section.setOutlet(outletFacade.findOutletById(outletId));
+        if (parentSectionId != null) {
+            section.setParent(outletFacade.findSectionById(parentSectionId));
+        }
+        section = outletFacade.createSection(section);
+        return section.getId();
+    }
+
+    @WebMethod(operationName = "findSectionByName")
+    public List<dk.i2m.converge.ws.model.Section> findSectionByName(@WebParam(name = "outletId") Long outletId, @WebParam(name = "section") String sectionName) throws DataNotFoundException {
+        List<Section> sections = outletFacade.findSectionByName(outletId, sectionName);
+        List<dk.i2m.converge.ws.model.Section> results = new ArrayList<dk.i2m.converge.ws.model.Section>();
+        
+        for (Section section : sections) {
+            dk.i2m.converge.ws.model.Section result = new dk.i2m.converge.ws.model.Section();
+            result.setId(section.getId());
+            result.setTitle(section.getName());
+            results.add(result);
+        }
+        return results;
     }
 
     /**
