@@ -1,18 +1,11 @@
 /*
  * Copyright (C) 2010 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.core.content.catalogue;
 
@@ -23,36 +16,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
+import javax.persistence.*;
 
 /**
  * Persisted model represents a media item belonging to a
- * {@link MediaRepository}. A {@link MediaItem} could be an
- * image, audio recording or video clip.
+ * {@link MediaRepository}. A {@link MediaItem} could be an image, audio recording or video clip.
  *
  * @author Allan Lykke Christensen
  */
 @Entity()
 @Table(name = "media_item")
 @NamedQueries({
-    @NamedQuery(name = MediaItem.FIND_BY_CATALOGUE, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.catalogue = :catalogue ORDER BY m.id ASC"),    
+    @NamedQuery(name = MediaItem.FIND_BY_CATALOGUE, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.catalogue = :catalogue ORDER BY m.id ASC"),
     @NamedQuery(name = MediaItem.FIND_BY_STATUS, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.status = :status ORDER BY m.updated DESC"),
     @NamedQuery(name = MediaItem.FIND_BY_OWNER, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.owner = :owner ORDER BY m.id DESC"),
     @NamedQuery(name = MediaItem.FIND_CURRENT_AS_OWNER, query = "SELECT DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :mediaRepository AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.APPROVED AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.REJECTED AND m.owner = :user ORDER BY m.updated DESC"),
@@ -62,7 +37,7 @@ import javax.persistence.Temporal;
 public class MediaItem implements Serializable {
 
     public static final String FIND_BY_CATALOGUE = "MediaItem.FindByCatalogue";
-    
+
     public static final String FIND_BY_STATUS = "MediaItem.FindByStatus";
 
     public static final String FIND_BY_OWNER = "MediaItem.FindByOwner";
@@ -126,7 +101,7 @@ public class MediaItem implements Serializable {
     inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "concept_id", nullable = false)})
     private List<Concept> concepts = new ArrayList<Concept>();
 
-    @OneToMany(mappedBy = "mediaItem", fetch= FetchType.EAGER)
+    @OneToMany(mappedBy = "mediaItem", fetch = FetchType.EAGER)
     private List<MediaItemRendition> renditions = new ArrayList<MediaItemRendition>();
 
     @javax.persistence.Version
@@ -241,6 +216,32 @@ public class MediaItem implements Serializable {
 
     public void setByLine(String byLine) {
         this.byLine = byLine;
+    }
+
+    /**
+     * Gets a {@link List} of {@link Rendition}s not attached
+     * to this {@link MediaItem}.
+     * 
+     * @return {@link List} of {@link Rendition}s not attached
+     *         to the {@link MediaItem}
+     */
+    public List<Rendition> getMissingRenditions() {
+        List<Rendition> missing = new ArrayList<Rendition>();
+        List<Rendition> catalogueRenditions = getCatalogue().getRenditions();
+
+        for (Rendition rendition : catalogueRenditions) {
+            boolean available = false;
+            for (MediaItemRendition mir : getRenditions()) {
+                if (mir.getRendition().equals(rendition)) {
+                    available = true;
+                }
+            }
+            if (!available) {
+                missing.add(rendition);
+            }
+        }
+
+        return missing;
     }
 
     /**
@@ -378,7 +379,7 @@ public class MediaItem implements Serializable {
      *          given {@link Rendition}
      */
     public MediaItemRendition findRendition(String rendition) throws RenditionNotFoundException {
-        
+
         for (MediaItemRendition mir : getRenditions()) {
             if (mir.getRendition().getName().equalsIgnoreCase(rendition)) {
                 return mir;
@@ -393,7 +394,6 @@ public class MediaItem implements Serializable {
      * @return {@code true} if one or more {@link Rendition}s 
      *         have been attached, otherwise {@code false}
      */
-
     public boolean isRenditionsAttached() {
         if (getRenditions() == null || getRenditions().isEmpty()) {
             return false;
@@ -401,7 +401,7 @@ public class MediaItem implements Serializable {
             return true;
         }
     }
-    
+
     /**
      * Determines if a given {@link Rendition} is attached
      * to the {@link MediaItem}.

@@ -70,11 +70,23 @@
                             </a4j:support>
                         </rich:inplaceInput>
 
-                        <h:outputText value="Credit" />
+                        <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_CREDIT}" />
                         <h:outputText value="#{attachment.mediaItem.byLine}" rendered="#{attachment.mediaItem.byLine != ''}" />
                         <h:outputText value="#{attachment.mediaItem.owner.fullName}" rendered="#{attachment.mediaItem.byLine == ''}" />
 
-                        <h:outputText value="ID" />
+                        <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_RENDITIONS}" rendered="#{userSession.catalogueEditor}" />
+                        <rich:dataGrid value="#{attachment.mediaItem.renditions}" var="rendition" rendered="#{userSession.catalogueEditor}">
+                            <h:outputLink value="#{rendition.absoluteFilename}" target="_blank">
+                                <h:outputText value="#{rendition.rendition.label}" />
+                            </h:outputLink>
+                        </rich:dataGrid>
+
+                        <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_RENDITIONS_MISSING}" rendered="#{userSession.catalogueEditor}" />
+                        <rich:dataGrid value="#{attachment.mediaItem.missingRenditions}" var="rendition" rendered="#{userSession.catalogueEditor}">
+                            <h:outputText value="#{rendition.label}" />
+                        </rich:dataGrid>
+
+                        <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_ID}" />
                         <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{attachment.mediaItem.id}">
                             <h:outputText value="#{attachment.mediaItem.id}">
                                 <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
@@ -243,7 +255,7 @@
                             <a4j:commandLink id="lnkUpdateAttachment" actionListener="#{newsItem.onUpdateAttachment}" styleClass="dialogButton" value="#{msgs.UPDATE}" reRender="dtMediaFiles" rendered="#{newsItem.selectedAttachment.id != null}">
                                 <rich:componentControl for="mpMediaItemSelected" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
-                            <a4j:commandLink id="lnkUseAttachment" actionListener="#{newsItem.onUseAttachment}" styleClass="dialogButton" value="#{msgs.ADD}" reRender="dtMediaFiles,pgMediaItemUpload" rendered="#{newsItem.selectedAttachment.id == null}">
+                            <a4j:commandLink id="lnkUseAttachment" actionListener="#{newsItem.onUseAttachment}" styleClass="dialogButton" value="#{msgs.ADD}" reRender="dtMediaFiles,searchResults,pgMediaItemUpload" rendered="#{newsItem.selectedAttachment.id == null}">
                                 <rich:componentControl for="mpMediaItemSelected" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
                             <h:commandLink id="lnkCloseMediaItemSelection" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpMediaItemSelected')}.hide(); return false;" />
