@@ -17,15 +17,7 @@
 package dk.i2m.converge.core.workflow;
 
 import java.io.Serializable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Section that is part of an {@link Outlet}.
@@ -34,8 +26,13 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "outlet_section")
+@NamedQueries({
+    @NamedQuery(name = Section.FIND_BY_OUTLET_AND_NAME, query = "SELECT s FROM Section s WHERE s.outlet = :outlet AND s.name LIKE :sectionName")
+})
 public class Section implements Serializable {
 
+    public static final String FIND_BY_OUTLET_AND_NAME = "Section.findByOutletAndName";
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
