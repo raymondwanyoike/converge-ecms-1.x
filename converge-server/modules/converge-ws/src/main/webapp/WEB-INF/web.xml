@@ -22,6 +22,12 @@
             <url-pattern>/administrator*</url-pattern>
         </web-resource-collection>
         <web-resource-collection>
+            <web-resource-name>Concept Services</web-resource-name>
+            <description/>
+            <url-pattern>/ConceptService/*</url-pattern>
+            <url-pattern>/ConceptService*</url-pattern>
+        </web-resource-collection>
+        <web-resource-collection>
             <web-resource-name>Outlet Services</web-resource-name>
             <description/>
             <url-pattern>/OutletService/*</url-pattern>
