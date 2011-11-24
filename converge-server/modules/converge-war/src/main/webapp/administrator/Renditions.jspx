@@ -90,6 +90,16 @@
                                     <h:inputTextarea id="txtDescription" styleClass="text mediumInput" value="#{administrator_Renditions.selectedLabel.description}" />
                                 </h:panelGrid>
                             </rich:tab>
+                            <rich:tab label="#{i18n.administrator_Renditions_RENDITION_IMAGE_DEFAULTS}">
+                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
+                                    <h:outputText value="#{i18n.administrator_Renditions_RENDITION_IMAGE_DEFAULTS_WIDTH}:" />
+                                    <h:inputText styleClass="text shortInput" value="#{administrator_Renditions.selectedLabel.defaultWidth}" />
+
+                                    <h:outputText value="#{i18n.administrator_Renditions_RENDITION_IMAGE_DEFAULTS_HEIGHT}:" />
+                                    <h:inputText styleClass="text shortInput" value="#{administrator_Renditions.selectedLabel.defaultHeight}" />
+
+                                </h:panelGrid>
+                            </rich:tab>
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">

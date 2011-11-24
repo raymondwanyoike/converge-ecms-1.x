@@ -1,37 +1,20 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
- * 
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- * 
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2010 - 2011 Interactive Media Management
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.core.content.catalogue;
 
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
- * Entity representing a label that can be attached to a media item to identify
- * its purpose.
+ * Entity representing a label that can be attached to a media item to identify its purpose.
  *
  * @author Allan Lykke Christensen
  */
@@ -42,10 +25,12 @@ import javax.persistence.Table;
 })
 public class Rendition implements Serializable {
 
-    /** Query used for obtaining a {@link Rendition} by its name. */
+    /**
+     * Query used for obtaining a {@link Rendition} by its name.
+     */
     public static final String FIND_BY_NAME = "Rendition.findByName";
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,6 +45,12 @@ public class Rendition implements Serializable {
 
     @Column(name = "description") @Lob
     private String description;
+
+    @Column(name = "default_width")
+    private Integer defaultWidth;
+
+    @Column(name = "default_height")
+    private Integer defaultHeight;
 
     @ManyToMany(mappedBy = "renditions")
     private List<Catalogue> catalogues;
@@ -150,6 +141,33 @@ public class Rendition implements Serializable {
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * Gets the default image height of this type of {@link Rendition}.
+     * 
+     * @return Default image height
+     */
+    public Integer getDefaultHeight() {
+        return defaultHeight;
+    }
+
+    /**
+     * Sets the default image height of this type of {@link Rendition}.
+     * 
+     * @param defaultHeight 
+     *          Default image height
+     */
+    public void setDefaultHeight(Integer defaultHeight) {
+        this.defaultHeight = defaultHeight;
+    }
+
+    public Integer getDefaultWidth() {
+        return defaultWidth;
+    }
+
+    public void setDefaultWidth(Integer defaultWidth) {
+        this.defaultWidth = defaultWidth;
     }
 
     @Override

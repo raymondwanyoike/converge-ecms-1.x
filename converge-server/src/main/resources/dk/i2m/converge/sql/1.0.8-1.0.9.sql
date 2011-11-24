@@ -1,5 +1,7 @@
 ALTER TABLE rendition DROP COLUMN opt_lock;
 ALTER TABLE rendition ADD COLUMN label varchar(255);
+ALTER TABLE rendition ADD COLUMN default_height int DEFAULT '0';
+ALTER TABLE rendition ADD COLUMN default_width int DEFAULT '0';
 ALTER TABLE media_item DROP COLUMN parent_id;
 
 RENAME TABLE media_repository TO catalogue;

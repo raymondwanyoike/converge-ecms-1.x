@@ -278,6 +278,24 @@
             <value>#{param['id']}</value>
         </managed-property>
     </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>cropRendition</managed-bean-name>
+        <managed-bean-class>dk.i2m.converge.jsf.beans.CropRendition</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+        <managed-property>
+            <property-name>mediaItemId</property-name>
+            <value>#{param['mid']}</value>
+        </managed-property>
+        <managed-property>
+            <property-name>sourceRenditionId</property-name>
+            <value>#{param['sid']}</value>
+        </managed-property>
+        <managed-property>
+            <property-name>targetRenditionId</property-name>
+            <value>#{param['tid']}</value>
+        </managed-property>
+    </managed-bean>
 
     <managed-bean>
         <managed-bean-name>mediaItemArchive</managed-bean-name>

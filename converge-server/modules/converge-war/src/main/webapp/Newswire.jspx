@@ -20,7 +20,7 @@
                         </a4j:commandLink>
                         <h:graphicImage value="#{res.BULLET_ICON}" alt="" title="" />
                         <a4j:commandLink ajaxSingle="true" reRender="frmBasketDetail" actionListener="#{newswire.onNewBasket}" oncomplete="#{rich:component('mpBasketDetail')}.show();">
-                            <h:outputText value="#{i18n.Newswire_OPTION_CREATE_BASKET}Create Basket" />
+                            <h:outputText value="#{i18n.Newswire_OPTION_CREATE_BASKET}" />
                         </a4j:commandLink>
                     </h:panelGrid>
                 </div>

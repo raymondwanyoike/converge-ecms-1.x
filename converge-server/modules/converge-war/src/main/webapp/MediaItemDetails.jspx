@@ -571,11 +571,21 @@
                                     </h:panelGrid>
                                 </rich:tab>
 
-                                <rich:tab id="tabDuplicateImage" label="#{msgs.media_item_rendition_DUPLICATE}" rendered="#{mediaItemDetails.selectedMediaItem.original.image}">
+                                <rich:tab id="tabGenerateImage" label="#{msgs.media_item_rendition_DUPLICATE}" rendered="#{mediaItemDetails.selectedMediaItem.original.image}">
                                     <h:panelGrid id="pgDuplicateImage" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                        <rich:dataList value="#{mediaItemDetails.selectedMediaItem.renditions}" var="rendition">
+                                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/CropRendition.xhtml" target="_blank">
+                                                <f:param name="mid" value="#{mediaItemDetails.selectedMediaItem.id}" />
+                                                <f:param name="tid" value="#{mediaItemDetails.uploadRendition.id}" />
+                                                <f:param name="sid" value="#{rendition.rendition.id}" />
+                                                <h:outputFormat value="#{i18n.MediaItemDetails_CROP_RENDITION_BASED_ON_X}">
+                                                    <f:param value="#{rendition.rendition.label}" />
+                                                </h:outputFormat>
+                                            </h:outputLink>
+                                        </rich:dataList>
                                     </h:panelGrid>
                                 </rich:tab>
-
+                                
                             </rich:tabPanel>
 
                             <h:panelGroup styleClass="dialogueButtons">
@@ -587,6 +597,8 @@
                 </a4j:region>
 
             </c:if>
+
+
         </ui:define>
     </ui:composition>
 </jsp:root>

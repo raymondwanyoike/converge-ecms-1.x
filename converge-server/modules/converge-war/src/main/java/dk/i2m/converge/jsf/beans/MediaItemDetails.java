@@ -1,32 +1,16 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
- * 
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- * 
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2010 Interactive Media Management
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.jsf.beans;
 
-import dk.i2m.converge.core.content.catalogue.Catalogue;
-import dk.i2m.converge.core.content.catalogue.MediaItem;
-import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
-import dk.i2m.converge.core.content.catalogue.Rendition;
-import dk.i2m.converge.core.content.catalogue.RenditionNotFoundException;
-import dk.i2m.converge.core.metadata.Concept;
-import dk.i2m.converge.core.metadata.GeoArea;
-import dk.i2m.converge.core.metadata.Organisation;
-import dk.i2m.converge.core.metadata.Person;
-import dk.i2m.converge.core.metadata.PointOfInterest;
-import dk.i2m.converge.core.metadata.Subject;
+import dk.i2m.converge.core.content.catalogue.*;
+import dk.i2m.converge.core.metadata.*;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
@@ -145,10 +129,15 @@ public class MediaItemDetails {
 
     public void onApply(ActionEvent event) {
         try {
+            if (!selectedMediaItem.isOriginalAvailable()) {
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "MediaItemDetails_ORIGINAL_RENDITION_X_MISSING", selectedMediaItem.getCatalogue().getOriginalRendition().getLabel());
+                return;
+            }
+
             selectedMediaItem = catalogueFacade.update(selectedMediaItem);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "Media item was saved", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n", "MediaItemDetails_MEDIA_ITEM_WAS_SAVED", null);
         } catch (Exception ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "An error occurred. " + ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "MediaItemDetails_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
         }
     }
 
@@ -210,7 +199,7 @@ public class MediaItemDetails {
         if (selectedMediaItem == null) {
             return false;
         }
-        
+
         return isEditor() || isOwner();
     }
 
@@ -298,13 +287,13 @@ public class MediaItemDetails {
         this.selectedRendition = new MediaItemRendition();
         this.selectedRendition.setMediaItem(this.selectedMediaItem);
     }
-    
+
     public void onSaveNewRendition(ActionEvent event) {
         this.selectedMediaItem.getRenditions().add(selectedRendition);
         this.selectedMediaItem = catalogueFacade.update(selectedMediaItem);
         this.selectedMediaItem = null;
         setId(getId());
-        
+
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "media_item_rendition_CREATED");
     }
 

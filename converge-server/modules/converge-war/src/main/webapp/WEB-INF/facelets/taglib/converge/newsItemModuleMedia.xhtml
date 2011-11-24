@@ -75,15 +75,20 @@
                         <h:outputText value="#{attachment.mediaItem.owner.fullName}" rendered="#{attachment.mediaItem.byLine == ''}" />
 
                         <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_RENDITIONS}" rendered="#{userSession.catalogueEditor}" />
-                        <rich:dataGrid value="#{attachment.mediaItem.renditions}" var="rendition" rendered="#{userSession.catalogueEditor}">
-                            <h:outputLink value="#{rendition.absoluteFilename}" target="_blank">
+                        <rich:dataGrid value="#{attachment.mediaItem.renditions}" var="rendition" style="background: #33aa33; width: 100%; font-weight: bold;" rendered="#{userSession.catalogueEditor}">
+                            <h:outputLink value="#{rendition.absoluteFilename}" style=" font-size: 0.9em; color: white; text-transform: uppercase;" target="_blank">
                                 <h:outputText value="#{rendition.rendition.label}" />
                             </h:outputLink>
                         </rich:dataGrid>
 
-                        <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_RENDITIONS_MISSING}" rendered="#{userSession.catalogueEditor}" />
-                        <rich:dataGrid value="#{attachment.mediaItem.missingRenditions}" var="rendition" rendered="#{userSession.catalogueEditor}">
-                            <h:outputText value="#{rendition.label}" />
+                        <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_RENDITIONS_MISSING}" rendered="#{userSession.catalogueEditor &amp;&amp; !empty attachment.mediaItem.missingRenditions}" />
+                        <rich:dataGrid value="#{attachment.mediaItem.missingRenditions}" style="background: #aa3333; width: 100%; font-weight: bold;" var="rendition" rendered="#{userSession.catalogueEditor &amp;&amp; !empty attachment.mediaItem.missingRenditions}">
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/CropRendition.xhtml" target="_blank">
+                                <f:param name="mid" value="#{attachment.mediaItem.id}" />
+                                <f:param name="tid" value="#{rendition.id}" />
+                                <f:param name="sid" value="#{attachment.mediaItem.original.rendition.id}" />
+                                <h:outputText style=" font-size: 0.9em; color: white; text-transform: uppercase;" value="#{rendition.label}" />
+                            </h:outputLink>
                         </rich:dataGrid>
 
                         <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_ID}" />
