@@ -139,16 +139,20 @@ public class Inbox {
      *          {@link ActionEvent} that invoked the listener.
      */
     public void onNewAssignment(ActionEvent event) {
-        //this.newAssignmentType
-        switch (getUser().getDefaultAssignmentType()) {
-            case MEDIA_ITEM:
-                this.newAssignmentType = "tabMedia";
-                break;
-            case NEWS_ITEM:
-                this.newAssignmentType = "tabStory";
-                break;
+        try {
+            switch (getUser().getDefaultAssignmentType()) {
+                case MEDIA_ITEM:
+                    this.newAssignmentType = "tabMedia";
+                    break;
+                case NEWS_ITEM:
+                    this.newAssignmentType = "tabStory";
+                    break;
+            }
+        } catch (NullPointerException ex) {
+            // Default assignment type not set
+            this.newAssignmentType = "tabStory";
         }
-        
+
         newAssignment = new DialogSelfAssignment();
 
         newAssignment.getAssignment().setDeadline(java.util.Calendar.getInstance());
@@ -169,13 +173,13 @@ public class Inbox {
     }
 
     public void onAddAssignment(ActionEvent event) {
-        
+
         if (newAssignmentType.equalsIgnoreCase("tabStory")) {
             newAssignment.getAssignment().setType(AssignmentType.NEWS_ITEM);
         } else {
             newAssignment.getAssignment().setType(AssignmentType.MEDIA_ITEM);
         }
-        
+
         // Not necessary with the above
         if (newAssignment.getAssignment().getType() == null) {
             JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_ERROR, "inbox_ASSIGNMENT_TYPE_REQUIRED");
@@ -244,7 +248,7 @@ public class Inbox {
                 break;
         }
     }
-    
+
     public String getCreatedItemLink() {
         return this.createdItemLink;
     }
