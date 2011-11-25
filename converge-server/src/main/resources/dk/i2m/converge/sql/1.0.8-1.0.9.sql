@@ -10,8 +10,14 @@ ALTER TABLE catalogue ADD COLUMN original_rendition BIGINT;
 
 ALTER TABLE `media_item` CHANGE COLUMN `media_repository_id` `catalogue_id` BIGINT(20) NULL DEFAULT NULL, 
 
-INSERT INTO rendition (name, label, description) VALUES ('rnd:highRes', 'High Resolution', 'Original rendition');
-INSERT INTO rendition (name, label, description) VALUES ('rnd:thumbnail', 'Thumbnail', 'Thumbnail of original rendition');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:thumbnail', 'Thumbnail', 'A very small rendition of an image, giving only a general idea of its content.');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:preview', 'Preview', 'Preview resolution image or video');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:lowRes', 'Low resolution', 'Low resolution image or video');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:highRes', 'High resolution', 'High resolution image or video');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:print', 'Content for print', 'Content intended to appear in print');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:web', 'Content for a web page', 'Content intended to appear on a web page');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:sms', 'Content for short message', 'Content intended to appear in a short messaging system');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:mobile', 'Content for a mobile device', 'Content intended to appear on a mobile or handheld device');
 
 CREATE  TABLE `media_item_rendition` (
   `id` BIGINT NOT NULL AUTO_INCREMENT ,

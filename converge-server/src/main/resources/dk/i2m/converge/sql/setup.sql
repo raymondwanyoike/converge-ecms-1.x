@@ -1127,3 +1127,12 @@ CREATE TABLE `workflow_step_validator_property` (
 
 INSERT INTO `app_version` (`id`, `from_version`, `to_version`, `migrated`, `migrated_date`) VALUES (1,'','1.0.9',1,'2011-11-19 23:00:00');
 INSERT INTO `SEQUENCE` (`SEQ_NAME`, `SEQ_COUNT`) VALUES ('SEQ_GEN', 0);
+
+INSERT INTO rendition (name, label, description) VALUES ('rnd:thumbnail', 'Thumbnail', 'A very small rendition of an image, giving only a general idea of its content.');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:preview', 'Preview', 'Preview resolution image or video');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:lowRes', 'Low resolution', 'Low resolution image or video');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:highRes', 'High resolution', 'High resolution image or video');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:print', 'Content for print', 'Content intended to appear in print');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:web', 'Content for a web page', 'Content intended to appear on a web page');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:sms', 'Content for short message', 'Content intended to appear in a short messaging system');
+INSERT INTO rendition (name, label, description) VALUES ('rnd:mobile', 'Content for a mobile device', 'Content intended to appear on a mobile or handheld device');
