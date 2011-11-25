@@ -123,7 +123,7 @@ public class CropRendition {
         }
 
         if (targetRendition.getDefaultWidth() != null && targetRendition.getDefaultWidth().intValue() > 0) {
-            setGenerateRenditionHeight(targetRendition.getDefaultWidth());
+            setGenerateRenditionWidth(targetRendition.getDefaultWidth());
         }
     }
 
