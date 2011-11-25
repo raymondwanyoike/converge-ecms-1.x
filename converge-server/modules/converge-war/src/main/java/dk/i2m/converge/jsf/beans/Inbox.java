@@ -10,24 +10,20 @@
 package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.converge.core.content.AssignmentType;
-import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemActor;
-import dk.i2m.converge.core.workflow.Outlet;
-import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
-import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
 import dk.i2m.converge.core.security.SystemPrivilege;
-import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.views.InboxView;
+import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.WorkflowState;
-import dk.i2m.converge.ejb.facades.DuplicateExecutionException;
-import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
-import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
-import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
-import dk.i2m.converge.jsf.components.tags.DialogSelfAssignment;
+import dk.i2m.converge.ejb.facades.*;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.jsf.components.tags.DialogSelfAssignment;
 import dk.i2m.jsf.JsfUtils;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -277,7 +273,6 @@ public class Inbox {
         showNewsItem = true;
         inboxTitle = JsfUtils.getResourceBundle().getString("inbox_MY_ASSIGNMENTS");
         List<InboxView> inboxView = newsItemFacade.findInbox(getUser().getUsername());
-        LOG.log(Level.INFO, "{0} items fetched for {1}", new Object[]{inboxView.size(), getUser().getUsername()});
         this.newsItems = new ListDataModel(inboxView);
     }
 
