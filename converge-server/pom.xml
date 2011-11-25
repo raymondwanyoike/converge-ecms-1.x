@@ -30,11 +30,11 @@
     </developers>
 
     <scm>
-        <connection>scm:hg:http://convergeecms.hg.sourceforge.net:8000/hgroot/convergeecms/convergeecms</connection>
-        <developerConnection>scm:hg:ssh://convergeecms.hg.sourceforge.net/hgroot/convergeecms/convergeecms</developerConnection>
-        <url>http://convergeecms.hg.sourceforge.net/hgweb/convergeecms</url>
+        <url>http://convergeecms.git.sourceforge.net/</url>
+        <developerConnection>scm:git:ssh://convergeecms.git.sourceforge.net/gitroot/convergeecms/convergeecms</developerConnection>
+        <connection>scm:git:git://convergeecms.git.sourceforge.net/gitroot/convergeecms/convergeecms</connection>
     </scm>
-	
+    
     <build>
         <extensions>
             <extension>
