@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>dk.i2m.converge</groupId>
     <artifactId>converge</artifactId>
-    <version>1.0.9-SNAPSHOT</version>
+    <version>1.1.0</version>
     <packaging>pom</packaging>
     <name>converge</name>
     <inceptionYear>2006</inceptionYear>
