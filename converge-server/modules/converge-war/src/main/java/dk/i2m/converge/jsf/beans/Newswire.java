@@ -18,19 +18,14 @@ package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.converge.core.content.ContentTag;
 import dk.i2m.converge.core.newswire.NewswireBasket;
-import dk.i2m.converge.core.workflow.Outlet;
-import dk.i2m.converge.core.security.SystemPrivilege;
-import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.newswire.NewswireService;
+import dk.i2m.converge.core.security.SystemPrivilege;
+import dk.i2m.converge.core.security.UserAccount;
+import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.domain.search.SearchResult;
 import dk.i2m.converge.domain.search.SearchResults;
-import dk.i2m.converge.ejb.facades.CalendarFacadeLocal;
-import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
-import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
-import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
-import dk.i2m.converge.ejb.facades.UserFacadeLocal;
-import dk.i2m.converge.ejb.facades.WorkflowFacadeLocal;
+import dk.i2m.converge.ejb.facades.*;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.NewswireServiceLocal;
 import dk.i2m.converge.jsf.components.tags.DialogAssignment;
@@ -51,7 +46,7 @@ import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 
 /**
- * Request-scoped backing bean for the {@code Newswire.jpsx} page.
+ * Request-scoped backing bean for the {@code Newswire.jspx} page.
  *
  * @author Allan Lykke Christensen
  */
@@ -265,7 +260,7 @@ public class Newswire {
 
             setKeyword("*:*");
             getFilterQueries().clear();
-            getFilterQueries().add("provider:" + selectedService.getSource().replaceAll(" ", "\\\\ ").replaceAll("-", "\\\\-"));
+            getFilterQueries().add("provider-id:" + selectedService.getId());
             conductSearch(getKeyword(), 0, getShow());
         }
     }
