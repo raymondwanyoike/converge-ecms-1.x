@@ -75,20 +75,6 @@ public class Dashboard {
         return this.events;
     }
 
-    /**
-     * Gets the {@link DataModel} containing todays news.
-     *
-     * @return {@link DataModel} containing todays news
-     */
-    public DataModel getNews() {
-        if (this.news == null) {
-            List<NewswireItem> todaysNews = newswireService.getTodaysNews();
-            news = new ListDataModel(todaysNews);
-        }
-
-        return this.news;
-    }
-
     private UserAccount getUserAccount() {
         final String valueExpression = "#{userSession.user}";
         return (UserAccount) JsfUtils.getValueOfValueExpression(valueExpression);

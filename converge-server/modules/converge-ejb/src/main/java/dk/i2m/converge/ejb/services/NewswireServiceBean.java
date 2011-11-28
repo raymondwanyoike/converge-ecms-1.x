@@ -11,50 +11,31 @@ package dk.i2m.converge.ejb.services;
 
 import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.content.ContentTag;
-import dk.i2m.converge.core.newswire.NewswireBasket;
-import dk.i2m.converge.core.newswire.NewswireDecoderException;
-import dk.i2m.converge.core.newswire.NewswireItem;
-import dk.i2m.converge.core.newswire.NewswireItemAttachment;
-import dk.i2m.converge.core.newswire.NewswireService;
-import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.ejb.facades.UserFacadeLocal;
-import dk.i2m.converge.core.plugin.PluginManager;
+import dk.i2m.converge.core.newswire.*;
 import dk.i2m.converge.core.plugin.NewswireDecoder;
+import dk.i2m.converge.core.plugin.PluginManager;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
+import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.domain.search.SearchFacet;
 import dk.i2m.converge.domain.search.SearchResult;
 import dk.i2m.converge.domain.search.SearchResults;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
+import dk.i2m.converge.ejb.facades.UserFacadeLocal;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.MapMessage;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+import javax.jms.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
@@ -155,24 +136,6 @@ public class NewswireServiceBean implements NewswireServiceLocal {
     public List<NewswireBasket> findBasketsByUser(Long userId) {
         Map<String, Object> params = QueryBuilder.with("uid", userId).parameters();
         return daoService.findWithNamedQuery(NewswireBasket.FIND_BY_USER, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<NewswireItem> getTodaysNews() {
-        try {
-            UserAccount user = userFacade.findById(ctx.getCallerPrincipal().getName());
-            Calendar start = Calendar.getInstance();
-            start.add(Calendar.HOUR_OF_DAY, -24);
-
-            Calendar end = Calendar.getInstance();
-            end.add(Calendar.HOUR_OF_DAY, +24);
-
-            Map<String, Object> params = QueryBuilder.with("start", start).and("end", end).and("user", user).parameters();
-            return daoService.findWithNamedQuery(NewswireItem.FIND_BY_DATE_USER, params);
-        } catch (DataNotFoundException ex) {
-            return Collections.EMPTY_LIST;
-        }
     }
 
     /** {@inheritDoc} */
@@ -700,7 +663,7 @@ public class NewswireServiceBean implements NewswireServiceLocal {
         } catch (MalformedURLException ex) {
             LOG.log(Level.SEVERE, "Invalid search engine configuration. {0}", ex.getMessage());
             LOG.log(Level.FINE, "", ex);
-            throw new IllegalStateException("Invalid search engine configuration", ex);
+            throw new java.lang.IllegalStateException("Invalid search engine configuration", ex);
         }
     }
 

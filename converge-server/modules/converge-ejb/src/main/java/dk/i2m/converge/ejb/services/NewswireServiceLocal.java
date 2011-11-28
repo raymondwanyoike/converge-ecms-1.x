@@ -117,14 +117,6 @@ public interface NewswireServiceLocal {
     void downloadNewswireService(Long newswireServiceId);
 
     /**
-     * Gets {@link NewswireItem}s from today for the current user.
-     *
-     * @return {@link List} of todays {@link NewswireItem}s from the newswire
-     *         services
-     */
-    List<NewswireItem> getTodaysNews();
-
-    /**
      * Searches the subscribed {@link NewswireService}s.
      * 
      * @param search
