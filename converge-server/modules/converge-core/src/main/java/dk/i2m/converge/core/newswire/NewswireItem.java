@@ -50,7 +50,6 @@ import org.eclipse.persistence.annotations.PrivateOwned;
 @NamedQueries({
     @NamedQuery(name = NewswireItem.FIND_BY_EXTERNAL_ID, query = "SELECT n FROM NewswireItem AS n WHERE n.externalId=:externalId"),
     @NamedQuery(name = NewswireItem.FIND_BY_DATE, query = "SELECT n FROM NewswireItem AS n WHERE n.date BETWEEN :start AND :end OR n.updated BETWEEN :start AND :end"),
-    @NamedQuery(name = NewswireItem.FIND_BY_DATE_USER, query = "SELECT DISTINCT n FROM NewswireItem n JOIN n.newswireService ns WHERE :user MEMBER OF ns.subscribers AND (n.date BETWEEN :start AND :end OR n.updated BETWEEN :start AND :end)"),
     @NamedQuery(name = NewswireItem.FIND_BY_USER, query = "SELECT DISTINCT n FROM NewswireItem n JOIN n.newswireService ns WHERE :user MEMBER OF ns.subscribers"),
     @NamedQuery(name = NewswireItem.FIND_BY_SERVICE, query = "SELECT n FROM NewswireItem AS n WHERE n.newswireService=:newswireService"),
     @NamedQuery(name = NewswireItem.SEARCH, query = "SELECT DISTINCT n FROM NewswireItem n JOIN n.newswireService ns WHERE :user MEMBER OF ns.subscribers AND (n.title LIKE :keyword OR n.summary LIKE :keyword)"),
@@ -65,9 +64,6 @@ public class NewswireItem implements Serializable {
 
     /** Query for finding newswire items for a particular date/time interval. Parameters {@code start}: start date/time, {@code end}: end date/time. */
     public static final String FIND_BY_DATE = "NewswireItem.findByDate";
-
-    /** Query for finding newswire items for a particular date/time interval for a given user. Parameters {@code start}: start date/time, {@code end}: end date/time, {@code user}: user account. */
-    public static final String FIND_BY_DATE_USER = "NewswireItem.findByDateUser";
 
     public static final String FIND_BY_USER = "NewswireItem.findByUser";
 
