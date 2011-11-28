@@ -35,7 +35,7 @@
                     </h:outputLink>
 
                     <h:panelGroup rendered="#{attachment.mediaItem.original.audio}" layout="block">
-                        <div id="container#{attachment.id}">Loading the player ...</div>
+                        <div id="container#{attachment.id}">#{i18n.jwplayer_LOADING_PLAYER}</div>
                         <script type="text/javascript"> 
                         jwplayer("container#{attachment.id}").setup({
                             flashplayer: "#{facesContext.externalContext.request.contextPath}/scripts/jwplayer/player.swf", 
@@ -49,7 +49,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{attachment.mediaItem.original.video}" layout="block">
-                        <div id="container#{attachment.id}">Loading the player ...</div>
+                        <div id="container#{attachment.id}">#{i18n.jwplayer_LOADING_PLAYER}</div>
                         <script type="text/javascript"> 
                         jwplayer("container#{attachment.id}").setup({
                             flashplayer: "#{facesContext.externalContext.request.contextPath}/scripts/jwplayer/player.swf", 
@@ -63,8 +63,8 @@
 
                     <h:panelGrid id="pgMediaInfo" columns="2" columnClasses="newsItemAttachmentLabel, newsItemAttachmentInput" styleClass="newsItemAttachmentInfo">
 
-                        <h:outputText value="#{msgs.CAPTION}" />
-                        <rich:inplaceInput required="true" value="#{attachment.caption}" viewClass="newsItemAttachmentCaptionInplace" viewHoverClass="newsItemAttachmentCaptionInplaceHover">
+                        <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_CAPTION_REQUIRED}" />
+                        <rich:inplaceInput required="true" requiredMessage="#{i18n.NewsItem_MEDIA_ATTACHMENT_CAPTION_REQUIRED}" value="#{attachment.caption}" viewClass="newsItemAttachmentCaptionInplace" viewHoverClass="newsItemAttachmentCaptionInplaceHover">
                             <a4j:support ajaxSingle="true" event="onviewactivated" reRender="dtMediaFiles">
                                 <f:setPropertyActionListener target="#{newsItem.updateAttachment}" value="#{attachment}" />
                             </a4j:support>
@@ -97,7 +97,7 @@
                                 <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
                             </h:outputText>
                         </h:outputLink>
-
+                        
                     </h:panelGrid>
 
                 </h:panelGrid>
