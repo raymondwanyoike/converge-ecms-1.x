@@ -222,7 +222,7 @@ public class NewswireService implements Serializable {
         for (NewswireItem item : getItems()) {
             Calendar expire = (Calendar) item.getDate().clone();
             expire.add(Calendar.DAY_OF_MONTH, getDaysToKeep());
-            if (expire.before(expired)) {
+            if (expire.before(now)) {
                 expired.add(item);
             }
         }
