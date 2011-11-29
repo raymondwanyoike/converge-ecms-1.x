@@ -36,9 +36,9 @@
                         </h:panelGrid>
                     </rich:column>
                 </rich:dataTable>                    
-                <h:panelGroup layout="block" style="padding-right: 10px;">
-                    <a4j:commandLink actionListener="#{activityStream.onShowMore}" reRender="dtNotifications" value="#{i18n.activityStreamModule_SHOW_MORE}" rendered="#{activityStream.showMore}" />
-                    <a4j:commandLink actionListener="#{activityStream.onDismissAll}" reRender="dtNotifications" value="#{i18n.activityStreamModule_DISMISS_ALL}" rendered="#{activityStream.notifications.rowCount &gt; 0}" />
+                <h:panelGroup layout="block">
+                    <a4j:commandLink styleClass="activityStreamBottomLink" actionListener="#{activityStream.onShowMore}" reRender="dtNotifications" value="#{i18n.activityStreamModule_SHOW_MORE}" rendered="#{activityStream.showMore}" />
+                    <a4j:commandLink styleClass="activityStreamBottomLink" actionListener="#{activityStream.onDismissAll}" reRender="dtNotifications" value="#{i18n.activityStreamModule_DISMISS_ALL}" rendered="#{activityStream.notifications.rowCount &gt; 0}" />
                 </h:panelGroup>
             </a4j:outputPanel>
 
