@@ -155,7 +155,9 @@ public class MailNewswireDecoder implements NewswireDecoder {
 
                 Properties props = new Properties();
                 Session session = Session.getDefaultInstance(props, null);
-                session.setDebug(true);
+                if (LOG.isLoggable(Level.FINEST)) {
+                    session.setDebug(true);
+                }
 
                 javax.mail.Store store;
                 try {
