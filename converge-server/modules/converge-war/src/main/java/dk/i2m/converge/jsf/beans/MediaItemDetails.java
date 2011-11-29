@@ -374,6 +374,25 @@ public class MediaItemDetails {
         }
     }
 
+    /**
+     * Executes a {@link CatalogueHookInstance} on the selected {@link MediaItem}.
+     * 
+     * @param instance 
+     *          {@link CatalogueHookInstance} to execute
+     */
+    public void setExecuteHook(CatalogueHookInstance instance) {
+        try {
+            catalogueFacade.executeHook(getSelectedMediaItem().getId(), instance.getId());
+            this.availableRenditions = null;
+            this.selectedMediaItem = null;
+            setId(getId());
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n", "MediaItemDetails_EXECUTE_HOOK_DONE", instance.getLabel());
+        } catch (DataNotFoundException ex) {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "MediaItemDetails_EXECUTE_HOOK_FAILED", instance.getLabel());
+            Logger.getLogger(MediaItemDetails.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public MediaItem getSelectedMediaItem() {
         return selectedMediaItem;
     }

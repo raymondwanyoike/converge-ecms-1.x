@@ -103,4 +103,6 @@ public interface CatalogueFacadeLocal {
     CatalogueHookInstance updateCatalogueAction(CatalogueHookInstance action);
 
     void executeBatchHook(dk.i2m.converge.core.content.catalogue.CatalogueHookInstance hookInstance, java.lang.Long catalogueId) throws dk.i2m.converge.ejb.services.DataNotFoundException;
+
+    void executeHook(java.lang.Long mediaItemId, java.lang.Long hookInstanceId) throws dk.i2m.converge.ejb.services.DataNotFoundException;
 }

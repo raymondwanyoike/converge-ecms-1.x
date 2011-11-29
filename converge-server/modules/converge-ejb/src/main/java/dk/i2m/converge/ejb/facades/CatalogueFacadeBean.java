@@ -274,6 +274,37 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         return daoService.update(rendition);
     }
 
+    /**
+     * Executes a {@link CatalogueHookInstance} on a {@link MediaItem}.
+     * 
+     * @param mediaItemId
+     *          Unique identifier of the {@link MediaItem}
+     * @param hookInstanceId
+     *          Unique identifier of the {@link CatalogueHookInstance}
+     * @throws DataNotFoundException 
+     *          If the given {@code mediaItemId} or {@code hookInstanceId}  
+     *          was invalid
+     */
+    @Override
+    public void executeHook(Long mediaItemId, Long hookInstanceId) throws DataNotFoundException {
+        MediaItem mediaItem = findMediaItemById(mediaItemId);
+        CatalogueHookInstance hookInstance = daoService.findById(CatalogueHookInstance.class, hookInstanceId);
+
+        LOG.log(Level.INFO, "Executing hook {0} for Media Item #{1}", new Object[]{hookInstance.getLabel(), mediaItem.getId()});
+        Long innerTaskId = systemFacade.createBackgroundTask("Executing " + hookInstance.getLabel() + " for Media Item #" + mediaItem.getId());
+        for (MediaItemRendition mir : mediaItem.getRenditions()) {
+            CatalogueEvent event = new CatalogueEvent(CatalogueEvent.Event.UpdateRendition, mediaItem, mir);
+            try {
+                CatalogueHook hook = hookInstance.getHook();
+                hook.execute(pluginContext, event, hookInstance);
+            } catch (CatalogueEventException ex) {
+                LOG.log(Level.WARNING, ex.getMessage());
+                LOG.log(Level.FINE, "Could not execute hook", ex);
+            }
+        }
+        systemFacade.removeBackgroundTask(innerTaskId);
+    }
+
     @Override
     public void executeBatchHook(CatalogueHookInstance hookInstance, Long catalogueId) throws DataNotFoundException {
         LOG.log(Level.INFO, "Executing Batch Hook");
@@ -413,7 +444,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         }
 
         // TODO: Set-up as workflow
-        
+
         if (mediaItem.getStatus() != null) {
             UserAccount user = null;
             try {

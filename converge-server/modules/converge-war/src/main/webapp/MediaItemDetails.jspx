@@ -26,6 +26,25 @@
 
                 <converge:moduleSpacer />
 
+                <c:if test="#{userSession.catalogueEditor}">
+                    <converge:moduleHeader moduleTitle="#{i18n.MediaItemDetails_CATALOGUE_HOOKS}" />
+                    <div>
+                        <h:panelGrid id="pgCatalogueHookOptions" style="margin-left: 2%; margin-right: 2%; width: 98%" rowClasses="left, left,center, center">
+                            <rich:dataList value="#{mediaItemDetails.selectedMediaItem.catalogue.hooks}" var="hook">
+                                <a4j:commandLink  reRender="preview, dtRenditions" ajaxSingle="true">
+                                    <f:setPropertyActionListener value="#{hook}" target="#{mediaItemDetails.executeHook}"/>
+                                    <h:outputFormat value="#{i18n.MediaItemDetails_EXECUTE_HOOK_X}">
+                                        <f:param value="#{hook.label}" />
+                                    </h:outputFormat>
+                                </a4j:commandLink>
+                            </rich:dataList>
+                        </h:panelGrid>
+                    </div>
+                    <converge:moduleSpacer />
+                </c:if>
+
+
+
                 <converge:moduleHeader moduleTitle="#{msgs.media_item_PREVIEW}" />
                 <h:panelGroup layout="block" id="preview" styleClass="mediaItemPreview">
                     <h:graphicImage url="#{res.EMPTY_FRAME}" rendered="#{!mediaItemDetails.selectedMediaItem.renditionsAttached}" />
@@ -571,7 +590,7 @@
                                     </h:panelGrid>
                                 </rich:tab>
 
-                                <rich:tab id="tabGenerateImage" label="#{msgs.media_item_rendition_DUPLICATE}" rendered="#{mediaItemDetails.selectedMediaItem.original.image}">
+                                <rich:tab id="tabGenerateImage" label="#{i18n.MediaItemDetails_NEW_RENDITION_GENERATE}" rendered="#{mediaItemDetails.selectedMediaItem.original.image}">
                                     <h:panelGrid id="pgDuplicateImage" columnClasses="tabSheet" style="padding: 10px; width: 100%">
                                         <rich:dataList value="#{mediaItemDetails.selectedMediaItem.renditions}" var="rendition">
                                             <h:outputLink value="#{facesContext.externalContext.request.contextPath}/CropRendition.xhtml" target="_blank">
@@ -585,7 +604,7 @@
                                         </rich:dataList>
                                     </h:panelGrid>
                                 </rich:tab>
-                                
+
                             </rich:tabPanel>
 
                             <h:panelGroup styleClass="dialogueButtons">
