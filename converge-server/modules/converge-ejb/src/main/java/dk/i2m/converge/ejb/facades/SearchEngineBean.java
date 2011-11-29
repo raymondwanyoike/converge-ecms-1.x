@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2011 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,45 +16,31 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.core.search.SearchEngineIndexingException;
-import dk.i2m.converge.domain.search.IndexField;
-import dk.i2m.converge.domain.search.SearchResult;
-import dk.i2m.converge.core.content.catalogue.MediaItem;
-import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.metadata.Concept;
-import dk.i2m.converge.core.metadata.GeoArea;
-import dk.i2m.converge.core.metadata.Organisation;
-import dk.i2m.converge.core.metadata.Person;
-import dk.i2m.converge.core.metadata.PointOfInterest;
-import dk.i2m.converge.core.metadata.Subject;
-import dk.i2m.converge.domain.search.SearchFacet;
-import dk.i2m.converge.domain.search.SearchResults;
-import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.ConfigurationKey;
+import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemActor;
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
+import dk.i2m.converge.core.metadata.*;
 import dk.i2m.converge.core.search.IndexQueueEntry;
 import dk.i2m.converge.core.search.QueueEntryOperation;
 import dk.i2m.converge.core.search.QueueEntryType;
+import dk.i2m.converge.core.search.SearchEngineIndexingException;
+import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.utils.BeanComparator;
-import dk.i2m.converge.ejb.services.ConfigurationServiceLocal;
-import dk.i2m.converge.ejb.services.DaoServiceLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
-import dk.i2m.converge.ejb.services.MetaDataServiceLocal;
-import dk.i2m.converge.ejb.services.QueryBuilder;
+import dk.i2m.converge.domain.search.IndexField;
+import dk.i2m.converge.domain.search.SearchFacet;
+import dk.i2m.converge.domain.search.SearchResult;
+import dk.i2m.converge.domain.search.SearchResults;
+import dk.i2m.converge.ejb.services.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -215,6 +201,9 @@ public class SearchEngineBean implements SearchEngineLocal {
         long startTime = System.currentTimeMillis();
         SearchResults searchResults = new SearchResults();
         try {
+            final DateFormat ORIGINAL_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            final DateFormat NEW_FORMAT = new SimpleDateFormat("MMMM yyyy");
+        
             SolrQuery solrQuery = new SolrQuery();
             solrQuery.setStart(start);
             solrQuery.setRows(rows);
@@ -257,6 +246,7 @@ public class SearchEngineBean implements SearchEngineLocal {
 
             solrQuery.addFacetField(IndexField.TYPE.getName());
             solrQuery.addFacetField(IndexField.OUTLET.getName());
+            solrQuery.addFacetField(IndexField.REPOSITORY.getName());
             solrQuery.addFacetField(IndexField.SECTION.getName());
             solrQuery.addFacetField(IndexField.SUBJECT.getName());
             solrQuery.addFacetField(IndexField.ORGANISATION.getName());
@@ -264,9 +254,9 @@ public class SearchEngineBean implements SearchEngineLocal {
             solrQuery.addFacetField(IndexField.LOCATION.getName());
             solrQuery.addFacetField(IndexField.POINT_OF_INTEREST.getName());
 
-            for (UserRole userRole : userFacade.getUserRoles()) {
-                solrQuery.addFacetField(userRole.getName());
-            }
+//            for (UserRole userRole : userFacade.getUserRoles()) {
+//                solrQuery.addFacetField(userRole.getName());
+//            }
 
             solrQuery.addFilterQuery(filterQueries);
             solrQuery.setFacetMinCount(1);
@@ -339,6 +329,47 @@ public class SearchEngineBean implements SearchEngineLocal {
                     }
                 }
             }
+            
+            for (FacetField facet : qr.getFacetDates()) {
+                List<FacetField.Count> facetEntries = facet.getValues();
+                if (facetEntries != null) {
+                    for (FacetField.Count fcount : facetEntries) {
+                        if (fcount.getCount() != 0) {
+                            if (!searchResults.getFacets().containsKey(facet.getName())) {
+                                searchResults.getFacets().put(facet.getName(), new ArrayList<SearchFacet>());
+                            }
+
+                            String facetLabel = "";
+                            try {
+                                Date facetDate = ORIGINAL_FORMAT.parse(fcount.getName());
+                                facetLabel = NEW_FORMAT.format(facetDate);
+                            } catch (ParseException ex) {
+                                LOG.log(Level.SEVERE, null, ex);
+                                facetLabel = fcount.getName();
+                            }
+
+                            String realFilterQuery = "date:[" + fcount.getName() + " TO " + fcount.getName() + "+1MONTH]";
+
+                            SearchFacet sf = new SearchFacet(facetLabel, realFilterQuery, fcount.getCount());
+
+                            // Check if the filter query is already active
+                            for (String fq : filterQueries) {
+                                if (fq.equals(realFilterQuery)) {
+                                    sf.setSelected(true);
+                                }
+                            }
+
+                            // Ensure that the facet is not already there
+                            if (!searchResults.getFacets().get(facet.getName()).contains(sf)) {
+                                searchResults.getFacets().get(facet.getName()).add(sf);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            
+            
         } catch (SolrServerException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
@@ -532,6 +563,7 @@ public class SearchEngineBean implements SearchEngineLocal {
                 mediaFormat = "Image";
             } else if (mir.isDocument()) {
                 mediaFormat = "Document";
+                story = metaDataService.extractContent(mir);
             } else {
                 mediaFormat = "Unknown";
             }
@@ -613,22 +645,24 @@ public class SearchEngineBean implements SearchEngineLocal {
     private SearchResult generateMediaHit(QueryResponse qr, HashMap<String, Object> values) {
         String id = (String) values.get(IndexField.ID.getName());
 
-        StringBuilder caption = new StringBuilder();
-        StringBuilder title = new StringBuilder();
-        StringBuilder note = new StringBuilder();
+        StringBuilder caption = new StringBuilder("");
+        StringBuilder title = new StringBuilder("");
+        StringBuilder note = new StringBuilder("");
 
         Map<String, List<String>> highlighting = qr.getHighlighting().get(id);
-
+        
         boolean highlightingExist = highlighting != null;
-
+        
         if (highlightingExist && highlighting.get(IndexField.STORY.getName()) != null) {
             for (String hl : highlighting.get(IndexField.STORY.getName())) {
                 caption.append(hl);
             }
-        } else {
+        } else if (highlighting.get(IndexField.STORY.getName()) != null) {
             caption.append(StringUtils.abbreviate((String) values.get(IndexField.STORY.getName()), 500));
+        } else {
+            caption.append(StringUtils.abbreviate((String) values.get(IndexField.CAPTION.getName()), 500));
         }
-
+        
         if (highlightingExist && highlighting.get(IndexField.TITLE.getName()) != null) {
             for (String hl : qr.getHighlighting().get(id).get(IndexField.TITLE.getName())) {
                 title.append(hl);
