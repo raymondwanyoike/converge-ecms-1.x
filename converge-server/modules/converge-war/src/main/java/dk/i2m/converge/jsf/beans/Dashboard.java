@@ -17,12 +17,10 @@
 package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.converge.core.calendar.Event;
-import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.views.CurrentAssignment;
 import dk.i2m.converge.ejb.facades.CalendarFacadeLocal;
 import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
-import dk.i2m.converge.ejb.services.NewswireServiceLocal;
 import dk.i2m.jsf.JsfUtils;
 import java.util.List;
 import javax.ejb.EJB;
@@ -35,8 +33,6 @@ import javax.faces.model.ListDataModel;
  * @author Allan Lykke Christensen
  */
 public class Dashboard {
-
-    @EJB private NewswireServiceLocal newswireService;
 
     @EJB private CalendarFacadeLocal calendarFacade;
 
