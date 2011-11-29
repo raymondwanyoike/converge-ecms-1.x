@@ -26,9 +26,15 @@ import org.eclipse.persistence.annotations.PrivateOwned;
 @Table(name = "newswire_service")
 @NamedQueries({
     @NamedQuery(name = NewswireService.COUNT_SUBSCRIBERS, query = "select count(ns.subscribers) from NewswireService ns where ns.id=:id"),
+    @NamedQuery(name = NewswireService.DELETE_EXPIRED_ITEMS, query = "DELETE FROM NewswireItem ni WHERE ni.newswireService.id=:id AND ni.date <= :expirationDate"),
     @NamedQuery(name = NewswireService.COUNT_ITEMS, query = "select count(ns.items) from NewswireService ns where ns.id=:id"),
     @NamedQuery(name = NewswireService.FIND_BY_STATUS, query = "select ns from NewswireService ns where ns.active=:active")})
 public class NewswireService implements Serializable {
+
+    /**
+     * Update query for removing all expired newswire items from a service. Parameters are {@code id} (ID of the newswire service) and {@code expirationDate} (Date of expiration).
+     */
+    public static final String DELETE_EXPIRED_ITEMS = "NewswireService.deleteExpiredItems";
 
     public static final String COUNT_SUBSCRIBERS = "NewswireService.countSubscribers";
 
@@ -36,7 +42,7 @@ public class NewswireService implements Serializable {
 
     public static final String FIND_BY_STATUS = "NewswireService.findByActive";
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -208,25 +214,6 @@ public class NewswireService implements Serializable {
 
     public void setItems(List<NewswireItem> newswireItems) {
         this.items = newswireItems;
-    }
-    
-    /**
-     * Gets a {@link List} of {@link NewswireItem}s that
-     * has expired from the service.
-     * 
-     * @return {@Link List} of expired {@link NewswireItem}s
-     */
-    public List<NewswireItem> getExpiredItems() {
-        List<NewswireItem> expired = new ArrayList<NewswireItem>();
-        Calendar now = Calendar.getInstance();
-        for (NewswireItem item : getItems()) {
-            Calendar expire = (Calendar) item.getDate().clone();
-            expire.add(Calendar.DAY_OF_MONTH, getDaysToKeep());
-            if (expire.before(now)) {
-                expired.add(item);
-            }
-        }
-        return expired;
     }
 
     public List<UserAccount> getSubscribers() {

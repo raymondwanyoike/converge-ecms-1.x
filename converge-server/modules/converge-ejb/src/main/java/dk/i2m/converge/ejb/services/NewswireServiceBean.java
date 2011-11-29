@@ -242,19 +242,25 @@ public class NewswireServiceBean implements NewswireServiceLocal {
         Long taskId = 0L;
         try {
             NewswireService service = daoService.findById(NewswireService.class, newswireServiceId);
-            taskId = systemFacade.createBackgroundTask("Expiring items from newswire service " + service.getSource());
-            List<NewswireItem> expired = service.getExpiredItems();
-
-            for (NewswireItem newswireItem : expired) {
-                try {
-                    solrServer.deleteById(String.valueOf(newswireItem.getId()));
-                    daoService.delete(NewswireItem.class, newswireItem.getId());
-                } catch (SolrServerException ex) {
-                    LOG.log(Level.SEVERE, "Could not remove newswire item #{0} from index. {1} ", new Object[]{newswireItem.getId(), ex.getMessage()});
-                } catch (IOException ex) {
-                    LOG.log(Level.SEVERE, "Could not remove newswire item #{0} from index. {1} ", new Object[]{newswireItem.getId(), ex.getMessage()});
-                }
+            if (service.getDaysToKeep().intValue() < 1) {
+                // Ignore
+                return;
             }
+            
+            taskId = systemFacade.createBackgroundTask("Expiring items from newswire service " + service.getSource());
+            try {
+                solrServer.deleteByQuery("provider-id:" + newswireServiceId + " AND date:[* TO NOW-"+service.getDaysToKeep()+"DAY/DAY]");
+                Calendar expirationDate = Calendar.getInstance();
+                expirationDate.add(Calendar.DAY_OF_MONTH, -service.getDaysToKeep());
+                QueryBuilder qb = QueryBuilder.with("id", newswireServiceId).and("expirationDate", expirationDate);
+                daoService.executeQuery(NewswireService.DELETE_EXPIRED_ITEMS, qb);
+
+            } catch (SolrServerException ex) {
+                LOG.log(Level.SEVERE, "Could not remove expired newswire items from index. {0} ", new Object[]{ex.getMessage()});
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, "Could not remove expired newswire items from index. {0} ", new Object[]{ex.getMessage()});
+            }
+            //}
 
         } catch (DataNotFoundException ex) {
             LOG.log(Level.WARNING, ex.getMessage());
