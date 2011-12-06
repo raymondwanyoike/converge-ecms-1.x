@@ -1,0 +1,13 @@
+This directory contains the installable EAR (Enterprise 
+Archive) file ready for installation on GlassFish v2.1.1.
+
+On top of the EAR file you'll also find the following files:
+
+- setup.sql                SQL structure and default data
+- solr.zip                 Search engine configuration
+- 1.0.8-1.1.0.sql          Upgrade script from Converge 1.0.8 to 1.1.0
+
+Instructions for installing Converge can be found at
+http://www.getconverge.com/support
+
+
