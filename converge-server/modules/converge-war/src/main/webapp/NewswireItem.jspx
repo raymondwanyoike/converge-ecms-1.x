@@ -8,8 +8,8 @@
 
             <div id="story">
                 <div id="controls">
-                    <h:graphicImage url="/images/icons/print.png" title="#{msgs.newswire_archive_PRINT_STORY}" alt="#{msgs.newswire_archive_PRINT_STORY}" onclick="javascript:window.print();" />
-                    <h:graphicImage url="/images/icons/remove.gif" title="#{msgs.newswire_archive_CLOSE_STORY}" alt="#{msgs.newswire_archive_CLOSE_STORY}" onclick="javascript:window.close();" />
+                    <h:graphicImage url="/images/icons/print.png" title="#{i18n.NewswireItem_PRINT}" alt="#{i18n.NewswireItem_PRINT}" onclick="javascript:window.print();" />
+                    <h:graphicImage url="/images/icons/remove.gif" title="#{i18n.NewswireItem_CLOSE}" alt="#{i18n.NewswireItem_CLOSE}" onclick="javascript:window.close();" />
                 </div>
 
                 <h1 style="margin-bottom: 0px;">#{newswireitem.selectedItem.title}</h1>
@@ -17,11 +17,11 @@
                     <span style="color:#0E774A; padding-right: 10px;">#{newswireitem.selectedItem.newswireService.source}</span> 
                     <span style="color:#FF0000; padding-right: 10px;">#{newswireitem.selectedItem.author}</span> 
                     <span style="color:#4272DB;"><h:outputText value="#{newswireitem.selectedItem.date.time}"  >
-                            <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                            <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                         </h:outputText></span></h2>
 
                 <c:if test="#{newswireitem.selectedItem.url != ''}">
-                    <h:outputLink value="#{newswireitem.selectedItem.url}">#{msgs.newswire_archive_FULL_STORY}</h:outputLink>
+                    <h:outputLink value="#{newswireitem.selectedItem.url}">#{i18n.NewswireItem_FULL_STORY}</h:outputLink>
                 </c:if>
 
 
@@ -42,14 +42,6 @@
                 <c:if test="#{!empty newswireitem.selectedItem.imageAttachments}">
                     <h3>#{i18n.NewswireItem_ATTACHMENTS_IMAGES}</h3>
                     <div style="display:block;clear: both; "></div>
-                    <a4j:outputPanel ajaxRendered="true">
-                        <h:message for="frmPage" style="color: green; font-weight: bold;"  />
-                    </a4j:outputPanel>
-                    <div style="display:block;clear: both; "></div>
-
-                    <a4j:commandLink rendered="#{userSession.catalogueEditor &amp;&amp; userSession.user.defaultCatalogueSelected}" ajaxSingle="true" reRender="frmPage" onclick="#{newswireitem.onAddToCatelogue}">
-                        <h:outputText value="Add to catalogue (#{userSession.user.defaultMediaRepository.name})" />
-                    </a4j:commandLink>
 
                     <a4j:repeat value="#{newswireitem.selectedItem.imageAttachments}" var="attachment">
                         <div class="imgAttachment">
@@ -66,9 +58,24 @@
                     <ul>
                         <ui:repeat value="#{newswireitem.selectedItem.attachments}" var="attachment">
                             <li><h:outputLink rendered="#{!attachment.storedInCatalogue}" target="_blank" value="#{facesContext.externalContext.request.contextPath}/NewswireItemAttachment?aid=#{attachment.id}&amp;nid=#{newswireitem.selectedItem.id}">#{attachment.filename}</h:outputLink>
-                                <h:outputLink rendered="#{attachment.storedInCatalogue}" target="_blank" value="#{attachment.catalogueUrl}">#{attachment.filename}</h:outputLink>&#160;&#160;(<h:outputText value="#{attachment.size/1024/1024}"><f:convertNumber maxFractionDigits="1" /></h:outputText> MB) #{attachment.description}</li>
+                                <h:outputLink rendered="#{attachment.storedInCatalogue}" target="_blank" value="#{attachment.catalogueUrl}">#{attachment.filename}</h:outputLink>&#160;&#160;(<h:outputText value="#{converge:displaySize(attachment.size)}" />) #{attachment.description}</li>
                             </ui:repeat>
                     </ul>
+                </c:if>
+
+                <c:if test="#{newswireitem.importReady &amp;&amp; userSession.catalogueEditor}">
+                    <a4j:outputPanel ajaxRendered="true">
+                        <h:message for="frmPage" style="color: green; font-weight: bold;"  />
+                    </a4j:outputPanel>
+                    <div style="display:block;clear: both; "></div>
+
+                    <h:selectOneMenu id="somImportCatalogue" value="#{newswireitem.importCatalogue}">
+                        <f:selectItems value="#{common.writableMediaRepositories}" />
+                    </h:selectOneMenu>
+
+                    <a4j:commandLink rendered="#{userSession.catalogueEditor &amp;&amp; userSession.user.defaultCatalogueSelected}" process="somImportCatalogue" ajaxSingle="true" reRender="frmPage" actionListener="#{newswireitem.onAddToCatalogue}">
+                        <h:outputText value="#{i18n.NewswireItem_IMPORT_TO_CATALOGUE}" />
+                    </a4j:commandLink>
                 </c:if>
 
             </div>

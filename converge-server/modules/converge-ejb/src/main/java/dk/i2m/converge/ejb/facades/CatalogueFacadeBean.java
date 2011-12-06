@@ -515,10 +515,13 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         item.setCreated(now);
         item.setUpdated(now);
 
-        if (newswireItem.isSummarised()) {
-            item.setDescription(newswireItem.getSummary());
-        } else {
-            item.setDescription(StringUtils.stripHtml(newswireItem.getContent()));
+        StringBuilder description = new StringBuilder();
+        if (org.apache.commons.lang.StringUtils.isBlank(newswireItem.getSummary())) {
+            description.append(newswireItem.getSummary());
+        }
+        
+        if (org.apache.commons.lang.StringUtils.isBlank(newswireItem.getContent())) {
+            description.append(StringUtils.stripHtml(newswireItem.getContent()));
         }
 
         item.setTitle(newswireItem.getTitle());

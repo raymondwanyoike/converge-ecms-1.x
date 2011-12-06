@@ -1,30 +1,24 @@
 /*
- *  Copyright (C) 2010 - 2011 Interactive Media Management
- * 
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- * 
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2010 - 2011 Interactive Media Management
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.newswire.NewswireItemAttachment;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.NewswireServiceLocal;
 import dk.i2m.jsf.JsfUtils;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -40,13 +34,24 @@ public class NewswireItem {
 
     @EJB private NewswireServiceLocal newswireService;
 
-    @EJB private CatalogueFacadeLocal mediaDatabase;
+    @EJB private CatalogueFacadeLocal catalogueFacade;
 
     private Long id = 0L;
 
     private dk.i2m.converge.core.newswire.NewswireItem selectedItem = null;
 
+    private Catalogue importCatalogue = null;
+
     public NewswireItem() {
+    }
+
+    @PostConstruct
+    public void init() {
+        // Set the default catalogue
+        Catalogue defaultCatalogue = getUser().getDefaultMediaRepository();
+        if (defaultCatalogue != null) {
+            importCatalogue = defaultCatalogue;
+        }
     }
 
     public Long getId() {
@@ -65,6 +70,22 @@ public class NewswireItem {
         }
     }
 
+    public dk.i2m.converge.core.newswire.NewswireItem getSelectedItem() {
+        return selectedItem;
+    }
+
+    public Catalogue getImportCatalogue() {
+        return importCatalogue;
+    }
+
+    public void setImportCatalogue(Catalogue importCatalogue) {
+        this.importCatalogue = importCatalogue;
+    }
+
+    private UserAccount getUser() {
+        return (UserAccount) JsfUtils.getValueOfValueExpression("#{userSession.user}");
+    }
+
     /**
      * Determines if a news item has been loaded. If a news item cannot be
      * retrieved from {@link NewsItem#getSelectedNewsItem()} it is not loaded.
@@ -80,12 +101,23 @@ public class NewswireItem {
         }
     }
 
-    public dk.i2m.converge.core.newswire.NewswireItem getSelectedItem() {
-        return selectedItem;
-    }
-
-    private UserAccount getUser() {
-        return (UserAccount) JsfUtils.getValueOfValueExpression("#{userSession.user}");
+    /**
+     * Determines if the {@link dk.i2m.converge.core.newswire.NewswireItem}
+     * can be imported to a {@link Catalogue}. It is only possible
+     * to import {@link dk.i2m.converge.core.newswire.NewswireItem}s where
+     * attachments have {@link Rendition}s set.
+     * 
+     * @return {@code true} if the {@link NewswireItem} can be imported,
+     *         otherwise {@code false}
+     */
+    public boolean isImportReady() {
+        boolean ready = false;
+        for (NewswireItemAttachment attachment : getSelectedItem().getAttachments()) {
+            if (attachment.isRenditionSet()) {
+                ready = true;
+            }
+        }
+        return ready;
     }
 
     /**
@@ -96,8 +128,11 @@ public class NewswireItem {
      *          Event that invoked the handler
      */
     public void onAddToCatalogue(ActionEvent event) {
-        Catalogue catalogue = getUser().getDefaultMediaRepository();
-        MediaItem item = mediaDatabase.create(selectedItem, catalogue);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "newswire_archive_ATTACHMENT_ADDED_TO_CATALOGUE", new Object[]{selectedItem.getTitle(), catalogue.getName(), item.getId()});
+        if (importCatalogue != null) {
+            MediaItem item = catalogueFacade.create(selectedItem, importCatalogue);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO , "i18n", "NewswireItem_IMPORT_SUCCESSFUL", importCatalogue.getName());
+        } else {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "NewswireItem_IMPORT_FAILED", null);
+        }
     }
 }
