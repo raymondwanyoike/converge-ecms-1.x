@@ -22,7 +22,6 @@ import dk.i2m.converge.core.reporting.activity.UserActivity;
 import dk.i2m.converge.core.reporting.activity.UserActivitySummary;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
-import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
 import dk.i2m.converge.ejb.services.QueryBuilder;
 import java.io.ByteArrayOutputStream;
@@ -38,13 +37,7 @@ import javax.ejb.Stateless;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HeaderFooter;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Footer;
-import org.apache.poi.ss.usermodel.Header;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.WorkbookUtil;
 
 /**
@@ -56,21 +49,32 @@ import org.apache.poi.ss.util.WorkbookUtil;
 public class ReportingFacadeBean implements ReportingFacadeLocal {
 
     @EJB private DaoServiceLocal daoService;
+    
+    @EJB private SystemFacadeLocal systemFacade;
 
     private static final Logger LOG = Logger.getLogger(ReportingFacadeBean.class.getName());
 
     @Override
-    public ActivityReport generateActivityReport(Date start, Date end, UserRole userRole) {
+    public ActivityReport generateActivityReport(Date start, Date end, UserRole userRole, boolean submitter) {
+        Long taskId = systemFacade.createBackgroundTask("Generating activity report");
         ActivityReport report = new ActivityReport(start, end, userRole);
 
         Map<String, Object> parameters = QueryBuilder.with("userRole", userRole).and("startDate", start).and("endDate", end).parameters();
 
-        List<UserAccount> users = daoService.findWithNamedQuery(UserAccount.FIND_ACTIVE_USERS_BY_ROLE, parameters);
+        String query;
+        if (submitter) {
+            query = UserAccount.FIND_ACTIVE_USERS_BY_ROLE;
+        } else {
+            query = UserAccount.FIND_NEWS_ITEMS_BY_USER_ROLE;
+        }
+        
+        List<UserAccount> users = daoService.findWithNamedQuery(query, parameters);
 
         for (UserAccount user : users) {
-            report.getUserActivity().add(generateUserActivityReport(start, end, user));
+            report.getUserActivity().add(generateUserActivityReport(start, end, user, submitter));
         }
 
+        systemFacade.removeBackgroundTask(taskId);
         return report;
     }
 
@@ -86,20 +90,30 @@ public class ReportingFacadeBean implements ReportingFacadeLocal {
      * @return {@link UserActivity} for the given period and user
      */
     @Override
-    public UserActivity generateUserActivityReport(Date start, Date end, UserAccount user) {
+    public UserActivity generateUserActivityReport(Date start, Date end, UserAccount user, boolean submitter) {
+        if (user == null) {
+            return null;
+        }
+        Long taskId = systemFacade.createBackgroundTask("Generating user activity report for " + user.getFullName());
         Map<String, Object> param = QueryBuilder.with("startDate", start).and("endDate", end).and("user", user).parameters();
-        List<NewsItem> items = daoService.findWithNamedQuery(NewsItem.FIND_SUBMITTED_BY_USER, param);
+        List<NewsItem> items;
+        if (submitter) {
+            items = daoService.findWithNamedQuery(NewsItem.FIND_SUBMITTED_BY_USER, param);
+        } else {
+            items = daoService.findWithNamedQuery(NewsItem.FIND_SUBMITTED_BY_PASSIVE_USER, param);
+        }
 
         UserActivity userActivity = new UserActivity();
         userActivity.setUser(user);
         userActivity.setSubmitted(items);
 
+        systemFacade.removeBackgroundTask(taskId);
         return userActivity;
     }
 
     @Override
     public UserActivitySummary generateUserActivitySummary(Date start, Date end, UserAccount user) {
-        UserActivitySummary summary = new UserActivitySummary(generateUserActivityReport(start, end, user));
+        UserActivitySummary summary = new UserActivitySummary(generateUserActivityReport(start, end, user, true));
         return summary;
     }
 

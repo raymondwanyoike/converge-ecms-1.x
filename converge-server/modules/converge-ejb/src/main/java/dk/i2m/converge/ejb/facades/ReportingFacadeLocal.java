@@ -27,11 +27,11 @@ import javax.ejb.Local;
 @Local
 public interface ReportingFacadeLocal {
 
-    dk.i2m.converge.core.reporting.activity.UserActivity generateUserActivityReport(java.util.Date start, java.util.Date end, dk.i2m.converge.core.security.UserAccount user);
+    dk.i2m.converge.core.reporting.activity.ActivityReport generateActivityReport(java.util.Date start, java.util.Date end, dk.i2m.converge.core.security.UserRole userRole, boolean submitter);
+    
+    dk.i2m.converge.core.reporting.activity.UserActivity generateUserActivityReport(java.util.Date start, java.util.Date end, dk.i2m.converge.core.security.UserAccount user, boolean submitter);
 
     dk.i2m.converge.core.reporting.activity.UserActivitySummary generateUserActivitySummary(java.util.Date start, java.util.Date end, dk.i2m.converge.core.security.UserAccount user);
 
     byte[] convertToExcel(ActivityReport report);
-
-    dk.i2m.converge.core.reporting.activity.ActivityReport generateActivityReport(java.util.Date start, java.util.Date end, dk.i2m.converge.core.security.UserRole userRole);
 }

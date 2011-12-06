@@ -66,8 +66,8 @@ import javax.persistence.UniqueConstraint;
     @NamedQuery(name = UserAccount.FIND_BY_UID, query = "SELECT u FROM UserAccount u WHERE u.username=:username"),
     @NamedQuery(name = UserAccount.FIND_BY_USER_ROLE, query = "SELECT u FROM UserRole r JOIN r.userAccounts u WHERE r.name=:roleName"),
     @NamedQuery(name = UserAccount.FIND_USERS_WITH_PUBLICATIONS, query = "SELECT u FROM NewsItemActor n JOIN n.newsItem ni JOIN ni.placements p JOIN n.user u WHERE (n.role = :userRole AND p.edition.publicationDate >= :startDate AND p.edition.publicationDate <= :endDate) GROUP BY u"),
-    @NamedQuery(name = UserAccount.FIND_ACTIVE_USERS_BY_ROLE, query =
-    "SELECT DISTINCT u FROM NewsItem AS ni JOIN ni.actors AS a JOIN a.user AS u JOIN ni.history AS h WHERE (a.role = :userRole AND h.user = a.user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY a.user.username DESC")
+    @NamedQuery(name = UserAccount.FIND_ACTIVE_USERS_BY_ROLE, query = "SELECT DISTINCT u FROM NewsItem AS ni JOIN ni.actors AS a JOIN a.user AS u JOIN ni.history AS h WHERE (a.role = :userRole AND h.user = a.user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY a.user.username DESC"),
+    @NamedQuery(name = UserAccount.FIND_NEWS_ITEMS_BY_USER_ROLE, query = "SELECT DISTINCT u FROM NewsItem AS ni JOIN ni.actors AS a JOIN a.user AS u JOIN ni.history AS h WHERE (a.role = :userRole AND h.user = a.user AND h.timestamp >= :startDate AND h.timestamp <= :endDate) ORDER BY a.user.username DESC")
 })
 public class UserAccount implements Serializable {
 
@@ -82,8 +82,11 @@ public class UserAccount implements Serializable {
     /** Query for generating the activity report. */
     public static final String FIND_USERS_WITH_PUBLICATIONS = "UserAccount.findUsersWithPublications";
 
-    /** Query for generating the activity report. */
+    /** Query for generating the activity report for active users only. */
     public static final String FIND_ACTIVE_USERS_BY_ROLE = "UserAccount.findActiveUsersByRole";
+    
+    /** Query for generating the activity report - for passive and active users. */
+    public static final String FIND_NEWS_ITEMS_BY_USER_ROLE = "UserAccount.findNewsItemsByUserRole";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

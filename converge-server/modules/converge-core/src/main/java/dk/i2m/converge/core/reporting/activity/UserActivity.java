@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * {@link UserActivity} contains the submitted and used
+ * {@link NewsItem}s for a given period of time for a given {@link UserAccount}.
  *
  * @author Allan Lykke Christensen
  */

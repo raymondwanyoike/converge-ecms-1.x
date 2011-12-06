@@ -12,24 +12,27 @@
 
 
             <h:form id="frmReporting">
-                <converge:moduleHeader moduleTitle="#{i18n.REPORT_ACTIVITY_REPORT_TITLE}" />
+                <converge:moduleHeader moduleTitle="#{i18n.ReportActivity_PAGE_TITLE}" />
                 <div class="moduleContent">
 
                     <h:panelGrid columns="2">
-                        <h:outputText value="#{i18n.REPORT_ACTIVITY_USER_ROLE}" />
+                        <h:outputText value="#{i18n.ReportActivity_USER_ROLE}" />
                         <h:selectOneMenu value="#{reportActivity.userRole}" converter="#{converters.userRoleConverter}">
                             <f:selectItems value="#{common.userRoles}"/>
                         </h:selectOneMenu>
 
-                        <h:outputText value="#{i18n.REPORT_ACTIVITY_START_DATE}" />
+                        <h:outputText value="#{i18n.ReportActivity_USER_ROLE_SUBMITTER}" />
+                        <h:selectBooleanCheckbox value="#{reportActivity.userRoleSubmitter}" title="#{i18n.ReportActivity_USER_ROLE_SUBMITTER_TOOLTIP}" />
+
+                        <h:outputText value="#{i18n.ReportActivity_START_DATE}" />
                         <rich:calendar id="calStartDate" value="#{reportActivity.startDate}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{msgs.FORMAT_DATE}" />
 
-                        <h:outputText value="#{i18n.REPORT_ACTIVITY_END_DATE}" />
-                        <rich:calendar id="calEditionDate" value="#{reportActivity.endDate}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{msgs.FORMAT_DATE}" />
+                        <h:outputText value="#{i18n.ReportActivity_END_DATE}" />
+                        <rich:calendar id="calEndDate" value="#{reportActivity.endDate}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{msgs.FORMAT_DATE}" />
 
                         <h:outputText value="" />
                         <h:column>
-                            <a4j:commandButton actionListener="#{reportActivity.onGenerateReport}" value="#{i18n.REPORT_ACTIVITY_GENERATE_REPORT}" reRender="frmOutput" styleClass="button mediumButton" />
+                            <a4j:commandButton actionListener="#{reportActivity.onGenerateReport}" value="#{i18n.ReportActivity_GENERATE_REPORT}" reRender="frmOutput" styleClass="button mediumButton" />
                             <a4j:status>
                                 <f:facet name="start">
                                     <h:graphicImage value="#{res.AJAX_LOADING_ICON}" />
@@ -46,7 +49,7 @@
 
             <h:form id="frmOutput">
                 <a4j:outputPanel rendered="#{reportActivity.report.rowCount > 0}">
-                    <converge:moduleHeader moduleTitle="Output" />
+                    <converge:moduleHeader moduleTitle="#{i18n.ReportActivity_OUTPUT}" />
                     <div class="moduleContent">
 
                         <h:panelGrid style="float: right; margin-bottom: 5px;" columns="2">
@@ -55,7 +58,7 @@
                             </h:commandLink>
 
                             <h:commandLink actionListener="#{reportActivity.onDownloadXls}" >
-                                <h:outputText value="Download as spreadsheet" />
+                                <h:outputText value="#{i18n.ReportActivity_DOWNLOAD_AS_SPREADSHEET}" />
                             </h:commandLink>
                         </h:panelGrid>
 
@@ -63,7 +66,7 @@
 
                             <rich:column sortBy="#{report.user.fullName}" sortOrder="ASCENDING">
                                 <f:facet name="header">
-                                    <h:outputText value="Name" />
+                                    <h:outputText value="#{i18n.ReportActivity_REPORT_NAME}" />
                                 </f:facet>
                                 <a4j:commandLink ajaxSingle="true" reRender="frmNewsItems">
                                     <h:outputText value="#{report.user.fullName} (#{report.user.username})" />
@@ -74,35 +77,35 @@
 
                             <rich:column>
                                 <f:facet name="header">
-                                    <h:outputText value="Submitted" escape="false" />
+                                    <h:outputText value="#{i18n.ReportActivity_REPORT_SUBMITTED}" escape="false" />
                                 </f:facet>
                                 <h:outputText value="#{report.numberOfNewsItemsSubmitted}" />
                             </rich:column>
 
                             <rich:column>
                                 <f:facet name="header">
-                                    <h:outputText value="Submitted with Media" escape="false" />
+                                    <h:outputText value="#{i18n.ReportActivity_REPORT_SUBMITTED_WITH_MEDIA}" escape="false" />
                                 </f:facet>
                                 <h:outputText value="#{report.numberOfNewsItemsSubmittedWithMediaItems}" />
                             </rich:column>
 
                             <rich:column>
                                 <f:facet name="header">
-                                    <h:outputText value="Used" />
+                                    <h:outputText value="#{i18n.ReportActivity_REPORT_USED}" />
                                 </f:facet>
                                 <h:outputText value="#{report.numberOfNewsItemsUsed}" />
                             </rich:column>
 
                             <rich:column>
                                 <f:facet name="header">
-                                    <h:outputText value="Used with Media" />
+                                    <h:outputText value="#{i18n.ReportActivity_REPORT_USED_WITH_MEDIA}" />
                                 </f:facet>
                                 <h:outputText value="#{report.numberOfNewsItemsUsedWithMedia}" />
                             </rich:column>
 
                             <rich:column>
                                 <f:facet name="header">
-                                    <h:outputText value="Used %" />
+                                    <h:outputText value="#{i18n.ReportActivity_REPORT_USED_PERCENT}" />
                                 </f:facet>
                                 <h:outputFormat value="{0,number,#%}">
                                     <f:param value="#{report.usage}" />
@@ -111,7 +114,7 @@
 
                             <rich:column>
                                 <f:facet name="header">
-                                    <h:outputText value="Used with Media %" />
+                                    <h:outputText value="#{i18n.ReportActivity_REPORT_USED_PERCENT_WITH_MEDIA}" />
                                 </f:facet>
                                 <h:outputFormat value="{0,number,#%}">
                                     <f:param value="#{report.usageWithMedia}" />
@@ -121,7 +124,6 @@
                     </div>
                 </a4j:outputPanel>
             </h:form>
-
 
             <h:form id="frmNewsItems">
                 <rich:modalPanel id="mpNewsItems" autosized="true" domElementAttachment="parent" >
@@ -274,17 +276,15 @@
 
                             </rich:tab>
 
-
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <h:commandLink id="lnkClose" styleClass="dialogButton" value="Close" onclick="#{rich:component('mpNewsItems')}.hide(); return false;" />
+                            <h:commandLink id="lnkClose" styleClass="dialogButton" value="#{i18n.Generic_CLOSE}" onclick="#{rich:component('mpNewsItems')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 
                 </rich:modalPanel>
             </h:form>
-
 
             <converge:moduleSpacer />
         </ui:define>
