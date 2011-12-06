@@ -1,18 +1,11 @@
 /*
  * Copyright (C) 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.ejb.messaging;
 
@@ -23,11 +16,8 @@ import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.plugin.NewswireDecoder;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
-import dk.i2m.converge.ejb.services.ConfigurationServiceLocal;
-import dk.i2m.converge.ejb.services.DaoServiceLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
-import dk.i2m.converge.ejb.services.PluginContextBeanLocal;
-import dk.i2m.converge.ejb.services.QueryBuilder;
+import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
+import dk.i2m.converge.ejb.services.*;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Calendar;
@@ -65,19 +55,24 @@ public class NewswireDecoderMessageBean implements MessageListener {
     @EJB private DaoServiceLocal daoService;
 
     @EJB private PluginContextBeanLocal pluginContext;
-    
+
+    @EJB private SystemFacadeLocal systemFacade;
+
     @Override
     public void onMessage(Message msg) {
+        Long taskId = 0L;
         try {
             Long newswireServiceId = null;
             try {
                 newswireServiceId = msg.getLongProperty("newswireServiceId");
                 LOG.log(Level.INFO, "Fetching single newswire service");
+                taskId = systemFacade.createBackgroundTask("Fetching newswire service manually");
             } catch (NumberFormatException ex) {
-                 LOG.log(Level.INFO, "Fetching all newswire services");
+                LOG.log(Level.INFO, "Fetching all newswire services");
+                taskId = systemFacade.createBackgroundTask("Fetching all newswire services manually");
             }
             SolrServer solrServer = getSolrServer();
-   
+
             if (newswireServiceId == null) {
                 Map<String, Object> parameters = QueryBuilder.with("active", true).parameters();
                 List<NewswireService> services = daoService.findWithNamedQuery(NewswireService.FIND_BY_STATUS, parameters);
@@ -91,12 +86,16 @@ public class NewswireDecoderMessageBean implements MessageListener {
 
         } catch (JMSException ex) {
             LOG.log(Level.SEVERE, null, ex);
+        } finally {
+            systemFacade.removeBackgroundTask(taskId);
         }
     }
 
     private void fetchNewswire(Long newswireServiceId, SolrServer solrServer) {
+        Long taskId = 0L;
         try {
             NewswireService service = daoService.findById(NewswireService.class, newswireServiceId);
+            taskId = systemFacade.createBackgroundTask("Fetching newswire service " + service.getSource());
             LOG.log(Level.INFO, "Newswire Service {0}", service.getSource());
             NewswireDecoder decoder = service.getDecoder();
 
@@ -117,6 +116,8 @@ public class NewswireDecoderMessageBean implements MessageListener {
             LOG.log(Level.WARNING, ex.getMessage());
         } catch (NewswireDecoderException ex) {
             LOG.log(Level.SEVERE, null, ex);
+        } finally {
+            systemFacade.removeBackgroundTask(taskId);
         }
     }
 
