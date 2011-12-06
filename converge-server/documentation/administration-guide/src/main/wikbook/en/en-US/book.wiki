@@ -1,0 +1,13 @@
+**EARLY DRAFT**
+
+This guide is intended for Converge administrators who want to configure
+Converge for their organisation.
+
+= About Converge = 
+
+{{include document="about.wiki" /}}
+
+= Catalogues {{anchor id=catalogues /}} =
+
+{{include document="catalogues.wiki" /}}
+

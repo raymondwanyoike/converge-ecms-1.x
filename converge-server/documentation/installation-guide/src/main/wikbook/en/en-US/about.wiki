@@ -1,0 +1,22 @@
+Converge is an editorial content and workflow management system for media
+organisations. The core features of Converge is described below.
+
+= Technology =
+
+Converge is a Java Enterprise Edition 5 (JEE5) applications and must be installed on a
+JEE5-compliant application server. Converge uses the Java Persistence API (JPA) and Java
+Database Connectivity (JDBC) to communicate with the database server and is therefore
+database independent. Converge has been extensively tested and used in production with
+the MySQL Database Server 5.5. User management is done through the Lightweight Directory
+Access Protocol (LDAP) such as OpenDS, OpenLDAP or Microsoft Active Directory. Converge 
+operates on a full open source stack consisting of:
+
+* Operating System: Ubuntu 10.04+
+* Application Server: Glassfish v2.1.1
+* Database Server: MySQL Server 5.5
+* Web Server: Apache 2+
+* Java Virtual Machine: Oracle Java 1.6.0
+* Directory Service: OpenDS 2+
+
+Converge can also operate on proprietary platforms using Microsoft Windows, Oracle Database
+and Application Servers, and Microsoft Active Directory.
