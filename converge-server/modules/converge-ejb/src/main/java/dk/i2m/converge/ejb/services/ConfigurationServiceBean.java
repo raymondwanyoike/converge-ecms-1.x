@@ -39,7 +39,7 @@ public class ConfigurationServiceBean implements ConfigurationServiceLocal {
 
     private ResourceBundle cfg = ResourceBundle.getBundle("dk.i2m.converge.Configuration");
 
-    private static final Logger log = Logger.getLogger(ConfigurationServiceBean.class.getName());
+    private static final Logger LOG = Logger.getLogger(ConfigurationServiceBean.class.getName());
 
     /** {@inheritDoc } */
     @Override
@@ -73,7 +73,7 @@ public class ConfigurationServiceBean implements ConfigurationServiceLocal {
 
                 return (T) obj;
             } catch (Exception ex) {
-                log.log(Level.WARNING, "Unknown configuration: {0}", new Object[]{key.name()});
+                LOG.log(Level.WARNING, "Unknown configuration: {0}", new Object[]{key.name()});
                 return defaultValue;
             }
         }
@@ -90,7 +90,7 @@ public class ConfigurationServiceBean implements ConfigurationServiceLocal {
             try {
                 return cfg.getString(key.name());
             } catch (Exception ex) {
-                log.log(Level.WARNING, "Unknown configuration: {0}", new Object[]{key.name()});
+                LOG.log(Level.WARNING, "Unknown configuration: {0}", new Object[]{key.name()});
                 return key.name();
             }
         }
@@ -108,12 +108,12 @@ public class ConfigurationServiceBean implements ConfigurationServiceLocal {
                 try {
                     return Integer.valueOf(cfg.getString(key.name()));
                 } catch (Exception ex) {
-                    log.log(Level.WARNING, "Unknown configuration: {0}", new Object[]{key.name()});
+                    LOG.log(Level.WARNING, "Unknown configuration: {0}", new Object[]{key.name()});
                     return -1;
                 }
             }
         } catch (NumberFormatException ex) {
-            log.log(Level.WARNING, "Couldn't retrieve configuration: {0}. {1}", new Object[]{key.name(), ex.getMessage()});
+            LOG.log(Level.WARNING, "Couldn't retrieve configuration: {0}. {1}", new Object[]{key.name(), ex.getMessage()});
             return -1;
         }
     }
@@ -129,7 +129,7 @@ public class ConfigurationServiceBean implements ConfigurationServiceLocal {
             try {
                 return Boolean.valueOf(cfg.getString(key.name()));
             } catch (Exception ex) {
-                log.log(Level.WARNING, "Unknown configuration: {0}", new Object[]{key.name()});
+                LOG.log(Level.WARNING, "Unknown configuration: {0}", new Object[]{key.name()});
                 return false;
             }
         }
