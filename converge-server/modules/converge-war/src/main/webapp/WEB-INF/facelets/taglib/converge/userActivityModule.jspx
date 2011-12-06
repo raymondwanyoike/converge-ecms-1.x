@@ -36,7 +36,8 @@
                 </h:panelGrid>
 
                 <h:outputLink rendered="#{showMoreStatistics}" value="#{facesContext.externalContext.request.contextPath}/MyActivity.xhtml">#{i18n.userActivityModule_SHOW_MORE}</h:outputLink>
-            </div>
+                </div>
         </h:form>
+        <converge:moduleSpacer />
     </ui:composition>
 </jsp:root>

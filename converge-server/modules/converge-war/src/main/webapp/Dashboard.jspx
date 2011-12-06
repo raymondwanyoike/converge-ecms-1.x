@@ -11,21 +11,7 @@
             <a4j:keepAlive beanName="dashboard" />
             <a4j:keepAlive beanName="activityStream" />
 
-            <h:form id="frmMyAssignments">
-                <converge:moduleHeader moduleTitle="#{msgs.CURRENT_ASSIGNMENTS}" />
-                <div class="moduleContent">
-
-                    <h:panelGrid columns="2">
-                        <h:graphicImage value="#{res.NEWS_ITEM_ICON}" />
-                        <h:outputLink value="#{facesContext.externalContext.request.contextPath}/Inbox.xhtml">
-                            <h:outputFormat value="#{i18n.Dashboard_X_ASSIGNMENTS_IN_INBOX}">
-                                <f:param value="#{dashboard.userAssignments.rowCount}" />
-                            </h:outputFormat>
-                        </h:outputLink>
-                    </h:panelGrid>
-                </div>
-            </h:form>
-            <converge:moduleSpacer />
+            <!--converge:currentAssignmentsModule /-->
 
             <h:form id="frmTodaysEvents">
                 <converge:moduleHeader moduleTitle="#{msgs.UPCOMING_EVENTS}" />
@@ -65,9 +51,7 @@
 
         <ui:define name="rightColumn">
             <converge:userProfileModule id="modUserProfile" user="#{userSession.user}" />
-            <converge:moduleSpacer />
             <converge:userActivityModule id="modUserActivity" showMoreStatistics="true" />
-            <converge:moduleSpacer />
 
             <c:if test="#{common.announcementsAvailable}">
                 <converge:moduleHeader moduleTitle="#{msgs.dashboard_ANNOUNCEMENTS}" />

@@ -23,6 +23,6 @@
                 </h:panelGrid>
             </div>
         </h:form>
-
+        <converge:moduleSpacer />
     </ui:composition>
 </jsp:root>

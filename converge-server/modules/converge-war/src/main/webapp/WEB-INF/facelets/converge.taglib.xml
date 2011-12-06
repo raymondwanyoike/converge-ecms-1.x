@@ -22,6 +22,11 @@
     </tag>
 
     <tag>
+        <tag-name>currentAssignmentsModule</tag-name>
+        <source>taglib/converge/currentAssignmentsModule.xhtml</source>
+    </tag>
+
+    <tag>
         <tag-name>contactToolTip</tag-name>
         <source>taglib/converge/contactToolTip.jspx</source>
     </tag>
