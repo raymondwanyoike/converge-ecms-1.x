@@ -27,6 +27,7 @@ import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.ConfigurationKey;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.reporting.activity.UserActivitySummary;
 import dk.i2m.converge.ejb.facades.ReportingFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
@@ -344,7 +345,7 @@ public class UserSession {
     public Map<String, List<Outlet>> getPrivilegedOutlets() {
         return privilegedOutlets;
     }
-
+    
     public Map<String, Outlet> getMyNewsItemsOutlets() {
         Map<String, Outlet> outlets = new LinkedHashMap<String, Outlet>();
 
