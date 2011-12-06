@@ -1,18 +1,11 @@
 /*
  * Copyright (C) 2010 - 2011 Interactive Media Management
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.jsf.beans;
 
@@ -64,6 +57,8 @@ import dk.i2m.converge.core.plugin.WorkflowValidator;
 import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.ejb.facades.ListingFacadeLocal;
 import dk.i2m.jsf.JsfUtils;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -399,9 +394,24 @@ public class Common {
     public String getApplicationVersion() {
         return systemFacade.getApplicationVersion();
     }
-    
+
     public String getShortApplicationVersion() {
         return systemFacade.getShortApplicationVersion();
+    }
+
+    /**
+     * Gets a unique URL encoded build number.
+     * 
+     * @return Unique URL encoded build number
+     */
+    public String getBuildNumber() {
+        try {
+            String buildDate = systemFacade.getApplicationVersion();
+            return URLEncoder.encode(buildDate, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            Long now = Calendar.getInstance().getTimeInMillis();
+            return "" + now;
+        }
     }
 
     public List<NewswireService> getNewswireServicesList() {
@@ -443,7 +453,7 @@ public class Common {
         Map<String, UserAccount> users = new LinkedHashMap<String, UserAccount>();
 
         for (UserAccount userAccount : userFacade.getUsers()) {
-            users.put(userAccount.getFullName() + " (" + userAccount.getUsername() +  ")", userAccount);
+            users.put(userAccount.getFullName() + " (" + userAccount.getUsername() + ")", userAccount);
         }
 
         return users;
