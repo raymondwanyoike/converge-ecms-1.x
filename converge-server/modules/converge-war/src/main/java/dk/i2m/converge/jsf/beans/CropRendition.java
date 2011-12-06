@@ -202,7 +202,8 @@ public class CropRendition {
     public void onCrop(ActionEvent event) {
         try {
             // Calculate the scale of the crop selection depending on the size of the image in the browser
-            int originalW = sourceMediaItemRendition.getWidth();
+            BufferedImage src = ImageIO.read(new URL(sourceMediaItemRendition.getAbsoluteFilename()));
+            int originalW = src.getWidth(); //sourceMediaItemRendition.getWidth();
             float increase = (float) originalW / (float) getTargetWidth();
             int calcCropX = (int) (getCropX() * (increase));
             int calcCropY = (int) (getCropY() * (increase));
@@ -210,7 +211,6 @@ public class CropRendition {
             int calcCropHeight = (int) ((float) getCropHeight() * (increase));
 
             // Crop image
-            BufferedImage src = ImageIO.read(new URL(sourceMediaItemRendition.getAbsoluteFilename()));
             BufferedImage dest = src.getSubimage(calcCropX, calcCropY, calcCropWidth, calcCropHeight);
 
             // Scale down/up image based on the requested rendition size
