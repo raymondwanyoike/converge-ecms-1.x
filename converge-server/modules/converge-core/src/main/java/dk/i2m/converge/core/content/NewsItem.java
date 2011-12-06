@@ -81,6 +81,7 @@ import org.eclipse.persistence.annotations.PrivateOwned;
     @NamedQuery(name = NewsItem.REVOKE_ALL_LOCKS, query = "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.checkedOutBy IS NOT NULL"),
     @NamedQuery(name = NewsItem.FIND_BY_USER_USER_ROLE_AND_DATE, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.user = :user AND a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.state = :state) ORDER BY ni.updated DESC"),
     @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (h.user = :user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_PASSIVE_USER, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (h.user = :user AND h.timestamp >= :startDate AND h.timestamp <= :endDate) ORDER BY ni.updated DESC"),    
     @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER_ROLE, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC")
 })
 public class NewsItem implements Serializable {
@@ -119,6 +120,8 @@ public class NewsItem implements Serializable {
     public static final String FIND_BY_USER_USER_ROLE_AND_DATE = "NewsItem.findByUserUserRoleAndDate";
 
     public static final String FIND_SUBMITTED_BY_USER = "NewsItem.findBySubmittedUser";
+    
+    public static final String FIND_SUBMITTED_BY_PASSIVE_USER = "NewsItem.findBySubmittedPassveUser";
     
     public static final String FIND_SUBMITTED_BY_USER_ROLE = "NewsItem.findBySubmittedAndUserRole";
 
