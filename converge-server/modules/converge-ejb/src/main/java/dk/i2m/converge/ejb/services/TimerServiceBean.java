@@ -161,6 +161,8 @@ public class TimerServiceBean implements TimerServiceLocal {
         try {
             if (timer.getInfo().equals(PeriodicTimer.NEWSWIRE.name())) {
                 newswireService.downloadNewswireServicesSync();
+            }else if (timer.getInfo().equals(PeriodicTimer.NEWSWIRE_PURGE.name())) {
+                newswireService.purgeNewswires();
             } else if (timer.getInfo().equals(PeriodicTimer.EDITION.name())) {
                 outletFacade.closeOverdueEditions();
             } else if (PeriodicTimer.CATALOGUE_WATCH.name().equals(timer.getInfo())) {

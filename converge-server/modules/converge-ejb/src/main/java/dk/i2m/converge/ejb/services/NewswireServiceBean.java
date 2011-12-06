@@ -233,8 +233,18 @@ public class NewswireServiceBean implements NewswireServiceLocal {
         List<NewswireService> services = daoService.findWithNamedQuery(NewswireService.FIND_BY_STATUS, parameters);
 
         for (NewswireService service : services) {
-            deleteExpiredItems(service.getId(), solrServer);
             fetchNewswire(service.getId(), solrServer);
+        }
+    }
+
+    @Override
+    public void purgeNewswires() {
+        SolrServer solrServer = getSolrServer();
+
+        List<NewswireService> services = daoService.findAll(NewswireService.class);
+
+        for (NewswireService service : services) {
+            deleteExpiredItems(service.getId(), solrServer);
         }
     }
 
@@ -246,10 +256,10 @@ public class NewswireServiceBean implements NewswireServiceLocal {
                 // Ignore
                 return;
             }
-            
+
             taskId = systemFacade.createBackgroundTask("Expiring items from newswire service " + service.getSource());
             try {
-                solrServer.deleteByQuery("provider-id:" + newswireServiceId + " AND date:[* TO NOW-"+service.getDaysToKeep()+"DAY/DAY]");
+                solrServer.deleteByQuery("provider-id:" + newswireServiceId + " AND date:[* TO NOW-" + service.getDaysToKeep() + "DAY/DAY]");
                 Calendar expirationDate = Calendar.getInstance();
                 expirationDate.add(Calendar.DAY_OF_MONTH, -service.getDaysToKeep());
                 QueryBuilder qb = QueryBuilder.with("id", newswireServiceId).and("expirationDate", expirationDate);
@@ -260,7 +270,6 @@ public class NewswireServiceBean implements NewswireServiceLocal {
             } catch (IOException ex) {
                 LOG.log(Level.SEVERE, "Could not remove expired newswire items from index. {0} ", new Object[]{ex.getMessage()});
             }
-            //}
 
         } catch (DataNotFoundException ex) {
             LOG.log(Level.WARNING, ex.getMessage());

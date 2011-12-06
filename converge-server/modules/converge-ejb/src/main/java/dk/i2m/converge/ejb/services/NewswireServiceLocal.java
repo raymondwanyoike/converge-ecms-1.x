@@ -187,4 +187,6 @@ public interface NewswireServiceLocal {
 
     void removeItem(Long id);
 
+    void purgeNewswires();
+
 }
