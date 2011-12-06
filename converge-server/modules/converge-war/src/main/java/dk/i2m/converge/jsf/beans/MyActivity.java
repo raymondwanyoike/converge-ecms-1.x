@@ -53,7 +53,7 @@ public class MyActivity {
     }
     
     public void onRefresh(ActionEvent event) {
-        userActivity = reportingFacade.generateUserActivityReport(from, to, getUser());
+        userActivity = reportingFacade.generateUserActivityReport(from, to, getUser(), true);
     }
     
     public Date getFrom() {
