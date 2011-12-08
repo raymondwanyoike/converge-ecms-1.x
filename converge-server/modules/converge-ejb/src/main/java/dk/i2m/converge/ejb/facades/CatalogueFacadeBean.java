@@ -763,7 +763,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         File mediaFile = new File(dir, rendition.getFilename());
 
         // Move file to the new location
-        LOG.log(Level.INFO, "Archiving {0} at {1}", new Object[]{file.getAbsolutePath(), mediaFile.getAbsolutePath()});
+        LOG.log(Level.FINE, "Archiving {0} at {1}", new Object[]{file.getAbsolutePath(), mediaFile.getAbsolutePath()});
         copyFile(file, mediaFile);
 
         rendition.setPath(cataloguePath.toString());
