@@ -19,12 +19,11 @@ package dk.i2m.converge.core.plugin;
 import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.Notification;
-import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.NewsItem;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.content.forex.Rate;
-import dk.i2m.converge.core.content.markets.FinancialMarket;
 import dk.i2m.converge.core.content.markets.MarketValue;
 import dk.i2m.converge.core.content.weather.Forecast;
 import dk.i2m.converge.core.newswire.NewswireDecoderException;
@@ -116,6 +115,16 @@ public interface PluginContext {
      *          If the {@link NewsItem} could not be indexed
      */
     void index(NewsItem item) throws SearchEngineIndexingException;
+    
+    /**
+     * Indexes a given {@link NewswireItem} in the search engine.
+     * 
+     * @param item
+     *          {@link NewswireItem} to index
+     * @throws SearchEngineIndexingException
+     *          If the {@link NewswireItem} could not be indexed
+     */
+    void index(NewswireItem item) throws SearchEngineIndexingException;
 
     /**
      * Gets a {@link List} of the latest {@link FinancialMarket} values.

@@ -247,6 +247,21 @@ public class NewswireServiceBean implements NewswireServiceLocal {
             deleteExpiredItems(service.getId(), solrServer);
         }
     }
+    
+    /**
+     * Indexes a {@link NewswireItem} in the database.
+     * 
+     * @param item
+     *          {@link NewswireItem} to index.
+     * @throws SearchEngineIndexingException 
+     *          If the item could not be indexed
+     */
+    @Override
+    public void index(NewswireItem item) throws SearchEngineIndexingException {
+        SolrServer solrServer = getSolrServer();
+        index(item, solrServer);
+    }
+    
 
     private void deleteExpiredItems(Long newswireServiceId, SolrServer solrServer) {
         Long taskId = 0L;
@@ -285,15 +300,18 @@ public class NewswireServiceBean implements NewswireServiceLocal {
             taskId = systemFacade.createBackgroundTask("Downloading newswire service " + service.getSource());
             NewswireDecoder decoder = service.getDecoder();
 
-            List<NewswireItem> items = decoder.decode(pluginContext, service);
 
-            for (NewswireItem newswireItem : items) {
-                try {
-                    index(newswireItem, solrServer);
-                } catch (SearchEngineIndexingException seie) {
-                    LOG.log(Level.SEVERE, "Could not index newswire item. " + seie.getMessage(), seie);
-                }
-            }
+        
+            decoder.decode(pluginContext, service);
+            
+
+//            for (NewswireItem newswireItem : items) {
+//                try {
+//                    index(newswireItem, solrServer);
+//                } catch (SearchEngineIndexingException seie) {
+//                    LOG.log(Level.SEVERE, "Could not index newswire item. " + seie.getMessage(), seie);
+//                }
+//            }
 
             service.setLastFetch(Calendar.getInstance());
             daoService.update(service);
@@ -324,7 +342,7 @@ public class NewswireServiceBean implements NewswireServiceLocal {
         for (ContentTag tag : ni.getTags()) {
             solrDoc.addField("tag", tag.getTag().toLowerCase());
         }
-
+        
         try {
             solrServer.add(solrDoc);
         } catch (SolrServerException ex) {

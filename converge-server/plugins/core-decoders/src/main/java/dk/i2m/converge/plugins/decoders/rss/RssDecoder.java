@@ -19,15 +19,18 @@ import com.sun.syndication.io.XmlReader;
 import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.DataExistsException;
 import dk.i2m.converge.core.content.ContentTag;
+import dk.i2m.converge.core.newswire.NewswireDecoderException;
 import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.plugin.NewswireDecoder;
 import dk.i2m.converge.core.plugin.PluginContext;
+import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.utils.StringUtils;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,7 +54,7 @@ public class RssDecoder implements NewswireDecoder {
         ENABLE_OPEN_CALAIS, URL
     }
 
-    /** Number of seconds to wait for a connection to the RSS feed. */
+    /** Number of seconds to wait for a connection to the RSS feed server. */
     public static final int CONNECTION_TIMEOUT = 60;
 
     /** Number of seconds to wait for the feed to be downloaded. */
@@ -59,24 +62,17 @@ public class RssDecoder implements NewswireDecoder {
 
     private static final Logger LOG = Logger.getLogger(RssDecoder.class.getName());
 
-    private Calendar releaseDate = new GregorianCalendar(2011, Calendar.APRIL,
-            12, 16, 20);
-
     private Map<String, String> availableProperties = null;
 
-    private ResourceBundle bundle = ResourceBundle.getBundle(
-            "dk.i2m.converge.plugins.decoders.rss.Messages");
+    private ResourceBundle bundle = ResourceBundle.getBundle("dk.i2m.converge.plugins.decoders.rss.Messages");
 
     private PluginContext pluginContext;
-
-    private String propUrl = "";
 
     private boolean useOpenCalais = false;
 
     private String openCalaisId = "";
 
-    private static final String OPENCALAIS_URL =
-            "http://api.opencalais.com/tag/rs/enrich";
+    private static final String OPENCALAIS_URL = "http://api.opencalais.com/tag/rs/enrich";
 
     /**
      * Creates a new instance of {@link RssDecoder}.
@@ -96,83 +92,56 @@ public class RssDecoder implements NewswireDecoder {
     }
 
     @Override
-    public List<NewswireItem> decode(PluginContext ctx,
-            NewswireService newswire) {
+    public void decode(PluginContext ctx, NewswireService newswire) throws NewswireDecoderException {
         this.pluginContext = ctx;
         String url = newswire.getPropertiesMap().get(Property.URL.name());
 
         if (newswire.getPropertiesMap().containsKey(Property.ENABLE_OPEN_CALAIS.name())) {
-            useOpenCalais = Boolean.parseBoolean(newswire.getPropertiesMap().
-                    get(Property.ENABLE_OPEN_CALAIS.name()));
+            useOpenCalais = Boolean.parseBoolean(newswire.getPropertiesMap().get(Property.ENABLE_OPEN_CALAIS.name()));
         } else {
             useOpenCalais = false;
         }
 
         if (useOpenCalais) {
-            openCalaisId = ctx.getConfiguration(
-                    ConfigurationKey.OPEN_CALAIS_API_KEY);
+            openCalaisId = ctx.getConfiguration(ConfigurationKey.OPEN_CALAIS_API_KEY);
         }
 
-        LOG.log(Level.FINE, "Downloading newswire webfeed {0} {1}",
-                new Object[]{newswire.getSource(), url});
+        LOG.log(Level.FINE, "Downloading newswire webfeed {0} {1}", new Object[]{newswire.getSource(), url});
         int duplicates = 0;
         int newItems = 0;
-        List<NewswireItem> createdItems = new ArrayList<NewswireItem>();
+
         try {
             URL feedSource = new URL(url);
             URLConnection feedConnection = feedSource.openConnection();
             feedConnection.setConnectTimeout(CONNECTION_TIMEOUT * 1000);
             feedConnection.setReadTimeout(READ_TIMEOUT * 1000);
-            //final FeedFetcher feedFetcher = new HttpClientFeedFetcher();
-            //SyndFeed feed = null;
 
             SyndFeedInput input = new SyndFeedInput();
             SyndFeed feed = input.build(new XmlReader(feedConnection));
 
-            //        feed = feedFetcher.retrieveFeed(feedSource);
-
             for (SyndEntry entry : (List<SyndEntry>) feed.getEntries()) {
                 try {
-                    createdItems.add(create(entry, newswire));
+                    create(entry, newswire);
                     newItems++;
                 } catch (DataExistsException dee) {
                     duplicates++;
                 }
             }
         } catch (MalformedURLException ex) {
-            LOG.log(Level.WARNING, "Problem with feed #{0} - {1} - {2}. {3}",
-                    new Object[]{newswire.getId(), newswire.getSource(), url,
-                        ex.getMessage()});
-            LOG.log(Level.FINE, "", ex);
+            throw new NewswireDecoderException(ex);
         } catch (IllegalArgumentException ex) {
-            LOG.log(Level.WARNING, "Problem with feed #{0} - {1} - {2}. {3}",
-                    new Object[]{newswire.getId(), newswire.getSource(), url,
-                        ex.getMessage()});
-            LOG.log(Level.FINE, "", ex);
+            throw new NewswireDecoderException(ex);
         } catch (FeedException ex) {
-            LOG.log(Level.WARNING, "Problem with feed #{0} - {1} - {2}. {3}",
-                    new Object[]{newswire.getId(), newswire.getSource(), url,
-                        ex.getMessage()});
-            LOG.log(Level.FINE, "", ex);
-//        } catch (final FetcherException ex) {
-//            logger.log(Level.WARNING, "Problem with feed {0} - {1} - {2}. {3}", new Object[]{newswire.getId(), newswire.getSource(), url, ex.getMessage()});
-//            logger.log(Level.FINE, "", ex);
+            throw new NewswireDecoderException(ex);
         } catch (IOException ex) {
-            LOG.log(Level.WARNING, "Problem with feed {0} - {1} - {2}. {3}",
-                    new Object[]{newswire.getId(), newswire.getSource(), url,
-                        ex.getMessage()});
-            LOG.log(Level.FINE, "", ex);
+            throw new NewswireDecoderException(ex);
         }
 
-        LOG.log(Level.INFO,
-                "{2} had {0} {0, choice, 0#duplicates|1#duplicate|2#duplicates} and {1} new {1, choice, 0#items|1#item|2#items} ",
-                new Object[]{duplicates, newItems, newswire.getSource()});
-
-        return createdItems;
+        LOG.log(Level.INFO, "{2} had {0} {0, choice, 0#duplicates|1#duplicate|2#duplicates} and {1} new {1, choice, 0#items|1#item|2#items} ", new Object[]{
+                    duplicates, newItems, newswire.getSource()});
     }
 
-    private NewswireItem create(SyndEntry entry, NewswireService source)
-            throws DataExistsException {
+    private void create(SyndEntry entry, NewswireService source) throws DataExistsException {
         List<NewswireItem> results = pluginContext.findNewswireItemsByExternalId(entry.getUri());
 
         if (results.isEmpty()) {
@@ -180,8 +149,7 @@ public class RssDecoder implements NewswireDecoder {
             NewswireItem item = new NewswireItem();
             item.setExternalId(entry.getUri());
             item.setTitle(StringUtils.stripHtml(entry.getTitle()));
-            item.setSummary(StringUtils.stripHtml(entry.getDescription().
-                    getValue()));
+            item.setSummary(StringUtils.stripHtml(entry.getDescription().getValue()));
             item.setUrl(entry.getLink());
             item.setNewswireService(source);
             item.setAuthor(entry.getAuthor());
@@ -201,12 +169,14 @@ public class RssDecoder implements NewswireDecoder {
             if (useOpenCalais) {
                 enrich(pluginContext, item);
             }
-
-
-            return pluginContext.createNewswireItem(item);
+            NewswireItem nwi = pluginContext.createNewswireItem(item);
+            try {
+                pluginContext.index(nwi);
+            } catch (SearchEngineIndexingException ex) {
+                Logger.getLogger(RssDecoder.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else {
-            throw new DataExistsException("NewswireItem with external id ["
-                    + entry.getUri() + "] already downloaded");
+            throw new DataExistsException("NewswireItem with external id [" + entry.getUri() + "] already downloaded");
         }
     }
 
@@ -232,7 +202,12 @@ public class RssDecoder implements NewswireDecoder {
 
     @Override
     public Date getDate() {
-        return releaseDate.getTime();
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return format.parse(bundle.getString("PLUGIN_BUILD_TIME"));
+        } catch (Exception ex) {
+            return Calendar.getInstance().getTime();
+        }
     }
 
     @Override
@@ -252,8 +227,6 @@ public class RssDecoder implements NewswireDecoder {
             HttpClient client = new HttpClient();
             int returnCode = client.executeMethod(method);
             if (returnCode == HttpStatus.SC_NOT_IMPLEMENTED) {
-                System.err.println(
-                        "The Post method is not implemented by this URI");
                 // still consume the response body
                 method.getResponseBodyAsString();
             } else if (returnCode == HttpStatus.SC_OK) {
@@ -276,9 +249,7 @@ public class RssDecoder implements NewswireDecoder {
                     }
                 }
             } else {
-                LOG.log(Level.WARNING,
-                        "Invalid response received from OpenCalais [{0}] {1}",
-                        new Object[]{returnCode, method.getResponseBodyAsString()});
+                LOG.log(Level.WARNING, "Invalid response received from OpenCalais [{0}] {1}", new Object[]{returnCode, method.getResponseBodyAsString()});
             }
 
         } catch (Exception e) {

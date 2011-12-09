@@ -21,6 +21,7 @@ import dk.i2m.converge.core.newswire.NewswireServiceProperty;
 import dk.i2m.converge.core.plugin.ArchiveException;
 import dk.i2m.converge.core.plugin.NewswireDecoder;
 import dk.i2m.converge.core.plugin.PluginContext;
+import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.utils.FileUtils;
 import dk.i2m.converge.core.utils.StringUtils;
 import dk.i2m.converge.nar.newsml.v1_0.*;
@@ -74,10 +75,9 @@ public class NewsMLDecoder implements NewswireDecoder {
 
     private NewswireService newswireService;
 
-    private List<NewswireItem> newswireItems = null;
+    //private List<NewswireItem> newswireItems = null;
 
-    private Map<String, String> renditionMapping =
-            new HashMap<String, String>();
+    private Map<String, String> renditionMapping = new HashMap<String, String>();
 
     @Override
     public Map<String, String> getAvailableProperties() {
@@ -91,8 +91,7 @@ public class NewsMLDecoder implements NewswireDecoder {
     }
 
     @Override
-    public List<NewswireItem> decode(PluginContext ctx,
-            NewswireService newswire) {
+    public void decode(PluginContext ctx, NewswireService newswire) {
         this.pluginCtx = ctx;
         this.newswireService = newswire;
         this.properties = newswire.getPropertiesMap();
@@ -107,17 +106,17 @@ public class NewsMLDecoder implements NewswireDecoder {
             }
         }
 
-        this.newswireItems = new ArrayList<NewswireItem>();
+//        this.newswireItems = new ArrayList<NewswireItem>();
 
         readNewswires();
 
-        List<NewswireItem> resultItems = new ArrayList<NewswireItem>();
-        for (NewswireItem item : this.newswireItems) {
-            NewswireItem nwi = pluginCtx.createNewswireItem(item);
-            resultItems.add(nwi);
-        }
+        //List<NewswireItem> resultItems = new ArrayList<NewswireItem>();
+//        for (NewswireItem item : this.newswireItems) {
+//            NewswireItem nwi = pluginCtx.createNewswireItem(item);
+//            resultItems.add(nwi);
+//        }
 
-        return resultItems;
+        //return resultItems;
     }
 
     @Override
@@ -186,8 +185,7 @@ public class NewsMLDecoder implements NewswireDecoder {
 
             String processedLocation = "";
             boolean moveProcessed = false;
-            if (this.properties.containsKey(
-                    Property.PROPERTY_NEWSWIRE_PROCESSED_LOCATION.name())) {
+            if (this.properties.containsKey(Property.PROPERTY_NEWSWIRE_PROCESSED_LOCATION.name())) {
                 moveProcessed = true;
                 processedLocation = this.properties.get(Property.PROPERTY_NEWSWIRE_PROCESSED_LOCATION.name());
             }
@@ -232,8 +230,7 @@ public class NewsMLDecoder implements NewswireDecoder {
                         NewsML newsMl = (NewsML) u.unmarshal(file);
                         Calendar itemCal = Calendar.getInstance();
                         try {
-                            Date itemDate = NEWSML_DATE_FORMAT.parse(newsMl.getNewsEnvelope().getDateAndTime().
-                                    getValue());
+                            Date itemDate = NEWSML_DATE_FORMAT.parse(newsMl.getNewsEnvelope().getDateAndTime().getValue());
                             itemCal.setTime(itemDate);
                             newswireItem.setDate(itemCal);
                         } catch (ParseException ex) {
@@ -243,19 +240,15 @@ public class NewsMLDecoder implements NewswireDecoder {
 
                         for (NewsItem item : newsMl.getNewsItem()) {
 
-                            List<TopicSet> topicSets = item.getNewsComponent().
-                                    getTopicSet();
+                            List<TopicSet> topicSets = item.getNewsComponent().getTopicSet();
 
                             for (TopicSet topicSet : topicSets) {
                                 for (Topic topic : topicSet.getTopic()) {
                                     for (Description description : topic.getDescription()) {
-                                        ContentTag topicTag =
-                                                pluginCtx.findOrCreateContentTag(description.getValue());
+                                        ContentTag topicTag = pluginCtx.findOrCreateContentTag(description.getValue());
 
-                                        if (!newswireItem.getTags().contains(
-                                                topicTag)) {
-                                            newswireItem.getTags().add(
-                                                    topicTag);
+                                        if (!newswireItem.getTags().contains(topicTag)) {
+                                            newswireItem.getTags().add(topicTag);
                                         }
                                     }
                                 }
@@ -263,11 +256,9 @@ public class NewsMLDecoder implements NewswireDecoder {
 
                             for (NewsComponent c : item.getNewsComponent().
                                     getNewsComponent()) {
-                                if (c.getRole().getFormalName().
-                                        equalsIgnoreCase("Main Text")) {
+                                if (c.getRole().getFormalName().equalsIgnoreCase("Main Text")) {
 
-                                    List<Object> objs = c.getNewsLines().
-                                            getHeadLineAndSubHeadLine();
+                                    List<Object> objs = c.getNewsLines().getHeadLineAndSubHeadLine();
                                     StringBuilder title = new StringBuilder();
 
                                     for (Object o : objs) {
@@ -279,33 +270,26 @@ public class NewsMLDecoder implements NewswireDecoder {
                                             }
                                         }
                                     }
-                                    newswireItem.setTitle(title.toString().
-                                            trim());
+                                    newswireItem.setTitle(title.toString().trim());
 
-                                    List<NewsLine> newsLines =
-                                            c.getNewsLines().getNewsLine();
-                                    StringBuilder summary =
-                                            new StringBuilder();
+                                    List<NewsLine> newsLines = c.getNewsLines().getNewsLine();
+                                    StringBuilder summary = new StringBuilder();
                                     for (NewsLine nl : newsLines) {
                                         for (NewsLineText line : nl.getNewsLineText()) {
                                             for (Object objLine : line.getContent()) {
-                                                summary.append(objLine).append(
-                                                        " ");
+                                                summary.append(objLine).append(" ");
                                             }
                                         }
                                     }
 
-                                    newswireItem.setSummary(summary.toString().
-                                            trim());
+                                    newswireItem.setSummary(summary.toString().trim());
 
                                     for (ContentItem ci : c.getContentItem()) {
                                         StringWriter sw = new StringWriter();
-                                        StreamResult result =
-                                                new StreamResult(sw);
+                                        StreamResult result = new StreamResult(sw);
 
                                         try {
-                                            if (ci.getFormat().getFormalName().
-                                                    equalsIgnoreCase("XHTML")) {
+                                            if (ci.getFormat().getFormalName().equalsIgnoreCase("XHTML")) {
                                                 for (DataContent dc : ci.getDataContent()) {
 
                                                     for (Object obj : dc.getAny()) {
@@ -425,65 +409,38 @@ public class NewsMLDecoder implements NewswireDecoder {
                                                     LOG.log(Level.WARNING, ex.getMessage(), ex);
                                                 }
                                             }
-                                        } else if (componentRole.equalsIgnoreCase(
-                                                "Image Wrapper")) {
-                                            String imgDir =
-                                                    this.properties.get(
-                                                    Property.PROPERTY_NEWSWIRE_LOCATION.name());
-                                            for (ContentItem picContentItem :
-                                                    picComponent.getContentItem()) {
-                                                if (picContentItem.getHref()
-                                                        != null) {
-                                                    for (dk.i2m.converge.nar.newsml.v1_0.Property p :
-                                                            picContentItem.getCharacteristics().
-                                                            getProperty()) {
-                                                        if (p.getFormalName().
-                                                                equalsIgnoreCase(
-                                                                "PicType")) {
-                                                            NewswireItemAttachment attachment =
-                                                                    new NewswireItemAttachment();
-                                                            attachment.setNewswireItem(
-                                                                    newswireItem);
+                                        } else if (componentRole.equalsIgnoreCase("Image Wrapper")) {
+                                            String imgDir = this.properties.get(Property.PROPERTY_NEWSWIRE_LOCATION.name());
+                                            for (ContentItem picContentItem : picComponent.getContentItem()) {
+                                                if (picContentItem.getHref() != null) {
+                                                    for (dk.i2m.converge.nar.newsml.v1_0.Property p : picContentItem.getCharacteristics().getProperty()) {
+                                                        if (p.getFormalName().equalsIgnoreCase("PicType")) {
+                                                            NewswireItemAttachment attachment = new NewswireItemAttachment();
+                                                            attachment.setNewswireItem(newswireItem);
 
-                                                            File imgFile =
-                                                                    new File(
-                                                                    imgDir,
-                                                                    picContentItem.getHref());
+                                                            File imgFile = new File(imgDir, picContentItem.getHref());
+
                                                             if (useCatalogue) {
-                                                                attachment.setCatalogue(
-                                                                        catalogue);
+                                                                attachment.setCatalogue(catalogue);
                                                                 try {
-                                                                    attachment.setCataloguePath(
-                                                                            pluginCtx.archive(
-                                                                            imgFile,
-                                                                            catalogue.getId(),
-                                                                            imgFile.getName()));
+                                                                    attachment.setCataloguePath(pluginCtx.archive(imgFile, catalogue.getId(), imgFile.getName()));
                                                                 } catch (ArchiveException ex) {
-                                                                    fileMissing =
-                                                                            true;
+                                                                    fileMissing = true;
                                                                 }
                                                             } else {
                                                                 try {
-                                                                    attachment.setData(
-                                                                            FileUtils.getBytes(
-                                                                            imgFile));
+                                                                    attachment.setData(FileUtils.getBytes(imgFile));
                                                                 } catch (IOException ex) {
-                                                                    LOG.log(Level.SEVERE,
-                                                                            null,
-                                                                            ex);
+                                                                    LOG.log(Level.SEVERE, null, ex);
                                                                 }
                                                             }
-                                                            attachment.setContentType(
-                                                                    "image/jpeg");
+                                                            attachment.setContentType("image/jpeg");
                                                             attachment.setDescription(p.getValue());
                                                             attachment.setFilename(picContentItem.getHref());
                                                             attachment.setSize(imgFile.length());
 
                                                             if (renditionMapping.containsKey(p.getValue())) {
-                                                                Rendition rendition =
-                                                                        pluginCtx.findRenditionByName(
-                                                                        renditionMapping.get(
-                                                                        p.getValue()));
+                                                                Rendition rendition = pluginCtx.findRenditionByName(renditionMapping.get(p.getValue()));
                                                                 attachment.setRendition(rendition);
                                                             }
 
@@ -505,8 +462,15 @@ public class NewsMLDecoder implements NewswireDecoder {
                         if (fileMissing) {
                             LOG.log(Level.INFO, "Newswire file missing. Skipping newswire item");
                         } else {
+                            NewswireItem nwi = pluginCtx.createNewswireItem(newswireItem);
+                            try {
+                                pluginCtx.index(nwi);
+                            } catch (SearchEngineIndexingException seie) {
+                                LOG.log(Level.WARNING, seie.getMessage());
+                                LOG.log(Level.FINEST, "", seie);
+                            }
 
-                            this.newswireItems.add(newswireItem);
+//                            this.newswireItems.add(newswireItem);
 
                             if (moveProcessed) {
                                 File newLocation = new File(processedDirectory, file.getName());

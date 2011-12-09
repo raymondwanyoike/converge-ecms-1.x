@@ -9,11 +9,10 @@
  */
 package dk.i2m.converge.ejb.services;
 
-import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.ConfigurationKey;
+import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.content.ContentTag;
-import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.catalogue.*;
 import dk.i2m.converge.core.content.forex.Rate;
@@ -28,8 +27,8 @@ import dk.i2m.converge.core.search.QueueEntryType;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.workflow.Outlet;
-import dk.i2m.converge.ejb.facades.ListingFacadeLocal;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
+import dk.i2m.converge.ejb.facades.ListingFacadeLocal;
 import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
 import dk.i2m.converge.ejb.facades.SearchEngineLocal;
 import java.io.File;
@@ -209,5 +208,10 @@ public class PluginContextBean implements PluginContextBeanLocal {
     @Override
     public String getConfiguration(ConfigurationKey key) {
         return cfgService.getString(key);
+    }
+
+    @Override
+    public void index(NewswireItem item) throws SearchEngineIndexingException {
+        newswireService.index(item);
     }
 }
