@@ -12,6 +12,11 @@
     </tag>
 
     <tag>
+        <tag-name>announcements</tag-name>
+        <source>taglib/converge/announcements.xhtml</source>
+    </tag>
+
+    <tag>
         <tag-name>appInfo</tag-name>
         <source>taglib/converge/appInfo.jspx</source>
     </tag>
@@ -71,7 +76,11 @@
         <source>taglib/converge/dialogEventSelection.jspx</source>
     </tag>
 
-
+    <tag>
+        <tag-name>upcomingEvents</tag-name>
+        <source>taglib/converge/upcomingEvents.xhtml</source>
+    </tag>
+    
     <tag>
         <tag-name>userProfileModule</tag-name>
         <source>taglib/converge/userProfileModule.jspx</source>

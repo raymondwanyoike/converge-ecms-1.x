@@ -4,45 +4,14 @@
     <ui:composition template="/WEB-INF/facelets/templates/dashboard.xhtml">
 
         <ui:define name="title">
-            <h:outputText value="#{msgs.DASHBOARD}" />
+            <h:outputText value="#{i18n.dashboard_PAGE_TITLE}" />
         </ui:define>
 
         <ui:define name="leftColumn">
             <a4j:keepAlive beanName="dashboard" />
             <a4j:keepAlive beanName="activityStream" />
-
             <!--converge:currentAssignmentsModule /-->
-
-            <h:form id="frmTodaysEvents">
-                <converge:moduleHeader moduleTitle="#{msgs.UPCOMING_EVENTS}" />
-                <div class="moduleContent">
-                    <rich:dataTable id="dtEvents"
-                                    var="event"
-                                    value="#{dashboard.events}"
-                                    style="width: 185px; border: 0px;">
-                        <rich:column style="text-align: center; width: 40px; padding: 0px; margin: 0px; vertical-align: top; border: 0px;">
-                            <span class="#{event.assigned ? 'upcomingEventsMonth' : 'upcomingUnassignedEventsMonth'}">
-                                <h:outputText value="#{event.startDate.time}">
-                                    <f:convertDateTime timeZone="#{userSession.user.timeZone}" pattern="MMM" />
-                                </h:outputText>
-                            </span>
-                            <span class="upcomingEventsDay">
-                                <h:outputText value="#{event.startDate.time}">
-                                    <f:convertDateTime timeZone="#{userSession.user.timeZone}" pattern="d" />
-                                </h:outputText>
-                            </span>
-                        </rich:column>
-                        <rich:column style="border: 0px; padding: 0px; padding-left: 5px;">
-                            <h:outputText value="#{event.summary}" styleClass="upcomingEventsSummary" /><br/>
-                            <h:outputText value="#{event.location}" styleClass="upcomingEventsLocation" />
-                            <converge:eventToolTip value="#{event}" />
-                        </rich:column>
-
-                    </rich:dataTable>
-                </div>
-            </h:form>
-            <converge:moduleSpacer />
-
+            <converge:upcomingEvents />
         </ui:define>
 
         <ui:define name="middleColumn">
@@ -52,29 +21,7 @@
         <ui:define name="rightColumn">
             <converge:userProfileModule id="modUserProfile" user="#{userSession.user}" />
             <converge:userActivityModule id="modUserActivity" showMoreStatistics="true" />
-
-            <c:if test="#{common.announcementsAvailable}">
-                <converge:moduleHeader moduleTitle="#{msgs.dashboard_ANNOUNCEMENTS}" />
-                <div class="moduleContent">
-                    <rich:dataTable value="#{common.publishedAnnouncements}" var="announcement" styleClass="dashboardAnnouncementTable">
-                        <rich:column styleClass="dashboardAnnouncementColumn">
-                            <h:panelGrid columns="2" styleClass="dashboardAnnouncementTitleTable" columnClasses="left, right">
-                                <h:outputText styleClass="dashboardAnnouncementTitle" value="#{announcement.title}" />
-                                <h:outputText styleClass="dashboardAnnouncementDate" value="#{announcement.date.time}">
-                                    <f:converter converterId="com.ocpsoft.PrettyTimeConverter"/>
-                                </h:outputText>
-                            </h:panelGrid>
-                            <h:panelGroup layout="block">
-                                <h:graphicImage value="#{announcement.thumb}" styleClass="dashboardAnnouncementThumb" rendered="#{announcement.thumb != ''}" />
-                                <h:outputText value="#{announcement.description}" styleClass="dashboardAnnouncementDescription"  escape="false" />
-                            </h:panelGroup>
-                        </rich:column>
-                    </rich:dataTable>
-                </div>
-                <converge:moduleSpacer />
-            </c:if>
-
-
+            <converge:announcements />
         </ui:define>
     </ui:composition>
 </jsp:root>

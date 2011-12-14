@@ -26,6 +26,7 @@ import dk.i2m.converge.core.utils.FileUtils;
 import dk.i2m.converge.core.utils.StringUtils;
 import dk.i2m.converge.nar.newsml.v1_0.*;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.text.DateFormat;
@@ -76,7 +77,6 @@ public class NewsMLDecoder implements NewswireDecoder {
     private NewswireService newswireService;
 
     //private List<NewswireItem> newswireItems = null;
-
     private Map<String, String> renditionMapping = new HashMap<String, String>();
 
     @Override
@@ -106,17 +106,7 @@ public class NewsMLDecoder implements NewswireDecoder {
             }
         }
 
-//        this.newswireItems = new ArrayList<NewswireItem>();
-
         readNewswires();
-
-        //List<NewswireItem> resultItems = new ArrayList<NewswireItem>();
-//        for (NewswireItem item : this.newswireItems) {
-//            NewswireItem nwi = pluginCtx.createNewswireItem(item);
-//            resultItems.add(nwi);
-//        }
-
-        //return resultItems;
     }
 
     @Override
@@ -209,140 +199,161 @@ public class NewsMLDecoder implements NewswireDecoder {
             } catch (TransformerConfigurationException ex) {
                 LOG.log(Level.SEVERE, null, ex);
             }
-            transformer.setOutputProperty("indent", "yes");
 
             // Read NewsML files from the newswire location
             File newswireDirectory = new File(location);
             File processedDirectory = new File(processedLocation);
 
-            for (File file : newswireDirectory.listFiles()) {
+            FilenameFilter xmlFiles = new FileExtensionFilter("xml");
 
-                if (file.getName().toLowerCase().endsWith(".xml")) {
-                    boolean fileMissing = false;
-                    List<NewswireItem> results = pluginCtx.findNewswireItemsByExternalId(file.getName());
 
-                    if (results.isEmpty()) {
-                        LOG.log(Level.INFO, "Processing {0}", file.getName());
-                        NewswireItem newswireItem = new NewswireItem();
-                        newswireItem.setExternalId(file.getName());
-                        newswireItem.setNewswireService(newswireService);
+            File[] xmlFilesToProcess = newswireDirectory.listFiles(xmlFiles);
+            int pending = xmlFilesToProcess.length;
+            LOG.log(Level.INFO, "Starting to process {0} files", pending);
 
-                        NewsML newsMl = (NewsML) u.unmarshal(file);
-                        Calendar itemCal = Calendar.getInstance();
-                        try {
-                            Date itemDate = NEWSML_DATE_FORMAT.parse(newsMl.getNewsEnvelope().getDateAndTime().getValue());
-                            itemCal.setTime(itemDate);
-                            newswireItem.setDate(itemCal);
-                        } catch (ParseException ex) {
-                            LOG.log(Level.SEVERE, null, ex);
-                            newswireItem.setDate(itemCal);
-                        }
+            for (File file : newswireDirectory.listFiles(xmlFiles)) {
+                LOG.log(Level.INFO, "{0} items to go", (pending--));
+                boolean fileMissing = false;
+                List<NewswireItem> results = pluginCtx.findNewswireItemsByExternalId(file.getName());
 
-                        for (NewsItem item : newsMl.getNewsItem()) {
+                if (results.isEmpty()) {
+                    LOG.log(Level.INFO, "Processing {0}", file.getName());
+                    NewswireItem newswireItem = new NewswireItem();
+                    newswireItem.setExternalId(file.getName());
+                    newswireItem.setNewswireService(newswireService);
 
-                            List<TopicSet> topicSets = item.getNewsComponent().getTopicSet();
+                    NewsML newsMl = (NewsML) u.unmarshal(file);
+                    Calendar itemCal = Calendar.getInstance();
+                    try {
+                        Date itemDate = NEWSML_DATE_FORMAT.parse(newsMl.getNewsEnvelope().getDateAndTime().getValue());
+                        itemCal.setTime(itemDate);
+                        newswireItem.setDate(itemCal);
+                    } catch (ParseException ex) {
+                        LOG.log(Level.SEVERE, null, ex);
+                        newswireItem.setDate(itemCal);
+                    }
 
-                            for (TopicSet topicSet : topicSets) {
-                                for (Topic topic : topicSet.getTopic()) {
-                                    for (Description description : topic.getDescription()) {
-                                        ContentTag topicTag = pluginCtx.findOrCreateContentTag(description.getValue());
+                    for (NewsItem item : newsMl.getNewsItem()) {
 
-                                        if (!newswireItem.getTags().contains(topicTag)) {
-                                            newswireItem.getTags().add(topicTag);
-                                        }
+                        List<TopicSet> topicSets = item.getNewsComponent().getTopicSet();
+
+                        for (TopicSet topicSet : topicSets) {
+                            for (Topic topic : topicSet.getTopic()) {
+                                for (Description description : topic.getDescription()) {
+                                    ContentTag topicTag = pluginCtx.findOrCreateContentTag(description.getValue());
+
+                                    if (!newswireItem.getTags().contains(topicTag)) {
+                                        newswireItem.getTags().add(topicTag);
                                     }
                                 }
                             }
+                        }
 
-                            for (NewsComponent c : item.getNewsComponent().
-                                    getNewsComponent()) {
-                                if (c.getRole().getFormalName().equalsIgnoreCase("Main Text")) {
+                        for (NewsComponent c : item.getNewsComponent().getNewsComponent()) {
+                            if (c.getRole().getFormalName().equalsIgnoreCase("Main Text")) {
 
-                                    List<Object> objs = c.getNewsLines().getHeadLineAndSubHeadLine();
-                                    StringBuilder title = new StringBuilder();
+                                StringBuffer byLine = new StringBuffer();
+                                for (CreditLine cl : c.getNewsLines().getCreditLine()) {
+                                    for (Object clObj : cl.getContent()) {
+                                        byLine.append(clObj);
+                                    }
+                                }
+                                newswireItem.setAuthor(byLine.toString());
 
-                                    for (Object o : objs) {
-                                        if (o instanceof HeadLine) {
-                                            HeadLine headline = (HeadLine) o;
+                                List<Object> objs = c.getNewsLines().getHeadLineAndSubHeadLine();
+                                StringBuilder title = new StringBuilder();
 
-                                            for (Object line : headline.getContent()) {
-                                                title.append(line).append(" ");
-                                            }
+                                for (Object o : objs) {
+                                    if (o instanceof HeadLine) {
+                                        HeadLine headline = (HeadLine) o;
+
+                                        for (Object line : headline.getContent()) {
+                                            title.append(line).append(" ");
                                         }
                                     }
-                                    newswireItem.setTitle(title.toString().trim());
+                                }
+                                newswireItem.setTitle(title.toString().trim());
 
-                                    List<NewsLine> newsLines = c.getNewsLines().getNewsLine();
-                                    StringBuilder summary = new StringBuilder();
-                                    for (NewsLine nl : newsLines) {
-                                        for (NewsLineText line : nl.getNewsLineText()) {
-                                            for (Object objLine : line.getContent()) {
-                                                summary.append(objLine).append(" ");
-                                            }
+                                List<NewsLine> newsLines = c.getNewsLines().getNewsLine();
+                                StringBuilder summary = new StringBuilder();
+                                for (NewsLine nl : newsLines) {
+                                    for (NewsLineText line : nl.getNewsLineText()) {
+                                        for (Object objLine : line.getContent()) {
+                                            summary.append(objLine).append(" ");
                                         }
                                     }
+                                }
 
-                                    newswireItem.setSummary(summary.toString().trim());
+                                newswireItem.setSummary(summary.toString().trim());
 
-                                    for (ContentItem ci : c.getContentItem()) {
-                                        StringWriter sw = new StringWriter();
-                                        StreamResult result = new StreamResult(sw);
+                                for (ContentItem ci : c.getContentItem()) {
+                                    StringWriter sw = new StringWriter();
+                                    StreamResult result = new StreamResult(sw);
 
-                                        try {
-                                            if (ci.getFormat().getFormalName().equalsIgnoreCase("XHTML")) {
-                                                for (DataContent dc : ci.getDataContent()) {
+                                    try {
+                                        if (ci.getFormat().getFormalName().equalsIgnoreCase("XHTML")) {
+                                            for (DataContent dc : ci.getDataContent()) {
 
-                                                    for (Object obj : dc.getAny()) {
-                                                        Element element =
-                                                                (Element) obj;
-                                                        NodeList bodies =
-                                                                element.getElementsByTagName(
-                                                                "body");
-                                                        if (bodies.getLength()
-                                                                > 0) {
-                                                            Node body =
-                                                                    bodies.item(0);
-                                                            DOMSource src =
-                                                                    new DOMSource(
-                                                                    body);
-                                                            transformer.transform(
-                                                                    src,
-                                                                    result);
-                                                            String storyBody =
-                                                                    sw.toString();
-                                                            newswireItem.addContent(storyBody.replaceAll(
-                                                                    "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>",
-                                                                    ""));
-                                                        }
+                                                for (Object obj : dc.getAny()) {
+                                                    Element element =
+                                                            (Element) obj;
+                                                    NodeList bodies =
+                                                            element.getElementsByTagName(
+                                                            "body");
+                                                    if (bodies.getLength()
+                                                            > 0) {
+                                                        Node body =
+                                                                bodies.item(0);
+                                                        DOMSource src =
+                                                                new DOMSource(
+                                                                body);
+                                                        transformer.transform(
+                                                                src,
+                                                                result);
+                                                        String storyBody =
+                                                                sw.toString();
+                                                        newswireItem.addContent(storyBody.replaceAll(
+                                                                "<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>",
+                                                                ""));
                                                     }
                                                 }
                                             }
-                                        } catch (Exception ex) {
-                                            LOG.log(Level.WARNING, ex.getMessage(), ex);
                                         }
+                                    } catch (Exception ex) {
+                                        LOG.log(Level.WARNING, ex.getMessage(), ex);
                                     }
-                                } else if (c.getRole().getFormalName().
-                                        equalsIgnoreCase("Main Picture") || c.getRole().getFormalName().
-                                        equalsIgnoreCase("Main Graphic")) {
+                                }
+                            } else if (c.getRole().getFormalName().
+                                    equalsIgnoreCase("Main Picture") || c.getRole().getFormalName().
+                                    equalsIgnoreCase("Main Graphic")) {
 
 
-                                    for (NewsComponent picComponent : c.getNewsComponent()) {
-                                        String componentRole = picComponent.getRole().getFormalName();
-                                        if (componentRole.equalsIgnoreCase("Picture Caption")) {
+                                for (NewsComponent picComponent : c.getNewsComponent()) {
+                                    String componentRole = picComponent.getRole().getFormalName();
+                                    if (componentRole.equalsIgnoreCase("Picture Caption")) {
 
-                                            List<Object> objs = c.getNewsLines().getHeadLineAndSubHeadLine();
-                                            StringBuilder title = new StringBuilder();
+                                        StringBuilder byLine = new StringBuilder();
+                                        for (CreditLine cl : c.getNewsLines().getCreditLine()) {
+                                            for (Object clObj : cl.getContent()) {
+                                                byLine.append(clObj);
+                                            }
+                                        }
+                                        newswireItem.setAuthor(byLine.toString());
 
-                                            for (Object o : objs) {
-                                                if (o instanceof HeadLine) {
-                                                    HeadLine headline = (HeadLine) o;
 
-                                                    for (Object line : headline.getContent()) {
-                                                        title.append(line).append(" ");
-                                                    }
+                                        List<Object> objs = c.getNewsLines().getHeadLineAndSubHeadLine();
+                                        StringBuilder title = new StringBuilder();
+
+                                        for (Object o : objs) {
+                                            if (o instanceof HeadLine) {
+                                                HeadLine headline = (HeadLine) o;
+
+                                                for (Object line : headline.getContent()) {
+                                                    title.append(line).append(" ");
                                                 }
                                             }
-                                            newswireItem.setTitle(title.toString().trim());
+                                        }
+                                        newswireItem.setTitle(title.toString().trim());
 
 
 //                                            List<NewsLine> newsLines = c.getNewsLines().getNewsLine();
@@ -363,92 +374,92 @@ public class NewsMLDecoder implements NewswireDecoder {
 //
 //                                            newswireItem.setSummary(summary.toString().trim());
 
-                                            for (ContentItem ci :
-                                                    picComponent.getContentItem()) {
-                                                StringWriter sw =
-                                                        new StringWriter();
-                                                StreamResult result =
-                                                        new StreamResult(sw);
+                                        for (ContentItem ci :
+                                                picComponent.getContentItem()) {
+                                            StringWriter sw =
+                                                    new StringWriter();
+                                            StreamResult result =
+                                                    new StreamResult(sw);
 
-                                                try {
-                                                    if (ci.getFormat().
-                                                            getFormalName().
-                                                            equalsIgnoreCase(
-                                                            "XHTML")) {
-                                                        for (DataContent dc :
-                                                                ci.getDataContent()) {
+                                            try {
+                                                if (ci.getFormat().
+                                                        getFormalName().
+                                                        equalsIgnoreCase(
+                                                        "XHTML")) {
+                                                    for (DataContent dc :
+                                                            ci.getDataContent()) {
 
-                                                            for (Object obj :
-                                                                    dc.getAny()) {
-                                                                Element element =
-                                                                        (Element) obj;
-                                                                NodeList bodies =
-                                                                        element.getElementsByTagName(
-                                                                        "body");
-                                                                if (bodies.getLength()
-                                                                        > 0) {
-                                                                    Node body =
-                                                                            bodies.item(
-                                                                            0);
-                                                                    DOMSource src =
-                                                                            new DOMSource(
-                                                                            body);
-                                                                    transformer.transform(
-                                                                            src,
-                                                                            result);
-                                                                    String storyBody =
-                                                                            StringUtils.stripHtml(
-                                                                            sw.toString());
-                                                                    newswireItem.addSummary(
-                                                                            storyBody);
-                                                                }
+                                                        for (Object obj :
+                                                                dc.getAny()) {
+                                                            Element element =
+                                                                    (Element) obj;
+                                                            NodeList bodies =
+                                                                    element.getElementsByTagName(
+                                                                    "body");
+                                                            if (bodies.getLength()
+                                                                    > 0) {
+                                                                Node body =
+                                                                        bodies.item(
+                                                                        0);
+                                                                DOMSource src =
+                                                                        new DOMSource(
+                                                                        body);
+                                                                transformer.transform(
+                                                                        src,
+                                                                        result);
+                                                                String storyBody =
+                                                                        StringUtils.stripHtml(
+                                                                        sw.toString());
+                                                                newswireItem.addSummary(
+                                                                        storyBody);
                                                             }
                                                         }
                                                     }
-                                                } catch (Exception ex) {
-                                                    LOG.log(Level.WARNING, ex.getMessage(), ex);
                                                 }
+                                            } catch (Exception ex) {
+                                                LOG.log(Level.WARNING, ex.getMessage(), ex);
                                             }
-                                        } else if (componentRole.equalsIgnoreCase("Image Wrapper")) {
-                                            String imgDir = this.properties.get(Property.PROPERTY_NEWSWIRE_LOCATION.name());
-                                            for (ContentItem picContentItem : picComponent.getContentItem()) {
-                                                if (picContentItem.getHref() != null) {
-                                                    for (dk.i2m.converge.nar.newsml.v1_0.Property p : picContentItem.getCharacteristics().getProperty()) {
-                                                        if (p.getFormalName().equalsIgnoreCase("PicType")) {
-                                                            NewswireItemAttachment attachment = new NewswireItemAttachment();
-                                                            attachment.setNewswireItem(newswireItem);
+                                        }
+                                    } else if (componentRole.equalsIgnoreCase("Image Wrapper")) {
+                                        String imgDir = this.properties.get(Property.PROPERTY_NEWSWIRE_LOCATION.name());
+                                        for (ContentItem picContentItem : picComponent.getContentItem()) {
+                                            if (picContentItem.getHref() != null) {
+                                                for (dk.i2m.converge.nar.newsml.v1_0.Property p : picContentItem.getCharacteristics().getProperty()) {
+                                                    if (p.getFormalName().equalsIgnoreCase("PicType")) {
+                                                        NewswireItemAttachment attachment = new NewswireItemAttachment();
+                                                        attachment.setNewswireItem(newswireItem);
 
-                                                            File imgFile = new File(imgDir, picContentItem.getHref());
+                                                        File imgFile = new File(imgDir, picContentItem.getHref());
 
-                                                            if (useCatalogue) {
-                                                                attachment.setCatalogue(catalogue);
-                                                                try {
-                                                                    attachment.setCataloguePath(pluginCtx.archive(imgFile, catalogue.getId(), imgFile.getName()));
-                                                                } catch (ArchiveException ex) {
-                                                                    fileMissing = true;
-                                                                }
-                                                            } else {
-                                                                try {
-                                                                    attachment.setData(FileUtils.getBytes(imgFile));
-                                                                } catch (IOException ex) {
-                                                                    LOG.log(Level.SEVERE, null, ex);
-                                                                }
+                                                        if (useCatalogue) {
+                                                            attachment.setCatalogue(catalogue);
+                                                            try {
+                                                                attachment.setCataloguePath(pluginCtx.archive(imgFile, catalogue.getId(), imgFile.getName()));
+                                                            } catch (ArchiveException ex) {
+                                                                fileMissing = true;
                                                             }
-                                                            attachment.setContentType("image/jpeg");
-                                                            attachment.setDescription(p.getValue());
-                                                            attachment.setFilename(picContentItem.getHref());
-                                                            attachment.setSize(imgFile.length());
-
-                                                            if (renditionMapping.containsKey(p.getValue())) {
-                                                                Rendition rendition = pluginCtx.findRenditionByName(renditionMapping.get(p.getValue()));
-                                                                attachment.setRendition(rendition);
+                                                        } else {
+                                                            try {
+                                                                attachment.setData(FileUtils.getBytes(imgFile));
+                                                            } catch (IOException ex) {
+                                                                LOG.log(Level.SEVERE, null, ex);
                                                             }
+                                                        }
+                                                        attachment.setContentType("image/jpeg");
+                                                        attachment.setDescription(p.getValue());
+                                                        attachment.setFilename(picContentItem.getHref());
+                                                        attachment.setSize(imgFile.length());
 
-                                                            newswireItem.getAttachments().add(attachment);
+                                                        if (renditionMapping.containsKey(p.getValue())) {
+                                                            String renditionId = renditionMapping.get(p.getValue());
+                                                            Rendition rendition = pluginCtx.findRenditionByName(renditionId);
+                                                            attachment.setRendition(rendition);
+                                                        }
 
-                                                            if (p.getValue().equalsIgnoreCase("Thumbnail")) {
-                                                                newswireItem.setThumbnailUrl(attachment.getCatalogueUrl());
-                                                            }
+                                                        newswireItem.getAttachments().add(attachment);
+
+                                                        if (p.getValue().equalsIgnoreCase("Thumbnail")) {
+                                                            newswireItem.setThumbnailUrl(attachment.getCatalogueUrl());
                                                         }
                                                     }
                                                 }
@@ -458,30 +469,28 @@ public class NewsMLDecoder implements NewswireDecoder {
                                 }
                             }
                         }
+                    }
 
-                        if (fileMissing) {
-                            LOG.log(Level.INFO, "Newswire file missing. Skipping newswire item");
-                        } else {
-                            NewswireItem nwi = pluginCtx.createNewswireItem(newswireItem);
-                            try {
-                                pluginCtx.index(nwi);
-                            } catch (SearchEngineIndexingException seie) {
-                                LOG.log(Level.WARNING, seie.getMessage());
-                                LOG.log(Level.FINEST, "", seie);
-                            }
+                    if (fileMissing) {
+                        LOG.log(Level.INFO, "Newswire file missing. Skipping newswire item");
+                    } else {
+                        NewswireItem nwi = pluginCtx.createNewswireItem(newswireItem);
+                        try {
+                            pluginCtx.index(nwi);
+                        } catch (SearchEngineIndexingException seie) {
+                            LOG.log(Level.WARNING, seie.getMessage());
+                            LOG.log(Level.FINEST, "", seie);
+                        }
 
-//                            this.newswireItems.add(newswireItem);
-
-                            if (moveProcessed) {
-                                File newLocation = new File(processedDirectory, file.getName());
-                                LOG.log(Level.INFO, "Moving {0} to {1}", new Object[]{file.getAbsolutePath(), newLocation.getAbsolutePath()});
-                                file.renameTo(newLocation);
-                            } else if (deleteProcessed) {
-                                if (file.delete()) {
-                                    LOG.log(Level.INFO, "{0} deleted", new Object[]{file.getAbsolutePath()});
-                                } else {
-                                    LOG.log(Level.WARNING, "{0} could not be deleted", new Object[]{file.getAbsolutePath()});
-                                }
+                        if (moveProcessed) {
+                            File newLocation = new File(processedDirectory, file.getName());
+                            LOG.log(Level.INFO, "Moving {0} to {1}", new Object[]{file.getAbsolutePath(), newLocation.getAbsolutePath()});
+                            file.renameTo(newLocation);
+                        } else if (deleteProcessed) {
+                            if (file.delete()) {
+                                LOG.log(Level.INFO, "{0} deleted", new Object[]{file.getAbsolutePath()});
+                            } else {
+                                LOG.log(Level.WARNING, "{0} could not be deleted", new Object[]{file.getAbsolutePath()});
                             }
                         }
                     }
@@ -495,5 +504,24 @@ public class NewsMLDecoder implements NewswireDecoder {
     @Override
     public ResourceBundle getBundle() {
         return bundle;
+    }
+
+    class FileExtensionFilter implements FilenameFilter {
+
+        private String extension;
+
+        public FileExtensionFilter(String extension) {
+            this.extension = extension;
+        }
+
+        @Override
+        public boolean accept(File directory, String filename) {
+            boolean fileOK = true;
+
+            if (extension != null) {
+                fileOK &= filename.toLowerCase().endsWith('.' + extension);
+            }
+            return fileOK;
+        }
     }
 }

@@ -3,6 +3,8 @@
     <application>
         <locale-config>
             <default-locale>en</default-locale>
+            <supported-locale>da</supported-locale>
+            <supported-locale>ar</supported-locale>
         </locale-config>
         <message-bundle>dk.i2m.converge.i18n.Messages</message-bundle>
         <resource-bundle>
@@ -26,74 +28,92 @@
         <navigation-case>
             <from-outcome>/administration/announcements</from-outcome>
             <to-view-id>/administrator/Announcements.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/calendar_categories</from-outcome>
             <to-view-id>/administrator/CalendarCategories.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/configuration</from-outcome>
             <to-view-id>/administrator/Configuration.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/languages</from-outcome>
             <to-view-id>/administrator/Languages.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/system</from-outcome>
             <to-view-id>/administrator/System.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/processes</from-outcome>
             <to-view-id>/administrator/Processes.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/timers</from-outcome>
             <to-view-id>/administrator/Timers.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/plugins</from-outcome>
             <to-view-id>/administrator/Plugins.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/outlets</from-outcome>
             <to-view-id>/administrator/Outlets.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/users</from-outcome>
             <to-view-id>/administrator/Users.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/user_roles</from-outcome>
             <to-view-id>/administrator/Roles.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/user_sessions</from-outcome>
             <to-view-id>/administrator/UserSessions.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/workflows</from-outcome>
             <to-view-id>/administrator/Workflows.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/newswires</from-outcome>
             <to-view-id>/administrator/Newsfeeds.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/renditions</from-outcome>
             <to-view-id>/administrator/Renditions.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/catalogues</from-outcome>
             <to-view-id>/administrator/Catalogues.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/search_engine</from-outcome>
             <to-view-id>/administrator/SearchEngine.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/administration/open_calais</from-outcome>
             <to-view-id>/administrator/OpenCalais.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
     </navigation-rule>
 
@@ -102,90 +122,112 @@
         <navigation-case>
             <from-outcome>/administration/administration</from-outcome>
             <to-view-id>/administrator/Administration.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/contacts</from-outcome>
             <to-view-id>/Contacts.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/help</from-outcome>
             <to-view-id>/Help.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/newswires</from-outcome>
             <to-view-id>/Newswire.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/newswireitem</from-outcome>
             <to-view-id>/NewswireItem.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/index</from-outcome>
             <to-view-id>/Dashboard.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/newsitem</from-outcome>
             <to-view-id>/NewsItem.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/inbox</from-outcome>
             <to-view-id>/Inbox.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/listings</from-outcome>
             <to-view-id>/Listings.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/planning</from-outcome>
             <to-view-id>/Planning.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/planning/editions</from-outcome>
             <to-view-id>/Editions.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/planning/assignments</from-outcome>
             <to-view-id>/Assignments.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/planning/pipeline</from-outcome>
             <to-view-id>/Pipeline.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/concepts</from-outcome>
             <to-view-id>/Concepts.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/calendar</from-outcome>
             <to-view-id>/Calendar.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/notifications</from-outcome>
             <to-view-id>/Notifications.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/myprofile</from-outcome>
             <to-view-id>/MyProfile.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/newsreader</from-outcome>
             <to-view-id>/NewsReader.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/reporting</from-outcome>
             <to-view-id>/Reporting.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/search</from-outcome>
             <to-view-id>/Search.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/search/byedition</from-outcome>
             <to-view-id>/SearchByEdition.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
         <navigation-case>
             <from-outcome>/searchresults</from-outcome>
             <to-view-id>/SearchResults.xhtml</to-view-id>
+            <redirect/>
         </navigation-case>
     </navigation-rule>
 
