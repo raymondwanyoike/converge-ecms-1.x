@@ -16,9 +16,9 @@
  */
 package dk.i2m.converge.mobile.server;
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGEncodeParam;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
+//import com.sun.image.codec.jpeg.JPEGCodec;
+//import com.sun.image.codec.jpeg.JPEGEncodeParam;
+//import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import java.awt.Container;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -89,12 +89,12 @@ public class ImageUtils {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         BufferedOutputStream out = new BufferedOutputStream(baos);
         // TODO: Replace - not public API ImageIO.write(destination, "PNG", new File(...));  (http://www.velocityreviews.com/forums/t148931-how-to-resize-a-jpg-image-file.html)
-        JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-        JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(thumbImage);
+//        JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
+//        JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(thumbImage);
         quality = Math.max(0, Math.min(quality, 100));
-        param.setQuality((float) quality / 100.0f, false);
-        encoder.setJPEGEncodeParam(param);
-        encoder.encode(thumbImage);
+//        param.setQuality((float) quality / 100.0f, false);
+//        encoder.setJPEGEncodeParam(param);
+//        encoder.encode(thumbImage);
         out.close();
 
         return baos.toByteArray();
