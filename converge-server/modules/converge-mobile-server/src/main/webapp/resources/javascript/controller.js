@@ -33,7 +33,7 @@ $(document).ready(function() {
 	// binds form submission and fields to the validation engine
     jQuery("#registrationForm").validationEngine();
     jQuery("#loginForm").validationEngine();
-	
+    
     hookLogin();
     hookRegister();
     hookSavePreferences();
@@ -86,9 +86,20 @@ function refreshCategories() {
                     category_count++;
                 }
             }
-            
+                     
             $('#lstSubscriptions').append('<li><a href="#cat' + mobile_subscriber.subscriptions[i].id + '">' + mobile_subscriber.subscriptions[i].title + '</a><span class="ui-li-count">' + category_count + '</span></li>');
 
+            var mylist= $('#lstSubscriptions');
+            var listitems = mylist.children('li').get();
+            listitems.sort(function(a,b){
+                var compA = $(a).text().toUpperCase();
+                var compB = $(b).text().toUpperCase();
+                return (compA < compB)? -1:
+                (compA > compB)? 1:0;
+            })
+            $.each(listitems, function(idx, itm){
+                $(listitems).appendTo(mylist);
+            });
             // Removing existing category page if it exists
             $('#cat' + mobile_subscriber.subscriptions[i].id).remove();
 
@@ -261,4 +272,3 @@ function hookRefresh() {
         $('#lstSubscriptions').listview('refresh');
     });
 }
-
