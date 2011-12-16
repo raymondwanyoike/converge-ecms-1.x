@@ -21,7 +21,7 @@
                 <f:param name="spellchecker_languages" value="+English=en" />
                 <f:param name="spellchecker_rpc_url" value="spell.check" />
                 <f:param name="spellchecker_report_misspellings" value="true" />
-                <f:param name="language" value="en" />
+                <f:param name="language" value="#{userSession.userLocale.lang}" />
                 <f:param name="apply_source_formatting" value="false" />
                 <f:param name="remove_linebreaks" value="false" />
                 <f:param name="paste_use_dialog" value="true" />

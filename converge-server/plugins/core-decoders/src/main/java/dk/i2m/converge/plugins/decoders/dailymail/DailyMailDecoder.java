@@ -1,18 +1,13 @@
 /*
  * Copyright (C) 2010 - 2011 Interactive Media Manangement
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option)
- * any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.plugins.decoders.dailymail;
 
@@ -21,6 +16,7 @@ import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.plugin.NewswireDecoder;
 import dk.i2m.converge.core.plugin.PluginContext;
+import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.utils.FileUtils;
 import java.io.*;
 import java.util.*;
@@ -33,8 +29,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.WordUtils;
 
 /**
- * Decoder for the Daily Mail newswire. Daily Mail is delivered via e-mail in
- * a ZIP file containing structured plain text.
+ * Decoder for the Daily Mail newswire. Daily Mail is delivered via e-mail in a ZIP file containing structured plain text.
  *
  * @author Allan Lykke Christensen
  */
@@ -59,42 +54,34 @@ public class DailyMailDecoder implements NewswireDecoder {
     public static final String TRANSPORT_IMAP_PORT = "TRANSPORT.IMAP.PORT";
 
     /** IMAP user name. */
-    public static final String TRANSPORT_IMAP_USERNAME =
-            "TRANSPORT.IMAP.USERNAME";
+    public static final String TRANSPORT_IMAP_USERNAME = "TRANSPORT.IMAP.USERNAME";
 
     /** IMAP password. */
-    public static final String TRANSPORT_IMAP_PASSWORD =
-            "TRANSPORT.IMAP.PASSWORD";
+    public static final String TRANSPORT_IMAP_PASSWORD = "TRANSPORT.IMAP.PASSWORD";
 
     /** IMAP folder containing the newswire mails. */
-    public static final String TRANSPORT_IMAP_FOLDER_NEWSWIRE =
-            "TRANSPORT.IMAP.FOLDER.NEWSWIRE";
+    public static final String TRANSPORT_IMAP_FOLDER_NEWSWIRE = "TRANSPORT.IMAP.FOLDER.NEWSWIRE";
 
     /** IMAP folder to move the newswire once processed. */
-    public static final String TRANSPORT_IMAP_FOLDER_PROCESSED =
-            "TRANSPORT.IMAP.FOLDER.PROCESSED";
+    public static final String TRANSPORT_IMAP_FOLDER_PROCESSED = "TRANSPORT.IMAP.FOLDER.PROCESSED";
 
     /** Should IMAP mails be deleted after being processed or moved to the processed directory. */
-    public static final String TRANSPORT_IMAP_DELETE_PROCESSED =
-            "TRANSPORT.IMAP.DELETE_PROCESSED";
+    public static final String TRANSPORT_IMAP_DELETE_PROCESSED = "TRANSPORT.IMAP.DELETE_PROCESSED";
 
     /** Should IMAP mails be deleted after being processed or moved to the processed directory. */
     public static final String CHARSET = "Charset";
 
     private static final String SCHEDULE_FILE_PREFIX = "schedule/dm";
 
-    private static final Logger LOG = Logger.getLogger(DailyMailDecoder.class.
-            getName());
+    private static final Logger LOG = Logger.getLogger(DailyMailDecoder.class.getName());
 
-    private ResourceBundle bundle = ResourceBundle.getBundle(
-            "dk.i2m.converge.plugins.decoders.dailymail.Messages");
+    private ResourceBundle bundle = ResourceBundle.getBundle("dk.i2m.converge.plugins.decoders.dailymail.Messages");
 
     private Map<String, String> availableProperties = null;
 
     private Map<String, String> properties = null;
 
-    private Calendar releaseDate = new GregorianCalendar(2011, Calendar.APRIL,
-            27, 7, 00);
+    private Calendar releaseDate = new GregorianCalendar(2011, Calendar.APRIL, 27, 7, 00);
 
     private PluginContext pluginContext;
 
@@ -145,39 +132,29 @@ public class DailyMailDecoder implements NewswireDecoder {
             availableProperties.put(bundle.getString(TRANSPORT_IMAP_PORT), TRANSPORT_IMAP_PORT);
             availableProperties.put(bundle.getString(TRANSPORT_IMAP_USERNAME), TRANSPORT_IMAP_USERNAME);
             availableProperties.put(bundle.getString(TRANSPORT_IMAP_PASSWORD), TRANSPORT_IMAP_PASSWORD);
-            availableProperties.put(bundle.getString(
-                    TRANSPORT_IMAP_FOLDER_NEWSWIRE),
-                    TRANSPORT_IMAP_FOLDER_NEWSWIRE);
-            availableProperties.put(bundle.getString(
-                    TRANSPORT_IMAP_FOLDER_PROCESSED),
-                    TRANSPORT_IMAP_FOLDER_PROCESSED);
-            availableProperties.put(bundle.getString(
-                    TRANSPORT_IMAP_DELETE_PROCESSED),
-                    TRANSPORT_IMAP_DELETE_PROCESSED);
+            availableProperties.put(bundle.getString(TRANSPORT_IMAP_FOLDER_NEWSWIRE), TRANSPORT_IMAP_FOLDER_NEWSWIRE);
+            availableProperties.put(bundle.getString(TRANSPORT_IMAP_FOLDER_PROCESSED), TRANSPORT_IMAP_FOLDER_PROCESSED);
+            availableProperties.put(bundle.getString(TRANSPORT_IMAP_DELETE_PROCESSED), TRANSPORT_IMAP_DELETE_PROCESSED);
             availableProperties.put(bundle.getString(CHARSET), CHARSET);
         }
         return this.availableProperties;
     }
 
     @Override
-    public List<NewswireItem> decode(PluginContext ctx,
-            NewswireService newswire) {
-        LOG.log(Level.INFO, "Processing newswire service {0}", newswire.
-                getSource());
+    public void decode(PluginContext ctx, NewswireService newswire) {
+        LOG.log(Level.INFO, "Processing newswire service {0}", newswire.getSource());
         Map<String, Calendar> filesToProcess = new HashMap<String, Calendar>();
         pluginContext = ctx;
 
-        StringBuilder workingDirectory = new StringBuilder(ctx.
-                getWorkingDirectory());
+        StringBuilder workingDirectory = new StringBuilder(ctx.getWorkingDirectory());
         workingDirectory.append(File.separator);
         workingDirectory.append("newswires");
         workingDirectory.append(File.separator);
         workingDirectory.append(newswire.getId());
         workingDirectory.append(File.separator);
 
-        List<NewswireItem> result = new ArrayList<NewswireItem>();
+        //List<NewswireItem> result = new ArrayList<NewswireItem>();
         this.properties = newswire.getPropertiesMap();
-
 
         if (this.properties.containsKey(CHARSET)) {
             this.charset = this.properties.get(CHARSET);
@@ -186,8 +163,7 @@ public class DailyMailDecoder implements NewswireDecoder {
         if (properties.containsKey(TRANSPORT)) {
             String transport = properties.get(TRANSPORT);
 
-            if (transport.equalsIgnoreCase(TRANSPORT_IMAP) || transport.
-                    equalsIgnoreCase(TRANSPORT_IMAPS)) {
+            if (transport.equalsIgnoreCase(TRANSPORT_IMAP) || transport.equalsIgnoreCase(TRANSPORT_IMAPS)) {
                 String host = properties.get(TRANSPORT_IMAP_SERVER);
                 String port = properties.get(TRANSPORT_IMAP_PORT);
                 String username = properties.get(TRANSPORT_IMAP_USERNAME);
@@ -197,8 +173,7 @@ public class DailyMailDecoder implements NewswireDecoder {
                 String folder_processed = properties.get(
                         TRANSPORT_IMAP_FOLDER_PROCESSED);
 
-                boolean deleteAfterProcess = Boolean.parseBoolean(properties.
-                        get(TRANSPORT_IMAP_DELETE_PROCESSED));
+                boolean deleteAfterProcess = Boolean.parseBoolean(properties.get(TRANSPORT_IMAP_DELETE_PROCESSED));
 
                 Properties props = new Properties();
                 Session session = Session.getDefaultInstance(props, null);
@@ -239,8 +214,7 @@ public class DailyMailDecoder implements NewswireDecoder {
 
                         LOG.log(Level.FINE,
                                 "Processing mail from {0} with subject ''{1}''",
-                                new Object[]{fromString.toString(), msg.
-                                    getSubject()});
+                                new Object[]{fromString.toString(), msg.getSubject()});
 
                         if (msg.getContent() instanceof Multipart) {
                             Multipart multipart = (Multipart) msg.getContent();
@@ -256,20 +230,16 @@ public class DailyMailDecoder implements NewswireDecoder {
                         // Don't delete or move if nothing was found in the mail, hence the format probably wasn't recognised
                         if (!filesToProcess.isEmpty()) {
                             if (!deleteAfterProcess) {
-                                LOG.log(Level.FINE, "Copying mail to {0}",
-                                        folder_processed);
-                                Folder processedFolder = store.getFolder(
-                                        folder_processed);
+                                LOG.log(Level.FINE, "Copying mail to {0}", folder_processed);
+                                Folder processedFolder = store.getFolder(folder_processed);
                                 processedFolder.open(Folder.READ_WRITE);
-                                processedFolder.appendMessages(new Message[]{
-                                            msg});
+                                processedFolder.appendMessages(new Message[]{msg});
                                 processedFolder.close(true);
                             }
                             LOG.log(Level.FINE, "Deleting original mail");
                             msg.setFlag(Flags.Flag.DELETED, true);
                         } else {
-                            LOG.log(Level.FINE,
-                                    "No Daily Mail newswire items found in mail. Mail left in folder");
+                            LOG.log(Level.FINE, "No Daily Mail newswire items found in mail. Mail left in folder");
                         }
                     }
                     folder.close(true);
@@ -282,8 +252,7 @@ public class DailyMailDecoder implements NewswireDecoder {
                     LOG.log(Level.SEVERE, null, ex);
                 }
 
-                LOG.log(Level.FINE, "Starting to process attachments {0}",
-                        filesToProcess.size());
+                LOG.log(Level.FINE, "Starting to process attachments {0}", filesToProcess.size());
 
                 for (String file : filesToProcess.keySet()) {
                     LOG.log(Level.FINE, "Processing {0}", file);
@@ -294,7 +263,14 @@ public class DailyMailDecoder implements NewswireDecoder {
                         if (item.getDate() == null) {
                             item.setDate(filesToProcess.get(file));
                         }
-                        result.add(ctx.createNewswireItem(item));
+                        ctx.createNewswireItem(item);
+                        try {
+                            ctx.index(item);
+                        } catch (SearchEngineIndexingException seie) {
+                            LOG.log(Level.SEVERE, seie.getMessage());
+                            LOG.log(Level.FINEST, "", seie);
+                        }
+
                     }
                 }
                 LOG.log(Level.FINE, "Attachment processing ended");
@@ -304,7 +280,7 @@ public class DailyMailDecoder implements NewswireDecoder {
         } else {
             LOG.log(Level.SEVERE, "Property '" + TRANSPORT + "' is missing");
         }
-        return result;
+        //return result;
     }
 
     /**
@@ -368,15 +344,13 @@ public class DailyMailDecoder implements NewswireDecoder {
         List<String> filesToProcess = new ArrayList<String>();
         try {
             LOG.log(Level.FINE, "Processing {0} with {1} parts",
-                    new Object[]{multipart.getContentType(), multipart.
-                        getCount()});
+                    new Object[]{multipart.getContentType(), multipart.getCount()});
             for (int i = 0, n = multipart.getCount(); i < n; i++) {
                 Part part = multipart.getBodyPart(i);
 
                 if (part.getContent() instanceof Multipart) {
                     LOG.log(Level.FINE, "Part is multipart");
-                    filesToProcess.addAll(processMultipart((Multipart) part.
-                            getContent(), workingDirectory));
+                    filesToProcess.addAll(processMultipart((Multipart) part.getContent(), workingDirectory));
                 }
                 String disposition = part.getDisposition();
                 LOG.log(Level.FINE, "Disposition {0} Content Type {1}",
@@ -385,10 +359,8 @@ public class DailyMailDecoder implements NewswireDecoder {
                 if ((disposition != null)
                         && ((disposition.equals(Part.ATTACHMENT)
                         || (disposition.equals(Part.INLINE))))) {
-                    LOG.log(Level.FINE, "Contained attachment: {0}", part.
-                            getFileName());
-                    filesToProcess.add(saveFile(workingDirectory, part.
-                            getFileName(), part.getInputStream()));
+                    LOG.log(Level.FINE, "Contained attachment: {0}", part.getFileName());
+                    filesToProcess.add(saveFile(workingDirectory, part.getFileName(), part.getInputStream()));
                 }
             }
 
@@ -470,8 +442,7 @@ public class DailyMailDecoder implements NewswireDecoder {
                         if (line.trim().isEmpty()) {
                             readStatus = ScheduleRead.START;
                         } else {
-                            scheduleContent.get(itemId).addSummary(StringEscapeUtils.
-                                    escapeXml(line.trim()));
+                            scheduleContent.get(itemId).addSummary(StringEscapeUtils.escapeXml(line.trim()));
                             scheduleContent.get(itemId).addSummary(" ");
                         }
                         break;
@@ -513,8 +484,7 @@ public class DailyMailDecoder implements NewswireDecoder {
             ZipEntry ze = files.nextElement();
 
             if (foundItems.containsKey(FileUtils.getFilename(ze.getName()))) {
-                NewswireItem item = foundItems.get(FileUtils.getFilename(ze.
-                        getName()));
+                NewswireItem item = foundItems.get(FileUtils.getFilename(ze.getName()));
                 String section = FileUtils.getFolder(ze.getName());
                 item.setTitle(WordUtils.capitalizeFully(item.getTitle().
                         toLowerCase()));
@@ -523,8 +493,7 @@ public class DailyMailDecoder implements NewswireDecoder {
 
                 BufferedReader br = null;
                 try {
-                    br = new BufferedReader(new InputStreamReader(zf.
-                            getInputStream(ze), charset));
+                    br = new BufferedReader(new InputStreamReader(zf.getInputStream(ze), charset));
                     String line = null;
                     while ((line = br.readLine()) != null) {
                         item.addContent(StringEscapeUtils.escapeXml(line));

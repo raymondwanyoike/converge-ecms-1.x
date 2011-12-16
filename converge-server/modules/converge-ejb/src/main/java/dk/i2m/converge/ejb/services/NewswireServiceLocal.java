@@ -189,4 +189,5 @@ public interface NewswireServiceLocal {
 
     void purgeNewswires();
 
+    void index(dk.i2m.converge.core.newswire.NewswireItem item) throws dk.i2m.converge.core.search.SearchEngineIndexingException;
 }

@@ -516,19 +516,22 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         item.setUpdated(now);
 
         StringBuilder description = new StringBuilder();
-        if (org.apache.commons.lang.StringUtils.isBlank(newswireItem.getSummary())) {
+        if (org.apache.commons.lang.StringUtils.isNotBlank(newswireItem.getSummary())) {
             description.append(newswireItem.getSummary());
         }
         
-        if (org.apache.commons.lang.StringUtils.isBlank(newswireItem.getContent())) {
+        if (org.apache.commons.lang.StringUtils.isNotBlank(newswireItem.getContent())) {
             description.append(StringUtils.stripHtml(newswireItem.getContent()));
         }
 
+        item.setDescription(description.toString());
         item.setTitle(newswireItem.getTitle());
         item.setOwner(user);
         item.setCatalogue(catalogue);
         item.setStatus(MediaItemStatus.APPROVED);
         item = create(item);
+        
+        // TODO: Import tags
 
         for (NewswireItemAttachment attachment : newswireItem.getAttachments()) {
             if (attachment.isStoredInCatalogue() && attachment.isRenditionSet()) {
@@ -539,10 +542,9 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
                     mir.setPath(archive(mediaFile, catalogue, attachment.getFilename()));
                     mir.setFilename(attachment.getFilename());
                     mir.setRendition(attachment.getRendition());
-                    mir = daoService.create(mir);
+                    mir.setMediaItem(item);
+                    mir = update(mediaFile, attachment.getFilename(), attachment.getContentType(), mir);
                     item.getRenditions().add(mir);
-
-                    update(item);
                 } catch (IOException ex) {
                     LOG.log(Level.SEVERE, null, ex);
                 }
@@ -763,7 +765,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         File mediaFile = new File(dir, rendition.getFilename());
 
         // Move file to the new location
-        LOG.log(Level.INFO, "Archiving {0} at {1}", new Object[]{file.getAbsolutePath(), mediaFile.getAbsolutePath()});
+        LOG.log(Level.FINE, "Archiving {0} at {1}", new Object[]{file.getAbsolutePath(), mediaFile.getAbsolutePath()});
         copyFile(file, mediaFile);
 
         rendition.setPath(cataloguePath.toString());

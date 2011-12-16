@@ -1,18 +1,11 @@
 /*
  * Copyright (C) 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.ejb.facades;
 
@@ -49,7 +42,7 @@ import org.apache.poi.ss.util.WorkbookUtil;
 public class ReportingFacadeBean implements ReportingFacadeLocal {
 
     @EJB private DaoServiceLocal daoService;
-    
+
     @EJB private SystemFacadeLocal systemFacade;
 
     private static final Logger LOG = Logger.getLogger(ReportingFacadeBean.class.getName());
@@ -65,9 +58,9 @@ public class ReportingFacadeBean implements ReportingFacadeLocal {
         if (submitter) {
             query = UserAccount.FIND_ACTIVE_USERS_BY_ROLE;
         } else {
-            query = UserAccount.FIND_NEWS_ITEMS_BY_USER_ROLE;
+            query = UserAccount.FIND_PASSIVE_USERS_BY_ROLE;
         }
-        
+
         List<UserAccount> users = daoService.findWithNamedQuery(query, parameters);
 
         for (UserAccount user : users) {

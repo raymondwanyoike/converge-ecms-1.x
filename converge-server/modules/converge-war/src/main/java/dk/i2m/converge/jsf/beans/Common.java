@@ -9,66 +9,35 @@
  */
 package dk.i2m.converge.jsf.beans;
 
-import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.Announcement;
 import dk.i2m.converge.core.ConfigurationKey;
-import dk.i2m.converge.core.security.EmploymentType;
-import dk.i2m.converge.core.security.FeeType;
-import dk.i2m.converge.core.content.Language;
-import dk.i2m.converge.core.workflow.Outlet;
-import dk.i2m.converge.core.workflow.OutletType;
-import dk.i2m.converge.core.content.NewsItemField;
-import dk.i2m.converge.core.security.Privilege;
-import dk.i2m.converge.core.metadata.Subject;
-import dk.i2m.converge.core.security.SystemPrivilege;
-import dk.i2m.converge.core.workflow.Workflow;
-import dk.i2m.converge.core.workflow.WorkflowStatePermission;
-import dk.i2m.converge.core.workflow.WorkflowStateType;
-import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
-import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
-import dk.i2m.converge.ejb.facades.UserFacadeLocal;
-import dk.i2m.converge.ejb.facades.WorkflowFacadeLocal;
-import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.calendar.EventCategory;
 import dk.i2m.converge.core.content.AssignmentType;
+import dk.i2m.converge.core.content.Language;
+import dk.i2m.converge.core.content.NewsItemField;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
 import dk.i2m.converge.core.content.catalogue.Rendition;
-import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.forex.Currency;
 import dk.i2m.converge.core.content.markets.FinancialMarket;
 import dk.i2m.converge.core.content.weather.Location;
 import dk.i2m.converge.core.content.weather.Situation;
-import dk.i2m.converge.core.metadata.GeoArea;
-import dk.i2m.converge.core.metadata.Organisation;
-import dk.i2m.converge.core.metadata.Person;
-import dk.i2m.converge.core.metadata.PointOfInterest;
+import dk.i2m.converge.core.metadata.*;
 import dk.i2m.converge.core.newswire.NewswireService;
-import dk.i2m.converge.core.plugin.CatalogueHook;
-import dk.i2m.converge.ejb.facades.CalendarFacadeLocal;
-import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
-import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
+import dk.i2m.converge.core.plugin.*;
+import dk.i2m.converge.core.security.*;
+import dk.i2m.converge.core.workflow.*;
+import dk.i2m.converge.ejb.facades.*;
 import dk.i2m.converge.ejb.services.NewswireServiceLocal;
-import dk.i2m.converge.core.plugin.Plugin;
-import dk.i2m.converge.core.plugin.NewswireDecoder;
-import dk.i2m.converge.core.plugin.EditionAction;
-import dk.i2m.converge.core.plugin.WorkflowAction;
-import dk.i2m.converge.core.plugin.WorkflowValidator;
-import dk.i2m.converge.core.workflow.WorkflowState;
-import dk.i2m.converge.ejb.facades.ListingFacadeLocal;
 import dk.i2m.jsf.JsfUtils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
+import javax.faces.application.Application;
+import javax.faces.context.FacesContext;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -112,7 +81,7 @@ public class Common {
 
     /**
      * Gets the dynamic {@link UserRole}s of the system.
-     * 
+     *
      * @return {@link Map} of dynamic {@link UserRole}s.
      */
     public Map<String, UserRole> getUserRoles() {
@@ -284,7 +253,7 @@ public class Common {
      * @return Current year
      */
     public int getCurrentYear() {
-        return Calendar.getInstance().get(Calendar.YEAR);
+        return java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
     }
 
     public Map<String, String> getHours() {
@@ -401,7 +370,7 @@ public class Common {
 
     /**
      * Gets a unique URL encoded build number.
-     * 
+     *
      * @return Unique URL encoded build number
      */
     public String getBuildNumber() {
@@ -409,7 +378,7 @@ public class Common {
             String buildDate = systemFacade.getApplicationVersion();
             return URLEncoder.encode(buildDate, "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            Long now = Calendar.getInstance().getTimeInMillis();
+            Long now = java.util.Calendar.getInstance().getTimeInMillis();
             return "" + now;
         }
     }
@@ -419,13 +388,23 @@ public class Common {
     }
 
     /**
-     * Gets a {@link Map} of available languages supported by the system.
+     * Gets a {@link Map} of available languages supported by the application. The languages are fetched from the JavaServer Faces configuration.
      *
-     * @return {@link Map} of available languages supported by the system.
+     * @return {@link Map} of supported languages
      */
     public Map<String, String> getAvailableLanguages() {
         Map<String, String> languages = new LinkedHashMap<String, String>();
-        languages.put("English", "en");
+
+        Application app = FacesContext.getCurrentInstance().getApplication();
+
+        Locale loc = app.getDefaultLocale();
+        languages.put(loc.getDisplayLanguage(loc), loc.getLanguage());
+
+        for (Iterator i = app.getSupportedLocales(); i.hasNext();) {
+            loc = (Locale) i.next();
+            languages.put(loc.getDisplayLanguage(loc), loc.getLanguage());
+        }
+
         return languages;
     }
 
@@ -518,7 +497,7 @@ public class Common {
 
     /**
      * Gets a {@link Map} of discovered {@link Catalogue} actions.
-     * 
+     *
      * @return {@link Map} of discovered {@link Catalogue} actions
      */
     public Map<String, String> getCatalogueActions() {
@@ -538,7 +517,7 @@ public class Common {
 
     /**
      * Gets a {@link Map} of discovered {@link NewsItem} actions.
-     * 
+     *
      * @return {@link Map} of discovered {@link NewsItem} actions
      */
     public Map<String, String> getNewsItemActions() {

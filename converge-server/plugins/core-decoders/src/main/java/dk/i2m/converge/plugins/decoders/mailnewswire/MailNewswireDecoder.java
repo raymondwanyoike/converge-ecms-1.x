@@ -16,6 +16,7 @@ import dk.i2m.converge.core.newswire.NewswireItemAttachment;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.plugin.NewswireDecoder;
 import dk.i2m.converge.core.plugin.PluginContext;
+import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.utils.FileUtils;
 import java.io.*;
 import java.util.*;
@@ -127,8 +128,7 @@ public class MailNewswireDecoder implements NewswireDecoder {
     }
 
     @Override
-    public List<NewswireItem> decode(PluginContext ctx,
-            NewswireService newswire) {
+    public void decode(PluginContext ctx, NewswireService newswire) {
         //tempDirectory = ctx.getWorkingDirectory();
         Map<String, Calendar> filesToProcess = new HashMap<String, Calendar>();
 
@@ -138,7 +138,6 @@ public class MailNewswireDecoder implements NewswireDecoder {
         workingDirectory.append(File.separator);
         tempDirectory = workingDirectory.toString();
 
-        List<NewswireItem> result = new ArrayList<NewswireItem>();
         Map<String, String> properties = newswire.getPropertiesMap();
 
         if (properties.containsKey(TRANSPORT)) {
@@ -192,8 +191,7 @@ public class MailNewswireDecoder implements NewswireDecoder {
 
                         Address[] recipients = msg.getFrom();
                         if (recipients != null) {
-                            InternetAddress sender =
-                                    (InternetAddress) recipients[0];
+                            InternetAddress sender = (InternetAddress) recipients[0];
                             if (sender.getPersonal() != null && !sender.getPersonal().trim().isEmpty()) {
                                 item.setAuthor(sender.getPersonal());
                             } else {
@@ -201,41 +199,30 @@ public class MailNewswireDecoder implements NewswireDecoder {
                             }
                         }
 
-                        LOG.log(Level.INFO,
-                                "Processing mail from {0} with subject ''{1}''",
-                                new Object[]{item.getAuthor(),
-                                    msg.getSubject()});
+                        LOG.log(Level.INFO, "Processing mail from {0} with subject ''{1}''", new Object[]{item.getAuthor(), msg.getSubject()});
                         if (msg.getContent() instanceof Multipart) {
                             Multipart multipart = (Multipart) msg.getContent();
                             processMultipart(item, multipart);
                         } else {
                             String content = msg.getContent().toString();
                             content = StringEscapeUtils.escapeHtml(content);
-                            content = content.replaceAll(System.getProperty(
-                                    "line.separator"), "<br/>");
+                            content = content.replaceAll(System.getProperty("line.separator"), "<br/>");
                             item.addContent(content);
 
-                            item.setSummary(StringUtils.abbreviate(content,
-                                    400).replaceAll(System.getProperty(
-                                    "line.separator"), " "));
-
+                            item.setSummary(StringUtils.abbreviate(content, 400).replaceAll(System.getProperty("line.separator"), " "));
                         }
 
                         boolean deleteMsg = true;
 
                         if (!deleteAfterProcess) {
                             try {
-                                Folder processedFolder = store.getFolder(
-                                        folder_processed);
+                                Folder processedFolder = store.getFolder(folder_processed);
                                 processedFolder.open(Folder.READ_WRITE);
-                                processedFolder.appendMessages(new Message[]{
-                                            msg});
+                                processedFolder.appendMessages(new Message[]{msg});
                                 processedFolder.close(true);
                             } catch (FolderNotFoundException fnfex) {
                                 deleteMsg = false;
-                                LOG.log(Level.WARNING,
-                                        "Could not open folder ''{0}''",
-                                        new Object[]{folder_processed});
+                                LOG.log(Level.WARNING, "Could not open folder ''{0}''", new Object[]{folder_processed});
                             }
                         }
 
@@ -243,7 +230,11 @@ public class MailNewswireDecoder implements NewswireDecoder {
                             msg.setFlag(Flags.Flag.DELETED, true);
                         }
                         item = ctx.createNewswireItem(item);
-                        result.add(item);
+                        try {
+                            ctx.index(item);
+                        } catch (SearchEngineIndexingException seie) {
+                            LOG.log(Level.SEVERE, null, seie);
+                        }
                     }
                     folder.close(true);
                     store.close();
@@ -255,13 +246,11 @@ public class MailNewswireDecoder implements NewswireDecoder {
                     LOG.log(Level.SEVERE, null, ex);
                 }
             } else {
-                LOG.log(Level.SEVERE, "Unknown transport ''{0}''",
-                        transport);
+                LOG.log(Level.SEVERE, "Unknown transport ''{0}''", transport);
             }
         } else {
             LOG.log(Level.SEVERE, "Property '" + TRANSPORT + "' is missing");
         }
-        return result;
     }
 
     private static byte[] getAttachment(InputStream input) throws IOException {

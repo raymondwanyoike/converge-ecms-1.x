@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2011 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,8 @@
  */
 package dk.i2m.converge.core.plugin;
 
-import dk.i2m.converge.core.newswire.NewswireItem;
+import dk.i2m.converge.core.newswire.NewswireDecoderException;
 import dk.i2m.converge.core.newswire.NewswireService;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,13 +36,18 @@ public interface NewswireDecoder extends Plugin {
     public abstract Map<String, String> getAvailableProperties();
 
     /**
-     * Decodes the newswire.
+     * Decodes the newswire. It is the responsibility of the decoder
+     * to add the discovered newswire items to the database and
+     * search engine. This can be done using the {@link PluginContext}
+     * with the methods {@link PluginContext#createNewswireItem(dk.i2m.converge.core.newswire.NewswireItem) }
+     * and {@link PluginContext#index(dk.i2m.converge.core.newswire.NewswireItem) }.
      *
      * @param ctx
      *          Plug-in context
      * @param newswire
      *          Service for which the decoder is used
-     * @return {@link List} of news wire items decoded
+     * @throws NewswireDecoderException
+     *          If the newswire service could not be decoded
      */
-    public abstract List<NewswireItem> decode(PluginContext ctx, NewswireService newswire);
+    public abstract void decode(PluginContext ctx, NewswireService newswire) throws NewswireDecoderException;
 }
