@@ -34,6 +34,13 @@ $(document).ready(function() {
     jQuery("#registrationForm").validationEngine();
     jQuery("#loginForm").validationEngine();
     
+
+  //reset type=date inputs to text
+  $( document ).bind( "mobileinit", function(){
+    $.mobile.page.prototype.options.degradeInputs.date = true;
+  });	
+
+    
     hookLogin();
     hookRegister();
     hookSavePreferences();
@@ -89,31 +96,20 @@ function refreshCategories() {
                      
             $('#lstSubscriptions').append('<li><a href="#cat' + mobile_subscriber.subscriptions[i].id + '">' + mobile_subscriber.subscriptions[i].title + '</a><span class="ui-li-count">' + category_count + '</span></li>');
 
-            var mylist= $('#lstSubscriptions');
-            var listitems = mylist.children('li').get();
-            listitems.sort(function(a,b){
-                var compA = $(a).text().toUpperCase();
-                var compB = $(b).text().toUpperCase();
-                return (compA < compB)? -1:
-                (compA > compB)? 1:0;
-            })
-            $.each(listitems, function(idx, itm){
-                $(listitems).appendTo(mylist);
-            });
             // Removing existing category page if it exists
             $('#cat' + mobile_subscriber.subscriptions[i].id).remove();
 
             $('body').append(
                 '<div data-role="page" id="cat' + mobile_subscriber.subscriptions[i].id + '" data-url="cat'+mobile_subscriber.subscriptions[i].id+'">' +
-                '    <div data-role="header" data-position="fixed" data-theme="b">' +
-                '        <a href="#cats" data-icon="arrow-l" data-back="true">Back</a>' +
+                '    <div data-role="header" data-position="fixed" class=".ui-star-cats-header" >' +
+                '        <a href="#cats" data-icon="arrow-l" data-back="true" data-theme="b" >Back</a>' +
                 '        <h1>' + mobile_subscriber.subscriptions[i].title + '</h1>' +
                 '    </div>' +
                 '    <div data-role="content" data-theme="e">' +
                 '        <ul id="lstCat' + mobile_subscriber.subscriptions[i].id + '" data-role="listview" data-url="lstCat' + mobile_subscriber.subscriptions[i].id + '">' +
                 '        </ul>' +
                 '    </div>' +
-                '    <div data-role="footer" data-theme="b" data-position="fixed" id="newsCatAd'+news_item_category.id+'">' +
+                '    <div data-role="footer" class=".ui-star-cats-footer" data-position="fixed" id="newsCatAd'+news_item_category.id+'">' +
                 '       <div class="ads"> ' +
                 '           <iframe id=\'ac238136'+ news_item_category.id+'\' name=\'ac238136'+ news_item_category.id+'\' src=\'http://www.the-star.co.ke/ads/www/delivery/afr.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE\' frameborder=\'0\' scrolling=\'no\' width=\'234\' height=\'60\' allowtransparency=\'true\'><a href=\'http://www.the-star.co.ke/ads/www/delivery/ck.php?n=a311071e&amp;cb=INSERT_RANDOM_NUMBER_HERE\' target=\'_blank\'><img src=\'http://www.the-star.co.ke/ads/www/delivery/avw.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE&amp;n=a311071e\' border=\'0\' alt=\'\' /></a></iframe>' +
                 '       </div>' + 
@@ -137,15 +133,15 @@ function refreshCategories() {
                     // Story Page
                     $('body').append(
                         '<div data-role="page" id="newsItem' + newsItem.id + '" data-url="newsItem'+newsItem.id+'">' +
-                        '    <div data-role="header" data-position="fixed" data-theme="b">' +
-                        '        <a href="#cat' + mobile_subscriber.subscriptions[i].id + '" data-icon="arrow-l" data-back="true">Back</a>' +
+                        '    <div data-role="header" data-position="fixed" >' +
+                        '        <a href="#cat' + mobile_subscriber.subscriptions[i].id + '" data-icon="arrow-l" data-back="true" data-theme="b" >Back</a>' +
                         '        <h1>' + newsItem.headline + '</h1>' +
                         '    </div>' +
                         '    <div data-role="content" data-theme="e">' +
                         '       <p class="dateline">' + newsItem.dateline + ' - ' + news_item_category.title + '</p>' +
                         '       <p><img src="' + newsItem.imgUrl + '" style="float: left; margin-right: 7px; margin-bottom: 7px;" />' + newsItem.story + '</p>' +
                         '    </div>' +
-                        '    <div data-role="footer" data-theme="b" data-position="fixed" id="newsItemAd'+newsItem.id+'">' +
+                        '    <div data-role="footer" class=".ui-star-cats-footer" data-position="fixed" id="newsItemAd'+newsItem.id+'">' +
                         '       <div class="ads"> ' +
                         '           <iframe id=\'ac238136'+ newsItem.id+'\' name=\'ac238136'+ newsItem.id+'\' src=\'http://www.the-star.co.ke/ads/www/delivery/afr.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE\' frameborder=\'0\' scrolling=\'no\' width=\'234\' height=\'60\' allowtransparency=\'true\'><a href=\'http://www.the-star.co.ke/ads/www/delivery/ck.php?n=a311071e&amp;cb=INSERT_RANDOM_NUMBER_HERE\' target=\'_blank\'><img src=\'http://www.the-star.co.ke/ads/www/delivery/avw.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE&amp;n=a311071e\' border=\'0\' alt=\'\' /></a></iframe>' +
                         '       </div>' +
@@ -208,6 +204,7 @@ function fetchSubscriptions(phone, password) {
 
 function hookLogin() {
     $('#btnLogin').click(function(event) {
+        
         var phone = $('#phone').val();
         var password = $('#password').val();
         
@@ -226,11 +223,14 @@ function hookLogin() {
                     
         $.mobile.changePage($("#cats"));            
     });
+    
+   	
 }
 
 function hookRegister() {
     $('#btnRegister').click(function(event) {
-        cnvms_register($('#registrationName').val(), $('#registrationPhone').val(), $('input[name=gender]:checked').val(), $('#select-choice-year').val(), $('#registrationPassword').val(), 
+        
+        cnvms_register($('#registrationName').val(), $('#registrationPhone').val(), $('input[name=gender]:checked').val(), $('#registrationDob').val(), $('#registrationPassword').val(), 
             function() {
                 document.location = '#login';
                 alert("Thanks for your registration, you may now proceed to log-in");
@@ -240,7 +240,7 @@ function hookRegister() {
                 alert($('#registrationPhone').val() + " is already registered");
             }
             );    
-    });
+    });  
 }
 
 function hookSavePreferences() {
