@@ -30,6 +30,17 @@ var mobile_news;
 
 // Initialises jQuery scripts
 $(document).ready(function() {
+	// binds form submission and fields to the validation engine
+    jQuery("#registrationForm").validationEngine();
+    jQuery("#loginForm").validationEngine();
+    
+
+  //reset type=date inputs to text
+  $( document ).bind( "mobileinit", function(){
+    $.mobile.page.prototype.options.degradeInputs.date = true;
+  });	
+
+    
     hookLogin();
     hookRegister();
     hookSavePreferences();
@@ -40,11 +51,21 @@ String.prototype.trunc = function(n){
     return this.substr(0,n-1)+(this.length>n?'...':'');
 };
 
+function filter(selector, query) {  
+  query =   $.trim(query); //trim white space  
+  query = query.replace(/ /gi, '|'); //add OR for regex query  
+  
+  $(selector).each(function() {  
+    ($(this).text().search(new RegExp(query, "i")) < 0) ? $(this).hide().removeClass('visible') : $(this).show().addClass('visible');  
+  });  
+}  //default each row to visible  
+ 
 function populatePreferences(categories) {
     for (i=0; i<categories.section.length; i++) {
         var category = categories.section[i];
         $('#prefCats').append('<input type="checkbox" name="cbCat" id="cbCat' + category.id + '" value="' + category.id + '" /><label for="cbCat' + category.id + '">' + category.title + '</label>');
-    }
+      
+	}
 
     // Check current preferences
     if (mobile_subscriber.subscriptions != undefined) {
@@ -72,7 +93,7 @@ function refreshCategories() {
                     category_count++;
                 }
             }
-            
+                     
             $('#lstSubscriptions').append('<li><a href="#cat' + mobile_subscriber.subscriptions[i].id + '">' + mobile_subscriber.subscriptions[i].title + '</a><span class="ui-li-count">' + category_count + '</span></li>');
 
             // Removing existing category page if it exists
@@ -80,15 +101,15 @@ function refreshCategories() {
 
             $('body').append(
                 '<div data-role="page" id="cat' + mobile_subscriber.subscriptions[i].id + '" data-url="cat'+mobile_subscriber.subscriptions[i].id+'">' +
-                '    <div data-role="header" data-position="fixed">' +
-                '        <a href="#cats" data-icon="arrow-l" data-back="true">Back</a>' +
+                '    <div data-role="header" data-position="fixed" class=".ui-star-cats-header" >' +
+                '        <a href="#cats" data-icon="arrow-l" data-back="true" data-theme="b" >Back</a>' +
                 '        <h1>' + mobile_subscriber.subscriptions[i].title + '</h1>' +
                 '    </div>' +
-                '    <div data-role="content">' +
+                '    <div data-role="content" data-theme="e">' +
                 '        <ul id="lstCat' + mobile_subscriber.subscriptions[i].id + '" data-role="listview" data-url="lstCat' + mobile_subscriber.subscriptions[i].id + '">' +
                 '        </ul>' +
                 '    </div>' +
-                '    <div data-role="footer" data-position="fixed" id="newsCatAd'+news_item_category.id+'">' +
+                '    <div data-role="footer" class=".ui-star-cats-footer" data-position="fixed" id="newsCatAd'+news_item_category.id+'">' +
                 '       <div class="ads"> ' +
                 '           <iframe id=\'ac238136'+ news_item_category.id+'\' name=\'ac238136'+ news_item_category.id+'\' src=\'http://www.the-star.co.ke/ads/www/delivery/afr.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE\' frameborder=\'0\' scrolling=\'no\' width=\'234\' height=\'60\' allowtransparency=\'true\'><a href=\'http://www.the-star.co.ke/ads/www/delivery/ck.php?n=a311071e&amp;cb=INSERT_RANDOM_NUMBER_HERE\' target=\'_blank\'><img src=\'http://www.the-star.co.ke/ads/www/delivery/avw.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE&amp;n=a311071e\' border=\'0\' alt=\'\' /></a></iframe>' +
                 '       </div>' + 
@@ -112,15 +133,15 @@ function refreshCategories() {
                     // Story Page
                     $('body').append(
                         '<div data-role="page" id="newsItem' + newsItem.id + '" data-url="newsItem'+newsItem.id+'">' +
-                        '    <div data-role="header" data-position="fixed">' +
-                        '        <a href="#cat' + mobile_subscriber.subscriptions[i].id + '" data-icon="arrow-l" data-back="true">Back</a>' +
+                        '    <div data-role="header" data-position="fixed" >' +
+                        '        <a href="#cat' + mobile_subscriber.subscriptions[i].id + '" data-icon="arrow-l" data-back="true" data-theme="b" >Back</a>' +
                         '        <h1>' + newsItem.headline + '</h1>' +
                         '    </div>' +
-                        '    <div data-role="content">' +
+                        '    <div data-role="content" data-theme="e">' +
                         '       <p class="dateline">' + newsItem.dateline + ' - ' + news_item_category.title + '</p>' +
                         '       <p><img src="' + newsItem.imgUrl + '" style="float: left; margin-right: 7px; margin-bottom: 7px;" />' + newsItem.story + '</p>' +
                         '    </div>' +
-                        '    <div data-role="footer" data-position="fixed" id="newsItemAd'+newsItem.id+'">' +
+                        '    <div data-role="footer" class=".ui-star-cats-footer" data-position="fixed" id="newsItemAd'+newsItem.id+'">' +
                         '       <div class="ads"> ' +
                         '           <iframe id=\'ac238136'+ newsItem.id+'\' name=\'ac238136'+ newsItem.id+'\' src=\'http://www.the-star.co.ke/ads/www/delivery/afr.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE\' frameborder=\'0\' scrolling=\'no\' width=\'234\' height=\'60\' allowtransparency=\'true\'><a href=\'http://www.the-star.co.ke/ads/www/delivery/ck.php?n=a311071e&amp;cb=INSERT_RANDOM_NUMBER_HERE\' target=\'_blank\'><img src=\'http://www.the-star.co.ke/ads/www/delivery/avw.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE&amp;n=a311071e\' border=\'0\' alt=\'\' /></a></iframe>' +
                         '       </div>' +
@@ -136,13 +157,13 @@ function refreshCategories() {
         }
         
         $('#lstSubscriptions').append(
-            '<li data-theme="e">' +
+            '<li data-theme="c">' +
             '<img src="images/maina.png" class="ui-li-thumb" />' +
             '<h3>Maina\'s List</h3>' +
             '<p>Coming soon!</p></li>');
             
         $('#lstSubscriptions').append(
-            '<li data-theme="e">' +
+            '<li data-theme="c">' +
             '<img src="images/caroline.png" class="ui-li-thumb" />' +
             '<h3>Caroline\'s Jobs</h3>' +
             '<p>Coming soon!</p></li>');
@@ -171,16 +192,19 @@ function fetchSubscriptions(phone, password) {
             
         cnvms_fetchnews(phone, password, function(newsData) {
             mobile_news = newsData
-        }, function() {
+        }, 
+	   function() {
             alert('Could not fetch news')
         });
-    }, function() {
-        alert("Invalid phone number or password");
+    },
+    function() {
+	    alert("Invalid phone number or password");
     });
 }
 
 function hookLogin() {
     $('#btnLogin').click(function(event) {
+        
         var phone = $('#phone').val();
         var password = $('#password').val();
         
@@ -199,20 +223,24 @@ function hookLogin() {
                     
         $.mobile.changePage($("#cats"));            
     });
+    
+   	
 }
 
 function hookRegister() {
     $('#btnRegister').click(function(event) {
+        
         cnvms_register($('#registrationName').val(), $('#registrationPhone').val(), $('input[name=gender]:checked').val(), $('#registrationDob').val(), $('#registrationPassword').val(), 
             function() {
                 document.location = '#login';
                 alert("Thanks for your registration, you may now proceed to log-in");
             },
             function() {
+			  //jQuery("#registrationForm").validationEngine();
                 alert($('#registrationPhone').val() + " is already registered");
             }
             );    
-    });
+    });  
 }
 
 function hookSavePreferences() {
@@ -244,4 +272,3 @@ function hookRefresh() {
         $('#lstSubscriptions').listview('refresh');
     });
 }
-
