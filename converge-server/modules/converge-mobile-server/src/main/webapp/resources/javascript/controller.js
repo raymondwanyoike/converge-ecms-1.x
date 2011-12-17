@@ -35,12 +35,6 @@ $(document).ready(function() {
     jQuery("#loginForm").validationEngine();
     
 
-  //reset type=date inputs to text
-  $( document ).bind( "mobileinit", function(){
-    $.mobile.page.prototype.options.degradeInputs.date = true;
-  });	
-
-    
     hookLogin();
     hookRegister();
     hookSavePreferences();
@@ -51,15 +45,6 @@ String.prototype.trunc = function(n){
     return this.substr(0,n-1)+(this.length>n?'...':'');
 };
 
-function filter(selector, query) {  
-  query =   $.trim(query); //trim white space  
-  query = query.replace(/ /gi, '|'); //add OR for regex query  
-  
-  $(selector).each(function() {  
-    ($(this).text().search(new RegExp(query, "i")) < 0) ? $(this).hide().removeClass('visible') : $(this).show().addClass('visible');  
-  });  
-}  //default each row to visible  
- 
 function populatePreferences(categories) {
     for (i=0; i<categories.section.length; i++) {
         var category = categories.section[i];
@@ -155,21 +140,21 @@ function refreshCategories() {
                 }
             }
         }
-        
-        $('#lstSubscriptions').append(
-            '<li data-theme="c">' +
-            '<img src="images/maina.png" class="ui-li-thumb" />' +
-            '<h3>Maina\'s List</h3>' +
-            '<p>Coming soon!</p></li>');
-            
-        $('#lstSubscriptions').append(
-            '<li data-theme="c">' +
-            '<img src="images/caroline.png" class="ui-li-thumb" />' +
-            '<h3>Caroline\'s Jobs</h3>' +
-            '<p>Coming soon!</p></li>');
+	   
+	   //$('#lstSubscriptions').append(
+//            '<li data-theme="e">' +
+//            '<img src="images/maina.png" class="ui-li-thumb" />' +
+//            '<h3>Maina\'s List</h3>' +
+//            '<p>Coming soon!</p></li>');
+//            
+//        $('#lstSubscriptions').append(
+//            '<li data-theme="e">' +
+//            '<img src="images/caroline.png" class="ui-li-thumb" />' +
+//            '<h3>Caroline\'s Jobs</h3>' +
+//            '<p>Coming soon!</p></li>');
 
         
-        // Re-render category pages
+       //  Re-render category pages
         for (i=0; i<category_ids.length; i++) {
             $('#cat' + mobile_subscriber.subscriptions[i].id).page();
         }

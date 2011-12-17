@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html>
-    <head>
+<html><head>
         <title>the Star! Mobile</title>
-	   <link rel="stylesheet" href="themes/the_star/star.mobile.css" />
+	   <link rel="stylesheet" href="themes/the_star/star.iphone.css" />
 	   <link rel="stylesheet" href="resources/css/validationEngine.jquery.css" />
 	   <script type="text/javascript" src="resources/javascript/jquery-1.6.2.min.js"></script>
         <script type="text/javascript" src="resources/javascript/jquery.mobile-1.0b2.min.js"></script>
@@ -79,9 +78,9 @@
                         </fieldset>
                     </div>
 
-				<div data-role="fieldcontain">
+				<div data-role="fieldcontain" data-inline="true" class="ui-hide-label" >
                         <label for="registrationDob"></label>
-                        <input type="date" value="" name="dob" id="registrationDob" placeholder="DOB: DYYYY-MM-DD" class="ui-star-datepicker" />
+                        <input type="text" value="" maxlength="10" name="dob" id="registrationDob" placeholder="DOB: YYYY-MM-DD" class="validate[required] text-input" />
                     </div>
 				
 				<div data-role="fieldcontain" class="ui-hide-label">
@@ -138,7 +137,10 @@
                 <ul data-role="listview" id="lstSubscriptions" data-inset="true" data-type="vertical" data-filter="true" data-filter-placeholder="Filter categories..." data-filter-theme="e"> 
                     
                 </ul>
+                <hr/>
+		  <h4>Special Stories</h4>
             </div>
+		  
             <div data-role="footer" class="ui-star-cats-footer" >
                 <div class="ads">
                     <iframe id='ac238136c' name='ac238136c' src='http://www.the-star.co.ke/ads/www/delivery/afr.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE' frameborder='0' scrolling='no' width='234' height='60' allowtransparency='true'><a href='http://www.the-star.co.ke/ads/www/delivery/ck.php?n=a311071e&amp;cb=INSERT_RANDOM_NUMBER_HERE' target='_blank'><img src='http://www.the-star.co.ke/ads/www/delivery/avw.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE&amp;n=a311071e' border='0' alt='ad' /></a></iframe>
