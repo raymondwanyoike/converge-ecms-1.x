@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head>
-        <title>the Star! Mobile</title>
-	   <link rel="stylesheet" href="themes/the_star/star.iphone.css" />
+        <title>Converge Mobile Application</title>
+	   <link rel="stylesheet" href="themes/converge.mobile.min.css" />
 	   <link rel="stylesheet" href="resources/css/validationEngine.jquery.css" />
 	   <script type="text/javascript" src="resources/javascript/jquery-1.6.2.min.js"></script>
         <script type="text/javascript" src="resources/javascript/jquery.mobile-1.0b2.min.js"></script>
@@ -16,10 +16,10 @@
         <!-- Login Page -->
         <div data-role="page" id="login" data-ajax="true">
 
-            <div data-role="header" class="ui-star-login-header" >
+            <div data-role="header" class="ui-converge-login-header" >
             </div>
 
-            <div data-role="content" data-inset="true" data-theme="e">
+            <div data-role="content" data-inset="true" data-theme="b">
 
                 <form id="loginForm">
                     <fieldset>
@@ -39,8 +39,8 @@
                     </fieldset>
                 </form>
             </div>
-            <div data-role="footer" class="ui-star-footer" >
-                <p align="center"> Smart People Read The Star!&reg; </p>
+            <div data-role="footer" data-theme="a" >
+                <p align="center"> Converge Mobile Application for Touch Devices </p>
 
             </div><!-- /footer -->
 
@@ -49,12 +49,12 @@
         <!-- Registration Page -->
         <div data-role="page" id="register">
 
-            <div data-role="header" class="ui-star-register-header" >
+            <div data-role="header" data-theme="a" >
                 <a href="#login" class="ui-btn-left ui-btn-back" data-icon="arrow-l">Login</a>
                 <h1>Register Account</h1>
             </div><!-- /header -->
 
-            <div data-role="content" data-theme="e">
+            <div data-role="content" data-theme="b">
 
                 <form id="registrationForm">
                     <div data-role="fieldcontain" class="ui-hide-label">
@@ -67,7 +67,7 @@
                         <input type="text" value="" maxlength="50" name="name" id="registrationName" placeholder="Name" class="validate[required] text-input"/>
                     </div>
 
-                    <div data-role="fieldcontain" >
+                    <div data-role="fieldcontain" data-theme="b">
                         <fieldset data-role="controlgroup" data-type="vertical">
                             <legend></legend>
                             <label for="registrationGenderFemale">Female</label>
@@ -99,8 +99,8 @@
 
             </div><!-- /content -->
 
-            <div data-role="footer" class="ui-star-footer" >
-                <p align="center"> Smart People Read The Star!&reg; </p>
+            <div data-role="footer" data-theme="a" >
+                <p align="center"> Converge Mobile Application for Touch Devices </p>
 
             </div><!-- /footer -->
         </div>
@@ -127,21 +127,21 @@
 
         <!-- News Category Page -->
         <div data-role="page" id="cats" >
-            <div data-role="header" data-position="fixed" class="ui-star-cats-header" >
+            <div data-role="header" data-position="fixed" data-theme="a" >
                 <a id="btnRefresh" data-icon="refresh" data-theme="b" >Refresh</a>
                 <h1>News</h1>
                 <a id="btnPreferences" href="#preferences" data-icon="gear" data-theme="b">Preferences</a>
             </div>
-            <div data-role="content" data-theme="e" >
+            <div data-role="content" data-theme="b" >
 
-                <ul data-role="listview" id="lstSubscriptions" data-inset="true" data-type="vertical" data-filter="true" data-filter-placeholder="Filter categories..." data-filter-theme="e"> 
+                <ul data-role="listview" id="lstSubscriptions" data-theme="c" data-inset="true" data-type="vertical" data-filter="true" data-filter-placeholder="Filter categories..." data-filter-theme="b"> 
 
                 </ul>
                 <hr/>
 		  <h4>Special Stories</h4>
             </div>
 		  
-            <div data-role="footer" class="ui-star-cats-footer" >
+            <div data-role="footer" data-theme="a" >
                 <div class="ads">
                     <iframe id='ac238136c' name='ac238136c' src='http://www.the-star.co.ke/ads/www/delivery/afr.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE' frameborder='0' scrolling='no' width='234' height='60' allowtransparency='true'><a href='http://www.the-star.co.ke/ads/www/delivery/ck.php?n=a311071e&amp;cb=INSERT_RANDOM_NUMBER_HERE' target='_blank'><img src='http://www.the-star.co.ke/ads/www/delivery/avw.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE&amp;n=a311071e' border='0' alt='ad' /></a></iframe>
                 </div>
