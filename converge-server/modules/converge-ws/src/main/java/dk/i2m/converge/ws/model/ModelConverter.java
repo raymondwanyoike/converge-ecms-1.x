@@ -47,6 +47,7 @@ public class ModelConverter {
         return s;
     }
 
+    //TODO: Issue #488 (Support multiple renditions)
     public static MediaItem toMediaItem(NewsItemMediaAttachment attachment) throws AttachmentNotAvailableException {
         if (attachment.getMediaItem() != null) {
             MediaItem mediaItem = new MediaItem();

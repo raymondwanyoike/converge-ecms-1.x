@@ -15,3 +15,8 @@
 /converge-server/modules/converge-ear/target/
 /converge-server/modules/converge-war/faces-config.NavData
 /converge-server/target/
+/converge-server/documentation/docstyles/target/
+/converge-server/documentation/installation-guide/target/
+/converge-server/documentation/administration-guide/target/
+/converge-server/modules/converge-mobile-server/target/
+/converge-server/modules/converge-ws-client/target/

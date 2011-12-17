@@ -16,10 +16,10 @@ import dk.i2m.converge.mobile.server.FileUtils;
 import dk.i2m.converge.mobile.server.ImageUtils;
 import dk.i2m.converge.mobile.server.domain.NewsItem;
 import dk.i2m.converge.mobile.server.domain.Outlet;
-import dk.i2m.converge.mobile.server.integration.ced.MediaItem;
-import dk.i2m.converge.mobile.server.integration.ced.OutletService;
-import dk.i2m.converge.mobile.server.integration.ced.OutletService_Service;
-import dk.i2m.converge.mobile.server.integration.ced.Section;
+import dk.i2m.converge.wsclient.MediaItem;
+import dk.i2m.converge.wsclient.OutletService;
+import dk.i2m.converge.wsclient.OutletService_Service;
+import dk.i2m.converge.wsclient.Section;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -107,7 +107,7 @@ public class WakeupService {
             QName qname = new QName(SERVICE_URI, OUTLET_SERVICE_NAME);
             Service service = OutletService_Service.create(url, qname);
             OutletService os = service.getPort(OutletService.class);
-            dk.i2m.converge.mobile.server.integration.ced.Outlet externalOutlet = os.getOutlet(externalOutletId);
+            dk.i2m.converge.wsclient.Outlet externalOutlet = os.getOutlet(externalOutletId);
 
             System.out.println(externalOutlet.getTitle());
             for (Section s : externalOutlet.getSections()) {
@@ -123,13 +123,13 @@ public class WakeupService {
                 }
             }
 
-            dk.i2m.converge.mobile.server.integration.ced.Edition externalEdition = os.getPublishedEdition(externalEditionId);
+            dk.i2m.converge.wsclient.Edition externalEdition = os.getPublishedEdition(externalEditionId);
             em.createQuery("UPDATE NewsItem ni " + "SET ni.available = ?1").setParameter(1, false).executeUpdate();
 
             String imgLocation = context.getInitParameter("IMG_LOCATION");
             String imgUrl = context.getInitParameter("IMG_URL");
 
-            for (dk.i2m.converge.mobile.server.integration.ced.NewsItem item : externalEdition.getItems()) {
+            for (dk.i2m.converge.wsclient.NewsItem item : externalEdition.getItems()) {
                 if (!isNewsItemAvailable(item.getId())) {
                     NewsItem newsItem = new NewsItem();
                     newsItem.setExternalId(item.getId());
@@ -139,7 +139,6 @@ public class WakeupService {
                     newsItem.setDateline(item.getDateLine());
                     newsItem.setByline(item.getByLine());
                     newsItem.setDisplayOrder(item.getDisplayOrder());
-
 
                     // Generate thumbs
                     if (!item.getMedia().isEmpty()) {
@@ -326,7 +325,7 @@ public class WakeupService {
 
 
         } catch (IOException ex) {
-            Logger.getLogger(WakeupService.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
         }
         return new byte[0];
     }

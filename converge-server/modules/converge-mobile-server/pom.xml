@@ -1,19 +1,23 @@
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <parent>
+        <artifactId>modules</artifactId>
+        <groupId>dk.i2m.converge</groupId>
+        <version>1.1.2-SNAPSHOT</version>
+    </parent>
+    
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dk.i2m.converge.mobile.server</groupId>
     <artifactId>converge-mobileserver</artifactId>
-    <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>Converge Mobile Server</name>
+    <name>Converge - Mobile Subscription Server</name>
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
     </properties>
 
     <dependencies>
@@ -62,7 +66,11 @@
             <artifactId>commons-beanutils</artifactId>
             <version>1.8.3</version>
         </dependency>
-
+        <dependency>
+            <groupId>dk.i2m.converge</groupId>
+            <artifactId>converge-ws-client</artifactId>
+            <version>1.1.2-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
@@ -76,6 +84,7 @@
             <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
+        
     </dependencies>
 
     <build>
@@ -139,23 +148,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxws-maven-plugin</artifactId>
                 <version>1.10</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                        <configuration>
-                            <packageName>dk.i2m.converge.mobile.server.integration.ced</packageName>
-                            <wsdlFiles>
-                                <wsdlFile>localhost_8080/converge-ws/OutletService.wsdl</wsdlFile>
-                            </wsdlFiles>
-                            <wsdlLocation>http://localhost:8080/converge-ws/OutletService</wsdlLocation>
-                            <staleFile>${project.build.directory}/jaxws/stale/OutletService.stale</staleFile>
-                        </configuration>
-                        <id>wsimport-generate-OutletService</id>
-                        <phase>generate-sources</phase>
-                    </execution>
-                </executions>
+                <executions />
                 <dependencies>
                     <dependency>
                         <groupId>javax.xml</groupId>
@@ -175,12 +168,10 @@
         <finalName>converge-mobileserver</finalName>
     </build>
     <repositories>
-
         <repository>
-            <url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
-            <id>eclipselink</id>
-            <layout>default</layout>
-            <name>Repository for library Library[eclipselink]</name>
+            <id>m2.i2m.dk</id>
+            <name>Interactive Media Management Maven 2 Repository</name>
+            <url>http://m2.i2m.dk</url>
         </repository>
         <repository>
             <url>http://download.java.net/maven/2/</url>
