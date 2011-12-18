@@ -18,32 +18,25 @@ package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.commons.FileUtils;
 import dk.i2m.commons.ImageUtils;
+import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.Notification;
+import dk.i2m.converge.core.newswire.NewswireService;
+import dk.i2m.converge.core.reporting.activity.UserActivitySummary;
+import dk.i2m.converge.core.security.SystemPrivilege;
+import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.Section;
-import dk.i2m.converge.core.security.SystemPrivilege;
-import dk.i2m.converge.ejb.facades.UserFacadeLocal;
-import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.core.security.UserRole;
-import dk.i2m.converge.core.newswire.NewswireService;
-import dk.i2m.converge.core.ConfigurationKey;
-import dk.i2m.converge.core.content.catalogue.Catalogue;
-import dk.i2m.converge.core.reporting.activity.UserActivitySummary;
 import dk.i2m.converge.ejb.facades.ReportingFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
-import dk.i2m.converge.jsf.model.MenuItem;
-import dk.i2m.converge.jsf.model.MenuItems;
+import dk.i2m.converge.ejb.facades.UserFacadeLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.jsf.model.MenuHelper;
+import dk.i2m.converge.jsf.model.MenuItem;
+import dk.i2m.converge.jsf.model.MenuItems;
 import dk.i2m.converge.utils.CalendarUtils;
 import dk.i2m.jsf.JsfUtils;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -515,7 +508,6 @@ public class UserSession {
      * @param locale {@link Locale} of the current user
      */
     private void setLocale(Locale locale) {
-        LOG.log(Level.INFO, "Setting the locale {0} for {1}", new Object[]{user.getPreferredLocale().toString(), user.getUsername()});
         FacesContext.getCurrentInstance().getViewRoot().setLocale(locale);
     }
 }
