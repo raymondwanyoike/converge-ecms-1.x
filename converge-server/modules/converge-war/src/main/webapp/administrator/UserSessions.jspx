@@ -12,7 +12,7 @@
                     <v:message />
                 </a4j:outputPanel>
 
-                <converge:moduleHeader moduleTitle="#{msgs.USER_SESSIONS} (#{administrator_UserSessions.sessions.rowCount})" />
+                <converge:moduleHeader moduleTitle="#{i18n.administrator_UserSessions_USER_SESSIONS}" />
                 <div class="moduleContent">
 
                     <h:panelGrid>
@@ -28,63 +28,65 @@
                             <f:facet name="header">
                                 <a4j:status id="dtUserSessionsLoading">
                                     <f:facet name="start">
-                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_AJAX_LOADING}" />
                                     </f:facet>
                                     <f:facet name="stop">
-                                        <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>
-                            <h:graphicImage alt="#{msgs.USER}" title="#{msgs.USER}" value="#{res.USER_ICON}" />
+                            <h:graphicImage alt="" title="" value="#{i18n.resource_ICON_USER}" />
                         </rich:column>
 
                         <rich:column sortBy="#{activeSession.start.time}" sortOrder="DESCENDING">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.SESSION_START}" />
+                                <h:outputText value="#{i18n.administrator_UserSessions_SESSION_START}" title="#{i18n.administrator_UserSessions_SESSION_START_TOOLTIP}" />
                             </f:facet>
                             <h:outputText value="#{activeSession.start.time}">
-                                <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{common.systemTimeZone}" />
                             </h:outputText>
                         </rich:column>
 
                         <rich:column sortBy="#{activeSession.lastActivity.time}">
                             <f:facet name="header">
-                                <h:outputText value="Duration" />
+                                <h:outputText value="#{i18n.administrator_UserSessions_LAST_ACTIVITY}" title="#{i18n.administrator_UserSessions_LAST_ACTIVITY_TOOLTIP}" />
                             </f:facet>
-                            <h:outputText value="#{activeSession.durationMinutes} minutes" />
+                            <h:outputText value="#{activeSession.lastActivity.time}" >
+                                <f:converter converterId="com.ocpsoft.PrettyTimeConverter"/>
+                            </h:outputText>
                         </rich:column>
 
                         <rich:column sortBy="#{activeSession.ipAddress}">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.usersessions_IP_ADDRESS}" />
+                                <h:outputText value="#{i18n.administrator_UserSessions_IP_ADDRESS}" />
                             </f:facet>
                             <h:outputText value="#{activeSession.ipAddress}" />
                         </rich:column>
 
                         <rich:column sortBy="#{activeSession.userAccount.username}">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.USER}" />
+                                <h:outputText value="#{i18n.administrator_UserSessions_USER}" />
                             </f:facet>
                             <h:outputText value="#{activeSession.userAccount.username}" />
                         </rich:column>
 
                         <rich:column sortBy="#{activeSession.userAccount.fullName}">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.NAME}" />
+                                <h:outputText value="#{i18n.administrator_UserSessions_NAME}" />
                             </f:facet>
                             <h:outputText value="#{activeSession.userAccount.fullName}" />
                         </rich:column>
 
                         <rich:column sortBy="#{activeSession.numberOfLocks}">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.administrator_user_sessions_LOCKS}" />
+                                <h:outputText value="#{i18n.administrator_UserSessions_LOCKS}" />
                             </f:facet>
                             <h:outputText value="#{activeSession.numberOfLocks}" />
                             <rich:toolTip showDelay="500" style="width: 300px;" styleClass="tooltip" rendered="#{activeSession.numberOfLocks > 0}">
                                 <rich:dataTable id="dtLocks" value="#{activeSession.locks}" var="lock" styleClass="table" rowClasses="odd, even">
                                     <rich:column>
                                         <h:outputText value="#{lock.id}">
-                                            <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                                            <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
                                         </h:outputText>
                                     </rich:column>
 
@@ -99,7 +101,7 @@
                             <f:facet name="header">
                                 <h:outputText value="&#160;" />
                             </f:facet>
-                            <a4j:commandButton id="logoff" value="#{msgs.administrator_user_sessions_LOGOFF}" styleClass="button dynamicButton">
+                            <a4j:commandButton id="logoff" value="#{i18n.administrator_UserSessions_LOGOFF}" styleClass="button dynamicButton" ajaxSingle="true">
                                 <f:setPropertyActionListener target="#{administrator_UserSessions.invalidateSession}" value="#{activeSession}" />
                                 <a4j:support event="oncomplete" reRender="frmUserSessions"/>
                             </a4j:commandButton>
