@@ -7,11 +7,11 @@
                          value="#{value.selectedNewsItem.story}"
                          theme="advanced"
                          customPlugins="EditorPlugins"
-                         plugins="safari,spellchecker,inlinepopups,paste,fullscreen,wordcount"
+                         plugins="safari,spellchecker,inlinepopups,paste,fullscreen,s_textmetrics"
                          rendered="true" skin="default" style="margin-left: 1%;" height="400"
                          readonly="#{!value.currentActor || value.readOnly}"
                          dialogType="window" inputElementType="input" onchange="handleFormChanged();">
-                <f:param name="theme_advanced_buttons1" value="bold,italic,underline,separator,cut,copy,paste,pastetext,pasteword,separator,spellchecker,separator,link,unlink,separator,fullscreen"/>
+                <f:param name="theme_advanced_buttons1" value="bold,italic,underline,separator,cut,copy,paste,pastetext,pasteword,separator,bullist,numlist,separator,spellchecker,separator,link,unlink,separator,fullscreen"/>
                 <f:param name="theme_advanced_buttons2" value=""/>
                 <f:param name="theme_advanced_buttons3" value=""/>
                 <f:param name="theme_advanced_toolbar_location" value="top"/>
@@ -21,8 +21,9 @@
                 <f:param name="spellchecker_languages" value="+English=en" />
                 <f:param name="spellchecker_rpc_url" value="spell.check" />
                 <f:param name="spellchecker_report_misspellings" value="true" />
-                <f:param name="language" value="#{userSession.userLocale.lang}" />
+                <f:param name="language" value="#{userSession.user.preferredLanguage}" />
                 <f:param name="apply_source_formatting" value="false" />
+                <f:param name="s_textmetrics_on" value="true" />
                 <f:param name="remove_linebreaks" value="false" />
                 <f:param name="paste_use_dialog" value="true" />
                 <f:param name="paste_auto_cleanup_on_paste" value="true" />
@@ -34,9 +35,10 @@
                 <f:param name="width" value="99%" />
                 <f:param name="content_css" value="css/wysiwyg.css" />
                 <f:param name="gecko_spellcheck" value="true" />
+                <f:param name="theme_advanced_path" value="false" />
             </rich:editor>
         </div>
-        <div style="clear: both; padding-bottom: 12px;"></div>
+        <converge:moduleSpacer />
     </c:if>
 
 </ui:composition>

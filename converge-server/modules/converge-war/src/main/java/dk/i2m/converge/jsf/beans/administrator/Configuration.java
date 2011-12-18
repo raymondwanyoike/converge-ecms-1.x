@@ -16,10 +16,9 @@
  */
 package dk.i2m.converge.jsf.beans.administrator;
 
+import dk.i2m.converge.core.plugin.Plugin;
 import dk.i2m.converge.domain.Property;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
-import dk.i2m.converge.core.plugin.Plugin;
-import dk.i2m.converge.ejb.services.TimerServiceLocal;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;

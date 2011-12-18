@@ -10,45 +10,48 @@
             <script type="text/javascript">
                 var formChanged = false;
 
-jQuery(document).ready(function() {
+                jQuery(document).ready(function() {
 
-jQuery('#frmNewsItem input[type=text], #frmNewsItem textarea').each(function (i) {
-  jQuery(this).data('initial_value', jQuery(this).val());
-});
+                    jQuery('#frmNewsItem input[type=text], #frmNewsItem textarea').each(function (i) {
+                        jQuery(this).data('initial_value', jQuery(this).val());
+                    });
 
-jQuery('#frmNewsItem input[type=text], #frmNewsItem textarea').keyup(function() {
-  if (jQuery(this).val() != jQuery(this).data('initial_value')) {
-           handleFormChanged();
-}
-});
+                    jQuery('#frmNewsItem input[type=text], #frmNewsItem textarea').keyup(function() {
+                        if (jQuery(this).val() != jQuery(this).data('initial_value')) {
+                            handleFormChanged();
+                        }
+                    });
 
-jQuery('#frmNewsItem').bind('change paste', function() {
-  handleFormChanged();
-});
+                    jQuery('#frmNewsItem').bind('change paste', function() {
+                        handleFormChanged();
+                    });
 
-});
+                });
 
-function handleFormChanged() {
-    formChanged = true;
-}
+                function handleFormChanged() {
+                    formChanged = true;
+                }
 
-function resetFormChanged() {
-    formChanged = false;
-}
+                function resetFormChanged() {
+                    formChanged = false;
+                }
 
-function confirmNavigation() {
- if (formChanged) {
-      return confirm('#{msgs.newsitem_CLOSE_WITHOUT_SAVING}');
- } else {
-      return true;
- }
-}
+                function confirmNavigation() {
+                    if (formChanged) {
+                        return confirm('#{msgs.newsitem_CLOSE_WITHOUT_SAVING}');
+                    } else {
+                        return true;
+                    }
+                }
 
- //jQuery(window).bind("beforeunload", function(){return confirmNavigation(); })
+                //jQuery(window).bind("beforeunload", function(){return confirmNavigation(); })
 
             </script>
 
             <h:form id="frmNewsItem">
+                <c:if test="#{newsItem.currentActor &amp;&amp; !newsItem.readOnly &amp;&amp; newsItem.autoSaveEnabled}">
+                    <a4j:poll actionListener="#{newsItem.onAutoSave}" ignoreDupResponses="true" interval="#{newsItem.autoSaveInterval}" />
+                </c:if>
                 <a4j:status id="staNewsItemLoading" for="regNewsItem" onstart="Richfaces.showModalPanel('mpLoading')" onstop="Richfaces.hideModalPanel('mpLoading')" />
                 <a4j:region id="regNewsItem">
                     <div id="layout2">
