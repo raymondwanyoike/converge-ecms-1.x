@@ -76,6 +76,11 @@
             <redirect/>
         </navigation-case>
         <navigation-case>
+            <from-outcome>/administration/user_configuration</from-outcome>
+            <to-view-id>/administrator/UserConfiguration.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
             <from-outcome>/administration/user_roles</from-outcome>
             <to-view-id>/administrator/Roles.xhtml</to-view-id>
             <redirect/>
@@ -499,6 +504,11 @@
     <managed-bean>
         <managed-bean-name>administrator_Roles</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Roles</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>administrator_UserConfiguration</managed-bean-name>
+        <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.UserConfiguration</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
         <!-- User Administration End -->
