@@ -19,7 +19,7 @@
                     <h:panelGrid columns="2" style="width: 100%; margin-top: 10px;" columnClasses="left, btnC">
                         <h:inputText value="#{administrator_OpenCalais.apiKey}" styleClass="text" style="width: 100%" />
                         <a4j:commandButton id="btnSave" styleClass="button dynamicButton" value="#{i18n.Generic_SAVE}" 
-                                           actionListener="#{administrator_OpenCalais.onSaveApiKey}" reRender="frmOprnCalais" />
+                                           actionListener="#{administrator_OpenCalais.onSaveApiKey}" reRender="frmOpenCalais" />
                     </h:panelGrid>
                 </div>
                 <converge:moduleSpacer />
