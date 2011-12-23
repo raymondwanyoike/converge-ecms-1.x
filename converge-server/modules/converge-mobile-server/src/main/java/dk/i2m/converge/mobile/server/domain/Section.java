@@ -43,6 +43,8 @@ public class Section implements Serializable {
     private String description;
     @Column(name = "display_order")
     private int displayOrder;
+    @Column(name = "special")
+    private int special;
 
     public Long getId() {
         return id;
@@ -82,6 +84,10 @@ public class Section implements Serializable {
 
     public void setDisplayOrder(int displayOrder) {
         this.displayOrder = displayOrder;
+    }
+    
+    public void setSpecial(int special) {
+        this.special = special;
     }
 
     @Override
