@@ -86,10 +86,14 @@ public class Section implements Serializable {
         this.displayOrder = displayOrder;
     }
     
+    public int getSpecial() {
+        return special;
+    }
+    
     public void setSpecial(int special) {
         this.special = special;
     }
-
+    
     @Override
     public int hashCode() {
         int hash = 0;

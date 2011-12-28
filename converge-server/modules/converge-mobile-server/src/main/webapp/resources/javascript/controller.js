@@ -33,8 +33,8 @@ $(document).ready(function() {
 	// binds form submission and fields to the validation engine
     jQuery("#registrationForm").validationEngine();
     jQuery("#loginForm").validationEngine();
-    
-
+        
+    clearValidationErrors();
     hookLogin();
     hookRegister();
     hookSavePreferences();
@@ -212,6 +212,15 @@ function hookLogin() {
    	
 }
 
+function clearValidationErrors() {
+    $('#registrationPage').click(function(event) {
+        $.mobile.changePage($("#register"));        
+        //validationEngine().hideAll();
+        $("#register").removeClass(formErrorContent);
+        //TODO: Improve error hiding function in the validation plugin
+    });
+}
+
 function hookRegister() {
     $('#btnRegister').click(function(event) {
         
@@ -219,9 +228,10 @@ function hookRegister() {
             function() {
                 document.location = '#login';
                 alert("Thanks for your registration, you may now proceed to log-in");
+                //validationEngine().hideAll();
+                $("#login").removeClass(formErrorContent);
             },
             function() {
-			  //jQuery("#registrationForm").validationEngine();
                 alert($('#registrationPhone').val() + " is already registered");
             }
             );    
