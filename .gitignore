@@ -2,6 +2,7 @@
 /converge-server/plugins/core-decoders/target/
 /converge-server/modules/converge-ejb/target/
 /converge-server/modules/converge-i18n/target/
+/converge-server/modules/converge-mobile-server/target/
 /converge-server/plugins/alertaction/target/
 /converge-server/plugins/atomexport/target/
 /converge-server/plugins/core-actions/target/
@@ -19,5 +20,4 @@
 /converge-server/documentation/docstyles/target/
 /converge-server/documentation/installation-guide/target/
 /converge-server/documentation/administration-guide/target/
-/converge-server/modules/converge-mobile-server/target/
 /converge-server/modules/converge-ws-client/target/
