@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <menuItems xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-  xsi:noNamespaceSchemaLocation="menu.xsd">
+           xsi:noNamespaceSchemaLocation="menu.xsd">
 
     <item id="lnkDashboard" active="true">
         <label>menu_DASHBOARD</label>
@@ -122,6 +122,12 @@
             <label>menu_USER_MANAGEMENT</label>
             <role>ADMINISTRATOR</role>
 
+            <children id="lnkAdministrationUserConfiguration" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/user_configuration</action>
+                <label>menu_USER_MANAGEMENT_CONFIGURATION</label>
+                <role>ADMINISTRATOR</role>
+            </children>
+
             <children id="lnkAdministrationUserSessions" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/user_sessions</action>
                 <label>menu_USER_MANAGEMENT_USER_SESSIONS</label>
@@ -155,6 +161,12 @@
             <children id="lnkAdministrationWorkflows" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/workflows</action>
                 <label>menu_OUTLETS_WORKFLOWS</label>
+                <role>ADMINISTRATOR</role>
+            </children>
+            
+            <children id="lnkAdministrationLanguages" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/languages</action>
+                <label>menu_LANGUAGES</label>
                 <role>ADMINISTRATOR</role>
             </children>
         </children>
@@ -202,24 +214,17 @@
             <role>ADMINISTRATOR</role>
         </children>
 
-        <children id="lnkAdministrationAnnouncements" resetOnClick="false">
-            <action>/administration/announcements</action>
-            <label>menu_ANNOUNCEMENTS</label>
-            <role>ADMINISTRATOR</role>
-        </children>
-
-        <children id="lnkAdministrationLanguages" resetOnClick="false">
-            <action>/administration/languages</action>
-            <label>menu_LANGUAGES</label>
-            <role>ADMINISTRATOR</role>
-        </children>
-
         <children id="lnkAdministrationOpenCalais" resetOnClick="false">
             <action>/administration/open_calais</action>
             <label>menu_OPEN_CALAIS</label>
             <role>ADMINISTRATOR</role>
         </children>
 
+        <children id="lnkAdministrationAnnouncements" resetOnClick="false">
+            <action>/administration/announcements</action>
+            <label>menu_ANNOUNCEMENTS</label>
+            <role>ADMINISTRATOR</role>
+        </children>
         
     </item>
 </menuItems>

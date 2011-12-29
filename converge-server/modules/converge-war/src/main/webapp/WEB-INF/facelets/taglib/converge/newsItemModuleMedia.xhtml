@@ -63,7 +63,7 @@
 
                     <h:panelGrid id="pgMediaInfo" columns="2" columnClasses="newsItemAttachmentLabel, newsItemAttachmentInput" styleClass="newsItemAttachmentInfo">
 
-                        <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_CAPTION_REQUIRED}" />
+                        <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_CAPTION}" />
                         <rich:inplaceInput required="true" requiredMessage="#{i18n.NewsItem_MEDIA_ATTACHMENT_CAPTION_REQUIRED}" value="#{attachment.caption}" viewClass="newsItemAttachmentCaptionInplace" viewHoverClass="newsItemAttachmentCaptionInplaceHover">
                             <a4j:support ajaxSingle="true" event="onviewactivated" reRender="dtMediaFiles">
                                 <f:setPropertyActionListener target="#{newsItem.updateAttachment}" value="#{attachment}" />

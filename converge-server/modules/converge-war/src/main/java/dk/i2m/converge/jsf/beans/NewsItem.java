@@ -10,6 +10,7 @@
 package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.commons.BeanComparator;
+import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.content.ContentItemPermission;
 import dk.i2m.converge.core.content.NewsItemActor;
@@ -31,6 +32,7 @@ import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.domain.search.SearchResult;
 import dk.i2m.converge.domain.search.SearchResults;
 import dk.i2m.converge.ejb.facades.*;
+import dk.i2m.converge.ejb.services.ConfigurationServiceLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.MetaDataServiceLocal;
 import dk.i2m.jsf.JsfUtils;
@@ -53,7 +55,9 @@ import org.richfaces.event.NodeSelectedEvent;
 import org.richfaces.event.UploadEvent;
 
 /**
- * Managed backing bean for {@code /NewsItem.jspx}. The backing bean is kept alive by the JSF file. Loading a news item is done by setting the ID of the item using {@link NewsItem#setId(java.lang.Long)}.
+ * Managed backing bean for {@code /NewsItem.jspx}. The backing bean is kept
+ * alive by the JSF file. Loading a news item is done by setting the ID of the
+ * item using {@link NewsItem#setId(java.lang.Long)}.
  *
  * @author Allan Lykke Christensen
  */
@@ -74,6 +78,8 @@ public class NewsItem {
     @EJB private UserFacadeLocal userFacade;
 
     @EJB private SearchEngineLocal searchEngine;
+
+    @EJB private ConfigurationServiceLocal cfgService;
 
     private dk.i2m.converge.core.content.NewsItem selectedNewsItem = null;
 
@@ -113,13 +119,22 @@ public class NewsItem {
 
     private String newConcept = "";
 
-    /** Dev Note: Could not use a Concept object for direct entry as it is abstract. */
+    /**
+     * Dev Note: Could not use a Concept object for direct entry as it is
+     * abstract.
+     */
     private String newConceptName = "";
 
-    /** Dev Note: Could not use a Concept object for direct entry as it is abstract. */
+    /**
+     * Dev Note: Could not use a Concept object for direct entry as it is
+     * abstract.
+     */
     private String newConceptDescription = "";
 
-    /** Dev Note: Could not use a Concept object for direct entry as it is abstract. */
+    /**
+     * Dev Note: Could not use a Concept object for direct entry as it is
+     * abstract.
+     */
     private String conceptType = "";
 
     private boolean conceptAdded = false;
@@ -132,7 +147,8 @@ public class NewsItem {
 
     private EditionCandidate editionCandidate;
 
-    private Map<String, EditionCandidate> editionCandidates = new LinkedHashMap<String, EditionCandidate>();
+    private Map<String, EditionCandidate> editionCandidates =
+            new LinkedHashMap<String, EditionCandidate>();
 
     private Catalogue selectedCatalogue = null;
 
@@ -140,7 +156,8 @@ public class NewsItem {
 
     private boolean showClosedEditions = false;
 
-    private Map<String, Concept> suggestedConcepts = new LinkedHashMap<String, Concept>();
+    private Map<String, Concept> suggestedConcepts =
+            new LinkedHashMap<String, Concept>();
 
     private List<Concept> selectedConcepts = new ArrayList<Concept>();
 
@@ -156,14 +173,16 @@ public class NewsItem {
      * are selected through the subject selection dialog.
      *
      * @param suggestion
-     *          String for which to base the suggestions
+* String for which to base the suggestions
      * @return {@link List} of suggested {@link Concept}s based on
      *         {@code suggestion}
      */
     public List<Concept> onConceptSuggestion(Object suggestion) {
         String conceptName = (String) suggestion;
         List<Concept> suggestedConcepts = new ArrayList<Concept>();
-        suggestedConcepts = metaDataFacade.findConceptsByName(conceptName, Person.class, GeoArea.class, PointOfInterest.class, Organisation.class);
+        suggestedConcepts = metaDataFacade.findConceptsByName(conceptName,
+                Person.class, GeoArea.class, PointOfInterest.class,
+                Organisation.class);
 
         return suggestedConcepts;
     }
@@ -173,7 +192,9 @@ public class NewsItem {
             Concept concept = metaDataFacade.findConceptByName(newConcept);
             if (!this.selectedNewsItem.getConcepts().contains(concept)) {
                 this.selectedNewsItem.getConcepts().add(concept);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, concept.getFullTitle() + " has been added to " + selectedNewsItem.getTitle(), null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                        false, concept.getFullTitle() + " has been added to "
+                        + selectedNewsItem.getTitle(), null);
             }
             this.newConcept = "";
             conceptAdded = true;
@@ -195,14 +216,17 @@ public class NewsItem {
         } else if ("POI".equalsIgnoreCase(conceptType)) {
             c = new PointOfInterest(newConceptName, newConceptDescription);
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Please select concept type", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
+                    "Please select concept type", null);
         }
 
         if (c != null) {
             c = metaDataFacade.create(c);
             if (!this.selectedNewsItem.getConcepts().contains(c)) {
                 this.selectedNewsItem.getConcepts().add(c);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, c.getFullTitle() + " has been added to " + selectedNewsItem.getTitle(), null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                        false, c.getFullTitle() + " has been added to "
+                        + selectedNewsItem.getTitle(), null);
             }
             this.newConcept = "";
         }
@@ -212,7 +236,9 @@ public class NewsItem {
         HtmlTree tree = (HtmlTree) event.getComponent();
         Subject subj = (Subject) tree.getRowData();
         this.selectedNewsItem.getConcepts().add(subj);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, subj.getFullTitle() + " has been added to " + selectedNewsItem.getTitle(), null);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false,
+                subj.getFullTitle() + " has been added to " + selectedNewsItem.
+                getTitle(), null);
     }
 
     /**
@@ -225,11 +251,34 @@ public class NewsItem {
     }
 
     /**
+     * Get the auto-save interval in milliseconds.
+     * 
+     * @return Auto-save interval in milliseconds. A value less than 1 indicates
+     *         that auto-save is disabled
+     */
+    public Integer getAutoSaveInterval() {
+        return cfgService.getInteger(ConfigurationKey.AUTO_SAVE_INTERVAL);
+    }
+
+    /**
+     * Determines if auto-save is enabled.
+     * 
+     * @return {@code true} if auto-save is enabled, otherwise {@code false}
+     */
+    public boolean isAutoSaveEnabled() {
+        if (getAutoSaveInterval() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Sets the id of the news item to load. Upon setting the identifier, the
      * news item will be checked-out from the database.
      *
      * @param id
-     *          Unique identifier of the news item to load
+* Unique identifier of the news item to load
      */
     public void setId(Long id) {
         LOG.log(Level.FINE, "Setting News Item #{0}", id);
@@ -241,7 +290,9 @@ public class NewsItem {
 
         if (selectedNewsItem == null || (selectedNewsItem.getId() != id)) {
             String username = getUser().getUsername();
-            LOG.log(Level.FINE, "Checking if {0} is permitted to open news item #{1}", new Object[]{username, id});
+            LOG.log(Level.FINE,
+                    "Checking if {0} is permitted to open news item #{1}",
+                    new Object[]{username, id});
 
             NewsItemHolder nih;
             try {
@@ -255,8 +306,14 @@ public class NewsItem {
                 this.pullbackAvailable = nih.isPullbackAvailable();
                 this.fieldVisibible = nih.getFieldVisibility();
                 this.versions = new ListDataModel(nih.getVersions());
-                if (!nih.isCheckedOut() && (this.permission == ContentItemPermission.USER || this.permission == ContentItemPermission.ROLE)) {
-                    JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "newsitem_MSG_OPEN_READ_ONLY", new Object[]{selectedNewsItem.getCheckedOutBy().getFullName()});
+                if (!nih.isCheckedOut() && (this.permission
+                        == ContentItemPermission.USER || this.permission
+                        == ContentItemPermission.ROLE)) {
+                    JsfUtils.createMessage("frmPage",
+                            FacesMessage.SEVERITY_ERROR,
+                            "newsitem_MSG_OPEN_READ_ONLY",
+                            new Object[]{selectedNewsItem.getCheckedOutBy().
+                                getFullName()});
                 }
             } catch (DataNotFoundException ex) {
                 this.permission = ContentItemPermission.UNAUTHORIZED;
@@ -272,7 +329,7 @@ public class NewsItem {
      * retrieved from {@link NewsItem#getSelectedNewsItem()} it is not loaded.
      *
      * @return {@code true} if a news item has been selected and loaded,
-     *         otherwise {@code false}
+     * otherwise {@code false}
      */
     public boolean isNewsItemLoaded() {
         if (getSelectedNewsItem() == null) {
@@ -282,7 +339,8 @@ public class NewsItem {
         }
     }
 
-    public void setSelectedNewsItem(dk.i2m.converge.core.content.NewsItem newsItem) {
+    public void setSelectedNewsItem(
+            dk.i2m.converge.core.content.NewsItem newsItem) {
         this.selectedNewsItem = newsItem;
     }
 
@@ -306,17 +364,22 @@ public class NewsItem {
             try {
                 selectedNewsItem = newsItemFacade.checkin(selectedNewsItem);
             } catch (LockingException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Could not save story. The story was locked by another user", null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        false,
+                        "Could not save story. The story was locked by another user",
+                        null);
                 return null;
             }
             return "/inbox";
         } else {
             try {
-                selectedNewsItem = newsItemFacade.step(selectedNewsItem, selectedStep.getId(), getComment());
+                selectedNewsItem = newsItemFacade.step(selectedNewsItem,
+                        selectedStep.getId(), getComment());
                 comment = "";
                 return "/inbox";
             } catch (WorkflowStateTransitionException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, ex.getMessage(), null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                        false, ex.getMessage(), null);
                 return null;
             }
         }
@@ -325,11 +388,15 @@ public class NewsItem {
     public void onApply(ActionEvent event) {
         try {
             selectedNewsItem = newsItemFacade.save(selectedNewsItem);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "Your changes were saved. If you want to pass on the assignment to the next person in the workflow, select the appropriate option and click 'Submit'", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false,
+                    "Your changes were saved. If you want to pass on the assignment to the next person in the workflow, select the appropriate option and click 'Submit'",
+                    null);
         } catch (LockingException ex) {
             LOG.log(Level.INFO, ex.getMessage());
             LOG.log(Level.FINE, "", ex);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Could not save story. The story was locked by another user", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
+                    "Could not save story. The story was locked by another user",
+                    null);
 
         }
     }
@@ -337,24 +404,28 @@ public class NewsItem {
     /**
      * Event handler invoked upon executing the periodic auto-save
      * poller.
-     * 
-     * @param event 
-     *          Event that invoked the auto-save
+     *
+     * @param event * Event that invoked the auto-save
      */
     public void onAutoSave(ActionEvent event) {
         try {
             selectedNewsItem = newsItemFacade.save(selectedNewsItem);
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Could not auto-save story. The story was locked by another user", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
+                    "Could not auto-save story. The story was locked by another user",
+                    null);
         }
     }
 
     public String onSave() {
         try {
             selectedNewsItem = newsItemFacade.checkin(selectedNewsItem);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "The assignment was saved", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false,
+                    "The assignment was saved", null);
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Could not save story. The story was locked by another user", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
+                    "Could not save story. The story was locked by another user",
+                    null);
         }
         return "/inbox";
     }
@@ -371,10 +442,13 @@ public class NewsItem {
             selectedNewsItem = null;
             setId(theId);
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Could not pullback story. The story was locked by another user", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
+                    "Could not pullback story. The story was locked by another user",
+                    null);
         } catch (WorkflowStateTransitionException ex) {
             LOG.log(Level.SEVERE, "", ex);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Could not pullback story. Contact IT department", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
+                    "Could not pullback story. Contact IT department", null);
         }
     }
 
@@ -387,9 +461,11 @@ public class NewsItem {
             try {
                 selectedNewsItem.getActors().remove(actor);
                 selectedNewsItem = newsItemFacade.save(selectedNewsItem);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "The actor has been removed", null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                        false, "The actor has been removed", null);
             } catch (LockingException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        false, ex.getMessage(), null);
             }
         }
     }
@@ -399,7 +475,9 @@ public class NewsItem {
             return;
         }
         org.richfaces.model.UploadItem item = event.getUploadItem();
-        LOG.log(Level.INFO, "Processing media file upload ''{0}'' of content-type ''{1}''", new Object[]{item.getFileName(), item.getContentType()});
+        LOG.log(Level.INFO,
+                "Processing media file upload ''{0}'' of content-type ''{1}''",
+                new Object[]{item.getFileName(), item.getContentType()});
 
         if (item.isTempFile()) {
             java.io.File tempFile = item.getFile();
@@ -420,7 +498,8 @@ public class NewsItem {
                 }
 
                 if (mime.startsWith("image/")) {
-                    LOG.log(Level.INFO, "Processing ''{0}'' as photo", new Object[]{item.getFileName()});
+                    LOG.log(Level.INFO, "Processing ''{0}'' as photo",
+                            new Object[]{item.getFileName()});
                     MediaItem photoItem = new MediaItem();
 // TODO: Fix
                     //photoItem.setContentType(mime);
@@ -436,30 +515,43 @@ public class NewsItem {
                     selectedAttachment.setCaption("");
                     selectedAttachment.setNewsItem(selectedNewsItem);
                     selectedAttachment.setMediaItem(photoItem);
-                    selectedAttachment.setDisplayOrder(selectedNewsItem.getNextAssetAttachmentDisplayOrder());
-                    selectedAttachment = newsItemFacade.create(selectedAttachment);
+                    selectedAttachment.setDisplayOrder(selectedNewsItem.
+                            getNextAssetAttachmentDisplayOrder());
+                    selectedAttachment = newsItemFacade.create(
+                            selectedAttachment);
                     try {
-                        selectedNewsItem = newsItemFacade.findNewsItemById(selectedNewsItem.getId());
+                        selectedNewsItem =
+                                newsItemFacade.findNewsItemById(selectedNewsItem.
+                                getId());
                     } catch (DataNotFoundException ex) {
-                        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+                        JsfUtils.createMessage("frmPage",
+                                FacesMessage.SEVERITY_ERROR, false, ex.
+                                getMessage(), null);
                     }
                 } else {
-                    LOG.log(Level.INFO, "Unknown media type (''{1}'') for ''{0}''", new Object[]{item.getFileName(), mime});
-                    JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "The format of " + item.getFileName() + " was not recognised", null);
+                    LOG.log(Level.INFO,
+                            "Unknown media type (''{1}'') for ''{0}''",
+                            new Object[]{item.getFileName(), mime});
+                    JsfUtils.createMessage("frmPage",
+                            FacesMessage.SEVERITY_ERROR, false, "The format of "
+                            + item.getFileName() + " was not recognised", null);
                 }
             } catch (Exception ex) {
                 LOG.severe("Could not read file");
             }
         } else {
-            LOG.severe("RichFaces is not set-up to use tempFiles for storing file uploads");
+            LOG.severe(
+                    "RichFaces is not set-up to use tempFiles for storing file uploads");
         }
 
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "profile_PHOTO_UPDATED_MSG");
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                "profile_PHOTO_UPDATED_MSG");
     }
 
     public void setUpdateAttachment(NewsItemMediaAttachment attachment) {
         attachment = newsItemFacade.update(attachment);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "The attachment was updated", null);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false,
+                "The attachment was updated", null);
     }
 
     public void onDeleteSelectedActor(ActionEvent event) {
@@ -477,13 +569,19 @@ public class NewsItem {
     }
 
     public void onAddActor(ActionEvent event) {
-        if (this.newActor != null && this.newActor.getRole() != null && this.newActor.getUser() != null) {
+        if (this.newActor != null && this.newActor.getRole() != null
+                && this.newActor.getUser() != null) {
             boolean dup = false;
 
             for (NewsItemActor nia : selectedNewsItem.getActors()) {
-                if (nia.getRole().equals(this.newActor.getRole()) && nia.getUser().equals(this.newActor.getUser())) {
+                if (nia.getRole().equals(this.newActor.getRole())
+                        && nia.getUser().equals(this.newActor.getUser())) {
                     dup = true;
-                    JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "newsitem_DUPLICATE_USER_ROLE", new Object[]{this.newActor.getUser().getFullName(), this.newActor.getRole().getName()});
+                    JsfUtils.createMessage("frmPage",
+                            FacesMessage.SEVERITY_ERROR,
+                            "newsitem_DUPLICATE_USER_ROLE",
+                            new Object[]{this.newActor.getUser().getFullName(),
+                                this.newActor.getRole().getName()});
                 }
             }
 
@@ -492,15 +590,20 @@ public class NewsItem {
                 this.newActor.setNewsItem(selectedNewsItem);
                 newsItemFacade.addActorToNewsItem(newActor);
                 try {
-                    selectedNewsItem = newsItemFacade.findNewsItemById(selectedNewsItem.getId());
+                    selectedNewsItem =
+                            newsItemFacade.findNewsItemById(selectedNewsItem.
+                            getId());
                 } catch (DataNotFoundException ex) {
-                    JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+                    JsfUtils.createMessage("frmPage",
+                            FacesMessage.SEVERITY_ERROR, false, ex.getMessage(),
+                            null);
                 }
             }
             this.newActor = new NewsItemActor();
 
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Please select a role and user before clicking 'Add'", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
+                    "Please select a role and user before clicking 'Add'", null);
         }
     }
 
@@ -510,9 +613,12 @@ public class NewsItem {
             selectedNewsItem.getConcepts().add(selectedMetaDataConcept);
             selectedNewsItem = newsItemFacade.save(selectedNewsItem);
 
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "newsitem_META_DATA_X_ADDED_TO_ASSIGNMENT", new Object[]{getSelectedMetaDataConcept().getName()});
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    "newsitem_META_DATA_X_ADDED_TO_ASSIGNMENT",
+                    new Object[]{getSelectedMetaDataConcept().getName()});
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
+                    ex.getMessage(), null);
         }
     }
 
@@ -522,36 +628,43 @@ public class NewsItem {
             selectedNewsItem.getConcepts().remove(selectedMetaDataConcept);
             selectedNewsItem = newsItemFacade.save(selectedNewsItem);
 
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "newsitem_META_DATA_X_REMOVED_FROM_ASSIGNMENT", new Object[]{getSelectedMetaDataConcept().getName()});
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    "newsitem_META_DATA_X_REMOVED_FROM_ASSIGNMENT",
+                    new Object[]{getSelectedMetaDataConcept().getName()});
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
+                    ex.getMessage(), null);
         }
     }
 
     public void onReplaceHeadline(ActionEvent event) {
-        selectedNewsItem.setTitle(selectedWorkflowStateTransition.getHeadlineVersion());
+        selectedNewsItem.setTitle(selectedWorkflowStateTransition.
+                getHeadlineVersion());
     }
 
     public void onReplaceBrief(ActionEvent event) {
-        selectedNewsItem.setBrief(selectedWorkflowStateTransition.getBriefVersion());
+        selectedNewsItem.setBrief(selectedWorkflowStateTransition.
+                getBriefVersion());
     }
 
     public void onReplaceStory(ActionEvent event) {
-        selectedNewsItem.setStory(selectedWorkflowStateTransition.getStoryVersion());
+        selectedNewsItem.setStory(selectedWorkflowStateTransition.
+                getStoryVersion());
     }
 
     /**
      * Handler for validating the selected {@link WorkflowStep}.
      *
      * @param event
-     *          Event that invoked the handler
+* Event that invoked the handler
      */
     public void onValidateWorkflowStep(ActionEvent event) {
         this.validWorkflowStep = true;
 
         if (selectedStep == null) {
             this.validWorkflowStep = false;
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "newsitem_VALIDATE_SELECT_OPTION");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    "newsitem_VALIDATE_SELECT_OPTION");
         }
 
         boolean isRoleValidated = false;
@@ -572,16 +685,20 @@ public class NewsItem {
 
         if (!isRoleValidated) {
             this.validWorkflowStep = false;
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "newsitem_VALIDATE_MISSING_ROLE", requiredRole.getName());
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    "newsitem_VALIDATE_MISSING_ROLE", requiredRole.getName());
         }
 
 
         for (WorkflowStepValidator validator : selectedStep.getValidators()) {
             try {
-                dk.i2m.converge.core.plugin.WorkflowValidator workflowValidator = validator.getValidator();
-                workflowValidator.execute(selectedNewsItem, selectedStep, validator);
+                dk.i2m.converge.core.plugin.WorkflowValidator workflowValidator =
+                        validator.getValidator();
+                workflowValidator.execute(selectedNewsItem, selectedStep,
+                        validator);
             } catch (WorkflowValidatorException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), new Object[]{});
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        false, ex.getMessage(), new Object[]{});
                 this.validWorkflowStep = false;
             }
         }
@@ -621,10 +738,12 @@ public class NewsItem {
     }
 
     public Map<String, UserAccount> getRoleUsers() {
-        Map<String, UserAccount> users = new LinkedHashMap<String, UserAccount>();
+        Map<String, UserAccount> users =
+                new LinkedHashMap<String, UserAccount>();
 
         if (newActor != null && newActor.getRole() != null) {
-            List<UserAccount> accounts = userFacade.getMembers(newActor.getRole());
+            List<UserAccount> accounts = userFacade.getMembers(
+                    newActor.getRole());
             Collections.sort(accounts, new BeanComparator("fullName"));
 
             for (UserAccount user : accounts) {
@@ -641,7 +760,8 @@ public class NewsItem {
     }
 
     public DataModel getMetaDataOrganisations() {
-        return new ListDataModel(metaDataFacade.findConceptByType(Organisation.class));
+        return new ListDataModel(metaDataFacade.findConceptByType(
+                Organisation.class));
     }
 
     public DataModel getMetaDataLocations() {
@@ -649,7 +769,8 @@ public class NewsItem {
     }
 
     public DataModel getMetaDataPointsOfInterest() {
-        return new ListDataModel(metaDataFacade.findConceptByType(PointOfInterest.class));
+        return new ListDataModel(metaDataFacade.findConceptByType(
+                PointOfInterest.class));
     }
 
     public DataModel getMetaDataPersons() {
@@ -676,7 +797,8 @@ public class NewsItem {
         return selectedWorkflowStateTransition;
     }
 
-    public void setSelectedWorkflowStateTransition(WorkflowStateTransition selectedWorkflowStateTransition) {
+    public void setSelectedWorkflowStateTransition(
+            WorkflowStateTransition selectedWorkflowStateTransition) {
         this.selectedWorkflowStateTransition = selectedWorkflowStateTransition;
     }
 
@@ -685,13 +807,16 @@ public class NewsItem {
      * state of the {@link NewsItem}.
      *
      * @return {@link Map} of available {@link WorkflowStep}s from the current
-     *         state of the {@link NewsItem}
+     * state of the {@link NewsItem}
      */
     public Map<String, WorkflowStep> getAvailableWorkflowSteps() {
-        Map<String, WorkflowStep> steps = new LinkedHashMap<String, WorkflowStep>();
+        Map<String, WorkflowStep> steps =
+                new LinkedHashMap<String, WorkflowStep>();
 
-        for (WorkflowStep step : getSelectedNewsItem().getCurrentState().getNextStates()) {
-            boolean isValidForUser = !Collections.disjoint(step.getValidFor(), getUser().getUserRoles());
+        for (WorkflowStep step : getSelectedNewsItem().getCurrentState().
+                getNextStates()) {
+            boolean isValidForUser = !Collections.disjoint(step.getValidFor(),
+                    getUser().getUserRoles());
             if (step.isValidForAll() || isValidForUser) {
                 steps.put(step.getName(), step);
             }
@@ -714,7 +839,7 @@ public class NewsItem {
      * {@link WorkflowStep}, validation will occur.
      *
      * @param selectedStep
-     *          {@link WorkflowStep} selected
+* {@link WorkflowStep} selected
      */
     public void setSelectedStep(WorkflowStep selectedStep) {
         this.selectedStep = selectedStep;
@@ -732,7 +857,7 @@ public class NewsItem {
      * Determines if the selected {@link WorkflowStep} is valid.
      *
      * @return {@code true} if the selected {@link WorkflowStep} is valid,
-     *         otherwise {@code false}
+     * otherwise {@code false}
      */
     public boolean isValidWorkflowStep() {
         return validWorkflowStep;
@@ -743,7 +868,7 @@ public class NewsItem {
      * {@link NewsItem}.
      *
      * @return {@code true} if the current user is among the current actors of
-     *         the {@link NewsItem}, otherwise {@code false}
+     * the {@link NewsItem}, otherwise {@code false}
      */
     public boolean isCurrentActor() {
         boolean currentActor = false;
@@ -796,7 +921,8 @@ public class NewsItem {
     public Map<String, Edition> getOpenEditions() {
         Map<String, Edition> editions = new LinkedHashMap<String, Edition>();
         if (selectedNewsItem.getOutlet() != null) {
-            for (Edition edition : outletFacade.findEditionsByStatus(true, selectedNewsItem.getOutlet())) {
+            for (Edition edition : outletFacade.findEditionsByStatus(true,
+                    selectedNewsItem.getOutlet())) {
                 editions.put(edition.getFriendlyName(), edition);
             }
         }
@@ -806,19 +932,21 @@ public class NewsItem {
     /**
      * Gets a {@link Map} of active sections for the {@link Outlet}
      * in the selected {@link NewsItemPlacement}.
-     * 
+     *
      * @return {@link Map} of active sections
      */
     public Map<String, Section> getSections() {
         Map<String, Section> sections = new LinkedHashMap<String, Section>();
-        for (Section section : selectedNewsItemPlacement.getOutlet().getActiveSections()) {
+        for (Section section : selectedNewsItemPlacement.getOutlet().
+                getActiveSections()) {
             sections.put(section.getFullName(), section);
         }
         return sections;
     }
 
     private UserAccount getUser() {
-        return (UserAccount) JsfUtils.getValueOfValueExpression("#{userSession.user}");
+        return (UserAccount) JsfUtils.getValueOfValueExpression(
+                "#{userSession.user}");
     }
 
     public String getKeyword() {
@@ -847,7 +975,7 @@ public class NewsItem {
      * Event handler for starting the search.
      *
      * @param event
-     *          Event that invoked the handler
+* Event that invoked the handler
      */
     public void onSearch(ActionEvent event) {
         if (!getKeyword().trim().isEmpty()) {
@@ -861,11 +989,17 @@ public class NewsItem {
 
             if (realResults.isEmpty()) {
                 searchResults = new ListDataModel(new ArrayList());
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "No results found with the query: {0}", getKeyword());
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                        false, "No results found with the query: {0}",
+                        getKeyword());
             } else {
 
                 for (SearchResult hit : realResults) {
-                    hit.setLink(MessageFormat.format(hit.getLink(), new Object[]{JsfUtils.getValueOfValueExpression("#{facesContext.externalContext.request.contextPath}")}));
+                    hit.setLink(
+                            MessageFormat.format(hit.getLink(),
+                            new Object[]{
+                                JsfUtils.getValueOfValueExpression(
+                                "#{facesContext.externalContext.request.contextPath}")}));
                 }
                 searchResults = new ListDataModel(realResults);
             }
@@ -884,11 +1018,16 @@ public class NewsItem {
             this.selectedAttachment.setNewsItem(selectedNewsItem);
 
             try {
-                this.selectedAttachment.setMediaItem(catalogueFacade.findMediaItemById(this.selectedMediaItemId));
-                this.selectedAttachment.setCaption(this.selectedAttachment.getMediaItem().getDescription());
+                this.selectedAttachment.setMediaItem(catalogueFacade.
+                        findMediaItemById(this.selectedMediaItemId));
+                this.selectedAttachment.setCaption(this.selectedAttachment.
+                        getMediaItem().getDescription());
             } catch (DataNotFoundException ex) {
-                LOG.log(Level.WARNING, "Media Item #{0} does not exist in the database. Schedule removal from search engine", this.selectedMediaItemId);
-                searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, this.selectedMediaItemId, QueueEntryOperation.REMOVE);
+                LOG.log(Level.WARNING,
+                        "Media Item #{0} does not exist in the database. Schedule removal from search engine",
+                        this.selectedMediaItemId);
+                searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM,
+                        this.selectedMediaItemId, QueueEntryOperation.REMOVE);
             }
         }
     }
@@ -896,10 +1035,12 @@ public class NewsItem {
     public void onUseAttachment(ActionEvent event) {
         if (this.userSubmission.getId() != null) {
             this.userSubmission.setDescription(selectedAttachment.getCaption());
-            this.userSubmission.setByLine(selectedAttachment.getMediaItem().getByLine());
+            this.userSubmission.setByLine(selectedAttachment.getMediaItem().
+                    getByLine());
         }
 
-        this.selectedAttachment.setDisplayOrder(this.selectedNewsItem.getNextAssetAttachmentDisplayOrder());
+        this.selectedAttachment.setDisplayOrder(this.selectedNewsItem.
+                getNextAssetAttachmentDisplayOrder());
         this.selectedAttachment = newsItemFacade.create(selectedAttachment);
         this.selectedNewsItem.getMediaAttachments().add(selectedAttachment);
 
@@ -909,14 +1050,16 @@ public class NewsItem {
             onPreAttachMediaFile(event);
         }
 
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "ASSET_ATTACHED_TO_STORY");
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                "ASSET_ATTACHED_TO_STORY");
     }
 
     public void onUpdateAttachment(ActionEvent event) {
         selectedNewsItem.getMediaAttachments().remove(selectedAttachment);
         selectedAttachment = newsItemFacade.update(selectedAttachment);
         selectedNewsItem.getMediaAttachments().add(selectedAttachment);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "The attachment was updated", null);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false,
+                "The attachment was updated", null);
     }
 
     public void onPreAttachMediaFile(ActionEvent event) {
@@ -964,9 +1107,8 @@ public class NewsItem {
     /**
      * Event handler for uploading a new {@link MediaItem}
      * to the {@link dk.i2m.converge.core.content.NewsItem}.
-     * 
-     * @param event 
-     *          Event that invoked the handler
+     *
+     * @param event * Event that invoked the handler
      */
     public void onUploadMediaItem(UploadEvent event) {
         if (event == null) {
@@ -995,20 +1137,27 @@ public class NewsItem {
 
             String filename = HttpUtils.getFilename(item.getFileName());
             try {
-                mir = catalogueFacade.create(tempFile, userSubmission, mir.getRendition(), item.getFileName(), item.getContentType());
+                mir = catalogueFacade.create(tempFile, userSubmission, mir.
+                        getRendition(), item.getFileName(),
+                        item.getContentType());
             } catch (IOException ioex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Could not upload file. " + ioex.getMessage(), null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        false, "Could not upload file. " + ioex.getMessage(),
+                        null);
             }
 
             try {
-                userSubmission = catalogueFacade.findMediaItemById(userSubmission.getId());
+                userSubmission =
+                        catalogueFacade.findMediaItemById(userSubmission.getId());
             } catch (DataNotFoundException ex) {
-                LOG.log(Level.SEVERE, "Could not find MediaItem #{0}", userSubmission.getId());
+                LOG.log(Level.SEVERE, "Could not find MediaItem #{0}",
+                        userSubmission.getId());
             }
 
             Map<String, String> props = new HashMap<String, String>();
 
-            List<DiscoveredProperty> discoProps = new ArrayList<DiscoveredProperty>();
+            List<DiscoveredProperty> discoProps =
+                    new ArrayList<DiscoveredProperty>();
             for (String s : props.keySet()) {
                 discoProps.add(new DiscoveredProperty(s, props.get(s)));
             }
@@ -1028,12 +1177,14 @@ public class NewsItem {
 //                discovered = new ListDataModel(discoProps);
 
         } else {
-            LOG.log(Level.SEVERE, "RichFaces is not set-up to use tempFiles for storing file uploads");
+            LOG.log(Level.SEVERE,
+                    "RichFaces is not set-up to use tempFiles for storing file uploads");
         }
 
         userSubmission = catalogueFacade.update(userSubmission);
 
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "Media item uploaded", null);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false,
+                "Media item uploaded", null);
     }
 
     public NewsItemMediaAttachment getDeleteMediaItem() {
@@ -1044,8 +1195,10 @@ public class NewsItem {
         this.deleteMediaItem = deleteMediaItem;
 
         if (this.deleteMediaItem != null) {
-            newsItemFacade.deleteMediaAttachmentById(this.deleteMediaItem.getId());
-            this.selectedNewsItem.getMediaAttachments().remove(this.deleteMediaItem);
+            newsItemFacade.deleteMediaAttachmentById(
+                    this.deleteMediaItem.getId());
+            this.selectedNewsItem.getMediaAttachments().remove(
+                    this.deleteMediaItem);
         }
     }
 
@@ -1108,7 +1261,9 @@ public class NewsItem {
 //            }
             editionCal.setTime(editionDate);
 
-            List<EditionCandidate> editions = outletFacade.findEditionCandidatesByDate(getSelectedNewsItemPlacement().getOutlet(), editionCal, showClosedEditions);
+            List<EditionCandidate> editions = outletFacade.
+                    findEditionCandidatesByDate(getSelectedNewsItemPlacement().
+                    getOutlet(), editionCal, showClosedEditions);
             Collections.sort(editions, new BeanComparator("publicationDate"));
             for (EditionCandidate e : editions) {
                 String label = "";
@@ -1138,9 +1293,11 @@ public class NewsItem {
     }
 
     /**
-     * Gets a {@link Map} of {@link Edition} candidates based on the selected edition date.
-     * 
-     * @return {@link Map} of {@link Edition} candidates based on the selected edition date
+     * Gets a {@link Map} of {@link Edition} candidates based on the selected
+     * edition date.
+     *
+     * @return {@link Map} of {@link Edition} candidates based on the selected
+     * edition date
      */
     public Map<String, EditionCandidate> getEditionCandidates() {
         return this.editionCandidates;
@@ -1150,13 +1307,19 @@ public class NewsItem {
         this.selectedNewsItemPlacement = new NewsItemPlacement();
         this.selectedNewsItemPlacement.setNewsItem(selectedNewsItem);
         if (getUser().getDefaultOutlet() != null) {
-            this.selectedNewsItemPlacement.setOutlet(getUser().getDefaultOutlet());
+            this.selectedNewsItemPlacement.setOutlet(
+                    getUser().getDefaultOutlet());
         } else {
-            this.selectedNewsItemPlacement.setOutlet(selectedNewsItem.getOutlet());
+            this.selectedNewsItemPlacement.setOutlet(
+                    selectedNewsItem.getOutlet());
         }
 
-        if (getUser().getDefaultSection() != null && this.selectedNewsItemPlacement.getOutlet() != null && getUser().getDefaultSection().getOutlet().equals(this.selectedNewsItemPlacement.getOutlet())) {
-            this.selectedNewsItemPlacement.setSection(getUser().getDefaultSection());
+        if (getUser().getDefaultSection() != null
+                && this.selectedNewsItemPlacement.getOutlet() != null
+                && getUser().getDefaultSection().getOutlet().equals(this.selectedNewsItemPlacement.
+                getOutlet())) {
+            this.selectedNewsItemPlacement.setSection(getUser().
+                    getDefaultSection());
         }
 
         this.editionCandidates = new LinkedHashMap<String, EditionCandidate>();
@@ -1167,21 +1330,27 @@ public class NewsItem {
     public void onAddPlacement(ActionEvent event) {
 
         if (getEditionCandidate() == null) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "OUTLET_PLACEMENT_SELECT_EDITION");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    "OUTLET_PLACEMENT_SELECT_EDITION");
             return;
         }
 
         if (getEditionCandidate().isExist()) {
             try {
-                selectedNewsItemPlacement.setEdition(outletFacade.findEditionById(getEditionCandidate().getEditionId()));
+                selectedNewsItemPlacement.setEdition(outletFacade.
+                        findEditionById(getEditionCandidate().getEditionId()));
             } catch (DataNotFoundException ex) {
-                LOG.log(Level.INFO, "Edition {0} could not be found in the database", getEditionCandidate().getEditionId());
+                LOG.log(Level.INFO,
+                        "Edition {0} could not be found in the database",
+                        getEditionCandidate().getEditionId());
             }
         } else {
-            selectedNewsItemPlacement.setEdition(outletFacade.createEdition(getEditionCandidate()));
+            selectedNewsItemPlacement.setEdition(outletFacade.createEdition(
+                    getEditionCandidate()));
         }
 
-        selectedNewsItemPlacement = newsItemFacade.createPlacement(selectedNewsItemPlacement);
+        selectedNewsItemPlacement = newsItemFacade.createPlacement(
+                selectedNewsItemPlacement);
 
         if (!selectedNewsItem.getPlacements().contains(selectedNewsItemPlacement)) {
             selectedNewsItem.getPlacements().add(selectedNewsItemPlacement);
@@ -1190,21 +1359,26 @@ public class NewsItem {
 
     public void onUpdatePlacement(ActionEvent event) {
         if (getEditionCandidate() == null) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "OUTLET_PLACEMENT_SELECT_EDITION");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    "OUTLET_PLACEMENT_SELECT_EDITION");
             return;
         }
 
         if (getEditionCandidate().isExist()) {
             try {
-                selectedNewsItemPlacement.setEdition(outletFacade.findEditionById(getEditionCandidate().getEditionId()));
+                selectedNewsItemPlacement.setEdition(outletFacade.
+                        findEditionById(getEditionCandidate().getEditionId()));
             } catch (DataNotFoundException ex) {
-                LOG.log(Level.INFO, "Edition {0} does not exist", getEditionCandidate().getEditionId());
+                LOG.log(Level.INFO, "Edition {0} does not exist",
+                        getEditionCandidate().getEditionId());
             }
         } else {
-            selectedNewsItemPlacement.setEdition(outletFacade.createEdition(getEditionCandidate()));
+            selectedNewsItemPlacement.setEdition(outletFacade.createEdition(
+                    getEditionCandidate()));
         }
 
-        selectedNewsItemPlacement = newsItemFacade.updatePlacement(selectedNewsItemPlacement);
+        selectedNewsItemPlacement = newsItemFacade.updatePlacement(
+                selectedNewsItemPlacement);
 
         if (!selectedNewsItem.getPlacements().contains(selectedNewsItemPlacement)) {
             selectedNewsItem.getPlacements().add(selectedNewsItemPlacement);
@@ -1222,10 +1396,14 @@ public class NewsItem {
         return selectedNewsItemPlacement;
     }
 
-    public void setSelectedNewsItemPlacement(NewsItemPlacement selectedNewsItemPlacement) {
+    public void setSelectedNewsItemPlacement(
+            NewsItemPlacement selectedNewsItemPlacement) {
         this.selectedNewsItemPlacement = selectedNewsItemPlacement;
-        if (this.selectedNewsItemPlacement != null && this.selectedNewsItemPlacement.getEdition() != null) {
-            this.editionCandidate = new EditionCandidate(this.selectedNewsItemPlacement.getEdition());
+        if (this.selectedNewsItemPlacement != null
+                && this.selectedNewsItemPlacement.getEdition() != null) {
+            this.editionCandidate =
+                    new EditionCandidate(this.selectedNewsItemPlacement.
+                    getEdition());
         }
     }
 
@@ -1254,8 +1432,9 @@ public class NewsItem {
     }
 
     /**
-     * Gets the number of columns to display in the grid of attached media items.
-     * 
+     * Gets the number of columns to display in the grid of attached media
+     * items.
+     *
      * @return Number of columns to display in the media attachment grid
      */
     public int getNumberOfMediaAttachmentsColumns() {
@@ -1270,26 +1449,33 @@ public class NewsItem {
 
     public void onSuggestConcepts(ActionEvent event) {
         if (getSelectedNewsItem().getStory().trim().isEmpty()) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "NewsItem_CONCEPTS_SUGGEST_FAILED_NO_STORY", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    "i18n", "NewsItem_CONCEPTS_SUGGEST_FAILED_NO_STORY", null);
             return;
         }
 
         try {
-            List<Concept> concepts = metaDataService.enrich(StringUtils.stripHtml(getSelectedNewsItem().getStory()));
+            List<Concept> concepts = metaDataService.enrich(StringUtils.
+                    stripHtml(getSelectedNewsItem().getStory()));
             suggestedConcepts = new LinkedHashMap<String, Concept>();
             this.selectedConcepts = new ArrayList<Concept>();
-            ResourceBundle bundle = JsfUtils.getResourceBundle(FacesContext.getCurrentInstance(), "i18n");
+            ResourceBundle bundle = JsfUtils.getResourceBundle(FacesContext.
+                    getCurrentInstance(), "i18n");
             for (Concept concept : concepts) {
-                String type = bundle.getString("Generic_" + concept.getType() + "_NAME");
-                suggestedConcepts.put(concept.getName() + " (" + type + ")", concept);
+                String type = bundle.getString("Generic_" + concept.getType()
+                        + "_NAME");
+                suggestedConcepts.put(concept.getName() + " (" + type + ")",
+                        concept);
             }
 
             if (suggestedConcepts.isEmpty()) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "NewsItem_CONCEPTS_SUGGEST_NO_RESULTS", null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        "i18n", "NewsItem_CONCEPTS_SUGGEST_NO_RESULTS", null);
             }
 
         } catch (EnrichException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "NewsItem_CONCEPTS_SUGGEST_FAILED", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    "i18n", "NewsItem_CONCEPTS_SUGGEST_FAILED", null);
         }
     }
 

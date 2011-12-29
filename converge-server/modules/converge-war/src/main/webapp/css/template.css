@@ -1756,4 +1756,7 @@ div.black h2 {
 
 .pluginInstanceAbout { background: white; border: 1px solid silver; height: 70px; padding: 3px; width: 98%; overflow:auto; position: relative; display: block; padding: 8px; font-family:'Lucida Grande', helvetica, verdana, sans-serif, arial; font-size: 1em; }
 .propertyInplace { white-space: normal; }
-    
+
+/* TextMetrics Plug-in for TinyMCE */
+div.metrics {float:right !important;}
+div.metrics > span {margin-left:0.5em !important;}

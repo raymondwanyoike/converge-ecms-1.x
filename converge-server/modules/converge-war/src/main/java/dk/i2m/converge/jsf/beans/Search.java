@@ -73,6 +73,8 @@ public class Search {
     private boolean criteriaDate = false;
 
     private boolean criteriaType = true;
+    
+    private long archiveSize = -1;
 
     public Search() {
     }
@@ -82,19 +84,29 @@ public class Search {
         reset();
     }
 
+    public long getArchiveSize() {
+        if (archiveSize < 0) {
+            archiveSize = searchEngine.search("*:*", 1, 1).getNumberOfResults();
+        }
+        return archiveSize;
+    }
+    
+    
+
     private void reset() {
         this.keyword = "";
         this.searchResults = new ListDataModel();
         this.pages = new ListDataModel(new ArrayList());
         this.showResults = false;
         this.resultsFound = 0;
-        
+
         this.sortField = getUser().getDefaultSearchResultsSortBy();
         if (this.sortField == null) {
             this.sortField = "score";
         }
-        
-        this.sortOrder = Boolean.toString(getUser().isDefaultSearchResultsOrder());
+
+        this.sortOrder = Boolean.toString(
+                getUser().isDefaultSearchResultsOrder());
 
         this.searchType = "type:Story";
         this.results = new SearchResults();
@@ -126,7 +138,7 @@ public class Search {
      * Sets the keyword (query) to be searched for.
      *
      * @param keyword
-     *          Keyword (query) to be searched for
+     * Keyword (query) to be searched for
      */
     public void setKeyword(String keyword) {
         this.keyword = keyword;
@@ -154,18 +166,25 @@ public class Search {
     public void onGenerateOverview(ActionEvent event) {
         byte[] output = searchEngine.generateReport(this.results);
 
-        String filename = "Search Results Overview.xls";
+        String filename = JsfUtils.getResourceBundle(FacesContext.
+                getCurrentInstance(), "i18n").getString(
+                "Search_OVERVIEW_REPORT_FILENAME");
 
-        HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+        HttpServletResponse response = (HttpServletResponse) FacesContext.
+                getCurrentInstance().getExternalContext().getResponse();
         response.setContentType("application/vnd.ms-excel");
-        response.setHeader("Content-disposition", "attachment; filename=" + filename);
+        response.setHeader("Content-disposition", "attachment; filename="
+                + filename);
         try {
             ServletOutputStream out = response.getOutputStream();
             out.write(output);
             out.flush();
             out.close();
         } catch (IOException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "Could not generate Excel report. " + ex.getMessage(), new Object[]{});
+
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    "i18n", "Search_COULD_NOT_OVERVIEW_GENERATE_REPORT", ex.
+                    getMessage());
         }
 
         FacesContext faces = FacesContext.getCurrentInstance();
@@ -175,8 +194,7 @@ public class Search {
     /**
      * Event handler for starting the search.
      *
-     * @param event
-     *          Event that invoked the handler
+     * @param event Event that invoked the handler
      */
     public void onSearch(ActionEvent event) {
         if (StringUtils.isEmpty(getKeyword())) {
@@ -209,7 +227,8 @@ public class Search {
     }
 
     public void onRemoveFacet(ActionEvent event) {
-        String filterQuery = JsfUtils.getRequestParameterMap().get("filterQuery");
+        String filterQuery =
+                JsfUtils.getRequestParameterMap().get("filterQuery");
         if (filterQuery != null) {
             filterQueries.remove(filterQuery);
             conductSearch(keyword, 0, 10);
@@ -226,16 +245,23 @@ public class Search {
         }
         filters.addAll(filterQueries);
 
-        this.results = searchEngine.search(keyword, start, rows, sortField, Boolean.valueOf(sortOrder), getDateFrom(), getDateTo(), filters.toArray(new String[filters.size()]));
+        this.results = searchEngine.search(keyword, start, rows, sortField,
+                Boolean.valueOf(sortOrder), getDateFrom(), getDateTo(), filters.
+                toArray(new String[filters.size()]));
 
         if (results.getNumberOfResults() == 0) {
             showResults = false;
             searchResults = new ListDataModel(new ArrayList());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "No results found with the query: {0}", getKeyword());
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
+                    "Search_NO_RESULTS_FOUND", getKeyword());
         } else {
 
             for (SearchResult hit : results.getHits()) {
-                hit.setLink(MessageFormat.format(hit.getLink(), new Object[]{JsfUtils.getValueOfValueExpression("#{facesContext.externalContext.request.contextPath}")}));
+                hit.setLink(
+                        MessageFormat.format(hit.getLink(),
+                        new Object[]{
+                            JsfUtils.getValueOfValueExpression(
+                            "#{facesContext.externalContext.request.contextPath}")}));
             }
             searchResults = new ListDataModel(results.getHits());
 
@@ -243,7 +269,8 @@ public class Search {
                 if (l >= 20) {
                     break;
                 }
-                SearchPage page = new SearchPage((l + 1), l * results.getResultsPerPage(), results.getNumberOfPages());
+                SearchPage page = new SearchPage((l + 1), l * results.
+                        getResultsPerPage(), results.getNumberOfPages());
                 ((ArrayList) getPages().getWrappedData()).add(page);
             }
 
@@ -297,7 +324,7 @@ public class Search {
 
     /**
      * Gets the {@link Date} for which the search results must not be earlier.
-     * 
+     *
      * @return {@link Date} for which the search results must not be earlier
      */
     public Date getDateFrom() {
@@ -306,9 +333,9 @@ public class Search {
 
     /**
      * Sets the {@link Date} for which the search results must not be earlier.
-     * 
-     * @param dateFrom
-     *          {@link Date} for which the search results must not be earlier
+     *
+     * @param dateFrom {@link Date} for which the search results must not be
+     * earlier
      */
     public void setDateFrom(Date dateFrom) {
         this.dateFrom = dateFrom;
@@ -316,7 +343,7 @@ public class Search {
 
     /**
      * Gets the {@link Date} for which the search results must not be older.
-     * 
+     *
      * @return {@link Date} for which the search results must not be older
      */
     public Date getDateTo() {
@@ -325,9 +352,8 @@ public class Search {
 
     /**
      * Sets the {@link Date} for which the search results must not be older.
-     * 
-     * @param dateTo
-     *          {@link Date} for which the search results must not be older
+     *
+     * @param dateTo {@link Date} for which the search results must not be older
      */
     public void setDateTo(Date dateTo) {
         this.dateTo = dateTo;
@@ -350,7 +376,8 @@ public class Search {
     }
 
     private UserAccount getUser() {
-        return (UserAccount) JsfUtils.getValueOfValueExpression("#{userSession.user}");
+        return (UserAccount) JsfUtils.getValueOfValueExpression(
+                "#{userSession.user}");
     }
 
     public class SearchPage {
