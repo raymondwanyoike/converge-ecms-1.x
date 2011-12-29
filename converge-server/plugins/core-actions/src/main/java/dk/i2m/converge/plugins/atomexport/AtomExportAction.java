@@ -108,8 +108,8 @@ public class AtomExportAction implements EditionAction {
             entry.setPublishedDate(edition.getPublicationDate().getTime());
             description = new SyndContentImpl();
             description.setType("text/plain");
-            description.setValue(StringEscapeUtils.escapeHtml(newsItem.
-                    getBrief()));
+            description.setValue(StringEscapeUtils.escapeHtml(
+                    newsItem.getBrief()));
             entry.setDescription(description);
 
             SyndContent story = new SyndContentImpl();
@@ -164,6 +164,11 @@ public class AtomExportAction implements EditionAction {
     }
 
     @Override
+    public boolean isSupportEditionExecute() {
+        return true;
+    }
+
+    @Override
     public Map<String, String> getAvailableProperties() {
         if (availableProperties == null) {
             addProperty(PROPERTY_FEED_TITLE);
@@ -214,10 +219,8 @@ public class AtomExportAction implements EditionAction {
     /**
      * Compiles a given template with the given attributes.
      *
-     * @param template
-     *          Template to compile
-     * @param attributes
-     *          Attributes to interpolate
+     * @param template   Template to compile
+     * @param attributes Attributes to interpolate
      * @return Compiled template
      */
     private String compileTemplate(String template,
@@ -255,5 +258,16 @@ public class AtomExportAction implements EditionAction {
     @Override
     public ResourceBundle getBundle() {
         return bundle;
+    }
+
+    @Override
+    public void executePlacement(PluginContext ctx, NewsItemPlacement placement,
+            Edition edition, OutletEditionAction action) {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    @Override
+    public boolean isSupportPlacementExecute() {
+        return false;
     }
 }

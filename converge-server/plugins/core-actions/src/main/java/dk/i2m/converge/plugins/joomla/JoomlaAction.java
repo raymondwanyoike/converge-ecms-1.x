@@ -11,6 +11,7 @@
  */
 package dk.i2m.converge.plugins.joomla;
 
+import dk.i2m.converge.core.LogEntry;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.plugin.PluginContext;
@@ -19,6 +20,7 @@ import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.workflow.WorkflowStepAction;
 import dk.i2m.converge.core.workflow.WorkflowStepActionProperty;
 import dk.i2m.converge.plugins.joomla.client.JoomlaConnection;
+import dk.i2m.converge.plugins.joomla.client.JoomlaException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,9 +37,11 @@ import java.util.logging.Logger;
 @dk.i2m.converge.core.annotations.WorkflowAction
 public class JoomlaAction extends JoomlaPlugin implements WorkflowAction {
 
-    private static final Logger LOG = Logger.getLogger(JoomlaAction.class.getName());
+    private static final Logger LOG = Logger.getLogger(JoomlaAction.class.
+            getName());
 
-    private ResourceBundle bundle = ResourceBundle.getBundle("dk.i2m.converge.plugins.joomla.JoomlaAction");
+    private ResourceBundle bundle = ResourceBundle.getBundle(
+            "dk.i2m.converge.plugins.joomla.JoomlaAction");
 
     /**
      * Creates a new instance of {@link JoomlaAction}.
@@ -59,24 +63,33 @@ public class JoomlaAction extends JoomlaPlugin implements WorkflowAction {
                 } else if (catMap.length == 3) {
                     categoryMapping.put(catMap[0], catMap[1]);
                     try {
-                        categoryPublish.put(catMap[0], Integer.valueOf(catMap[2]));
+                        categoryPublish.put(catMap[0],
+                                Integer.valueOf(catMap[2]));
                     } catch (NumberFormatException ex) {
-                        LOG.log(Level.INFO, "Invalid category publish delay: {0}", catMap[2]);
+                        ctx.log(LogEntry.Severity.WARNING,
+                                "Invalid category publish delay: {0}",
+                                new Object[]{catMap[2]}, stepAction, stepAction.
+                                getId());
                     }
                 } else if (catMap.length == 4) {
                     categoryMapping.put(catMap[0], catMap[1]);
                     try {
-                        categoryPublish.put(catMap[0], Integer.valueOf(catMap[2]));
+                        categoryPublish.put(catMap[0],
+                                Integer.valueOf(catMap[2]));
                     } catch (NumberFormatException ex) {
-                        LOG.log(Level.INFO, "Invalid category publish delay: {0}", catMap[2]);
+                        LOG.log(Level.INFO,
+                                "Invalid category publish delay: {0}", catMap[2]);
                     }
                     try {
                         categoryExpire.put(catMap[0], Integer.valueOf(catMap[3]));
                     } catch (NumberFormatException ex) {
-                        LOG.log(Level.INFO, "Invalid category expire delay [{0}] for category [{1}]", new Object[]{catMap[3], catMap[0]});
+                        LOG.log(Level.INFO,
+                                "Invalid category expire delay [{0}] for category [{1}]",
+                                new Object[]{catMap[3], catMap[0]});
                     }
                 } else {
-                    LOG.log(Level.INFO, "Invalid category mapping: {0}", prop.getValue());
+                    LOG.log(Level.INFO, "Invalid category mapping: {0}", prop.
+                            getValue());
                 }
             } else if (prop.getKey().equalsIgnoreCase(
                     PROPERTY_CATEGORY_IMAGE_RESIZE)) {
@@ -86,7 +99,8 @@ public class JoomlaAction extends JoomlaPlugin implements WorkflowAction {
                     categoryMapping.put(imgCat[0], prop.getValue());
                 } else {
                     LOG.log(Level.INFO,
-                            "Invalid image category settings: {0}", prop.getValue());
+                            "Invalid image category settings: {0}", prop.
+                            getValue());
                 }
             }
 
@@ -153,8 +167,11 @@ public class JoomlaAction extends JoomlaPlugin implements WorkflowAction {
         connection.setReplyTimeout(replyTimeout);
         connection.setTimeZone(user.getTimeZone());
 
-        if (!connection.isConnectionValid()) {
-            LOG.log(Level.WARNING, "Connection invalid");
+        try {
+            connection.validateConnection();
+        } catch (JoomlaException ex) {
+            LOG.log(Level.WARNING, "Connection invalid. {0}", ex.getCause().
+                      getMessage());
             return;
         }
 
@@ -201,7 +218,8 @@ public class JoomlaAction extends JoomlaPlugin implements WorkflowAction {
     @Override
     public Date getDate() {
         try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat format =
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             return format.parse(bundle.getString("PLUGIN_BUILD_TIME"));
         } catch (Exception ex) {
             return Calendar.getInstance().getTime();

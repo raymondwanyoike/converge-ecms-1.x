@@ -17,6 +17,8 @@
 package dk.i2m.converge.plugins.actions.opencalais;
 
 import dk.i2m.converge.core.EnrichException;
+import dk.i2m.converge.core.LogEntry;
+import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.plugin.EditionAction;
@@ -48,19 +50,9 @@ public class OpenCalaisAction implements EditionAction {
     @Override
     public void execute(PluginContext ctx, Edition edition,
             OutletEditionAction action) {
-        for (NewsItemPlacement placements : edition.getPlacements()) {
 
-            List<Concept> concepts = new ArrayList<Concept>();
-            try {
-                concepts = ctx.enrich(placements.getNewsItem().getStory());
-            } catch (EnrichException ex) {
-                LOG.log(Level.SEVERE, ex.getMessage());
-            }
-            placements.getNewsItem().getConcepts().addAll(concepts);
-            Set<Concept> set = new HashSet<Concept>(placements.getNewsItem().
-                    getConcepts());
-            ArrayList<Concept> unique = new ArrayList<Concept>(set);
-            placements.getNewsItem().setConcepts(unique);
+        for (NewsItemPlacement placement : edition.getPlacements()) {
+            executePlacement(ctx, placement, edition, action);
         }
     }
 
@@ -106,5 +98,42 @@ public class OpenCalaisAction implements EditionAction {
     @Override
     public ResourceBundle getBundle() {
         return bundle;
+    }
+
+    @Override
+    public void executePlacement(PluginContext ctx, NewsItemPlacement placement,
+            Edition edition, OutletEditionAction action) {
+
+        NewsItem newsItem = placement.getNewsItem();
+        ctx.log(LogEntry.Severity.INFO,
+                "Enriching news item #{0} via OpenCalais",
+                new Object[]{newsItem.getId()}, newsItem, newsItem.getId());
+
+        List<Concept> concepts = new ArrayList<Concept>();
+        try {
+            concepts = ctx.enrich(newsItem.getStory());
+
+        } catch (EnrichException ex) {
+            LOG.log(Level.SEVERE, ex.getMessage());
+            ctx.log(LogEntry.Severity.SEVERE,
+                    "Could not enrich news item #{0}. {1}",
+                    new Object[]{newsItem.getId(), ex.getMessage()}, newsItem,
+                    newsItem.getId());
+
+        }
+        newsItem.getConcepts().addAll(concepts);
+        Set<Concept> set = new HashSet<Concept>(newsItem.getConcepts());
+        ArrayList<Concept> unique = new ArrayList<Concept>(set);
+        newsItem.setConcepts(unique);
+    }
+
+    @Override
+    public boolean isSupportEditionExecute() {
+        return true;
+    }
+
+    @Override
+    public boolean isSupportPlacementExecute() {
+        return true;
     }
 }

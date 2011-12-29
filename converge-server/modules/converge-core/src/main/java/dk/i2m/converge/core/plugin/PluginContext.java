@@ -51,8 +51,7 @@ public interface PluginContext {
     /**
      * Creates a {@link NewswireItem} in the Converge database.
      *
-     * @param item
-     *          {@link NewswireItem} to create
+     * @param item {@link NewswireItem} to create
      * @return Created {@link NewswireItem}
      */
     NewswireItem createNewswireItem(NewswireItem item);
@@ -61,8 +60,7 @@ public interface PluginContext {
      * Finds a {@link List} of {@link NewswireItem}s with a given external
      * identifier.
      *
-     * @param externalId
-     *          External identifier of the {@link NewswireItem}
+     * @param externalId External identifier of the {@link NewswireItem}
      * @return {@link List} of {@link NewswireItem}s with the given
      *         {@code externalId}
      */
@@ -70,34 +68,28 @@ public interface PluginContext {
 
     /**
      * Fetches the newswire items of a given {@link NewswireService}.
-     * 
-     * @param service
-     *          {@link NewswireService} to fetch
+     *
+     * @param service {@link NewswireService} to fetch
      * @return {@link List} of {@link NewswireItem}s in the {@link NewswireService}
-     * @throws NewswireDecoderException 
-     *          If the decoder of the service could not fetch the items
+     * @throws NewswireDecoderException If the decoder of the service could not
+     * fetch the items
      */
     void fetch(NewswireService service) throws NewswireDecoderException;
 
     /**
      * Dispatches e-mail.
      *
-     * @param to
-     *          Recipient
-     * @param from
-     *          Addressee
-     * @param subject
-     *          Subject of the e-mail
-     * @param content
-     *          Body of the e-mail
+     * @param to      Recipient
+     * @param from    Addressee
+     * @param subject Subject of the e-mail
+     * @param content Body of the e-mail
      */
     void dispatchMail(String to, String from, String subject, String content);
 
     /**
      * Creates a {@link Notification}.
      *
-     * @param notifcation
-     *          {@link Notification} to create
+     * @param notifcation {@link Notification} to create
      * @return Created {@link Notification}
      */
     Notification createNotification(Notification notifcation);
@@ -109,26 +101,24 @@ public interface PluginContext {
     /**
      * Indexes a given {@link NewsItem} in the search engine.
      *
-     * @param item
-     *          {@link NewsItem} to index
-     * @throws SearchEngineIndexingException
-     *          If the {@link NewsItem} could not be indexed
+     * @param item {@link NewsItem} to index
+     * @throws SearchEngineIndexingException If the {@link NewsItem} could not
+     * be indexed
      */
     void index(NewsItem item) throws SearchEngineIndexingException;
-    
+
     /**
      * Indexes a given {@link NewswireItem} in the search engine.
-     * 
-     * @param item
-     *          {@link NewswireItem} to index
-     * @throws SearchEngineIndexingException
-     *          If the {@link NewswireItem} could not be indexed
+     *
+     * @param item {@link NewswireItem} to index
+     * @throws SearchEngineIndexingException If the {@link NewswireItem} could
+     * not be indexed
      */
     void index(NewswireItem item) throws SearchEngineIndexingException;
 
     /**
      * Gets a {@link List} of the latest {@link FinancialMarket} values.
-     * 
+     *
      * @return {@link List} of latest {@link FinancialMarket} values
      */
     List<MarketValue> findMarketListing();
@@ -137,7 +127,8 @@ public interface PluginContext {
 
     List<Forecast> findWeatherForecast();
 
-    dk.i2m.converge.core.content.ContentTag findOrCreateContentTag(java.lang.String name);
+    dk.i2m.converge.core.content.ContentTag findOrCreateContentTag(
+            java.lang.String name);
 
     Catalogue findCatalogue(Long catalogueId);
 
@@ -145,38 +136,70 @@ public interface PluginContext {
 
     /**
      * Archives a {@link File} in a {@link dk.i2m.converge.core.content.catalogue.Catalogue}.
-     * 
-     * @param file
-     *          {@link File} to archive
-     * @param catalogueId
-     *          Unique identifier of the {@link dk.i2m.converge.core.content.catalogue.Catalogue}
-     *          where the file should be archived
-     * @param fileName
-     *          Name of the file
+     *
+     * @param file        {@link File} to archive
+     * @param catalogueId Unique identifier of the {@link dk.i2m.converge.core.content.catalogue.Catalogue}
+     * where the file should be archived
+     * @param fileName    Name of the file
      * @return Path and name of the archived file
-     * @throws ArchiveException
-     *          If the file could not be archived in the given catalogue
+     * @throws ArchiveException If the file could not be archived in the given
+     * catalogue
      */
-    java.lang.String archive(java.io.File file, Long catalogueId, String fileName) throws ArchiveException;
+    java.lang.String archive(java.io.File file, Long catalogueId,
+            String fileName) throws ArchiveException;
 
-    dk.i2m.converge.core.content.catalogue.MediaItemRendition createMediaItemRendition(java.io.File file, java.lang.Long mediaItemId, java.lang.Long renditionId, java.lang.String filename, java.lang.String contentType) throws java.lang.IllegalArgumentException, java.io.IOException;
+    dk.i2m.converge.core.content.catalogue.MediaItemRendition createMediaItemRendition(
+            java.io.File file, java.lang.Long mediaItemId,
+            java.lang.Long renditionId, java.lang.String filename,
+            java.lang.String contentType) throws
+            java.lang.IllegalArgumentException, java.io.IOException;
 
-    dk.i2m.converge.core.content.catalogue.MediaItemRendition updateMediaItemRendition(java.io.File file, String filename, String contentType, dk.i2m.converge.core.content.catalogue.MediaItemRendition mediaItemRendition) throws java.io.IOException;
+    dk.i2m.converge.core.content.catalogue.MediaItemRendition updateMediaItemRendition(
+            java.io.File file, String filename, String contentType,
+            dk.i2m.converge.core.content.catalogue.MediaItemRendition mediaItemRendition)
+            throws java.io.IOException;
 
     /**
      * Discover {@link Concept}s matching the given story.
-     * 
-     * @param story
-     *          Story for which to discover {@link Concept}s
-     * @return {@link List} of {@link Concept}s discovered by
-     *         OpenCalais for the given story
-     * @throws EnrichException 
-     *          If the story could not be enriched due to
-     *          connectivity or overload to the OpenCalais server
+     *
+     * @param story Story for which to discover {@link Concept}s
+     * @return {@link List} of {@link Concept}s discovered by OpenCalais for the
+     * given story
+     * @throws EnrichException * If the story could not be enriched due to
+     * connectivity or overload to the OpenCalais server
      */
-    List<dk.i2m.converge.core.metadata.Concept> enrich(String story) throws EnrichException;
-    
+    List<dk.i2m.converge.core.metadata.Concept> enrich(String story) throws
+            EnrichException;
+
     String extractContent(MediaItemRendition mediaItemRendition);
-    
+
     String getConfiguration(ConfigurationKey key);
+
+    /**
+     * Logs activity.
+     *
+     * @param severity Severity of the log statement
+     * @param message  Message to log
+     * @param origin   Origin of the log
+     * @param originId ID of the origin
+     */
+    void log(dk.i2m.converge.core.LogEntry.Severity severity,
+            java.lang.String message, java.lang.Object origin,
+            java.lang.Object originId);
+
+    /**
+     * Logs activity.
+     *
+     * @param severity         Severity of the log statement
+     * @param message          Message to log
+     * @param messageArguments Arguments for the message
+     * @param origin           Origin of the log
+     * @param originId         ID of the origin
+     */
+    void log(dk.i2m.converge.core.LogEntry.Severity severity,
+            java.lang.String message, java.lang.Object[] messageArguments,
+            java.lang.Object origin,
+            java.lang.Object originId);
+    
+    UserAccount getCurrentUserAccount();
 }

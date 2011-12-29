@@ -1,16 +1,22 @@
 /*
  * Copyright (C) 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later 
+ * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.plugins.actions.urlcallback;
 
+import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.plugin.EditionAction;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.workflow.Edition;
@@ -28,7 +34,8 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 
 /**
- * {@link EditionAction} for executing a URL. This action can be used as a callback for external system that needs to be notified of an
+ * {@link EditionAction} for executing a URL. This action can be used as a
+ * callback for external system that needs to be notified of an
  * {@link Edition} closing.
  *
  * @author Allan Lykke Christensen
@@ -40,9 +47,11 @@ public class UrlCallbackAction implements EditionAction {
 
     private Map<String, String> availableProperties = null;
 
-    private static final Logger LOG = Logger.getLogger(UrlCallbackAction.class.getName());
+    private static final Logger LOG = Logger.getLogger(UrlCallbackAction.class.
+            getName());
 
-    private ResourceBundle bundle = ResourceBundle.getBundle("dk.i2m.converge.plugins.actions.urlcallback.Messages");
+    private ResourceBundle bundle = ResourceBundle.getBundle(
+            "dk.i2m.converge.plugins.actions.urlcallback.Messages");
 
     public enum Property {
 
@@ -50,11 +59,13 @@ public class UrlCallbackAction implements EditionAction {
     }
 
     @Override
-    public void execute(PluginContext ctx, Edition edition, OutletEditionAction action) {
+    public void execute(PluginContext ctx, Edition edition,
+            OutletEditionAction action) {
         Map<String, String> properties = action.getPropertiesAsMap();
 
         if (!properties.containsKey(Property.CALLBACK_URL.name())) {
-            LOG.log(Level.WARNING, "{0} property missing from properties", Property.CALLBACK_URL.name());
+            LOG.log(Level.WARNING, "{0} property missing from properties",
+                    Property.CALLBACK_URL.name());
             return;
         }
 
@@ -67,7 +78,8 @@ public class UrlCallbackAction implements EditionAction {
             } catch (Exception e) {
                 LOG.log(Level.WARNING,
                         "Invalid value set for {0}: {1}. Using {2}",
-                        new Object[]{Property.TIMEOUT.name(), rawTimeout, timeout});
+                        new Object[]{Property.TIMEOUT.name(), rawTimeout,
+                            timeout});
             }
         }
 
@@ -87,12 +99,30 @@ public class UrlCallbackAction implements EditionAction {
         try {
             client.executeMethod(method);
         } catch (HttpException ex) {
-            LOG.log(Level.WARNING, "Could not execute callback URL. " + ex.getMessage(), ex);
+            LOG.log(Level.WARNING, "Could not execute callback URL. " + ex.
+                    getMessage(), ex);
         } catch (IOException ex) {
-            LOG.log(Level.WARNING, "Could not execute callback URL. " + ex.getMessage(), ex);
+            LOG.log(Level.WARNING, "Could not execute callback URL. " + ex.
+                    getMessage(), ex);
         } finally {
             method.releaseConnection();
         }
+    }
+    
+    @Override
+    public void executePlacement(PluginContext ctx, NewsItemPlacement placement,
+            Edition edition, OutletEditionAction action) {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    @Override
+    public boolean isSupportEditionExecute() {
+        return true;
+    }
+
+    @Override
+    public boolean isSupportPlacementExecute() {
+        return false;
     }
 
     @Override
@@ -129,7 +159,8 @@ public class UrlCallbackAction implements EditionAction {
     @Override
     public Date getDate() {
         try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat format =
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             return format.parse(bundle.getString("PLUGIN_BUILD_TIME"));
         } catch (Exception ex) {
             return Calendar.getInstance().getTime();

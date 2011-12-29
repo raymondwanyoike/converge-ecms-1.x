@@ -20,3 +20,5 @@
 /converge-server/documentation/administration-guide/target/
 /converge-server/modules/converge-mobile-server/target/
 /converge-server/modules/converge-ws-client/target/
+/converge-server/converge-installer/target/
+/converge-maven/create-newswire-decoder/target/

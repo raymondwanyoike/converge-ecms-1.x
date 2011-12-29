@@ -1,11 +1,18 @@
 /*
  * Copyright (C) 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later 
+ * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.ejb.services;
 
@@ -27,12 +34,10 @@ import dk.i2m.converge.core.search.QueueEntryType;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.workflow.Outlet;
-import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
-import dk.i2m.converge.ejb.facades.ListingFacadeLocal;
-import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
-import dk.i2m.converge.ejb.facades.SearchEngineLocal;
+import dk.i2m.converge.ejb.facades.*;
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
@@ -45,6 +50,8 @@ import javax.ejb.Stateless;
  */
 @Stateless
 public class PluginContextBean implements PluginContextBeanLocal {
+
+    @EJB private SystemFacadeLocal systemFacade;
 
     @EJB private ConfigurationServiceLocal cfgService;
 
@@ -66,6 +73,18 @@ public class PluginContextBean implements PluginContextBeanLocal {
 
     @EJB private MetaDataServiceLocal metaDataService;
 
+    private UserAccount currentUserAccount = null;
+
+    @Override
+    public void setCurrentUserAccount(UserAccount userAccount) {
+        this.currentUserAccount = userAccount;
+    }
+    
+    @Override
+    public UserAccount getCurrentUserAccount() {
+        return this.currentUserAccount;
+    }
+    
     @Override
     public String getWorkingDirectory() {
         return cfgService.getString(ConfigurationKey.WORKING_DIRECTORY);
@@ -87,7 +106,8 @@ public class PluginContextBean implements PluginContextBeanLocal {
     }
 
     @Override
-    public void dispatchMail(String to, String from, String subject, String content) {
+    public void dispatchMail(String to, String from, String subject,
+            String content) {
         notificationService.dispatchMail(to, from, subject, content);
     }
 
@@ -102,13 +122,15 @@ public class PluginContextBean implements PluginContextBeanLocal {
     }
 
     @Override
-    public List<NewsItem> findNewsItemsByStateAndOutlet(String stateName, Outlet outlet) {
+    public List<NewsItem> findNewsItemsByStateAndOutlet(String stateName,
+            Outlet outlet) {
         return newsItemFacade.findByStateAndOutlet(stateName, outlet);
     }
 
     @Override
     public void index(NewsItem item) throws SearchEngineIndexingException {
-        searchEngine.addToIndexQueue(QueueEntryType.NEWS_ITEM, item.getId(), QueueEntryOperation.UPDATE);
+        searchEngine.addToIndexQueue(QueueEntryType.NEWS_ITEM, item.getId(),
+                QueueEntryOperation.UPDATE);
     }
 
     @Override
@@ -128,12 +150,14 @@ public class PluginContextBean implements PluginContextBeanLocal {
 
     @Override
     public ContentTag findOrCreateContentTag(String name) {
-        Map<String, Object> params = QueryBuilder.with("name", name).parameters();
+        Map<String, Object> params =
+                QueryBuilder.with("name", name).parameters();
 
         ContentTag tag;
 
         try {
-            tag = daoService.findObjectWithNamedQuery(ContentTag.class, ContentTag.FIND_BY_NAME, params);
+            tag = daoService.findObjectWithNamedQuery(ContentTag.class,
+                    ContentTag.FIND_BY_NAME, params);
         } catch (DataNotFoundException ex) {
             tag = daoService.create(new ContentTag(name));
         }
@@ -160,7 +184,8 @@ public class PluginContextBean implements PluginContextBeanLocal {
     }
 
     @Override
-    public String archive(File file, Long catalogueId, String fileName) throws ArchiveException {
+    public String archive(File file, Long catalogueId, String fileName) throws
+            ArchiveException {
         try {
             Catalogue catalogue = catalogueFacade.findCatalogueById(catalogueId);
             return catalogueFacade.archive(file, catalogue, fileName);
@@ -172,7 +197,9 @@ public class PluginContextBean implements PluginContextBeanLocal {
     }
 
     @Override
-    public MediaItemRendition createMediaItemRendition(File file, Long mediaItemId, Long renditionId, String filename, String contentType) throws IllegalArgumentException, IOException {
+    public MediaItemRendition createMediaItemRendition(File file,
+            Long mediaItemId, Long renditionId, String filename,
+            String contentType) throws IllegalArgumentException, IOException {
         try {
             MediaItem mediaItem = catalogueFacade.findMediaItemById(mediaItemId);
             Rendition rendition = catalogueFacade.findRenditionById(renditionId);
@@ -184,19 +211,25 @@ public class PluginContextBean implements PluginContextBeanLocal {
             } catch (RenditionNotFoundException rex) {
             }
 
-            return catalogueFacade.create(file, mediaItem, rendition, filename, contentType);
+            return catalogueFacade.create(file, mediaItem, rendition, filename,
+                    contentType);
         } catch (DataNotFoundException ex) {
             throw new IllegalArgumentException(ex);
         }
     }
 
     @Override
-    public MediaItemRendition updateMediaItemRendition(java.io.File file, String filename, String contentType, dk.i2m.converge.core.content.catalogue.MediaItemRendition mediaItemRendition) throws IOException {
-        return catalogueFacade.update(file, filename, contentType, mediaItemRendition);
+    public MediaItemRendition updateMediaItemRendition(java.io.File file,
+            String filename, String contentType,
+            dk.i2m.converge.core.content.catalogue.MediaItemRendition mediaItemRendition)
+            throws IOException {
+        return catalogueFacade.update(file, filename, contentType,
+                mediaItemRendition);
     }
 
     @Override
-    public List<dk.i2m.converge.core.metadata.Concept> enrich(String story) throws EnrichException {
+    public List<dk.i2m.converge.core.metadata.Concept> enrich(String story)
+            throws EnrichException {
         return metaDataService.enrich(story);
     }
 
@@ -214,4 +247,23 @@ public class PluginContextBean implements PluginContextBeanLocal {
     public void index(NewswireItem item) throws SearchEngineIndexingException {
         newswireService.index(item);
     }
+
+    @Override
+    public void log(dk.i2m.converge.core.LogEntry.Severity severity,
+            java.lang.String message, java.lang.Object[] messageArguments,
+            java.lang.Object origin,
+            java.lang.Object originId) {
+        String msg = MessageFormat.format(message, messageArguments);
+        systemFacade.log(severity, getCurrentUserAccount(), msg, origin, String.valueOf(originId));
+    }
+
+    @Override
+    public void log(dk.i2m.converge.core.LogEntry.Severity severity,
+            java.lang.String message, java.lang.Object origin,
+            java.lang.Object originId) {
+        systemFacade.log(severity, getCurrentUserAccount(), message, origin, String.valueOf(
+                originId));
+    }
+
+    
 }

@@ -17,9 +17,10 @@
 package dk.i2m.converge.ejb.facades;
 
 import dk.i2m.converge.core.Announcement;
+import dk.i2m.converge.core.ConfigurationKey;
+import dk.i2m.converge.core.LogEntry;
 import dk.i2m.converge.core.content.Language;
 import dk.i2m.converge.domain.Property;
-import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import java.util.List;
 import javax.ejb.Local;
@@ -32,19 +33,8 @@ import javax.ejb.Local;
 @Local
 public interface SystemFacadeLocal {
 
-    /**
-     * Conducts a sanity check of the system.
-     *
-     * @return <code>true</code> if the sanity of the system is OK, otherwise
-     * <code>false</code>
-     */
     boolean sanityCheck();
 
-    /**
-     * Gets a {@link List} of the system properties and their values.
-     *
-     * @return {@link List} of system properties
-     */
     List<Property> getSystemProperties();
 
     /**
@@ -57,7 +47,7 @@ public interface SystemFacadeLocal {
 
     /**
      * Gets the version of the currently installed system.
-     * 
+     *
      * @return Version of the currently installed system
      */
     String getApplicationVersion();
@@ -73,8 +63,8 @@ public interface SystemFacadeLocal {
      * Gets the {@link String} value of a given {@link ConfigurationKey}.
      *
      * @param key
-     *          {@link ConfigurationKey} for which to obtain the {@link String}
-     *          value
+     * {@link ConfigurationKey} for which to obtain the {@link String}
+     * value
      * @return {@link String} value of the {@link ConfigurationKey}
      */
     String getProperty(ConfigurationKey key);
@@ -90,7 +80,7 @@ public interface SystemFacadeLocal {
      * Gets all published {@link Announcement}s from the database
      *
      * @return {@link List} of published {@link Announcement}s in the database
-     *         sorted descending by date
+     * sorted descending by date
      */
     List<Announcement> getPublishedAnnouncements();
 
@@ -98,7 +88,7 @@ public interface SystemFacadeLocal {
      * Updates an existing {@link Announcement}.
      *
      * @param announcement
-     *          {@link Announcement} to update
+     * {@link Announcement} to update
      * @return Updated {@link Announcement}
      */
     Announcement updateAnnouncement(Announcement announcement);
@@ -107,7 +97,7 @@ public interface SystemFacadeLocal {
      * Creates a new {@link Announcement}.
      *
      * @param announcement
-     *          {@link Announcement} to create
+     * {@link Announcement} to create
      * @return Created {@link Announcement}
      */
     Announcement createAnnouncement(Announcement announcement);
@@ -116,7 +106,7 @@ public interface SystemFacadeLocal {
      * Delete an existing {@link Announcement}.
      *
      * @param id
-     *          Unique identifier of the {@link Announcement}
+     * Unique identifier of the {@link Announcement}
      */
     void deleteAnnouncement(Long id);
 
@@ -124,58 +114,21 @@ public interface SystemFacadeLocal {
      * Find existing {@link Announcement} in the database.
      *
      * @param id
-     *          Unique identifier of the {@link Announcement}
+     * Unique identifier of the {@link Announcement}
      * @return {@link Announcement} matching the {@code id}
      * @throws DataNotFoundException
-     *          If no {@link Announcement} could be matched to the {@code id}
+     * If no {@link Announcement} could be matched to the {@code id}
      */
     Announcement findAnnouncementById(Long id) throws DataNotFoundException;
 
-    /**
-     * Gets all {@link Language}s from the database.
-     *
-     * @return {@link List} of all {@link Language}s in the database
-     */
     List<Language> getLanguages();
 
-    /**
-     * Updates an existing {@link Language}.
-     *
-     * @param language
-     *          {@link Language} to update
-     * @return Updated {@link Language}
-     */
     Language updateLanguage(Language language);
 
-    /**
-     * Creates a new {@link Language}.
-     *
-     * @param language
-     *          {@link Language} to create
-     * @return Created {@link Language}
-     */
     Language createLanguage(Language language);
 
-    /**
-     * Delete an existing {@link Language}.
-     *
-     * @param id
-     *          Unique identifier of the {@link Language}
-     * @throws ReferentialIntegrityException
-     *          If referential integrity is broken by deleting the
-     *          {@link Language}
-     */
     void deleteLanguage(Long id) throws ReferentialIntegrityException;
 
-    /**
-     * Find existing {@link Language} in the database.
-     *
-     * @param id
-     *          Unique identifier of the {@link Language}
-     * @return {@link Language} matching the {@code id}
-     * @throws DataNotFoundException
-     *          If no {@link Language} could be matched to the {@code id}
-     */
     Language findLanguageById(Long id) throws DataNotFoundException;
 
     boolean upgrade(dk.i2m.converge.core.AppVersion version);
@@ -185,8 +138,33 @@ public interface SystemFacadeLocal {
     Long createBackgroundTask(String name);
 
     void removeBackgroundTask(Long id);
-    
+
     java.util.List<dk.i2m.converge.core.BackgroundTask> getBackgroundTasks();
 
     java.lang.String getShortApplicationVersion();
+
+    void log(dk.i2m.converge.core.LogEntry.Severity severity,
+            dk.i2m.converge.core.security.UserAccount actor,
+            java.lang.String message, java.lang.Object origin,
+            java.lang.String originId);
+
+    void log(dk.i2m.converge.core.LogEntry.Severity severity,
+            dk.i2m.converge.core.security.UserAccount actor,
+            java.lang.String message, java.lang.String origin,
+            java.lang.String originId);
+
+    java.util.List<dk.i2m.converge.core.LogEntry> findLogEntries(
+            java.lang.String origin,
+            java.lang.String originId);
+
+    java.util.List<dk.i2m.converge.core.LogEntry> findLogEntries(
+            java.lang.Object origin,
+            java.lang.String originId);
+
+    java.util.List<dk.i2m.converge.core.LogEntry> findLogEntries(Object origin,
+            String originId, int start, int count);
+
+    List<LogEntry> findLogEntries(int start, int count);
+
+    List<LogEntry> findLogEntries();
 }
