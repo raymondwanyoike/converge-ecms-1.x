@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head>
           <title>Converge Mobile Application</title>
-          <link rel="stylesheet" href="themes/converge.mobile.min.css" />
+          <link rel="stylesheet" href="themes/the_star/star.iphone.css" />
 	  <link rel="stylesheet" href="resources/css/validationEngine.jquery.css" />
 	  <script type="text/javascript" src="resources/javascript/jquery-1.6.2.min.js"></script>
           <script type="text/javascript" src="resources/javascript/jquery.mobile-1.0b2.min.js"></script>
@@ -16,7 +16,7 @@
         <!-- Login Page -->
         <div data-role="page" id="login" data-ajax="true">
 
-            <div data-role="header" class="ui-converge-login-header" >
+            <div data-role="header" id="login-header" >
             </div>
 
             <div data-role="content" data-inset="true" data-theme="b">
@@ -37,11 +37,11 @@
                         <hr/>
                         <!--<p align="center">Don't have an account? <a href="#register"> Click here to sign up</a></p>-->
                         <p align="center">Don't have an account?</p>
-                        <p><input type="button" value="Register" id="registrationPage" class="ui-converge-button" /></p>
+                        <p><input type="button" value="Register" id="registrationPage" data-theme="c" /></p>
                     </fieldset>
                 </form>
             </div>
-            <div data-role="footer" class="ui-converge-footer" >
+            <div data-role="footer" data-theme="a" >
                 <p align="center"> <fmt:message key="footer" /> </p>
 
             </div><!-- /footer -->
@@ -54,7 +54,8 @@
             <div data-role="header" data-theme="a" >
                 <a href="#login" class="ui-btn-left ui-btn-back" data-icon="arrow-l">Login</a>
                 <h1>Register Account</h1>
-            </div><!-- /header -->
+            </div>
+            <!-- /header -->
 
             <div data-role="content" data-theme="b">
 
@@ -95,13 +96,13 @@
                                placeholder="Password Again" class="validate[required] text-input"/>
                     </div>
 
-                    <p> <input type="button" value="Sign Up" id="btnRegister" class="ui-converge-button" /></p>
+                    <p> <input type="button" value="Sign Up" id="btnRegister" data-theme="c" /></p>
 
                 </form>
 
             </div><!-- /content -->
 
-            <div data-role="footer" class="ui-converge-footer" >
+            <div data-role="footer" data-theme="a" >
                 <p align="center"> Converge Mobile Application for Touch Devices </p>
 
             </div><!-- /footer -->
@@ -115,13 +116,13 @@
                 <h1>Preferences</h1>
             </div>
 
-            <div data-role="content" id="preferenceContent" class="ui-converge-preferences-body" >
+            <div data-role="content" id="preferenceContent" data-theme="c" >
                 <div data-role="fieldcontain" >	
                     <fieldset id="prefCats" data-role="controlgroup" ></fieldset>
                 </div>
             </div>
 
-            <div data-role="footer" class="ui-converge-footer" >
+            <div data-role="footer" data-theme="a" >
                 <p align="center"> Smart People Read The Star!&reg; </p>
 
             </div><!-- /footer -->
@@ -146,7 +147,7 @@
 			</ul>
             </div>
 		  
-            <div data-role="footer" class="ui-converge-footer" >
+            <div data-role="footer" data-theme="a" >
                 <div class="ads">
                     <iframe id='ac238136c' name='ac238136c' src='http://www.the-star.co.ke/ads/www/delivery/afr.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE' frameborder='0' scrolling='no' width='234' height='60' allowtransparency='true'><a href='http://www.the-star.co.ke/ads/www/delivery/ck.php?n=a311071e&amp;cb=INSERT_RANDOM_NUMBER_HERE' target='_blank'><img src='http://www.the-star.co.ke/ads/www/delivery/avw.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE&amp;n=a311071e' border='0' alt='ad' /></a></iframe>
                 </div>
