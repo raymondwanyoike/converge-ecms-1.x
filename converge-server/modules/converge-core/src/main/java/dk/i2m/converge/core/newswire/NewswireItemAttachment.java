@@ -20,17 +20,7 @@ import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.Rendition;
 import java.io.File;
 import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Attachment of a {@link NewswireItem}.
@@ -185,11 +175,21 @@ public class NewswireItemAttachment implements Serializable {
         }
     }
 
+    /**
+     * Gets the file location of the catalogue. If the attachment is not stored
+     * in a catalogue an empty string is returned.
+     * 
+     * @return File location of the catalogue, or an empty string if the
+     *         attachment is not stored in a catalogue
+     */
     public String getCatalogueFileLocation() {
         if (isStoredInCatalogue()) {
             StringBuilder url = new StringBuilder();
-            // TODO: Fix cataloguepath to be compatible with Windows
-            url.append(catalogue.getLocation()).append(File.separator).append(getCataloguePath()).append(File.separator).append(getFilename());
+            url.append(catalogue.getLocation());
+            url.append(File.separator);
+            url.append(getCataloguePath());
+            url.append(File.separator);
+            url.append(getFilename());
             return url.toString();
         } else {
             return "";
