@@ -48,7 +48,15 @@ String.prototype.trunc = function(n){
 function populatePreferences(categories) {
     for (i=0; i<categories.section.length; i++) {
         var category = categories.section[i];
-        $('#prefCats').append('<input type="checkbox" name="cbCat" id="cbCat' + category.id + '" value="' + category.id + '" /><label for="cbCat' + category.id + '">' + category.title + '</label>');
+        //Display only non-special categories for the user to choose from
+        if (category.special=="false") {
+            $('#prefCats').append('<input type="checkbox" name="cbCat" id="cbCat' + category.id + '" value="' + category.id + '" /><label for="cbCat' + category.id + '">' + category.title + '</label>');
+        }
+        else{
+            //TODO: Handle the scenario of no optional categories to choose from. Follow up
+            $('#cats').append('<li><a href="#cat' + mobile_subscriber.subscriptions[i].id + '">' + mobile_subscriber.subscriptions[i].title + '</a><span class="ui-li-count">' + category_count + '</span></li>>');
+            
+        }
       
 	}
 
@@ -141,12 +149,14 @@ function refreshCategories() {
             }
         }
 	   
-	   //$('#lstSubscriptions').append(
+//	   $('#lstSubscriptions').append(
 //            '<li data-theme="e">' +
-//            '<img src="images/maina.png" class="ui-li-thumb" />' +
+//             '#lstSpecial'
+//           '<img src="images/maina.png" class="ui-li-thumb" />'
 //            '<h3>Maina\'s List</h3>' +
-//            '<p>Coming soon!</p></li>');
-//            
+//           '<p>Coming soon!</p></li>'
+//        );
+            
 //        $('#lstSubscriptions').append(
 //            '<li data-theme="e">' +
 //            '<img src="images/caroline.png" class="ui-li-thumb" />' +
