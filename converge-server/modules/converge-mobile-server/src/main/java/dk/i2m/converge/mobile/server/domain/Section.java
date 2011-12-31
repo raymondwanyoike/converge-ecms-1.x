@@ -13,6 +13,9 @@
 package dk.i2m.converge.mobile.server.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -44,7 +47,9 @@ public class Section implements Serializable {
     @Column(name = "display_order")
     private int displayOrder;
     @Column(name = "special")
-    private int special;
+    private boolean special;
+    @Column (name = "imgurl")
+    private String imgurl;
     
     public Long getId() {
         return id;
@@ -85,15 +90,23 @@ public class Section implements Serializable {
     public void setDisplayOrder(int displayOrder) {
         this.displayOrder = displayOrder;
     }
-    
-    public int getSpecial() {
+
+    public boolean isSpecial() {
         return special;
     }
-    
-    public void setSpecial(int special) {
+
+    public void setSpecial(boolean special) {
         this.special = special;
     }
-       
+
+    public String getImgurl() {
+        return imgurl;
+    }
+
+    public void setImgurl(String imgurl) {
+        this.imgurl = imgurl;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
