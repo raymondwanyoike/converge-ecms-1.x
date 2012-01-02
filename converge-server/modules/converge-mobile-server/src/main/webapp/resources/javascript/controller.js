@@ -52,14 +52,12 @@ function populatePreferences(categories) {
         if (category.special=="false") {
             $('#prefCats').append('<input type="checkbox" name="cbCat" id="cbCat' + category.id + '" value="' + category.id + '" /><label for="cbCat' + category.id + '">' + category.title + '</label>');
         }
-        else{
-            //TODO: Handle the scenario of no optional categories to choose from. Follow up
-            $('#cats').append('<li><a href="#cat' + mobile_subscriber.subscriptions[i].id + '">' + mobile_subscriber.subscriptions[i].title + '</a><span class="ui-li-count">' + category_count + '</span></li>>');
-            
+        else {
+            //TODO: Handle the special categories
+                             
         }
-      
-	}
 
+	}
     // Check current preferences
     if (mobile_subscriber.subscriptions != undefined) {
         for (i=0; i< mobile_subscriber.subscriptions.length; i++) {
