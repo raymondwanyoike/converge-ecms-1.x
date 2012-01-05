@@ -1,10 +1,4 @@
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+DROP TABLE IF EXISTS `announcement`;
 
 CREATE TABLE `announcement` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -16,6 +10,8 @@ CREATE TABLE `announcement` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `app_version`;
+
 CREATE TABLE `app_version` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `from_version` varchar(255) NOT NULL,
@@ -25,6 +21,7 @@ CREATE TABLE `app_version` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `assignment`;
 
 CREATE TABLE `assignment` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -38,12 +35,16 @@ CREATE TABLE `assignment` (
   KEY `FK_assignment_assigned_by` (`assigned_by`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `background_task`;
+
 CREATE TABLE `background_task` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `task_start` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `catalogue`;
 
 CREATE TABLE `catalogue` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -63,6 +64,8 @@ CREATE TABLE `catalogue` (
   KEY `FK_media_repository_editor_role_id` (`editor_role_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `catalogue_hook`;
+
 CREATE TABLE `catalogue_hook` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `execute_order` int(11) DEFAULT NULL,
@@ -72,7 +75,9 @@ CREATE TABLE `catalogue_hook` (
   `manual` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `FK_catalogue_hook_catalogue` (`catalogue_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `catalogue_hook_property`;
 
 CREATE TABLE `catalogue_hook_property` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -81,13 +86,17 @@ CREATE TABLE `catalogue_hook_property` (
   `catalogue_hook_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_catalogue_hook_property` (`catalogue_hook_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `catalogue_rendition`;
 
 CREATE TABLE `catalogue_rendition` (
   `catalogue_id` bigint(20) NOT NULL,
   `rendition_id` bigint(20) NOT NULL,
   PRIMARY KEY (`catalogue_id`,`rendition_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `clearance_level`;
 
 CREATE TABLE `clearance_level` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -95,6 +104,8 @@ CREATE TABLE `clearance_level` (
   `label` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `concept`;
 
 CREATE TABLE `concept` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -124,12 +135,16 @@ CREATE TABLE `concept` (
   KEY `FK_concept_updated_by` (`updated_by`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `concept_broader`;
+
 CREATE TABLE `concept_broader` (
   `broader_id` bigint(20) NOT NULL,
   `narrower_id` bigint(20) NOT NULL,
   PRIMARY KEY (`broader_id`,`narrower_id`),
   KEY `FK_concept_broader_narrower_id` (`narrower_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `concept_related`;
 
 CREATE TABLE `concept_related` (
   `concept_id1` bigint(20) NOT NULL,
@@ -138,12 +153,16 @@ CREATE TABLE `concept_related` (
   KEY `FK_concept_related_concept_id2` (`concept_id2`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `concept_same_as`;
+
 CREATE TABLE `concept_same_as` (
   `concept_id1` bigint(20) NOT NULL,
   `concept_id2` bigint(20) NOT NULL,
   PRIMARY KEY (`concept_id1`,`concept_id2`),
   KEY `FK_concept_same_as_concept_id2` (`concept_id2`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `config`;
 
 CREATE TABLE `config` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -152,6 +171,8 @@ CREATE TABLE `config` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNQ_config_0` (`config_key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `contact`;
 
 CREATE TABLE `contact` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -170,6 +191,8 @@ CREATE TABLE `contact` (
   KEY `FK_contact_created_by` (`created_by`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `contact_address`;
+
 CREATE TABLE `contact_address` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `display_order` int(11) DEFAULT NULL,
@@ -184,6 +207,8 @@ CREATE TABLE `contact_address` (
   KEY `FK_contact_address_contact_id` (`contact_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `contact_email`;
+
 CREATE TABLE `contact_email` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `display_order` int(11) NOT NULL,
@@ -193,6 +218,8 @@ CREATE TABLE `contact_email` (
   PRIMARY KEY (`id`),
   KEY `FK_contact_email_contact_id` (`contact_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `contact_phone`;
 
 CREATE TABLE `contact_phone` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -204,6 +231,8 @@ CREATE TABLE `contact_phone` (
   KEY `FK_contact_phone_contact_id` (`contact_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `content_language`;
+
 CREATE TABLE `content_language` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
@@ -211,11 +240,15 @@ CREATE TABLE `content_language` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `content_tag`;
+
 CREATE TABLE `content_tag` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `tag` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `department`;
 
 CREATE TABLE `department` (
   `id` bigint(20) NOT NULL,
@@ -227,6 +260,8 @@ CREATE TABLE `department` (
   KEY `FK_department_outlet_id` (`outlet_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `department_membership`;
+
 CREATE TABLE `department_membership` (
   `department_id` bigint(20) NOT NULL,
   `user_account_id` bigint(20) NOT NULL,
@@ -234,12 +269,16 @@ CREATE TABLE `department_membership` (
   KEY `FK_department_membership_user_account_id` (`user_account_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `department_role`;
+
 CREATE TABLE `department_role` (
   `department_id` bigint(20) NOT NULL,
   `role_id` bigint(20) NOT NULL,
   PRIMARY KEY (`department_id`,`role_id`),
   KEY `FK_department_role_role_id` (`role_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `edition`;
 
 CREATE TABLE `edition` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -254,6 +293,8 @@ CREATE TABLE `edition` (
   PRIMARY KEY (`id`),
   KEY `FK_edition_outlet_id` (`outlet_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `edition_pattern`;
 
 CREATE TABLE `edition_pattern` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -272,6 +313,8 @@ CREATE TABLE `edition_pattern` (
   KEY `FK_edition_pattern_outlet_id` (`outlet_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `edition_section`;
+
 CREATE TABLE `edition_section` (
   `id` bigint(20) NOT NULL,
   `section_start` int(11) DEFAULT NULL,
@@ -287,6 +330,8 @@ CREATE TABLE `edition_section` (
   KEY `FK_edition_section_edition_id` (`edition_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `edition_template`;
+
 CREATE TABLE `edition_template` (
   `id` bigint(20) NOT NULL,
   `opt_lock` int(11) DEFAULT NULL,
@@ -296,6 +341,8 @@ CREATE TABLE `edition_template` (
   PRIMARY KEY (`id`),
   KEY `FK_edition_template_outlet_id` (`outlet_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `edition_template_section`;
 
 CREATE TABLE `edition_template_section` (
   `id` bigint(20) NOT NULL,
@@ -309,6 +356,8 @@ CREATE TABLE `edition_template_section` (
   PRIMARY KEY (`id`),
   KEY `FK_edition_template_section_template_id` (`template_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `event`;
 
 CREATE TABLE `event` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -324,6 +373,7 @@ CREATE TABLE `event` (
   KEY `FK_event_originator_id` (`originator_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `event_category`;
 
 CREATE TABLE `event_category` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -333,12 +383,16 @@ CREATE TABLE `event_category` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `event_news_item`;
+
 CREATE TABLE `event_news_item` (
   `Event_id` bigint(20) NOT NULL,
   `newsItem_id` bigint(20) NOT NULL,
   PRIMARY KEY (`Event_id`,`newsItem_id`),
   KEY `FK_event_news_item_newsItem_id` (`newsItem_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `financial_market`;
 
 CREATE TABLE `financial_market` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -348,6 +402,8 @@ CREATE TABLE `financial_market` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `forex_currency`;
+
 CREATE TABLE `forex_currency` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `symbol` varchar(255) DEFAULT NULL,
@@ -356,6 +412,8 @@ CREATE TABLE `forex_currency` (
   `short_name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `forex_rate`;
 
 CREATE TABLE `forex_rate` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -367,6 +425,8 @@ CREATE TABLE `forex_rate` (
   KEY `FK_forex_rate_currency` (`currency`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `index_queue`;
+
 CREATE TABLE `index_queue` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `entry_type` varchar(255) DEFAULT NULL,
@@ -375,6 +435,8 @@ CREATE TABLE `index_queue` (
   `entry_operation` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `market_value`;
 
 CREATE TABLE `market_value` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -385,6 +447,8 @@ CREATE TABLE `market_value` (
   PRIMARY KEY (`id`),
   KEY `FK_market_value_financial_market_id` (`financial_market_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `media_item`;
 
 CREATE TABLE `media_item` (
   `id` bigint(20) NOT NULL,
@@ -405,11 +469,13 @@ CREATE TABLE `media_item` (
   `status` varchar(255) DEFAULT NULL,
   `byline` mediumtext,
   PRIMARY KEY (`id`),
+  KEY `FK_media_item_media_repository_id` (`catalogue_id`),
   KEY `FK_media_item_rendition_id` (`rendition_id`),
   KEY `FK_media_item_assignment_id` (`assignment_id`),
-  KEY `FK_media_item_owner` (`owner`),
-  KEY `FK_media_item_media_repository_id` (`catalogue_id`)
+  KEY `FK_media_item_owner` (`owner`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `media_item_concept`;
 
 CREATE TABLE `media_item_concept` (
   `media_item_id` bigint(20) NOT NULL,
@@ -417,6 +483,8 @@ CREATE TABLE `media_item_concept` (
   PRIMARY KEY (`media_item_id`,`concept_id`),
   KEY `FK_media_item_concept_concept_id` (`concept_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `media_item_rendition`;
 
 CREATE TABLE `media_item_rendition` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -445,7 +513,9 @@ CREATE TABLE `media_item_rendition` (
   `video_sampling_method` varchar(255) DEFAULT '',
   `media_item_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `news_item`;
 
 CREATE TABLE `news_item` (
   `id` bigint(20) NOT NULL,
@@ -494,10 +564,7 @@ CREATE TABLE `news_item` (
   KEY `FK_news_item_language_id` (`language_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table news_item_actor
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `news_item_actor`;
 
 CREATE TABLE `news_item_actor` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -511,10 +578,7 @@ CREATE TABLE `news_item_actor` (
   KEY `FK_news_item_actor_role_id` (`role_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table news_item_concept
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `news_item_concept`;
 
 CREATE TABLE `news_item_concept` (
   `news_item_id` bigint(20) NOT NULL,
@@ -523,10 +587,7 @@ CREATE TABLE `news_item_concept` (
   KEY `FK_news_item_concept_concept_id` (`concept_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table news_item_media_attachment
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `news_item_media_attachment`;
 
 CREATE TABLE `news_item_media_attachment` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -539,10 +600,7 @@ CREATE TABLE `news_item_media_attachment` (
   KEY `FK_news_item_media_attachment_media_item_id` (`media_item_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table news_item_news_item_review_comment
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `news_item_news_item_review_comment`;
 
 CREATE TABLE `news_item_news_item_review_comment` (
   `NewsItem_id` bigint(20) NOT NULL,
@@ -551,10 +609,7 @@ CREATE TABLE `news_item_news_item_review_comment` (
   KEY `news_item_news_item_review_commentshareComments_id` (`shareComments_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table news_item_photo
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `news_item_photo`;
 
 CREATE TABLE `news_item_photo` (
   `news_item_id` bigint(20) NOT NULL,
@@ -563,10 +618,7 @@ CREATE TABLE `news_item_photo` (
   KEY `FK_news_item_photo_photo_id` (`photo_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table news_item_placement
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `news_item_placement`;
 
 CREATE TABLE `news_item_placement` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -583,10 +635,7 @@ CREATE TABLE `news_item_placement` (
   KEY `FK_news_item_placement_outlet_id` (`outlet_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table news_item_related
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `news_item_related`;
 
 CREATE TABLE `news_item_related` (
   `news_item_id` bigint(20) NOT NULL,
@@ -595,10 +644,7 @@ CREATE TABLE `news_item_related` (
   KEY `FK_news_item_related_related_news_item_id` (`related_news_item_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table news_item_review_comment
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `news_item_review_comment`;
 
 CREATE TABLE `news_item_review_comment` (
   `id` bigint(20) NOT NULL,
@@ -612,10 +658,7 @@ CREATE TABLE `news_item_review_comment` (
   KEY `FK_news_item_review_comment_news_item_id` (`news_item_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table news_item_share
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `news_item_share`;
 
 CREATE TABLE `news_item_share` (
   `news_item_id` bigint(20) NOT NULL,
@@ -624,10 +667,7 @@ CREATE TABLE `news_item_share` (
   KEY `FK_news_item_share_user_account_id` (`user_account_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table news_item_workflow_state_transition
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `news_item_workflow_state_transition`;
 
 CREATE TABLE `news_item_workflow_state_transition` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -646,10 +686,7 @@ CREATE TABLE `news_item_workflow_state_transition` (
   KEY `news_item_workflow_state_transitionuser_account_id` (`user_account_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table newswire_basket
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `newswire_basket`;
 
 CREATE TABLE `newswire_basket` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -668,10 +705,7 @@ CREATE TABLE `newswire_basket` (
   KEY `FK_newswire_basket_owner` (`owner`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table newswire_baskets_tags
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `newswire_baskets_tags`;
 
 CREATE TABLE `newswire_baskets_tags` (
   `content_tag_id` bigint(20) NOT NULL,
@@ -680,10 +714,7 @@ CREATE TABLE `newswire_baskets_tags` (
   KEY `FK_newswire_baskets_tags_newswire_basket_id` (`newswire_basket_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table newswire_item
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `newswire_item`;
 
 CREATE TABLE `newswire_item` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -698,13 +729,11 @@ CREATE TABLE `newswire_item` (
   `author` varchar(255) DEFAULT NULL,
   `thumbnail_url` mediumtext,
   PRIMARY KEY (`id`),
-  KEY `FK_newswire_item_newswire_service_id` (`newswire_service_id`)
+  KEY `FK_newswire_item_newswire_service_id` (`newswire_service_id`),
+  KEY `idx_external_id` (`external_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table newswire_item_attachment
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `newswire_item_attachment`;
 
 CREATE TABLE `newswire_item_attachment` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -717,15 +746,13 @@ CREATE TABLE `newswire_item_attachment` (
   `newswire_item_id` bigint(20) DEFAULT NULL,
   `catalogue_id` bigint(20) DEFAULT NULL,
   `catalogue_path` mediumtext,
+  `rendition_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_newswire_item_attachment_newswire_item_id` (`newswire_item_id`),
   KEY `FK_newswire_item_attachment_catalogue` (`catalogue_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table newswire_item_tag
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `newswire_item_tag`;
 
 CREATE TABLE `newswire_item_tag` (
   `content_tag_id` bigint(20) NOT NULL,
@@ -734,10 +761,7 @@ CREATE TABLE `newswire_item_tag` (
   KEY `FK_newswire_item_tag_newswire_item_id` (`newswire_item_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table newswire_restriction
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `newswire_restriction`;
 
 CREATE TABLE `newswire_restriction` (
   `user_role_id` bigint(20) NOT NULL,
@@ -746,25 +770,19 @@ CREATE TABLE `newswire_restriction` (
   KEY `FK_newswire_restriction_newswire_service_id` (`newswire_service_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table newswire_service
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `newswire_service`;
 
 CREATE TABLE `newswire_service` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `source` varchar(255) DEFAULT NULL,
   `last_fetch` datetime DEFAULT NULL,
   `decoder_class` mediumtext,
-  `days_to_keep` int(11) DEFAULT '0',
   `active` tinyint(4) DEFAULT '0',
+  `days_to_keep` int(11) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table newswire_service_baskets
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `newswire_service_baskets`;
 
 CREATE TABLE `newswire_service_baskets` (
   `newswire_basket_id` bigint(20) NOT NULL,
@@ -773,10 +791,7 @@ CREATE TABLE `newswire_service_baskets` (
   KEY `FK_newswire_service_baskets_newswire_service_id` (`newswire_service_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table newswire_service_property
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `newswire_service_property`;
 
 CREATE TABLE `newswire_service_property` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -788,10 +803,7 @@ CREATE TABLE `newswire_service_property` (
   KEY `FK_newswire_service_property_newswire_service_id` (`newswire_service_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table notification
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `notification`;
 
 CREATE TABLE `notification` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -805,24 +817,18 @@ CREATE TABLE `notification` (
   KEY `FK_notification_recipient_id` (`recipient_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table open_calais_mapping
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `open_calais_mapping`;
 
 CREATE TABLE `open_calais_mapping` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `type_group` varchar(255) NOT NULL,
   `field` varchar(255) NOT NULL,
-  `field_value` varchar(255) NOT NULL DEFAULT '',
+  `field_value` varchar(255) NOT NULL,
   `concept_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table organisation_location
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `organisation_location`;
 
 CREATE TABLE `organisation_location` (
   `location_id` bigint(20) NOT NULL,
@@ -831,10 +837,7 @@ CREATE TABLE `organisation_location` (
   KEY `FK_organisation_location_organisation_id` (`organisation_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table outlet
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `outlet`;
 
 CREATE TABLE `outlet` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -848,10 +851,7 @@ CREATE TABLE `outlet` (
   KEY `FK_outlet_language_id` (`language_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-
-# Dump of table outlet_edition_action
-# ------------------------------------------------------------
+DROP TABLE IF EXISTS `outlet_edition_action`;
 
 CREATE TABLE `outlet_edition_action` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -864,6 +864,8 @@ CREATE TABLE `outlet_edition_action` (
   KEY `FK_outlet_edition_action_outlet_id` (`outlet_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `outlet_edition_action_property`;
+
 CREATE TABLE `outlet_edition_action_property` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `opt_lock` int(11) DEFAULT NULL,
@@ -874,12 +876,16 @@ CREATE TABLE `outlet_edition_action_property` (
   KEY `outleteditionactionpropertyoutletedition_action_id` (`outlet_edition_action_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `outlet_role`;
+
 CREATE TABLE `outlet_role` (
   `outlet_id` bigint(20) NOT NULL,
   `role_id` bigint(20) NOT NULL,
   PRIMARY KEY (`outlet_id`,`role_id`),
   KEY `FK_outlet_role_role_id` (`role_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `outlet_section`;
 
 CREATE TABLE `outlet_section` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -894,6 +900,8 @@ CREATE TABLE `outlet_section` (
   KEY `FK_outlet_section_outlet_id` (`outlet_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `person_affiliation`;
+
 CREATE TABLE `person_affiliation` (
   `person_id` bigint(20) NOT NULL,
   `organisation_id` bigint(20) NOT NULL,
@@ -901,24 +909,111 @@ CREATE TABLE `person_affiliation` (
   KEY `FK_person_affiliation_organisation_id` (`organisation_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `photo`;
+
+CREATE TABLE `photo` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `photo_taken` date DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `opt_lock` int(11) DEFAULT NULL,
+  `description` mediumtext,
+  `photographer_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_photo_photographer_id` (`photographer_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `photo_concept`;
+
+CREATE TABLE `photo_concept` (
+  `Photo_id` bigint(20) NOT NULL,
+  `concepts_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`Photo_id`,`concepts_id`),
+  KEY `FK_photo_concept_concepts_id` (`concepts_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `photo_entry`;
+
+CREATE TABLE `photo_entry` (
+  `id` bigint(20) NOT NULL,
+  `opt_lock` int(11) DEFAULT NULL,
+  `width` int(11) DEFAULT NULL,
+  `heiht_inches` float DEFAULT NULL,
+  `width_inches` float DEFAULT NULL,
+  `file_binary_data` longblob,
+  `format` varchar(255) DEFAULT NULL,
+  `file_content_type` varchar(255) DEFAULT NULL,
+  `width_dpi` int(11) DEFAULT NULL,
+  `file_size` bigint(20) DEFAULT NULL,
+  `height` int(11) DEFAULT NULL,
+  `bits` int(11) DEFAULT NULL,
+  `height_dpi` int(11) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `file_name` varchar(255) DEFAULT NULL,
+  `photo_entry_id` varchar(255) DEFAULT NULL,
+  `photo_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_photo_entry_photo_id` (`photo_id`),
+  KEY `FK_photo_entry_photo_entry_id` (`photo_entry_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `photo_entry_type`;
+
+CREATE TABLE `photo_entry_type` (
+  `id` varchar(255) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `photo_related`;
+
+CREATE TABLE `photo_related` (
+  `photo_id` bigint(20) NOT NULL,
+  `related_photo_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`photo_id`,`related_photo_id`),
+  KEY `FK_photo_related_related_photo_id` (`related_photo_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `PHOTOITEM`;
+
+CREATE TABLE `PHOTOITEM` (
+  `id` bigint(20) NOT NULL,
+  `photo_taken` date DEFAULT NULL,
+  `photographer_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_PHOTOITEM_photographer_id` (`photographer_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `privilege`;
+
 CREATE TABLE `privilege` (
   `id` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `rendition`;
 
 CREATE TABLE `rendition` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `description` mediumtext,
   `name` varchar(255) DEFAULT NULL,
   `label` varchar(255) DEFAULT NULL,
+  `default_height` int(11) DEFAULT '0',
+  `default_width` int(11) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `SEQUENCE`;
 
 CREATE TABLE `SEQUENCE` (
   `SEQ_NAME` varchar(50) NOT NULL,
   `SEQ_COUNT` decimal(38,0) DEFAULT NULL,
   PRIMARY KEY (`SEQ_NAME`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `user_account`;
 
 CREATE TABLE `user_account` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -955,6 +1050,8 @@ CREATE TABLE `user_account` (
   KEY `FK_user_account_default_media_repository` (`default_media_repository`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `user_account_membership`;
+
 CREATE TABLE `user_account_membership` (
   `user_account_id` bigint(20) NOT NULL,
   `user_role_id` bigint(20) NOT NULL,
@@ -962,12 +1059,16 @@ CREATE TABLE `user_account_membership` (
   KEY `FK_user_account_membership_user_role_id` (`user_role_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `user_account_newswire_services`;
+
 CREATE TABLE `user_account_newswire_services` (
   `user_account_id` bigint(20) NOT NULL,
   `newswire_service_id` bigint(20) NOT NULL,
   PRIMARY KEY (`user_account_id`,`newswire_service_id`),
   KEY `user_account_newswire_services_newswire_service_id` (`newswire_service_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `user_role`;
 
 CREATE TABLE `user_role` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -977,12 +1078,16 @@ CREATE TABLE `user_role` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `user_role_privilege`;
+
 CREATE TABLE `user_role_privilege` (
   `role_id` bigint(20) NOT NULL,
   `privilege_id` varchar(255) NOT NULL,
   PRIMARY KEY (`role_id`,`privilege_id`),
   KEY `FK_user_role_privilege_privilege_id` (`privilege_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `weather_forecast`;
 
 CREATE TABLE `weather_forecast` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -996,6 +1101,8 @@ CREATE TABLE `weather_forecast` (
   KEY `FK_weather_forecast_location` (`location`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `weather_location`;
+
 CREATE TABLE `weather_location` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
@@ -1003,12 +1110,16 @@ CREATE TABLE `weather_location` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `weather_situation`;
+
 CREATE TABLE `weather_situation` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `figure_url` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `workflow`;
 
 CREATE TABLE `workflow` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -1023,6 +1134,8 @@ CREATE TABLE `workflow` (
   KEY `FK_workflow_workflow_state_trash` (`workflow_state_trash`),
   KEY `FK_workflow_workflow_state_end` (`workflow_state_end`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `workflow_state`;
 
 CREATE TABLE `workflow_state` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -1041,6 +1154,8 @@ CREATE TABLE `workflow_state` (
   KEY `FK_workflow_state_workflow_id` (`workflow_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `workflow_state_visible`;
+
 CREATE TABLE `workflow_state_visible` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `field` varchar(255) DEFAULT NULL,
@@ -1049,6 +1164,8 @@ CREATE TABLE `workflow_state_visible` (
   PRIMARY KEY (`id`),
   KEY `FK_workflow_state_visible_workflow_state_id` (`workflow_state_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `workflow_step`;
 
 CREATE TABLE `workflow_step` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -1063,6 +1180,8 @@ CREATE TABLE `workflow_step` (
   KEY `FK_workflow_step_to_state_id` (`to_state_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `workflow_step_action`;
+
 CREATE TABLE `workflow_step_action` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `execute_order` int(11) DEFAULT NULL,
@@ -1072,6 +1191,8 @@ CREATE TABLE `workflow_step_action` (
   PRIMARY KEY (`id`),
   KEY `FK_workflow_step_action_workflow_step` (`workflow_step`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `workflow_step_action_property`;
 
 CREATE TABLE `workflow_step_action_property` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -1083,11 +1204,15 @@ CREATE TABLE `workflow_step_action_property` (
   KEY `workflowstepaction_propertyworkflow_step_action_id` (`workflow_step_action_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `workflow_step_user_role`;
+
 CREATE TABLE `workflow_step_user_role` (
   `workflow_step_id` bigint(20) NOT NULL,
   `user_role_id` bigint(20) NOT NULL,
   PRIMARY KEY (`workflow_step_id`,`user_role_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `workflow_step_validation`;
 
 CREATE TABLE `workflow_step_validation` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -1098,6 +1223,8 @@ CREATE TABLE `workflow_step_validation` (
   KEY `FK_workflow_step_validation_workflow_step_id` (`workflow_step_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `workflow_step_validator`;
+
 CREATE TABLE `workflow_step_validator` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `workflow_step_id` bigint(20) DEFAULT NULL,
@@ -1106,6 +1233,8 @@ CREATE TABLE `workflow_step_validator` (
   `validator_class` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `workflow_step_validator_property`;
 
 CREATE TABLE `workflow_step_validator_property` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1116,16 +1245,7 @@ CREATE TABLE `workflow_step_validator_property` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
-
-
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-INSERT INTO `app_version` (`id`, `from_version`, `to_version`, `migrated`, `migrated_date`) VALUES (1,'','1.0.9',1,'2011-11-19 23:00:00');
+INSERT INTO `app_version` (`id`, `from_version`, `to_version`, `migrated`, `migrated_date`) VALUES (1,'','1.1.2',1,'2012-01-02 23:40:00');
 INSERT INTO `SEQUENCE` (`SEQ_NAME`, `SEQ_COUNT`) VALUES ('SEQ_GEN', 0);
 
 INSERT INTO rendition (name, label, description) VALUES ('rnd:thumbnail', 'Thumbnail', 'A very small rendition of an image, giving only a general idea of its content.');
