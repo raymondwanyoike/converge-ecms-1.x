@@ -1,49 +1,38 @@
 /*
  * Copyright (C) 2010 - 2011 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later 
+ * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with 
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.ejb.services;
 
 import dk.i2m.converge.core.ConfigurationKey;
-import dk.i2m.converge.core.workflow.Department;
-import dk.i2m.converge.core.security.EmploymentType;
-import dk.i2m.converge.core.security.FeeType;
-import dk.i2m.converge.core.workflow.Outlet;
-import dk.i2m.converge.core.security.Privilege;
-import dk.i2m.converge.core.security.SystemPrivilege;
-import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.core.security.UserRole;
+import dk.i2m.converge.core.security.*;
 import dk.i2m.converge.core.utils.BeanComparator;
+import dk.i2m.converge.core.workflow.Department;
+import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.jndi.ldap.LdapUtils;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.naming.CommunicationException;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
-import javax.ejb.Stateless;
-import javax.naming.CommunicationException;
+import javax.naming.directory.*;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -347,8 +336,18 @@ public class UserServiceBean implements UserServiceLocal {
         user.setMobile(LdapUtils.validateAttribute(attrs.get(fieldMobile)));
         user.setOrganisation(LdapUtils.validateAttribute(attrs.get(fieldOrganisation)));
         user.setPhone(LdapUtils.validateAttribute(attrs.get(fieldPhone)));
+        
+        // If the user does not have a preferred language, get the one specified
+        // in the LDAP directory
         if (StringUtils.isBlank(user.getPreferredLanguage())) {
             user.setPreferredLanguage(LdapUtils.validateAttribute(attrs.get(fieldLanguage)));
+        }
+        
+        // If no preferred language was specified in the profile nor in the LDAP
+        // use the default language specified for the application
+        if (StringUtils.isBlank(user.getPreferredLanguage())) {
+            String language = cfgService.getString(ConfigurationKey.LANGUAGE);
+            user.setPreferredLanguage(language);
         }
         user.setSurname(LdapUtils.validateAttribute(attrs.get(fieldSurname)));
 
