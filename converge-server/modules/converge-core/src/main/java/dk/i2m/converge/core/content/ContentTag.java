@@ -21,16 +21,7 @@ import dk.i2m.converge.core.newswire.NewswireItem;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Meta data tag of a piece of content.
@@ -40,13 +31,15 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "content_tag")
 @NamedQueries({
-    @NamedQuery(name = ContentTag.FIND_BY_NAME, query = "SELECT c FROM ContentTag c WHERE c.tag = :name"),
-    @NamedQuery(name = ContentTag.FIND_LIKE_NAME, query = "SELECT c FROM ContentTag c WHERE c.tag LIKE :name")
+    @NamedQuery(name = ContentTag.FIND_BY_NAME, query =
+    "SELECT c FROM ContentTag c WHERE c.tag = :name"),
+    @NamedQuery(name = ContentTag.FIND_LIKE_NAME, query =
+    "SELECT c FROM ContentTag c WHERE c.tag LIKE :name")
 })
 public class ContentTag implements Serializable {
 
     public static final String FIND_BY_NAME = "ContentTag.findByName";
-    
+
     public static final String FIND_LIKE_NAME = "ContentTag.findLikeName";
 
     @Id
@@ -59,7 +52,7 @@ public class ContentTag implements Serializable {
 
     @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
     private List<NewswireItem> newswireItems = new ArrayList<NewswireItem>();
-    
+
     @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
     private List<NewswireBasket> baskets = new ArrayList<NewswireBasket>();
 
@@ -96,10 +89,12 @@ public class ContentTag implements Serializable {
             return false;
         }
         final ContentTag other = (ContentTag) obj;
-        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+        if (this.id != other.id
+                && (this.id == null || !this.id.equals(other.id))) {
             return false;
         }
-        if ((this.tag == null) ? (other.tag != null) : !this.tag.equals(other.tag)) {
+        if ((this.tag == null) ? (other.tag != null) : !this.tag.equals(
+                other.tag)) {
             return false;
         }
         return true;
@@ -115,6 +110,6 @@ public class ContentTag implements Serializable {
 
     @Override
     public String toString() {
-        return "ContentTag{" + "id=" + id + ", tag=" + tag + '}';
+        return getClass() + "[id=" + id + ", tag=" + tag + "]";
     }
 }
