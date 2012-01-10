@@ -1,11 +1,23 @@
 **EARLY DRAFT**
 
-This guide is intended for Converge administrators who want to configure
+This guide is intended for Converge administrators who want to install and configure
 Converge for their organisation.
 
-= About Converge = 
+= Release Note {{anchor id=releasenote /}} = 
+
+{{include document="release-note.wiki" /}}
+
+= About Converge {{anchor id=about /}} = 
 
 {{include document="about.wiki" /}}
+
+= Installing and upgrading Converge {{anchor id=installation /}} =
+
+{{include document="install.wiki" /}}
+
+= Building Converge from Source {{anchor id=building /}} =
+
+{{include document="building-from-source.wiki" /}}
 
 = Catalogues {{anchor id=catalogues /}} =
 
