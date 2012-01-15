@@ -183,7 +183,7 @@ public interface PluginContext {
      * @param origin   Origin of the log
      * @param originId ID of the origin
      */
-    void log(dk.i2m.converge.core.LogEntry.Severity severity,
+    void log(dk.i2m.converge.core.logging.LogSeverity severity,
             java.lang.String message, java.lang.Object origin,
             java.lang.Object originId);
 
@@ -196,7 +196,7 @@ public interface PluginContext {
      * @param origin           Origin of the log
      * @param originId         ID of the origin
      */
-    void log(dk.i2m.converge.core.LogEntry.Severity severity,
+    void log(dk.i2m.converge.core.logging.LogSeverity severity,
             java.lang.String message, java.lang.Object[] messageArguments,
             java.lang.Object origin,
             java.lang.Object originId);

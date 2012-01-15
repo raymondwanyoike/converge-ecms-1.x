@@ -16,9 +16,9 @@
  */
 package dk.i2m.converge.plugins.indexedition;
 
-import dk.i2m.converge.core.LogEntry;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.plugin.EditionAction;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
@@ -60,19 +60,19 @@ public class IndexEditionAction implements EditionAction {
 
         NewsItem newsItem = placement.getNewsItem();
 
-        ctx.log(LogEntry.Severity.INFO, bundle.getString(
+        ctx.log(LogSeverity.INFO, bundle.getString(
                 "LOG_INDEXING_NEWS_ITEM_X"), new Object[]{newsItem.getId()},
                 newsItem, newsItem.getId());
         if (newsItem.isEndState()) {
             try {
                 ctx.index(newsItem);
             } catch (SearchEngineIndexingException ex) {
-                ctx.log(LogEntry.Severity.SEVERE, bundle.getString(
+                ctx.log(LogSeverity.SEVERE, bundle.getString(
                         "LOG_INDEXING_FAILED"), new Object[]{newsItem.getId(),
                             ex.getMessage()}, newsItem, newsItem.getId());
             }
         } else {
-            ctx.log(LogEntry.Severity.INFO, bundle.getString(
+            ctx.log(LogSeverity.INFO, bundle.getString(
                     "LOG_INDEXING_NEWS_ITEM_X_NOT_END_STATE"),
                     new Object[]{newsItem.getId()}, newsItem, newsItem.getId());
         }

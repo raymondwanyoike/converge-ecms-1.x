@@ -16,7 +16,7 @@
  */
 package dk.i2m.converge.ejb.messaging;
 
-import dk.i2m.converge.core.LogEntry;
+import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.newswire.NewswireDecoderException;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.plugin.NewswireDecoder;
@@ -30,10 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
-import javax.ejb.MessageDrivenContext;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -97,7 +95,7 @@ public class NewswireDecoderMessageBean implements MessageListener {
         try {
             NewswireService service = daoService.findById(NewswireService.class,
                     newswireServiceId);
-            pluginContext.log(LogEntry.Severity.SEVERE,
+            pluginContext.log(LogSeverity.SEVERE,
                     "Fetching newswire service: {0}", new Object[]{service.
                         getSource()}, service, service.getId());
             taskId = systemFacade.createBackgroundTask("Fetching newswire service "
@@ -107,7 +105,7 @@ public class NewswireDecoderMessageBean implements MessageListener {
             decoder.decode(pluginContext, service);
             service.setLastFetch(Calendar.getInstance());
             daoService.update(service);
-            pluginContext.log(LogEntry.Severity.SEVERE,
+            pluginContext.log(LogSeverity.SEVERE,
                     "Finished fetching newswire service: {0}",
                     new Object[]{service.getSource()}, service, service.getId());
         } catch (DataNotFoundException ex) {

@@ -16,9 +16,9 @@
  */
 package dk.i2m.converge.plugins.joomla;
 
-import dk.i2m.converge.core.LogEntry;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.plugin.EditionAction;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.workflow.Edition;
@@ -65,7 +65,7 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
         try {
             connection.validateConnection();
         } catch (JoomlaException ex) {
-            pluginContext.log(LogEntry.Severity.SEVERE, bundle.getString(
+            pluginContext.log(LogSeverity.SEVERE, bundle.getString(
                     "LOG_INVALID_CONNECTION"), new Object[]{ex.getCause().
                         getMessage()}, action, action.getId());
             return;
@@ -82,14 +82,14 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
                         try {
                             newArticle(connection, placement);
                         } catch (JoomlaActionException ex) {
-                            pluginContext.log(LogEntry.Severity.SEVERE, bundle.
+                            pluginContext.log(LogSeverity.SEVERE, bundle.
                                     getString("LOG_COULD_NOT_CREATE_ARTICLE"),
                                     new Object[]{ex.getMessage()}, action,
                                     action.getId());
                             LOG.log(Level.FINE, "", ex);
                         }
                     } else {
-                        pluginContext.log(LogEntry.Severity.INFO, bundle.
+                        pluginContext.log(LogSeverity.INFO, bundle.
                                 getString("LOG_SECTION_NOT_MAPPED"),
                                 new Object[]{placement.getNewsItem().getId(),
                                     placement.getSection().getFullName()},
@@ -118,7 +118,7 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
         try {
             connection.validateConnection();
         } catch (JoomlaException ex) {
-            pluginContext.log(LogEntry.Severity.SEVERE, bundle.getString(
+            pluginContext.log(LogSeverity.SEVERE, bundle.getString(
                     "LOG_INVALID_CONNECTION"), new Object[]{ex.getMessage()}, action, action.getId());
             return;
         }
@@ -137,7 +137,7 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
                         LOG.log(Level.FINE, "", ex);
                     }
                 } else {
-                    pluginContext.log(LogEntry.Severity.INFO, bundle.getString(
+                    pluginContext.log(LogSeverity.INFO, bundle.getString(
                             "LOG_SECTION_NOT_MAPPED"), new Object[]{placement.
                                 getNewsItem().getId(), placement.getSection().
                                 getFullName()}, action, action.getId());
@@ -219,7 +219,7 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
                         categoryPublish.put(catMap[0],
                                 Integer.valueOf(catMap[2].trim()));
                     } catch (NumberFormatException ex) {
-                        pluginContext.log(LogEntry.Severity.WARNING,
+                        pluginContext.log(LogSeverity.WARNING,
                                 "Invalid category publish delay: {0}",
                                 new Object[]{catMap[2]}, action, action.getId());
                     }
@@ -229,7 +229,7 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
                         categoryPublish.put(catMap[0],
                                 Integer.valueOf(catMap[2].trim()));
                     } catch (NumberFormatException ex) {
-                        pluginContext.log(LogEntry.Severity.WARNING,
+                        pluginContext.log(LogSeverity.WARNING,
                                 "Invalid category publish delay: {0}",
                                 new Object[]{catMap[2]}, action, action.getId());
                     }
@@ -237,12 +237,12 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
                         categoryExpire.put(catMap[0],
                                 Integer.valueOf(catMap[3].trim()));
                     } catch (NumberFormatException ex) {
-                        pluginContext.log(LogEntry.Severity.WARNING,
+                        pluginContext.log(LogSeverity.WARNING,
                                 "Invalid category expire delay: {0}",
                                 new Object[]{catMap[3]}, action, action.getId());
                     }
                 } else {
-                    pluginContext.log(LogEntry.Severity.WARNING,
+                    pluginContext.log(LogSeverity.WARNING,
                             "Invalid category mapping: {0}", new Object[]{prop.
                                 getValue()}, action, action.getId());
                 }
@@ -253,7 +253,7 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
                 if (imgCat.length == 4) {
                     this.categoryImageMapping.put(imgCat[0], prop.getValue());
                 } else {
-                    pluginContext.log(LogEntry.Severity.WARNING,
+                    pluginContext.log(LogSeverity.WARNING,
                             "Invalid image category settings: {0}",
                             new Object[]{prop.getValue()}, action,
                             action.getId());

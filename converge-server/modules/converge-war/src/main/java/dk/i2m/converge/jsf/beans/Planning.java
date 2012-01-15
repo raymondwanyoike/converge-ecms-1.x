@@ -16,7 +16,7 @@
  */
 package dk.i2m.converge.jsf.beans;
 
-import dk.i2m.converge.core.LogEntry;
+import dk.i2m.converge.core.logging.LogEntry;
 import dk.i2m.converge.core.calendar.Event;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemPlacement;

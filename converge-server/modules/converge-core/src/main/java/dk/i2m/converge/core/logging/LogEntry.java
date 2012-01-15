@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.core;
+package dk.i2m.converge.core.logging;
 
 import dk.i2m.converge.core.security.UserAccount;
 import java.io.Serializable;
@@ -43,11 +43,6 @@ public class LogEntry implements Serializable {
      */
     public static final String FIND_BY_ORIGIN = "LogEntry.findByOrigin";
 
-    public enum Severity {
-
-        SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -55,7 +50,7 @@ public class LogEntry implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "severity")
-    private Severity severity;
+    private LogSeverity severity;
 
     @Column(name = "description") @Lob
     private String description = "";
@@ -80,12 +75,12 @@ public class LogEntry implements Serializable {
     /**
      * Creates a new {@link LogEntry}.
      *
-     * @param severity    {@link Severity} of the {@link LogEntry}
+     * @param severity    {@link LogSeverity} of the {@link LogEntry}
      * @param description Description of the {@link LogEntry}
      * @param origin      Origin of the {@link LogEntry}
      * @param originId    Identifier of the origin
      */
-    public LogEntry(Severity severity, String description, String origin,
+    public LogEntry(LogSeverity severity, String description, String origin,
             String originId) {
         this.severity = severity;
         this.description = description;
@@ -133,11 +128,11 @@ public class LogEntry implements Serializable {
         this.originId = originId;
     }
 
-    public Severity getSeverity() {
+    public LogSeverity getSeverity() {
         return severity;
     }
 
-    public void setSeverity(Severity severity) {
+    public void setSeverity(LogSeverity severity) {
         this.severity = severity;
     }
 

@@ -17,9 +17,9 @@
 package dk.i2m.converge.plugins.actions.opencalais;
 
 import dk.i2m.converge.core.EnrichException;
-import dk.i2m.converge.core.LogEntry;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.plugin.EditionAction;
 import dk.i2m.converge.core.plugin.PluginContext;
@@ -105,7 +105,7 @@ public class OpenCalaisAction implements EditionAction {
             Edition edition, OutletEditionAction action) {
 
         NewsItem newsItem = placement.getNewsItem();
-        ctx.log(LogEntry.Severity.INFO,
+        ctx.log(LogSeverity.INFO,
                 "Enriching news item #{0} via OpenCalais",
                 new Object[]{newsItem.getId()}, newsItem, newsItem.getId());
 
@@ -115,7 +115,7 @@ public class OpenCalaisAction implements EditionAction {
 
         } catch (EnrichException ex) {
             LOG.log(Level.SEVERE, ex.getMessage());
-            ctx.log(LogEntry.Severity.SEVERE,
+            ctx.log(LogSeverity.SEVERE,
                     "Could not enrich news item #{0}. {1}",
                     new Object[]{newsItem.getId(), ex.getMessage()}, newsItem,
                     newsItem.getId());

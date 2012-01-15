@@ -16,8 +16,9 @@
  */
 package dk.i2m.converge.ejb.messaging;
 
-import dk.i2m.converge.core.LogEntry;
+import dk.i2m.converge.core.logging.LogEntry;
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.plugin.EditionAction;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.workflow.Edition;
@@ -139,10 +140,10 @@ public class EditionServiceMessageBean implements MessageListener {
                 }
 
             } catch (DataNotFoundException ex) {
-                pluginContext.log(LogEntry.Severity.WARNING, ex.getMessage(),
+                pluginContext.log(LogSeverity.WARNING, ex.getMessage(),
                         new OutletEditionAction(), actionId);
             } catch (EditionActionException ex) {
-                pluginContext.log(LogEntry.Severity.WARNING, ex.getMessage(),
+                pluginContext.log(LogSeverity.WARNING, ex.getMessage(),
                         new OutletEditionAction(), actionId);
             }
 

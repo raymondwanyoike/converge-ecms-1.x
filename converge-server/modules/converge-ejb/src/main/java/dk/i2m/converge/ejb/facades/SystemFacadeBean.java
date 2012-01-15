@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,32 +16,24 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.domain.Property;
 import dk.i2m.converge.core.Announcement;
 import dk.i2m.converge.core.AppVersion;
 import dk.i2m.converge.core.BackgroundTask;
-import dk.i2m.converge.core.content.Language;
 import dk.i2m.converge.core.ConfigurationKey;
-import dk.i2m.converge.core.LogEntry;
+import dk.i2m.converge.core.content.Language;
 import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.ejb.services.ConfigurationServiceLocal;
-import dk.i2m.converge.ejb.services.DaoServiceLocal;
-import dk.i2m.converge.ejb.services.UserServiceLocal;
+import dk.i2m.converge.core.logging.LogEntry;
+import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.plugin.Plugin;
 import dk.i2m.converge.core.plugin.PluginManager;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.utils.BeanComparator;
 import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.core.workflow.WorkflowStateTransition;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
-import dk.i2m.converge.ejb.services.QueryBuilder;
-import dk.i2m.converge.ejb.services.TimerServiceLocal;
+import dk.i2m.converge.domain.Property;
+import dk.i2m.converge.ejb.services.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -419,7 +411,7 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     }
 
     @Override
-    public void log(LogEntry.Severity severity, UserAccount actor,
+    public void log(LogSeverity severity, UserAccount actor,
             String message, String origin, String originId) {
         LogEntry entry = new LogEntry();
         entry.setDate(Calendar.getInstance().getTime());
@@ -432,7 +424,7 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     }
 
     @Override
-    public void log(LogEntry.Severity severity, UserAccount actor,
+    public void log(LogSeverity severity, UserAccount actor,
             String message, Object origin, String originId) {
         log(severity, actor, message, origin.getClass().getName(), originId);
     }

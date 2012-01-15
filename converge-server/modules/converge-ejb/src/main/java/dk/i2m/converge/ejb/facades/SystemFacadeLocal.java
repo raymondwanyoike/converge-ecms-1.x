@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@ package dk.i2m.converge.ejb.facades;
 
 import dk.i2m.converge.core.Announcement;
 import dk.i2m.converge.core.ConfigurationKey;
-import dk.i2m.converge.core.LogEntry;
 import dk.i2m.converge.core.content.Language;
+import dk.i2m.converge.core.logging.LogEntry;
 import dk.i2m.converge.domain.Property;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import java.util.List;
@@ -143,25 +143,25 @@ public interface SystemFacadeLocal {
 
     java.lang.String getShortApplicationVersion();
 
-    void log(dk.i2m.converge.core.LogEntry.Severity severity,
+    void log(dk.i2m.converge.core.logging.LogSeverity severity,
             dk.i2m.converge.core.security.UserAccount actor,
             java.lang.String message, java.lang.Object origin,
             java.lang.String originId);
 
-    void log(dk.i2m.converge.core.LogEntry.Severity severity,
+    void log(dk.i2m.converge.core.logging.LogSeverity severity,
             dk.i2m.converge.core.security.UserAccount actor,
             java.lang.String message, java.lang.String origin,
             java.lang.String originId);
 
-    java.util.List<dk.i2m.converge.core.LogEntry> findLogEntries(
+    java.util.List<dk.i2m.converge.core.logging.LogEntry> findLogEntries(
             java.lang.String origin,
             java.lang.String originId);
 
-    java.util.List<dk.i2m.converge.core.LogEntry> findLogEntries(
+    java.util.List<dk.i2m.converge.core.logging.LogEntry> findLogEntries(
             java.lang.Object origin,
             java.lang.String originId);
 
-    java.util.List<dk.i2m.converge.core.LogEntry> findLogEntries(Object origin,
+    java.util.List<dk.i2m.converge.core.logging.LogEntry> findLogEntries(Object origin,
             String originId, int start, int count);
 
     List<LogEntry> findLogEntries(int start, int count);

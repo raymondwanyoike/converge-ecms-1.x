@@ -249,7 +249,7 @@ public class PluginContextBean implements PluginContextBeanLocal {
     }
 
     @Override
-    public void log(dk.i2m.converge.core.LogEntry.Severity severity,
+    public void log(dk.i2m.converge.core.logging.LogSeverity severity,
             java.lang.String message, java.lang.Object[] messageArguments,
             java.lang.Object origin,
             java.lang.Object originId) {
@@ -258,7 +258,7 @@ public class PluginContextBean implements PluginContextBeanLocal {
     }
 
     @Override
-    public void log(dk.i2m.converge.core.LogEntry.Severity severity,
+    public void log(dk.i2m.converge.core.logging.LogSeverity severity,
             java.lang.String message, java.lang.Object origin,
             java.lang.Object originId) {
         systemFacade.log(severity, getCurrentUserAccount(), message, origin, String.valueOf(
