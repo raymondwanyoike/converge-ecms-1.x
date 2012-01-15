@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NewsML Version="1.2">
+<!--AFP NewsML text-photo profile evolution2-->
+<!--Processed by Xafp1-4ToNewsML1-2 rev18-->
+<Catalog Href="http://www.afp.com/dtd/AFPCatalog.xml"/>
+<NewsEnvelope>
+<TransmissionId>2415</TransmissionId>
+<DateAndTime>20111219T161542Z</DateAndTime>
+<NewsService FormalName="DGTE"/>
+<NewsProduct FormalName="AFW"/>
+<NewsProduct FormalName="EUW"/>
+<NewsProduct FormalName="MEW"/>
+<NewsProduct FormalName="ANA"/>
+<NewsProduct FormalName="PAW"/>
+<NewsProduct FormalName="MAX"/>
+<NewsProduct FormalName="DGTE"/>
+<NewsProduct FormalName="DAGI"/>
+<NewsProduct FormalName="DPSE"/>
+<Priority FormalName="4"/>
+</NewsEnvelope>
+<NewsItem xml:lang="en">
+<Identification>
+<NewsIdentifier>
+<ProviderId>afp.com</ProviderId>
+<DateId>20111219T161536Z</DateId>
+<NewsItemId>TX-PAR-BLL02</NewsItemId>
+<RevisionId PreviousRevision="0" Update="N">1</RevisionId>
+<PublicIdentifier>urn:newsml:afp.com:20111219T161536Z:TX-PAR-BLL02:1</PublicIdentifier>
+</NewsIdentifier>
+<NameLabel>Ukraine-EU-rights-politics-diplomacy</NameLabel>
+</Identification>
+<NewsManagement>
+<NewsItemType FormalName="News"/>
+<FirstCreated>20111219T161536Z</FirstCreated>
+<ThisRevisionCreated>20111219T161536Z</ThisRevisionCreated>
+<Status FormalName="Usable"/>
+<Urgency FormalName="4"/>
+<DerivedFrom NewsItem="urn:newsml:afp.com:20111219T155227Z:TX-PAR-BLI84"/>
+<AssociatedWith FormalName="Photo"/>
+</NewsManagement>
+<NewsComponent>
+<NewsLines>
+<DateLine xml:lang="en">KIEV, Dec 19, 2011 (AFP) -</DateLine>
+<HeadLine xml:lang="en">Tymoshenko case stalling Ukraine accession roadmap, EU warns</HeadLine>
+<NewsLine>
+<NewsLineType FormalName="AdvisoryLine"/>
+<NewsLineText xml:lang="en">ADDS Yanukovych, Barroso quotes</NewsLineText>
+</NewsLine>
+<NewsLine>
+<NewsLineType FormalName="ProductLine"/>
+<NewsLineText xml:lang="en">=(Picture)=</NewsLineText>
+</NewsLine>
+</NewsLines>
+<AdministrativeMetadata>
+<Provider>
+<Party FormalName="AFP"/>
+</Provider>
+<Creator>
+<Party FormalName="Anya Tsukanova "/>
+</Creator>
+</AdministrativeMetadata>
+<DescriptiveMetadata>
+<Language FormalName="en"/>
+<Genre FormalName="4thlead"/>
+<SubjectCode>
+<SubjectMatter FormalName="11014000"/>
+</SubjectCode>
+<SubjectCode>
+<SubjectMatter FormalName="11007000"/>
+</SubjectCode>
+<SubjectCode>
+<Subject FormalName="11000000"/>
+</SubjectCode>
+<SubjectCode>
+<SubjectMatter FormalName="11002000"/>
+</SubjectCode>
+<OfInterestTo FormalName="EAA-TEG-1=AFW"/>
+<OfInterestTo FormalName="EAA-TEG-1=EUW"/>
+<OfInterestTo FormalName="EAA-TEG-1=MEW"/>
+<OfInterestTo FormalName="ANA-TEG-1=ANA"/>
+<OfInterestTo FormalName="ASI-TEG-1=PAW"/>
+<OfInterestTo FormalName="MAX-TEG-1=MAX"/>
+<DateLineDate>20111219T161801+0400</DateLineDate>
+<Location HowPresent="Origin">
+<Property FormalName="Country" Value="UKR"/>
+<Property FormalName="City" Value="KIEV"/>
+</Location>
+<Property FormalName="Keyword" Value="Ukraine"/>
+<Property FormalName="Keyword" Value="EU"/>
+<Property FormalName="Keyword" Value="rights"/>
+<Property FormalName="Keyword" Value="politics"/>
+<Property FormalName="Keyword" Value="diplomacy"/>
+<Property FormalName="GeneratorSoftware" Value="Cafp32"/>
+</DescriptiveMetadata>
+<ContentItem>
+<MediaType FormalName="Text"/>
+<Format FormalName="NITF3.1"/>
+<Characteristics>
+<SizeInBytes>3596</SizeInBytes>
+<Property FormalName="Words" Value="599"/>
+</Characteristics>
+<DataContent>
+<nitf>
+<body>
+<body.content>
+<p>The European Union warned Ukraine on Monday that the jailing of ex-prime minister Yulia Tymoshenko had stalled the signing of an agreement taking Kiev a step closer to membership of the bloc.</p>
+<p>EU president Herman Van Rompuy said after talks with Ukrainian President Viktor Yanukovych in Kiev that the signing of the deal depended on "political circumstances," citing Tymoshenko's case.</p>
+<p>"We want to take further steps to sign and ratify the association agreement as soon as we can, but this will depend on political circumstances," he said.</p>
+<p>"Our strongest concerns are primarily related to the risks of politically motivated justice, among which the Tymoshenko trial is the most striking example."</p>
+<p>The summit between Van Rompuy and EU commission chief Jose Manuel Barroso and Yanukovych ended as had been widely expected with the wording of the deal finalised but no signatures.</p>
+<p>Barroso told journalists after the meeting that "the key to strengthening our relationship is in the hands of the Ukrainian authorities".</p>
+<p>EU officials had raised concerns about "what's being perceived as selective justice in Ukraine against the members of previous administrations and notably Mrs Tymoshenko," he added.</p>
+<p>Tymoshenko was sentenced to seven years in jail on October 11 for abuse of authority for the gas contracts she agreed to with Russia in 2009, a verdict the EU called politically motivated.</p>
+<p>Her long-time opponent Yanukovych denied any involvement in the case.</p>
+<p>Both sides had hoped earlier this year that the summit would see the signing of an Association Agreement between Kiev and Brussels that would mark the first formal move towards Kiev eventually joining the bloc.</p>
+<p>However, the jailing of Tymoshenko has sparked a crisis in ties between Ukraine and the EU just as Russia is putting out feelers to Kiev to come closer into its orbit.</p>
+<p>At one stage, it appeared that Tymoshenko's case would endanger the summit taking place at all, but the EU officials travelled to Kiev to meet Yanukovych for talks on Monday as scheduled. </p>
+<p>Yanukovych said at a news conference that the leaders tackled "sensitive questions" in relations with the European Union.</p>
+<p>"I'd like to confirm that the declarations and comments of the EU on this subject will not remain outside our attention," he said.</p>
+<p>Several hundred Tymoshenko supporters outside the meeting venue shouted "Freedom for Yulia!" and brandished banners with slogans including: "The EU must impose sanctions on Yanukovych's gang," while being held back by riot police. </p>
+<p>Tymoshenko on Monday reaffirmed her backing for European integration and blamed the present government for alienating the European Union with its treatment of political opponents.</p>
+<p>"The current authorities are doing everything to destroy this choice for Ukraine... through carrying out political repressions," she said in a statement to journalists through her spokesman before the summit, the Interfax news agency reported.</p>
+<p>"The breakdown in European integration is not a question of Tymoshenko. It's the absence in Ukraine of democratic standards, which are being destroyed by the current authorities," she was quoted as saying.</p>
+<p>EU enlargement commissioner Stefan Fule held one-on-one talks with Yanukovych last week in an apparent bid to shift his stance on the jailing of the former prime minister turned opposition leader.</p>
+<p>Fule also took the highly unusual step of visiting Tymoshenko in the cell amid growing concern over her health which her supporters say has left her bed-ridden with chronic back pains.</p>
+<p>sjw-ant-am/txw</p>
+</body.content>
+</body>
+</nitf>
+</DataContent>
+</ContentItem>
+</NewsComponent>
+</NewsItem>
+</NewsML>
+

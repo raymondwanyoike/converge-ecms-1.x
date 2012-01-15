@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NewsML Version="1.2">
+<!--AFP NewsML text-photo profile evolution2-->
+<!--Processed by Xafp1-4ToNewsML1-2 rev18-->
+<Catalog Href="http://www.afp.com/dtd/AFPCatalog.xml"/>
+<NewsEnvelope>
+<TransmissionId>2712</TransmissionId>
+<DateAndTime>20111219T171524Z</DateAndTime>
+<NewsService FormalName="DGTE"/>
+<NewsProduct FormalName="AFW"/>
+<NewsProduct FormalName="EUW"/>
+<NewsProduct FormalName="MEW"/>
+<NewsProduct FormalName="ANA"/>
+<NewsProduct FormalName="PAW"/>
+<NewsProduct FormalName="MAX"/>
+<NewsProduct FormalName="DGTE"/>
+<NewsProduct FormalName="DAGI"/>
+<NewsProduct FormalName="DPSE"/>
+<Priority FormalName="4"/>
+</NewsEnvelope>
+<NewsItem xml:lang="en">
+<Identification>
+<NewsIdentifier>
+<ProviderId>afp.com</ProviderId>
+<DateId>20111219T171519Z</DateId>
+<NewsItemId>TX-PAR-BLR54</NewsItemId>
+<RevisionId PreviousRevision="0" Update="N">1</RevisionId>
+<PublicIdentifier>urn:newsml:afp.com:20111219T171519Z:TX-PAR-BLR54:1</PublicIdentifier>
+</NewsIdentifier>
+<NameLabel>Fbl-GER-Cup</NameLabel>
+</Identification>
+<NewsManagement>
+<NewsItemType FormalName="News"/>
+<FirstCreated>20111219T171519Z</FirstCreated>
+<ThisRevisionCreated>20111219T171519Z</ThisRevisionCreated>
+<Status FormalName="Usable"/>
+<Urgency FormalName="4"/>
+<DerivedFrom NewsItem="urn:newsml:afp.com:20111219T171352Z:TX-PAR-BLR28"/>
+</NewsManagement>
+<NewsComponent>
+<NewsLines>
+<DateLine xml:lang="en">BERLIN, Dec 19, 2011 (AFP) -</DateLine>
+<HeadLine xml:lang="en">Football: Moenchengladbach out to topple cup holders Schalke</HeadLine>
+</NewsLines>
+<AdministrativeMetadata>
+<Provider>
+<Party FormalName="AFP"/>
+</Provider>
+</AdministrativeMetadata>
+<DescriptiveMetadata>
+<Language FormalName="en"/>
+<Genre FormalName="CurtainRaiser"/>
+<SubjectCode>
+<SubjectMatter FormalName="15054000"/>
+</SubjectCode>
+<OfInterestTo FormalName="EAA-TEG-1=AFW"/>
+<OfInterestTo FormalName="EAA-TEG-1=EUW"/>
+<OfInterestTo FormalName="EAA-TEG-1=MEW"/>
+<OfInterestTo FormalName="ANA-TEG-1=ANA"/>
+<OfInterestTo FormalName="ASI-TEG-1=PAW"/>
+<OfInterestTo FormalName="MAX-TEG-1=MAX"/>
+<DateLineDate>20111219T101950+0100</DateLineDate>
+<Location HowPresent="Origin">
+<Property FormalName="Country" Value="DEU"/>
+<Property FormalName="City" Value="BERLIN"/>
+</Location>
+<Property FormalName="Keyword" Value="Fbl"/>
+<Property FormalName="Keyword" Value="GER"/>
+<Property FormalName="Keyword" Value="Cup"/>
+<Property FormalName="GeneratorSoftware" Value="Cafp32"/>
+</DescriptiveMetadata>
+<ContentItem>
+<MediaType FormalName="Text"/>
+<Format FormalName="NITF3.1"/>
+<Characteristics>
+<SizeInBytes>2014</SizeInBytes>
+<Property FormalName="Words" Value="335"/>
+</Characteristics>
+<DataContent>
+<nitf>
+<body>
+<body.content>
+<p>Borussia Moenchengladbach will look to rubber-stamp their good form thus far this season when they face the equally in-form Schalke 04 in the last 16 of the German Cup on Wednesday.</p>
+<p>Gladbach, five-time German champions and twice winners of the UEFA Cup, lie in an impressive fourth place in the Bundesliga, only months after they preserved their elite status with a relegation play-off win over VfL Bochum.</p>
+<p>However, they may well be without their impressive attacking midfielder Marco Reus, who returned from a big toe injury for the 1-0 win over Mainz at the weekend but suffered a knock to his knee during the match.</p>
+<p>Schalke, though, will provide a tough challenge as not only are they the holders but also come into the match on the back of a 5-0 thumping of Werder Bremen, in which veteran Spanish striker Raul scored a hat-trick.</p>
+<p>Raul also scored the only goal when the two sides met in the league in August.</p>
+<p>Wednesday will also see fourth division outfit Holstein Kiel eyeing a potential giant-killing as they host struggling Mainz.</p>
+<p>Tuesday's action sees last season's champions Borussia Dortmund -- unbeaten in their last 11 league games -- and present leaders Bayern Munich facing away ties against Fortuna Duesseldorf and Bochum respectively.</p>
+<p>Bayern's players have been warned that they should have their minds on the match and not their impending Christmas holiday break, even if they are playing lower league opposition, who are ninth in the second division.</p>
+<p>"The players know that our cup ambitions don't stop at this stage of the competition," said coach Jupp Heynckes. "Thus no letting up on Tuesday."</p>
+<p/>
+<p>Fixtures (1800GMT unless otherwise stated)</p>
+<p>Tuesday:</p>
+<p>VfL Bochum v Bayern Munich, Nuremberg v Greuther Furth, Hoffenheim v Augsburg (1930GMT), Fortuna Duesseldorf v Borussia Dortmund (1930GMT)</p>
+<p/>
+<p>Wednesday:</p>
+<p>Hertha Berlin v Kaiserslautern, Holstein Kiel v Mainz, VfB Stuttgart v SV Hamburg (1930GMT), Borussia Moenchengladbach v Schalke 04 (1930GMT)</p>
+<p>sg/pi/thw</p>
+</body.content>
+</body>
+</nitf>
+</DataContent>
+</ContentItem>
+</NewsComponent>
+</NewsItem>
+</NewsML>
+

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NewsML Version="1.2">
+<!--AFP NewsML text-photo profile evolution2-->
+<!--Processed by Xafp1-4ToNewsML1-2 rev18-->
+<Catalog Href="http://www.afp.com/dtd/AFPCatalog.xml"/>
+<NewsEnvelope>
+<TransmissionId>2488</TransmissionId>
+<DateAndTime>20111219T163224Z</DateAndTime>
+<NewsService FormalName="DGTE"/>
+<NewsProduct FormalName="AFW"/>
+<NewsProduct FormalName="EUW"/>
+<NewsProduct FormalName="MEW"/>
+<NewsProduct FormalName="ANA"/>
+<NewsProduct FormalName="PAW"/>
+<NewsProduct FormalName="MAX"/>
+<NewsProduct FormalName="DGTE"/>
+<NewsProduct FormalName="DAGI"/>
+<NewsProduct FormalName="DPSE"/>
+<Priority FormalName="4"/>
+</NewsEnvelope>
+<NewsItem xml:lang="en">
+<Identification>
+<NewsIdentifier>
+<ProviderId>afp.com</ProviderId>
+<DateId>20111219T163217Z</DateId>
+<NewsItemId>TX-PAR-BLM45</NewsItemId>
+<RevisionId PreviousRevision="0" Update="N">1</RevisionId>
+<PublicIdentifier>urn:newsml:afp.com:20111219T163217Z:TX-PAR-BLM45:1</PublicIdentifier>
+</NewsIdentifier>
+<NameLabel>Iraq-politics</NameLabel>
+</Identification>
+<NewsManagement>
+<NewsItemType FormalName="News"/>
+<FirstCreated>20111219T163216Z</FirstCreated>
+<ThisRevisionCreated>20111219T163216Z</ThisRevisionCreated>
+<Status FormalName="Usable"/>
+<Urgency FormalName="4"/>
+<DerivedFrom NewsItem="urn:newsml:afp.com:20111219T162231Z:TX-NIC-EWY11"/>
+<AssociatedWith FormalName="PHOTOARCH"/>
+</NewsManagement>
+<NewsComponent>
+<NewsLines>
+<DateLine xml:lang="en">Baghdad, Dec 19, 2011 (AFP) -</DateLine>
+<HeadLine xml:lang="en">Iraq leader warns of political 'collapse'</HeadLine>
+<NewsLine>
+<NewsLineType FormalName="AdvisoryLine"/>
+<NewsLineText xml:lang="en">ADDS Barzani quotes</NewsLineText>
+</NewsLine>
+<NewsLine>
+<NewsLineType FormalName="ProductLine"/>
+<NewsLineText xml:lang="en">=(File Picture)=</NewsLineText>
+</NewsLine>
+</NewsLines>
+<AdministrativeMetadata>
+<Provider>
+<Party FormalName="AFP"/>
+</Provider>
+<Creator>
+<Party FormalName="Ammar Karim "/>
+</Creator>
+</AdministrativeMetadata>
+<DescriptiveMetadata>
+<Language FormalName="en"/>
+<Genre FormalName="3rdlead"/>
+<SubjectCode>
+<Subject FormalName="11000000"/>
+</SubjectCode>
+<OfInterestTo FormalName="EAA-TEG-1=AFW"/>
+<OfInterestTo FormalName="EAA-TEG-1=EUW"/>
+<OfInterestTo FormalName="EAA-TEG-1=MEW"/>
+<OfInterestTo FormalName="ANA-TEG-1=ANA"/>
+<OfInterestTo FormalName="ASI-TEG-1=PAW"/>
+<OfInterestTo FormalName="MAX-TEG-1=MAX"/>
+<DateLineDate>20111219T115246+0300</DateLineDate>
+<Location HowPresent="Origin">
+<Property FormalName="Country" Value="IRQ"/>
+<Property FormalName="City" Value="Baghdad"/>
+</Location>
+<Property FormalName="Keyword" Value="Iraq"/>
+<Property FormalName="Keyword" Value="politics"/>
+<Property FormalName="GeneratorSoftware" Value="Cafp32"/>
+</DescriptiveMetadata>
+<ContentItem>
+<MediaType FormalName="Text"/>
+<Format FormalName="NITF3.1"/>
+<Characteristics>
+<SizeInBytes>3502</SizeInBytes>
+<Property FormalName="Words" Value="583"/>
+</Characteristics>
+<DataContent>
+<nitf>
+<body>
+<body.content>
+<p>An Iraqi leader Monday called for urgent talks to prevent the "collapse" of a unity government after its Sunni Vice President was barred from foreign travel in an unfolding crisis as US troops withdrew.</p>
+<p>Barely a day after American forces completed their pullout, two of Iraq's main political blocs were at loggerheads, with Vice President Tareq al-Hashemi and Deputy Prime Minister Saleh al-Mutlak, both Sunni members of the secular Iraqiya bloc, coming under pressure from the Shiite-led authorities.</p>
+<p>A judicial committee said on Monday that Hashemi was not allowed to leave the country, and several of his bodyguards have been detained in connection with terror attacks, while Prime Minister Nuri al-Maliki has moved for Mutlak to be sacked.</p>
+<p>Massud Barzani, president of the autonomous northern Kurdish region, later issued a statement calling for "an urgent national meeting to avoid the collapse of the political process.</p>
+<p>"The situation is heading towards deep crisis, and the ruling partnership has become threatened," added Barzani, who in November 2010 hosted a meeting of senior Iraqi leaders at which the foundations of the national unity government were laid, ending months of impasse following elections in March that year.</p>
+<p>He did not propose a date for the meeting in Monday's statement.</p>
+<p>Earlier, a five-member judicial panel barred Hashemi and several of his guards from travelling overseas "due to issues related to terrorism," a senior security official told AFP.</p>
+<p>State broadcaster Al-Iraqiya TV also reported the travel ban.</p>
+<p>Three of Hashemi's guards were also arrested on Sunday evening, when the vice president was briefly escorted off a domestic flight from Baghdad to the Kurdish region's capital Arbil. Ten others have been detained in recent weeks.</p>
+<p>His office on Monday complained of "intentional harassment" in the form of a security force blockading his home for several weeks, as well as other incidents.</p>
+<p>The latest events come after the Iraqiya bloc of Hashemi and Mutlak said on Saturday it was boycotting parliament in protest over the prime minister's alleged monopolising of power.</p>
+<p>On Sunday Maliki called for Mutlak to be ousted, and lawmakers are due to consider his request on January 3, a parliament official said.</p>
+<p>Mutlak, who was accused of being a supporter of Saddam's outlawed Baath party in the run-up to the 2010 elections that he was barred from standing in, told his own Babiliyah television channel this month that Maliki was "worse than Saddam Hussein."</p>
+<p>Iraqiya, which holds 82 seats in the 325-member parliament and controls nine ministerial posts, has not pulled out of Iraq's national unity government.</p>
+<p>The bloc, which garnered most of its support from the Sunni Arab minority and emerged with the most seats in March 2010 elections, was out-manoeuvred for the premiership by Maliki who, after finishing second in the polls, struck a deal with another group to broaden his power base and lead the government.</p>
+<p>The political party loyal to anti-US Shiite cleric Moqtada al-Sadr lamented that the timing of the crisis, after US troops completed their withdrawal from the country early on Sunday, suggested American forces had held the political system together.</p>
+<p>"We do not want to send any wrong message to the world, after the withdrawal of the occupying forces, that the one who was controlling the issues in Iraq was the occupier," said Baha al-Araji, head of the Sadrist parliamentary bloc.</p>
+<p>bur-psr/srm</p>
+</body.content>
+</body>
+</nitf>
+</DataContent>
+</ContentItem>
+</NewsComponent>
+</NewsItem>
+</NewsML>
+

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NewsML Version="1.2">
+<!--AFP NewsML text-photo profile evolution2-->
+<!--Processed by Xafp1-4ToNewsML1-2 rev18-->
+<Catalog Href="http://www.afp.com/dtd/AFPCatalog.xml"/>
+<NewsEnvelope>
+<TransmissionId>2606</TransmissionId>
+<DateAndTime>20111219T165908Z</DateAndTime>
+<NewsService FormalName="DGTE"/>
+<NewsProduct FormalName="ANA"/>
+<NewsProduct FormalName="AFW"/>
+<NewsProduct FormalName="EUW"/>
+<NewsProduct FormalName="MEW"/>
+<NewsProduct FormalName="MAX"/>
+<NewsProduct FormalName="PAW"/>
+<NewsProduct FormalName="GEN"/>
+<NewsProduct FormalName="DAGI"/>
+<NewsProduct FormalName="DGTE"/>
+<NewsProduct FormalName="DPSE"/>
+<Priority FormalName="4"/>
+</NewsEnvelope>
+<NewsItem xml:lang="en">
+<Identification>
+<NewsIdentifier>
+<ProviderId>afp.com</ProviderId>
+<DateId>20111219T165859Z</DateId>
+<NewsItemId>TX-PAR-BLP33</NewsItemId>
+<RevisionId PreviousRevision="0" Update="N">1</RevisionId>
+<PublicIdentifier>urn:newsml:afp.com:20111219T165859Z:TX-PAR-BLP33:1</PublicIdentifier>
+</NewsIdentifier>
+<NameLabel>NKorea-politics-Kim-US-future</NameLabel>
+</Identification>
+<NewsManagement>
+<NewsItemType FormalName="News"/>
+<FirstCreated>20111219T165859Z</FirstCreated>
+<ThisRevisionCreated>20111219T165859Z</ThisRevisionCreated>
+<Status FormalName="Usable"/>
+<Urgency FormalName="4"/>
+<DerivedFrom NewsItem="urn:newsml:afp.com:20111219T165433Z:TX-WASH-TOI34"/>
+</NewsManagement>
+<NewsComponent>
+<NewsLines>
+<DateLine xml:lang="en">WASHINGTON, Dec 19, 2011 (AFP) -</DateLine>
+<HeadLine xml:lang="en">Kim death threatens chaos for US policy</HeadLine>
+</NewsLines>
+<AdministrativeMetadata>
+<Provider>
+<Party FormalName="AFP"/>
+</Provider>
+<Creator>
+<Party FormalName="Shaun Tandon "/>
+</Creator>
+</AdministrativeMetadata>
+<DescriptiveMetadata>
+<Language FormalName="en"/>
+<Genre FormalName="Analysis"/>
+<SubjectCode>
+<Subject FormalName="11000000"/>
+</SubjectCode>
+<OfInterestTo FormalName="ANA-TEG-1=ANA"/>
+<OfInterestTo FormalName="EAA-TEG-1=AFW"/>
+<OfInterestTo FormalName="EAA-TEG-1=EUW"/>
+<OfInterestTo FormalName="EAA-TEG-1=MEW"/>
+<OfInterestTo FormalName="MAX-TEG-1=MAX"/>
+<OfInterestTo FormalName="ASI-TEG-1=PAW"/>
+<DateLineDate>20111219T094522-0500</DateLineDate>
+<Location HowPresent="Origin">
+<Property FormalName="Country" Value="USA"/>
+<Property FormalName="City" Value="WASHINGTON"/>
+</Location>
+<Property FormalName="Keyword" Value="NKorea"/>
+<Property FormalName="Keyword" Value="politics"/>
+<Property FormalName="Keyword" Value="Kim"/>
+<Property FormalName="Keyword" Value="US"/>
+<Property FormalName="Keyword" Value="future"/>
+<Property FormalName="GeneratorSoftware" Value="Cafp32"/>
+</DescriptiveMetadata>
+<ContentItem>
+<MediaType FormalName="Text"/>
+<Format FormalName="NITF3.1"/>
+<Characteristics>
+<SizeInBytes>4601</SizeInBytes>
+<Property FormalName="Words" Value="766"/>
+</Characteristics>
+<DataContent>
+<nitf>
+<body>
+<body.content>
+<p>The death of Kim Jong-Il throws into disarray a US policy of waiting patiently for change in nuclear-armed North Korea, with officials nervously seeking clues on the regime's future direction.</p>
+<p>After years of on-off efforts to end North Korea's nuclear program, the United States recently made a tactical shift to maintain low-level dialogue as a way to discourage future provocations even if no big issues are resolved.</p>
+<p>But experts said that Kim Jong-Il's death fundamentally changes US calculations. Instead of a recalcitrant strongman, the United States now must deal with an untested young leader who remains a mystery on the global stage.</p>
+<p>Kim Jong-Il, 69, had been groomed for 14 years as successor to his father, the regime's founder Kim Il-Sung. Heir apparent Kim Jong-Un is in his late 20s and is believed to lack a firm support base within the opaque regime.</p>
+<p>North Korea expert L. Gordon Flake, executive director of the Mansfield Foundation, said that US diplomacy is dependent on policy, not personalities, but that Pyongyang is unlikely to be able to make key decisions right now.</p>
+<p>But Flake, who advised then-senator Barack Obama during his presidential campaign, said that the longer-term implications could be different. Kim Jong-Il set off repeated crises since inheriting power in 1994, including carrying out two tests of nuclear weapons.</p>
+<p>"Some people thought for his entire reign that we're just waiting around the corner for Kim Jong-Il to be some type of reformer. That obviously didn't pan out," he said.</p>
+<p>"In the short run, there is the risk that North Korea may lash out. But in the long run, I don't think there's any way to bemoan Kim Jong-Il's passing," he said.</p>
+<p>US policymakers had hinted in recent weeks that they were making some headway with North Korea, which could perhaps open the way for more formal talks or a resumption of US food assistance to the impoverished state.</p>
+<p>Obama's administration, despite its policy worldwide of not closing the door on talks with US adversaries, had been adamant that it will not resume formal negotiations until North Korea clearly commits to past agreements on denuclearization.</p>
+<p>Bruce Klingner of the Heritage Foundation, a conservative think-tank, noted that "very few if any officials in the administration were optimistic" about North Korea after two deadly incidents against South Korea last year.</p>
+<p>"The death of Kim Jong-Il would presumably delay a resumption of (US) negotiations as the new North Korean leadership assesses to what degree it is willing to open up to the outside world," Klingner said.</p>
+<p>"Although the demise of Kim Jong-Il provides an opportunity for change on the Korean peninsula, it is a transition fraught with uncertainty, nervousness and potential danger," he said.</p>
+<p>While Kim's death sent shockwaves throughout the world, the news was not unexpected. He suffered a stroke three years ago and, with his reputed passion for fatty foods and alcohol, was certainly not known for a healthy lifestyle.</p>
+<p>In a presentation last year, a military strategist warned that the United States needed to study all possible outcomes as a complete collapse of the nuclear-armed regime could trigger a crisis unseen since World War II.</p>
+<p>Colonel David Maxwell of the Army's Special Operations Command, who said he was speaking in personal capacity, said in the presentation that North Koreans should be expected to resist fiercely any foreign forces and could mount an insurgency far more sophisticated than those seen in Iraq or Afghanistan.</p>
+<p>Former New Mexico governor Bill Richardson, who has maintained contacts with North Korea since his time as US ambassador to the United Nations, said that fellow Democrat Obama is "playing it correctly by playing it cool."</p>
+<p>"I've always felt that when we isolated them, it didn't work. Possibly, if things look stable, resume the food aid and the humanitarian assistance," Richardson told CBS television.</p>
+<p>Some members of the rival Republican Party urged pressure with a goal of regime change. Presidential contender Mitt Romney hoped that Kim's death would hasten the end of North Koreans' "long and brutal national nightmare."</p>
+<p>Representative Ed Royce, a Republican who has led a push against US food assistance, said the transition "is less stable than may appear" as "the North Korean people are starting to question this corrupt dynasty."</p>
+<p>"Now is not the time for talk of new beginnings and food aid. We should be doing what we can to delegitimize this succession with the suffering North Korean people," Royce said.</p>
+<p>sct/rl</p>
+</body.content>
+</body>
+</nitf>
+</DataContent>
+</ContentItem>
+</NewsComponent>
+</NewsItem>
+</NewsML>
+

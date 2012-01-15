@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NewsML Version="1.2">
+<!--AFP NewsML text-photo profile evolution2-->
+<!--Processed by Xafp1-4ToNewsML1-2 rev18-->
+<Catalog Href="http://www.afp.com/dtd/AFPCatalog.xml"/>
+<NewsEnvelope>
+<TransmissionId>2443</TransmissionId>
+<DateAndTime>20111219T162035Z</DateAndTime>
+<NewsService FormalName="DGTE"/>
+<NewsProduct FormalName="AFW"/>
+<NewsProduct FormalName="EUW"/>
+<NewsProduct FormalName="MEW"/>
+<NewsProduct FormalName="MAX"/>
+<NewsProduct FormalName="PAW"/>
+<NewsProduct FormalName="ANA"/>
+<NewsProduct FormalName="DGTE"/>
+<NewsProduct FormalName="DAGI"/>
+<NewsProduct FormalName="DPSE"/>
+<Priority FormalName="2"/>
+</NewsEnvelope>
+<NewsItem xml:lang="en">
+<Identification>
+<NewsIdentifier>
+<ProviderId>afp.com</ProviderId>
+<DateId>20111219T162032Z</DateId>
+<NewsItemId>TX-PAR-BLL51</NewsItemId>
+<RevisionId PreviousRevision="0" Update="N">1</RevisionId>
+<PublicIdentifier>urn:newsml:afp.com:20111219T162032Z:TX-PAR-BLL51:1</PublicIdentifier>
+</NewsIdentifier>
+<NameLabel>ALERT</NameLabel>
+</Identification>
+<NewsManagement>
+<NewsItemType FormalName="Alert"/>
+<FirstCreated>20111219T162033Z</FirstCreated>
+<ThisRevisionCreated>20111219T162033Z</ThisRevisionCreated>
+<Status FormalName="Usable"/>
+<Urgency FormalName="2"/>
+<DerivedFrom NewsItem="urn:newsml:afp.com:20111219T162008Z:TX-PAR-BLL42"/>
+</NewsManagement>
+<NewsComponent>
+<NewsLines/>
+<AdministrativeMetadata>
+<Provider>
+<Party FormalName="AFP"/>
+</Provider>
+</AdministrativeMetadata>
+<DescriptiveMetadata>
+<Language FormalName="en"/>
+<SubjectCode>
+<Subject FormalName="04000000"/>
+</SubjectCode>
+<OfInterestTo FormalName="EAA-TEG-1=AFW"/>
+<OfInterestTo FormalName="EAA-TEG-1=EUW"/>
+<OfInterestTo FormalName="EAA-TEG-1=MEW"/>
+<OfInterestTo FormalName="MAX-TEG-1=MAX"/>
+<OfInterestTo FormalName="ASI-TEG-1=PAW"/>
+<OfInterestTo FormalName="ANA-TEG-1=ANA"/>
+<Location HowPresent="Origin">
+<Property FormalName="Country" Value="BEL"/>
+<Property FormalName="City" Value="Brussels"/>
+</Location>
+<Property FormalName="Keyword" Value="ALERT"/>
+<Property FormalName="GeneratorSoftware" Value="Cafp32"/>
+</DescriptiveMetadata>
+<ContentItem>
+<MediaType FormalName="Text"/>
+<Format FormalName="NITF3.1"/>
+<Characteristics>
+<SizeInBytes>70</SizeInBytes>
+<Property FormalName="Words" Value="11"/>
+</Characteristics>
+<DataContent>
+<nitf>
+<body>
+<body.content>
+<p>EU Treaty 'forbids' financing of states by ECB: Draghi</p>
+<p>oaa/spm/bmm</p>
+</body.content>
+</body>
+</nitf>
+</DataContent>
+</ContentItem>
+</NewsComponent>
+</NewsItem>
+</NewsML>
+

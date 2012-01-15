@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NewsML Version="1.2">
+<!--AFP NewsML text-photo profile evolution2-->
+<!--Processed by Xafp1-4ToNewsML1-2 rev18-->
+<Catalog Href="http://www.afp.com/dtd/AFPCatalog.xml"/>
+<NewsEnvelope>
+<TransmissionId>2705</TransmissionId>
+<DateAndTime>20111219T171442Z</DateAndTime>
+<NewsService FormalName="DGTE"/>
+<NewsProduct FormalName="ANA"/>
+<NewsProduct FormalName="AFW"/>
+<NewsProduct FormalName="EUW"/>
+<NewsProduct FormalName="MEW"/>
+<NewsProduct FormalName="MAX"/>
+<NewsProduct FormalName="PAW"/>
+<NewsProduct FormalName="GEN"/>
+<NewsProduct FormalName="DAGI"/>
+<NewsProduct FormalName="DGTE"/>
+<NewsProduct FormalName="DPSE"/>
+<Priority FormalName="4"/>
+</NewsEnvelope>
+<NewsItem xml:lang="en">
+<Identification>
+<NewsIdentifier>
+<ProviderId>afp.com</ProviderId>
+<DateId>20111219T171438Z</DateId>
+<NewsItemId>TX-PAR-BLR51</NewsItemId>
+<RevisionId PreviousRevision="0" Update="N">1</RevisionId>
+<PublicIdentifier>urn:newsml:afp.com:20111219T171438Z:TX-PAR-BLR51:1</PublicIdentifier>
+</NewsIdentifier>
+<NameLabel>NKorea-politics-Kim-UN</NameLabel>
+</Identification>
+<NewsManagement>
+<NewsItemType FormalName="News"/>
+<FirstCreated>20111219T171438Z</FirstCreated>
+<ThisRevisionCreated>20111219T171438Z</ThisRevisionCreated>
+<Status FormalName="Usable"/>
+<Urgency FormalName="4"/>
+<DerivedFrom NewsItem="urn:newsml:afp.com:20111219T171315Z:TX-WASH-TOJ59"/>
+</NewsManagement>
+<NewsComponent>
+<NewsLines>
+<DateLine xml:lang="en">UNITED NATIONS, Dec 19, 2011 (AFP) -</DateLine>
+<HeadLine xml:lang="en">UN to step up help for N. Korea after leader's death</HeadLine>
+</NewsLines>
+<AdministrativeMetadata>
+<Provider>
+<Party FormalName="AFP"/>
+</Provider>
+</AdministrativeMetadata>
+<DescriptiveMetadata>
+<Language FormalName="en"/>
+<Genre FormalName="Lead"/>
+<SubjectCode>
+<Subject FormalName="11000000"/>
+</SubjectCode>
+<SubjectCode>
+<SubjectMatter FormalName="11014000"/>
+</SubjectCode>
+<OfInterestTo FormalName="ANA-TEG-1=ANA"/>
+<OfInterestTo FormalName="EAA-TEG-1=AFW"/>
+<OfInterestTo FormalName="EAA-TEG-1=EUW"/>
+<OfInterestTo FormalName="EAA-TEG-1=MEW"/>
+<OfInterestTo FormalName="MAX-TEG-1=MAX"/>
+<OfInterestTo FormalName="ASI-TEG-1=PAW"/>
+<DateLineDate>20111219T121158-0500</DateLineDate>
+<Location HowPresent="Origin">
+<Property FormalName="Country" Value="ZZZ"/>
+<Property FormalName="City" Value="UNITED NATIONS"/>
+</Location>
+<Property FormalName="Keyword" Value="NKorea"/>
+<Property FormalName="Keyword" Value="politics"/>
+<Property FormalName="Keyword" Value="Kim"/>
+<Property FormalName="Keyword" Value="UN"/>
+<Property FormalName="GeneratorSoftware" Value="Cafp32"/>
+</DescriptiveMetadata>
+<ContentItem>
+<MediaType FormalName="Text"/>
+<Format FormalName="NITF3.1"/>
+<Characteristics>
+<SizeInBytes>950</SizeInBytes>
+<Property FormalName="Words" Value="158"/>
+</Characteristics>
+<DataContent>
+<nitf>
+<body>
+<body.content>
+<p>UN leader Ban Ki-moon vowed Monday to step up UN help for North Korea after the death of its leader Kim Jong-Il, his spokesman said.</p>
+<p>"The secretary general reaffirms his commitment to peace and security on the Korean peninsula. The United Nations system will continue to help the people of the DPRK (North Korea)," said spokesman Farhan Haq.</p>
+<p>Ban, a former foreign minister for the North's arch-rival South Korea, extended his "sympathy" to the people of North Korea "at this time of their national mourning."</p>
+<p>The United Nations has been desperately trying to raise international funds to provide food for North Korea where there is a new food crisis. It appealed for $218 million dollars this year but less than 20 percent has been raised.</p>
+<p>Ban has regularly expressed concern at the deadlock in international talks on the North's nuclear arms program. He said last week that the mood on the Korean peninsula was almost "frozen."</p>
+<p>tw/rl</p>
+</body.content>
+</body>
+</nitf>
+</DataContent>
+</ContentItem>
+</NewsComponent>
+</NewsItem>
+</NewsML>
+

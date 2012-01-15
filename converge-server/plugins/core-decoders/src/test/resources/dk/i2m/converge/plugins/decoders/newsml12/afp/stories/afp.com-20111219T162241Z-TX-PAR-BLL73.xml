@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NewsML Version="1.2">
+<!--AFP NewsML text-photo profile evolution2-->
+<!--Processed by Xafp1-4ToNewsML1-2 rev18-->
+<Catalog Href="http://www.afp.com/dtd/AFPCatalog.xml"/>
+<NewsEnvelope>
+<TransmissionId>2455</TransmissionId>
+<DateAndTime>20111219T162313Z</DateAndTime>
+<NewsService FormalName="DGTE"/>
+<NewsProduct FormalName="AFW"/>
+<NewsProduct FormalName="EUW"/>
+<NewsProduct FormalName="MEW"/>
+<NewsProduct FormalName="ANA"/>
+<NewsProduct FormalName="MAX"/>
+<NewsProduct FormalName="DGTE"/>
+<NewsProduct FormalName="DAGI"/>
+<NewsProduct FormalName="DPSE"/>
+<Priority FormalName="4"/>
+</NewsEnvelope>
+<NewsItem xml:lang="en">
+<Identification>
+<NewsIdentifier>
+<ProviderId>afp.com</ProviderId>
+<DateId>20111219T162241Z</DateId>
+<NewsItemId>TX-PAR-BLL73</NewsItemId>
+<RevisionId PreviousRevision="0" Update="N">1</RevisionId>
+<PublicIdentifier>urn:newsml:afp.com:20111219T162241Z:TX-PAR-BLL73:1</PublicIdentifier>
+</NewsIdentifier>
+<NameLabel>Israel-Palestinians-conflict-settler-arrest</NameLabel>
+</Identification>
+<NewsManagement>
+<NewsItemType FormalName="News"/>
+<FirstCreated>20111219T162240Z</FirstCreated>
+<ThisRevisionCreated>20111219T162240Z</ThisRevisionCreated>
+<Status FormalName="Usable"/>
+<Urgency FormalName="4"/>
+<DerivedFrom NewsItem="urn:newsml:afp.com:20111219T161833Z:TX-JER-SSF59"/>
+</NewsManagement>
+<NewsComponent>
+<NewsLines>
+<DateLine xml:lang="en">JERUSALEM, Dec 19, 2011 (AFP) -</DateLine>
+<HeadLine xml:lang="en">West Bank mosque defaced in suspected settler attack</HeadLine>
+</NewsLines>
+<AdministrativeMetadata>
+<Provider>
+<Party FormalName="AFP"/>
+</Provider>
+</AdministrativeMetadata>
+<DescriptiveMetadata>
+<Language FormalName="en"/>
+<Genre FormalName="Update"/>
+<SubjectCode>
+<SubjectDetail FormalName="02003003"/>
+</SubjectCode>
+<SubjectCode>
+<SubjectMatter FormalName="16010000"/>
+</SubjectCode>
+<OfInterestTo FormalName="EAA-TEG-1=AFW"/>
+<OfInterestTo FormalName="EAA-TEG-1=EUW"/>
+<OfInterestTo FormalName="EAA-TEG-1=MEW"/>
+<OfInterestTo FormalName="ANA-TEG-1=ANA"/>
+<OfInterestTo FormalName="MAX-TEG-1=MAX"/>
+<DateLineDate>20111219T172701+0200</DateLineDate>
+<Location HowPresent="Origin">
+<Property FormalName="Country" Value="ZZZ"/>
+<Property FormalName="City" Value="JERUSALEM"/>
+</Location>
+<Property FormalName="Keyword" Value="Israel"/>
+<Property FormalName="Keyword" Value="Palestinians"/>
+<Property FormalName="Keyword" Value="conflict"/>
+<Property FormalName="Keyword" Value="settler"/>
+<Property FormalName="Keyword" Value="arrest"/>
+<Property FormalName="GeneratorSoftware" Value="Cafp32"/>
+</DescriptiveMetadata>
+<ContentItem>
+<MediaType FormalName="Text"/>
+<Format FormalName="NITF3.1"/>
+<Characteristics>
+<SizeInBytes>1827</SizeInBytes>
+<Property FormalName="Words" Value="304"/>
+</Characteristics>
+<DataContent>
+<nitf>
+<body>
+<body.content>
+<p>Attackers sprayed a West Bank mosque with anti-Islamic and pro-settler graffiti on Monday, a Palestinian official said, in an assault that bore the hallmarks of another raid by Jewish extremists.</p>
+<p>The mayor of Bani Naim south of Hebron said that slogans in Hebrew sprayed on walls surrounding the village's Sahaba mosque included "curses against the Prophet Mohammed" as well as "price tag" and "Yitzhar youth," a reference to a hardline settlement and nearby outpost in the northern West Bank.</p>
+<p>Mayor Radwan Manasra said that the mosque was on the village's southern edge, facing the settlement of Pnei Haver, about 3.5 kilometres (two miles) away.</p>
+<p>It was the seventh suspected attack in as many days by ultra-nationalist Jews fighting government plans to dismantle wildcat settlement outposts by vandalising mainly Palestinian property, although they have recently struck at Israeli army bases and the homes and offices of leftwing Israelis.</p>
+<p>It was the third mosque attack since Wednesday, one of which coincided with the demolition by troops of the Mitzpe Yitzhar outpost.</p>
+<p>Earlier on Monday, unidentified assailants torched five cars in the West Bank village of Beitin north of Ramallah, although in this case no graffiti were left at the scene.</p>
+<p>"Police are searching for the suspects -- it's not clear exactly who was behind it -- and the investigation continues," Israeli police spokesman Micky Rosenfeld told AFP.</p>
+<p>"In this incident there was no writing or graffiti in the area," but he said that police were "obviously" investigating the possibility of it being a "price tag" attack.</p>
+<p>Last week, Prime Minister Benjamin Netanyahu ordered tougher measures against Jewish "rioters" after a surge in settler violence, in particular an attack on an Israeli military base in the West Bank.</p>
+<p>jjm/scw/srm</p>
+</body.content>
+</body>
+</nitf>
+</DataContent>
+</ContentItem>
+</NewsComponent>
+</NewsItem>
+</NewsML>
+

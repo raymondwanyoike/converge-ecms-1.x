@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NewsML Version="1.2">
+<!--AFP NewsML text-photo profile evolution2-->
+<!--Processed by Xafp1-4ToNewsML1-2 rev18-->
+<Catalog Href="http://www.afp.com/dtd/AFPCatalog.xml"/>
+<NewsEnvelope>
+<TransmissionId>2464</TransmissionId>
+<DateAndTime>20111219T162527Z</DateAndTime>
+<NewsService FormalName="DGTE"/>
+<NewsProduct FormalName="AFW"/>
+<NewsProduct FormalName="EUW"/>
+<NewsProduct FormalName="MEW"/>
+<NewsProduct FormalName="ANA"/>
+<NewsProduct FormalName="MAX"/>
+<NewsProduct FormalName="DGTE"/>
+<NewsProduct FormalName="DAGI"/>
+<NewsProduct FormalName="DPSE"/>
+<Priority FormalName="4"/>
+</NewsEnvelope>
+<NewsItem xml:lang="en">
+<Identification>
+<NewsIdentifier>
+<ProviderId>afp.com</ProviderId>
+<DateId>20111219T162518Z</DateId>
+<NewsItemId>TX-PAR-BLL93</NewsItemId>
+<RevisionId PreviousRevision="0" Update="N">1</RevisionId>
+<PublicIdentifier>urn:newsml:afp.com:20111219T162518Z:TX-PAR-BLL93:1</PublicIdentifier>
+</NewsIdentifier>
+<NameLabel>DRCongo-vote</NameLabel>
+</Identification>
+<NewsManagement>
+<NewsItemType FormalName="News"/>
+<FirstCreated>20111219T162518Z</FirstCreated>
+<ThisRevisionCreated>20111219T162518Z</ThisRevisionCreated>
+<Status FormalName="Usable"/>
+<Urgency FormalName="4"/>
+<DerivedFrom NewsItem="urn:newsml:afp.com:20111219T154053Z:TX-PAR-BLH64"/>
+<AssociatedWith FormalName="Photo"/>
+</NewsManagement>
+<NewsComponent>
+<NewsLines>
+<DateLine xml:lang="en">KINSHASA, Dec 19, 2011 (AFP) -</DateLine>
+<HeadLine xml:lang="en">Tensions rise ahead of DRCongo inauguration</HeadLine>
+<NewsLine>
+<NewsLineType FormalName="ProductLine"/>
+<NewsLineText xml:lang="en">=(Picture)=</NewsLineText>
+</NewsLine>
+</NewsLines>
+<AdministrativeMetadata>
+<Provider>
+<Party FormalName="AFP"/>
+</Provider>
+</AdministrativeMetadata>
+<DescriptiveMetadata>
+<Language FormalName="en"/>
+<SubjectCode>
+<SubjectMatter FormalName="11003000"/>
+</SubjectCode>
+<OfInterestTo FormalName="EAA-TEG-1=AFW"/>
+<OfInterestTo FormalName="EAA-TEG-1=EUW"/>
+<OfInterestTo FormalName="EAA-TEG-1=MEW"/>
+<OfInterestTo FormalName="ANA-TEG-1=ANA"/>
+<OfInterestTo FormalName="MAX-TEG-1=MAX"/>
+<DateLineDate>20111219T133909+0100</DateLineDate>
+<Location HowPresent="Origin">
+<Property FormalName="Country" Value="COD"/>
+<Property FormalName="City" Value="KINSHASA"/>
+</Location>
+<Property FormalName="Keyword" Value="DRCongo"/>
+<Property FormalName="Keyword" Value="vote"/>
+<Property FormalName="GeneratorSoftware" Value="Cafp32"/>
+</DescriptiveMetadata>
+<ContentItem>
+<MediaType FormalName="Text"/>
+<Format FormalName="NITF3.1"/>
+<Characteristics>
+<SizeInBytes>2210</SizeInBytes>
+<Property FormalName="Words" Value="368"/>
+</Characteristics>
+<DataContent>
+<nitf>
+<body>
+<body.content>
+<p>Tensions rose in the Democratic Republic of Congo on Monday, a day after the country's opposition leader again called himself president despite losing in last month's troubled polls.</p>
+<p>Police and army personnel, some in tanks, were stationed around the capital Kinshasha and there were reports of supporters for opposition leader Etienne Tshisekedi being dispersed with tear gas.</p>
+<p>Tshisekedi on Sunday claimed to be the elected president of the vast African nation, even though the country's supreme court and the election commission said current President Joseph Kabila had won 49 percent of the November 28 vote, against 32 percent for Tshisekedi.</p>
+<p>Kabila's victory was upheld even after international observers slammed polling conditions, citing problems in the vote count and the loss of huge numbers of ballots.</p>
+<p>AFP journalists saw several tanks in the Limete district, home to Tshisekedi's party, the Union for Democracy and Social Progress. </p>
+<p>"It's for the people that these tanks are there," government spokesman Lambert Mande told UN-supported radio Okapi. "It's to help their ease of movement and to protect important visitors."</p>
+<p>Kabila, who has been president since 2006, is set to be sworn in on Friday.</p>
+<p>Tshisekedi, however, announced his intention Sunday to also take the oath of office.</p>
+<p>As he made the comments, seated at a desk with the Congolese flag draped behind him, some 200 activists outside chanted "Tshisekedi president!"</p>
+<p>Tshisekedi claimed the lawful government had been blocked from office and he asked police and the armed forces to "only obey legitimate authority."</p>
+<p>The 79-year-old opposition leader also said he would give a "very large reward" to anyone bringing him Kabila "tied up."</p>
+<p>Kabila's party spokesman Aubin Minaku brushed off the rhetoric.</p>
+<p>"Yet another joke," Minaku said, calling Tshisekedi a "bad loser" and warning him about the gravity of making threats. </p>
+<p>French Foreign Minister Alain Juppe called for dialogue and urged all sides to avoid violence in the stand-off.</p>
+<p>"What we hope is that the two sides will avoid all violence and up to now that seems to be the case," Juppe said in the French city of Bordeaux.</p>
+<p>bur-epe/wat/jmm</p>
+</body.content>
+</body>
+</nitf>
+</DataContent>
+</ContentItem>
+</NewsComponent>
+</NewsItem>
+</NewsML>
+

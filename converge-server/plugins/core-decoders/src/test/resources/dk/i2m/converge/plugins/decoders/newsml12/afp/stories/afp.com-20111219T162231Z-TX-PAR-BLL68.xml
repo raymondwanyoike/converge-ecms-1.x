@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NewsML Version="1.2">
+<!--AFP NewsML text-photo profile evolution2-->
+<!--Processed by Xafp1-4ToNewsML1-2 rev18-->
+<Catalog Href="http://www.afp.com/dtd/AFPCatalog.xml"/>
+<NewsEnvelope>
+<TransmissionId>2452</TransmissionId>
+<DateAndTime>20111219T162238Z</DateAndTime>
+<NewsService FormalName="DGTE"/>
+<NewsProduct FormalName="AFW"/>
+<NewsProduct FormalName="EUW"/>
+<NewsProduct FormalName="MEW"/>
+<NewsProduct FormalName="ANA"/>
+<NewsProduct FormalName="PAW"/>
+<NewsProduct FormalName="MAX"/>
+<NewsProduct FormalName="DGTE"/>
+<NewsProduct FormalName="DAGI"/>
+<NewsProduct FormalName="DPSE"/>
+<Priority FormalName="4"/>
+</NewsEnvelope>
+<NewsItem xml:lang="en">
+<Identification>
+<NewsIdentifier>
+<ProviderId>afp.com</ProviderId>
+<DateId>20111219T162231Z</DateId>
+<NewsItemId>TX-PAR-BLL68</NewsItemId>
+<RevisionId PreviousRevision="0" Update="N">1</RevisionId>
+<PublicIdentifier>urn:newsml:afp.com:20111219T162231Z:TX-PAR-BLL68:1</PublicIdentifier>
+</NewsIdentifier>
+<NameLabel>Indonesia-Australia-immigration-boat-accident</NameLabel>
+</Identification>
+<NewsManagement>
+<NewsItemType FormalName="News"/>
+<FirstCreated>20111219T162231Z</FirstCreated>
+<ThisRevisionCreated>20111219T162231Z</ThisRevisionCreated>
+<Status FormalName="Usable"/>
+<Urgency FormalName="4"/>
+<DerivedFrom NewsItem="urn:newsml:afp.com:20111219T160705Z:TX-PAR-BLK29"/>
+<AssociatedWith FormalName="Graphic"/>
+<AssociatedWith FormalName="Photo"/>
+<AssociatedWith FormalName="Video"/>
+</NewsManagement>
+<NewsComponent>
+<NewsLines>
+<DateLine xml:lang="en">WATULIMO, Indonesia, Dec 19, 2011 (AFP) -</DateLine>
+<HeadLine xml:lang="en">15 found alive near Indonesia migrant boat capsize</HeadLine>
+<NewsLine>
+<NewsLineType FormalName="AdvisoryLine"/>
+<NewsLineText xml:lang="en">ADDS UNHCR reax</NewsLineText>
+</NewsLine>
+<NewsLine>
+<NewsLineType FormalName="ProductLine"/>
+<NewsLineText xml:lang="en">=(Graphic+Picture+Video)=</NewsLineText>
+</NewsLine>
+</NewsLines>
+<AdministrativeMetadata>
+<Provider>
+<Party FormalName="AFP"/>
+</Provider>
+<Creator>
+<Party FormalName="S. Arif "/>
+</Creator>
+</AdministrativeMetadata>
+<DescriptiveMetadata>
+<Language FormalName="en"/>
+<Genre FormalName="Recit"/>
+<Genre FormalName="3rdlead"/>
+<SubjectCode>
+<SubjectMatter FormalName="03013000"/>
+</SubjectCode>
+<SubjectCode>
+<SubjectDetail FormalName="14003002"/>
+</SubjectCode>
+<OfInterestTo FormalName="EAA-TEG-1=AFW"/>
+<OfInterestTo FormalName="EAA-TEG-1=EUW"/>
+<OfInterestTo FormalName="EAA-TEG-1=MEW"/>
+<OfInterestTo FormalName="ANA-TEG-1=ANA"/>
+<OfInterestTo FormalName="ASI-TEG-1=PAW"/>
+<OfInterestTo FormalName="MAX-TEG-1=MAX"/>
+<DateLineDate>20111219T212330+0800</DateLineDate>
+<Location HowPresent="Origin">
+<Property FormalName="Country" Value="IDN"/>
+<Property FormalName="City" Value="WATULIMO"/>
+</Location>
+<Property FormalName="Keyword" Value="Indonesia"/>
+<Property FormalName="Keyword" Value="Australia"/>
+<Property FormalName="Keyword" Value="immigration"/>
+<Property FormalName="Keyword" Value="boat"/>
+<Property FormalName="Keyword" Value="accident"/>
+<Property FormalName="GeneratorSoftware" Value="Cafp32"/>
+</DescriptiveMetadata>
+<ContentItem>
+<MediaType FormalName="Text"/>
+<Format FormalName="NITF3.1"/>
+<Characteristics>
+<SizeInBytes>4551</SizeInBytes>
+<Property FormalName="Words" Value="758"/>
+</Characteristics>
+<DataContent>
+<nitf>
+<body>
+<body.content>
+<p>Indonesian rescuers found 15 people alive Monday in the area where a boat capsized, raising hopes of more survivors among 200 missing asylum seekers who were en route to Australia.</p>
+<p>Thirteen of the survivors found on a dinghy 100 kilometres from the capsize are receiving medical treatment in a temporary shelter on the outskirts of Jember city in eastern Java and most cannot walk, an AFP correspondent said.</p>
+<p>"I got on the boat in Java to go to Australia. After six hours in rough conditions, the boat capsized, and rescuers only found us days later," Pakistani Muhammad Mehdi told AFP at the shelter.</p>
+<p>Two Indonesian men were found on Monday afternoon on Sendang Biru beach near eastern Java's Malang city and are suspected to be crew members who abandoned the sinking ship.</p>
+<p>"But we cannot confirm that just yet," East Java provincial Disaster Management Agency chief Siswanto told AFP.</p>
+<p>The fibreglass vessel had a capacity of 100 but was carrying about 250 migrants -- mostly Afghans and Iranians -- when it sank on Saturday, 40 nautical miles off eastern Java.</p>
+<p>Rescuers had held out little hope of finding more survivors in bad weather and high seas, calling it the "largest loss of life" yet from the sinking of one of the many boats packed with Asian and Middle Eastern migrants who undertake the perilous sea voyage from Indonesia to Australia.</p>
+<p>Officials have yet to confirm the 13 people rescued were from Saturday's capsize, but said they would soon be taken to hospital.</p>
+<p>The survivors were spotted by crew on a tugboat carrying coal, who rescued the 12 men and one woman who were floating in the water, Siswanto said. </p>
+<p>Fishermen plucked 34 survivors from shark-infested waters six hours after the boat capsized and were taken to Blitar city on Sunday for identification by the International Organization for Migration (IOM).</p>
+<p>"Everyone was rushing to get onto my boat, which could only fit around 30 of them. I had to leave dozens of them floating," 35-year-old fisherman Ahmad Jambe said.</p>
+<p>"I called the police on my way back but they took a long time to come. If they had come earlier, more could be saved."</p>
+<p>Five rescue boats and two helicopters were deployed to comb Indonesia's far-eastern shores despite bad weather, joined by an Australian navy patrol ship and surveillance aircraft, but visibility was low amid bad weather. </p>
+<p>Survivors interviewed by AFP said they were heading to Australia's Christmas Island when their boat was hit by a storm.</p>
+<p>Crew members and migrants had wrestled over 25 life vests on the doomed boat, officials said.</p>
+<p>"The migrants said the six crew members had rushed for the life vests, put them on themselves and swam off," East Java search and rescue agency chief Sutrisno told AFP.</p>
+<p>The migrants were said to include Pakistanis, Iraqis, Turks and Saudis. They said they had paid agents between $2,500 and $5,000 to seek asylum in Australia and claimed their UN documentation papers were lost at sea.</p>
+<p>Thousands of asylum-seekers head through Southeast Asian countries on their way to Australia every year and many link up with people-smugglers in Indonesia for the dangerous voyage on ramshackle boats.</p>
+<p>"It is hard for anyone not to be moved by the great human toll this incident seems to have caused," the UN's High Commissioner for Refugees Antonio Guterres said. </p>
+<p>"This is a further tragic reminder that desperate people resort to desperate measures."</p>
+<p>Christmas Island is a favoured destination for people-smugglers, lying closer to Indonesia than Australia. Nearly 50 would-be migrants are believed to have died in wild seas during a shipwreck there in December 2010.</p>
+<p>Australia's Home Affairs Minister Jason Clare on Monday said Indonesia had requested help from Australian police to investigate people-smugglers, who he said had showed a "callous disregard for human life".</p>
+<p>"The only way to tackle this effectively (is) if you've got police forces in Australia and in Indonesia, police forces across the region working very closely together," he told ABC radio.</p>
+<p>However, Canberra has suffered numerous setbacks in its attempts to enforce a regional strategy on the problem.</p>
+<p>The Australian newspaper said an associate of Afghan human-trafficking kingpin Sayed Abbas was believed to be responsible for sending the latest boat.</p>
+<p>It reported that Indonesian authorities were investigating Haji Ismail, also known as Sayed Azad or Sayed Jalal, as a prime suspect after his name was supplied to investigators by survivors.</p>
+<p>strs-ad/co/txw</p>
+</body.content>
+</body>
+</nitf>
+</DataContent>
+</ContentItem>
+</NewsComponent>
+</NewsItem>
+</NewsML>
+

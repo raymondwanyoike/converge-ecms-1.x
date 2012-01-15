@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NewsML Version="1.2">
+<!--AFP NewsML text-photo profile evolution2-->
+<!--Processed by Xafp1-4ToNewsML1-2 rev18-->
+    <Catalog Href="http://www.afp.com/dtd/AFPCatalog.xml"/>
+    <NewsEnvelope>
+        <TransmissionId>2372</TransmissionId>
+        <DateAndTime>20111219T160604Z</DateAndTime>
+        <NewsService FormalName="DGTE"/>
+        <NewsProduct FormalName="ANA"/>
+        <NewsProduct FormalName="AFW"/>
+        <NewsProduct FormalName="EUW"/>
+        <NewsProduct FormalName="MEW"/>
+        <NewsProduct FormalName="MAX"/>
+        <NewsProduct FormalName="PAW"/>
+        <NewsProduct FormalName="GEN"/>
+        <NewsProduct FormalName="DAGI"/>
+        <NewsProduct FormalName="DGTE"/>
+        <NewsProduct FormalName="DPSE"/>
+        <Priority FormalName="4"/>
+    </NewsEnvelope>
+    <NewsItem xml:lang="en">
+        <Identification>
+            <NewsIdentifier>
+                <ProviderId>afp.com</ProviderId>
+                <DateId>20111219T160559Z</DateId>
+                <NewsItemId>TX-PAR-BLK12</NewsItemId>
+                <RevisionId PreviousRevision="0" Update="N">1</RevisionId>
+                <PublicIdentifier>urn:newsml:afp.com:20111219T160559Z:TX-PAR-BLK12:1</PublicIdentifier>
+            </NewsIdentifier>
+            <NameLabel>NKorea-politics-Kim-US-vote-Republicans</NameLabel>
+        </Identification>
+        <NewsManagement>
+            <NewsItemType FormalName="News"/>
+            <FirstCreated>20111219T160559Z</FirstCreated>
+            <ThisRevisionCreated>20111219T160559Z</ThisRevisionCreated>
+            <Status FormalName="Usable"/>
+            <Urgency FormalName="4"/>
+            <DerivedFrom NewsItem="urn:newsml:afp.com:20111219T160408Z:TX-WASH-TOF40"/>
+        </NewsManagement>
+        <NewsComponent>
+            <NewsLines>
+                <DateLine xml:lang="en">DES MOINES, Iowa, Dec 19, 2011 (AFP) -</DateLine>
+                <HeadLine xml:lang="en">US Republicans: Kim death gives hope for NKorea</HeadLine>
+                <NewsLine>
+                    <NewsLineType FormalName="AdvisoryLine"/>
+                    <NewsLineText xml:lang="en">ADDS Perry</NewsLineText>
+                </NewsLine>
+            </NewsLines>
+            <AdministrativeMetadata>
+                <Provider>
+                    <Party FormalName="AFP"/>
+                </Provider>
+            </AdministrativeMetadata>
+            <DescriptiveMetadata>
+                <Language FormalName="en"/>
+                <Genre FormalName="Lead"/>
+                <SubjectCode>
+                    <Subject FormalName="11000000"/>
+                </SubjectCode>
+                <SubjectCode>
+                    <SubjectMatter FormalName="11003000"/>
+                </SubjectCode>
+                <SubjectCode>
+                    <SubjectMatter FormalName="11010000"/>
+                </SubjectCode>
+                <OfInterestTo FormalName="ANA-TEG-1=ANA"/>
+                <OfInterestTo FormalName="EAA-TEG-1=AFW"/>
+                <OfInterestTo FormalName="EAA-TEG-1=EUW"/>
+                <OfInterestTo FormalName="EAA-TEG-1=MEW"/>
+                <OfInterestTo FormalName="MAX-TEG-1=MAX"/>
+                <OfInterestTo FormalName="ASI-TEG-1=PAW"/>
+                <DateLineDate>20111219T085451-0500</DateLineDate>
+                <Location HowPresent="Origin">
+                    <Property FormalName="Country" Value="USA"/>
+                    <Property FormalName="Area" Value="Iowa"/>
+                    <Property FormalName="City" Value="DES MOINES"/>
+                </Location>
+                <Property FormalName="Keyword" Value="NKorea"/>
+                <Property FormalName="Keyword" Value="politics"/>
+                <Property FormalName="Keyword" Value="Kim"/>
+                <Property FormalName="Keyword" Value="US"/>
+                <Property FormalName="Keyword" Value="vote"/>
+                <Property FormalName="Keyword" Value="Republicans"/>
+                <Property FormalName="GeneratorSoftware" Value="Cafp32"/>
+            </DescriptiveMetadata>
+            <ContentItem>
+                <MediaType FormalName="Text"/>
+                <Format FormalName="NITF3.1"/>
+                <Characteristics>
+                    <SizeInBytes>2980</SizeInBytes>
+                    <Property FormalName="Words" Value="496"/>
+                </Characteristics>
+                <DataContent>
+                    <nitf>
+                        <body>
+                            <body.content>
+                                <p>Republican US presidential candidates hailed Kim Jong-Il's death as the end of a "tyrant" whose passing gives secretive nuclear-armed North Korea a chance to become more open and democratic.</p>
+                                <p>"Kim Jong-Il was a ruthless tyrant who lived a life of luxury while the North Korean people starved," former Massachusetts governor Mitt Romney, the on-again, off-again frontrunner for the party's nomination, said in a statement.</p>
+                                <p>"Kim Jong-Il was a conscienceless tyrant," former US ambassador to China Jon Huntsman said in a statement as he campaigned in New Hampshire, which holds a key early nominating contest.</p>
+                                <p>"His death closes a tragic chapter for the people of North Korea and offers them the best opportunity to get on a path towards a more free and open society and political reform," said Huntsman.</p>
+                                <p>Huntsman said Washington must work with key allies South Korea and Japan and partners like China and Russia to "use all available pressure points to prevent rogue activities and proliferation" out of North Korea.</p>
+                                <p>Romney said "America must show leadership at this time" and work with its allies "to turn North Korea off the treacherous course it is on and ensure security in the region."</p>
+                                <p>"The North Korean people are suffering through a long and brutal national nightmare. I hope the death of Kim Jong-Il hastens its end," he said.</p>
+                                <p>North Korean official media announced Sunday that Kim, 69, had died from a heart attack.</p>
+                                <p>Kim's death came as North Korea and the United States were making tentative efforts to restart stalled six-nation talks on the North's nuclear program.</p>
+                                <p>Nuclear envoys from Washington and Pyongyang met in New York in July and in Geneva in October, but reported no breakthrough. South Korea's Yonhap news agency said that a third meeting could have taken place soon.</p>
+                                <p>The North quit the six-party forum, which involves the United States, China, the two Koreas, Japan and Russia, in April 2009, a month before staging its second nuclear test.</p>
+                                <p>Texas Governor Rick Perry, another contender for the Republican nod to take on President Barack Obama in November 2012 elections, said Kim's death "is an opportunity to reunify the peninsula if the situation is handled effectively."</p>
+                                <p>Kim's son and apparent heir, Kim Jong-Un, "is an unknown quantity, and may not be able to maintain power," Perry said in a statement.</p>
+                                <p>"North Korea remains a nuclear power, and there is a great threat that those weapons might fall into the wrong hands if civil war breaks out," he added.</p>
+                                <p>"The United States must now strongly reaffirm our commitment to Asian allies, particularly South Korea, and maintain a strong military, diplomatic, and economic presence in the Pacific region during this period," said Perry.</p>
+                                <p>"We should also engage with China, and encourage Beijing to work towards a peaceful transition from a grim dictatorship to a free Korea," said the Texas governor, who called the late Stalinist leader a "vicious dictator."</p>
+                                <p>ok/rl</p>
+                            </body.content>
+                        </body>
+                    </nitf>
+                </DataContent>
+            </ContentItem>
+        </NewsComponent>
+    </NewsItem>
+</NewsML>
+
