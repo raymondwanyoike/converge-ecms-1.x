@@ -2,6 +2,7 @@
 /converge-server/plugins/core-decoders/target/
 /converge-server/modules/converge-ejb/target/
 /converge-server/modules/converge-i18n/target/
+/converge-server/modules/converge-mobile-server/target/
 /converge-server/plugins/alertaction/target/
 /converge-server/plugins/atomexport/target/
 /converge-server/plugins/core-actions/target/
@@ -13,6 +14,7 @@
 /converge-server/modules/converge-war/target/
 /converge-server/modules/converge-ws/target/
 /converge-server/modules/converge-ear/target/
+/converge-server/modules/converge-mobile-server/target
 /converge-server/modules/converge-war/faces-config.NavData
 /converge-server/target/
 /converge-server/documentation/docstyles/target/
@@ -22,3 +24,4 @@
 /converge-server/modules/converge-ws-client/target/
 /converge-server/converge-installer/target/
 /converge-maven/create-newswire-decoder/target/
+/converge-server/plugins/converge-plugin-newsml12/target/

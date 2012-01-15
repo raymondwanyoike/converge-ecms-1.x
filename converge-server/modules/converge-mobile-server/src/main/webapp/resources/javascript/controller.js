@@ -33,8 +33,8 @@ $(document).ready(function() {
 	// binds form submission and fields to the validation engine
     jQuery("#registrationForm").validationEngine();
     jQuery("#loginForm").validationEngine();
-    
-
+        
+    clearValidationErrors();
     hookLogin();
     hookRegister();
     hookSavePreferences();
@@ -48,10 +48,16 @@ String.prototype.trunc = function(n){
 function populatePreferences(categories) {
     for (i=0; i<categories.section.length; i++) {
         var category = categories.section[i];
-        $('#prefCats').append('<input type="checkbox" name="cbCat" id="cbCat' + category.id + '" value="' + category.id + '" /><label for="cbCat' + category.id + '">' + category.title + '</label>');
-      
-	}
+        //Display only non-special categories for the user to choose from
+        if (category.special=="false") {
+            $('#prefCats').append('<input type="checkbox" name="cbCat" id="cbCat' + category.id + '" value="' + category.id + '" /><label for="cbCat' + category.id + '">' + category.title + '</label>');
+        }
+        else {
+            //TODO: Handle the special categories
+                             
+        }
 
+	}
     // Check current preferences
     if (mobile_subscriber.subscriptions != undefined) {
         for (i=0; i< mobile_subscriber.subscriptions.length; i++) {
@@ -141,12 +147,14 @@ function refreshCategories() {
             }
         }
 	   
-	   //$('#lstSubscriptions').append(
+//	   $('#lstSubscriptions').append(
 //            '<li data-theme="e">' +
-//            '<img src="images/maina.png" class="ui-li-thumb" />' +
+//             '#lstSpecial'
+//           '<img src="images/maina.png" class="ui-li-thumb" />'
 //            '<h3>Maina\'s List</h3>' +
-//            '<p>Coming soon!</p></li>');
-//            
+//           '<p>Coming soon!</p></li>'
+//        );
+            
 //        $('#lstSubscriptions').append(
 //            '<li data-theme="e">' +
 //            '<img src="images/caroline.png" class="ui-li-thumb" />' +
@@ -212,6 +220,14 @@ function hookLogin() {
    	
 }
 
+function clearValidationErrors() {
+    $('#registrationPage').click(function(event) {
+        jQuery("#loginForm").validationEngine('hide');
+        $.mobile.changePage($("#register"));   
+        
+    });
+}
+
 function hookRegister() {
     $('#btnRegister').click(function(event) {
         
@@ -219,9 +235,9 @@ function hookRegister() {
             function() {
                 document.location = '#login';
                 alert("Thanks for your registration, you may now proceed to log-in");
+                jQuery("#registrationForm").validationEngine('hide');
             },
             function() {
-			  //jQuery("#registrationForm").validationEngine();
                 alert($('#registrationPhone').val() + " is already registered");
             }
             );    
