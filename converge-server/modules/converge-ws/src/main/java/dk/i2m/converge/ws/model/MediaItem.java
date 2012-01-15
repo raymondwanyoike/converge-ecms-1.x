@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,11 @@
  */
 package dk.i2m.converge.ws.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
+ * {@link MediaItem} representing a file attached to a {@link NewsItem}.
  *
  * @author Allan Lykke Christensen
  */
@@ -28,11 +32,12 @@ public class MediaItem {
 
     private String caption;
 
-    private String url;
-
-    private String rendition;
-
     private String contentType;
+
+    private Integer priority = 0;
+
+    private List<MediaItemRendition> renditions =
+            new ArrayList<MediaItemRendition>();
 
     public MediaItem() {
     }
@@ -53,14 +58,6 @@ public class MediaItem {
         this.id = id;
     }
 
-    public String getRendition() {
-        return rendition;
-    }
-
-    public void setRendition(String rendition) {
-        this.rendition = rendition;
-    }
-
     public String getTitle() {
         return title;
     }
@@ -69,19 +66,27 @@ public class MediaItem {
         this.title = title;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public String getContentType() {
         return contentType;
     }
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
+
+    public List<MediaItemRendition> getRenditions() {
+        return renditions;
+    }
+
+    public void setRenditions(List<MediaItemRendition> renditions) {
+        this.renditions = renditions;
     }
 }

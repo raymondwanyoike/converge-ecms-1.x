@@ -1,14 +1,18 @@
 /*
- *  Copyright (C) 2011 Interactive Media Management. All Rights Reserved.
- * 
- *  NOTICE:  All information contained herein is, and remains the property of 
- *  INTERACTIVE MEDIA MANAGEMENT and its suppliers, if any.  The intellectual 
- *  and technical concepts contained herein are proprietary to INTERACTIVE MEDIA
- *  MANAGEMENT and its suppliers and may be covered by Danish and Foreign 
- *  Patents, patents in process, and are protected by trade secret or copyright 
- *  law. Dissemination of this information or reproduction of this material
- *  is strictly forbidden unless prior written permission is obtained from 
- *  INTERACTIVE MEDIA MANAGEMENT.
+ * Copyright (C) 2011 - 2012 Interactive Media Management
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.mobile.server.service;
 
@@ -16,10 +20,8 @@ import dk.i2m.converge.mobile.server.FileUtils;
 import dk.i2m.converge.mobile.server.ImageUtils;
 import dk.i2m.converge.mobile.server.domain.NewsItem;
 import dk.i2m.converge.mobile.server.domain.Outlet;
-import dk.i2m.converge.wsclient.MediaItem;
-import dk.i2m.converge.wsclient.OutletService;
-import dk.i2m.converge.wsclient.OutletService_Service;
-import dk.i2m.converge.wsclient.Section;
+import dk.i2m.converge.mobile.server.utils.BeanComparator;
+import dk.i2m.converge.wsclient.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -29,6 +31,7 @@ import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,13 +51,13 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 /**
- * RESTful service for initiating the synchronisation with <em>Converge 
+ * RESTful service for initiating the synchronisation with <em>Converge
  * Editorial</em>. The service is initiated by passing:
  * <ul>
- *     <li>ID of the external outlet</li>
- *     <li>ID of the edition to download</li>
- *     <li>ID of the internal outlet</li>
- *     <li>Key of the internal outlet</li>
+ * <li>ID of the external outlet</li>
+ * <li>ID of the edition to download</li>
+ * <li>ID of the internal outlet</li>
+ * <li>Key of the internal outlet</li>
  * </li>
  *
  * @author Allan Lykke Christensen
@@ -65,71 +68,91 @@ public class WakeupService {
 
     @Context
     ServletContext context;
+
     @PersistenceContext(unitName = "cmsPU")
     private EntityManager em;
-    private static final Logger LOG = Logger.getLogger(WakeupService.class.getName());
+
+    private static final Logger LOG = Logger.getLogger(WakeupService.class.
+            getName());
+
     private static final String SERVICE_URI = "http://soap.ws.converge.i2m.dk/";
+
     private static final String OUTLET_SERVICE_NAME = "OutletService";
 
     /**
      * Initiates the download of a given edition on <em>Converge Editorial</em>.
-     * 
+     *
      * @param externalId
-     *          Unique identifier of the Outlet on <em>Converge Editorial</em>
+ * Unique identifier of the Outlet on <em>Converge Editorial</em>
      * @param internalId
-     *          Internal identifier of the Outlet on <em>Converge Mobile 
-     *          Server</em>
+ * Internal identifier of the Outlet on <em>Converge Mobile
+     * Server</em>
      * @param internalKey
-     *          Internal key of the Outlet on <em>Converge Mobile Server</em>
+* Internal key of the Outlet on <em>Converge Mobile Server</em>
      * @param editionId
-     *          Unique identifier of the Edition to download on <em>Converge 
-     *          Editorial</em>
+  * Unique identifier of the Edition to download on <em>Converge
+     * Editorial</em>
      * @return Empty string
      */
     @GET
-    public String handleGET(@PathParam(value = "eid") String externalId, @PathParam(value = "iid") String internalId, @PathParam(value = "key") String internalKey, @PathParam(value = "edition") String editionId) {
+    public String handleGET(@PathParam(value = "eid") String externalId,
+            @PathParam(value = "iid") String internalId, @PathParam(value =
+            "key") String internalKey,
+            @PathParam(value = "edition") String editionId) {
         try {
 
-            LOG.log(Level.INFO, "Synchronisation of External Outlet {0} with Internal Outlet {1} with key {2}", new Object[]{externalId, internalId, internalKey});
+            LOG.log(Level.INFO,
+                    "Synchronisation of External Outlet {0} with Internal Outlet {1} with key {2}",
+                    new Object[]{externalId, internalId, internalKey});
 
             Outlet outlet = em.find(Outlet.class, Long.valueOf(internalId));
 
             if (!outlet.getKey().equals(internalKey)) {
-                LOG.log(Level.WARNING, "Invalid key provided by invoker {0}, expecting {1}", new Object[]{internalKey, outlet.getKey()});
+                LOG.log(Level.WARNING,
+                        "Invalid key provided by invoker {0}, expecting {1}",
+                        new Object[]{internalKey, outlet.getKey()});
                 return "";
             }
 
             Long externalOutletId = Long.valueOf(outlet.getExternalId());
             Long externalEditionId = Long.valueOf(editionId);
 
-            Authenticator.setDefault(new MyAuthenticator(outlet.getExternalUid(), outlet.getExternalPwd()));
+            Authenticator.setDefault(new MyAuthenticator(outlet.getExternalUid(),
+                    outlet.getExternalPwd()));
             URL url = new URL(outlet.getExternalUrl());
             QName qname = new QName(SERVICE_URI, OUTLET_SERVICE_NAME);
             Service service = OutletService_Service.create(url, qname);
             OutletService os = service.getPort(OutletService.class);
-            dk.i2m.converge.wsclient.Outlet externalOutlet = os.getOutlet(externalOutletId);
+            dk.i2m.converge.wsclient.Outlet externalOutlet = os.getOutlet(
+                    externalOutletId);
 
-            System.out.println(externalOutlet.getTitle());
             for (Section s : externalOutlet.getSections()) {
                 if (isNewSection(s.getId())) {
-                    dk.i2m.converge.mobile.server.domain.Section section = new dk.i2m.converge.mobile.server.domain.Section();
+                    dk.i2m.converge.mobile.server.domain.Section section =
+                            new dk.i2m.converge.mobile.server.domain.Section();
                     section.setTitle(s.getTitle());
                     section.setExternalId(s.getId());
                     section.setDisplayOrder(1);
-                    LOG.log(Level.INFO, "Adding new section {0}", new Object[]{s.getTitle()});
+                    LOG.log(Level.INFO, "Adding new section {0}",
+                            new Object[]{s.getTitle()});
                     em.persist(section);
                     outlet.getSections().add(section);
                     em.merge(outlet);
                 }
             }
 
-            dk.i2m.converge.wsclient.Edition externalEdition = os.getPublishedEdition(externalEditionId);
-            em.createQuery("UPDATE NewsItem ni " + "SET ni.available = ?1").setParameter(1, false).executeUpdate();
-
+            String renditionThumb = context.getInitParameter("RENDITION_THUMB");
+            String renditionStory = context.getInitParameter("RENDITION_STORY");
             String imgLocation = context.getInitParameter("IMG_LOCATION");
             String imgUrl = context.getInitParameter("IMG_URL");
 
-            for (dk.i2m.converge.wsclient.NewsItem item : externalEdition.getItems()) {
+            dk.i2m.converge.wsclient.Edition externalEdition = os.
+                    getPublishedEdition(externalEditionId);
+            em.createQuery("UPDATE NewsItem ni " + "SET ni.available = ?1").
+                    setParameter(1, false).executeUpdate();
+
+            for (dk.i2m.converge.wsclient.NewsItem item : externalEdition.
+                    getItems()) {
                 if (!isNewsItemAvailable(item.getId())) {
                     NewsItem newsItem = new NewsItem();
                     newsItem.setExternalId(item.getId());
@@ -142,62 +165,115 @@ public class WakeupService {
 
                     // Generate thumbs
                     if (!item.getMedia().isEmpty()) {
-                        MediaItem mediaItem = item.getMedia().iterator().next();
-                        URL mediaItemUrl = new URL(mediaItem.getUrl());
+
+                        Collections.sort(item.getMedia(), new BeanComparator(
+                                "priority"));
+
+                        MediaItem img = item.getMedia().iterator().next();
+                        MediaItemRendition thumbImg = null;
+                        MediaItemRendition storyImg = null;
+
+                        for (MediaItemRendition mir : img.getRenditions()) {
+                            if (mir.getName().equalsIgnoreCase(renditionThumb)) {
+                                thumbImg = mir;
+                            } else if (mir.getName().equalsIgnoreCase(
+                                    renditionStory)) {
+                                storyImg = mir;
+                            }
+                        }
 
                         try {
-                            String thumbLocation = imgLocation + "/" + mediaItem.getId() + "-thumb.jpg";
-                            String storyLocation = imgLocation + "/" + mediaItem.getId() + ".jpg";
-                            String thumbPNGLocation = imgLocation + "/" + mediaItem.getId() + "-thumb.png";
-                            String storyPNGLocation = imgLocation + "/" + mediaItem.getId() + ".png";
-
-                            byte[] thumb = ImageUtils.generateThumbnail(getBytesFromUrl(mediaItemUrl), 48, 48, 100);
-                            FileUtils.writeToFile(thumb, thumbLocation);
-
-                            byte[] storyImg = ImageUtils.generateThumbnail(getBytesFromUrl(mediaItemUrl), 200, 100, 100);
-                            FileUtils.writeToFile(storyImg, storyLocation);
-
-                            convertJpgToPng(thumbLocation, thumbPNGLocation);
-                            convertJpgToPng(storyLocation, storyPNGLocation);
-
-                            File f = new File(thumbLocation);
-                            if (f.delete()) {
-                                LOG.log(Level.INFO, "{0} deleted", thumbLocation);
-                            } else {
-                                LOG.log(Level.INFO, "{0} could not be deleted", thumbLocation);
-                            }
-
-                            f = new File(storyLocation);
-                            if (f.delete()) {
-                                LOG.log(Level.INFO, "{0} deleted", storyLocation);
-                            } else {
-                                LOG.log(Level.INFO, "{0} could not be deleted", storyLocation);
-                            }
-
-                            newsItem.setThumbUrl(imgUrl + "/" + mediaItem.getId() + "-thumb.png");
-                            newsItem.setImgUrl(imgUrl + "/" + mediaItem.getId() + ".png");
-                        } catch (Exception e) {
-                            LOG.log(Level.WARNING, "Could not generate thumb");
+                            org.apache.commons.io.FileUtils.copyURLToFile(new URL(thumbImg.
+                                    getUrl()), new File(imgLocation
+                                    + File.separator + img.getId() + "-thumb"),
+                                    30000,
+                                    30000);
+                            newsItem.setThumbUrl(imgUrl + "/" + img.getId()
+                                    + "-thumb");
+                        } catch (IOException ex) {
+                            Logger.getLogger(WakeupService.class.getName()).
+                                    log(Level.SEVERE, null, ex);
                         }
+
+                        try {
+                            org.apache.commons.io.FileUtils.copyURLToFile(new URL(storyImg.
+                                    getUrl()), new File(imgLocation
+                                    + File.separator + img.getId() + "-story"),
+                                    30000,
+                                    30000);
+                            newsItem.setImgUrl(imgUrl + "/" + img.getId()
+                                    + "-story");
+                        } catch (IOException ex) {
+                            Logger.getLogger(WakeupService.class.getName()).
+                                    log(Level.SEVERE, null, ex);
+                        }
+
+
+                        //URL mediaItemUrl = new URL(mediaItem.getUrl());
+
+//                        try {
+//                            String thumbLocation = imgLocation + "/" + mediaItem.getId() + "-thumb.jpg";
+//                            String storyLocation = imgLocation + "/" + mediaItem.getId() + ".jpg";
+//                            String thumbPNGLocation = imgLocation + "/" + mediaItem.getId() + "-thumb.png";
+//                            String storyPNGLocation = imgLocation + "/" + mediaItem.getId() + ".png";
+//
+//                            byte[] thumb = ImageUtils.generateThumbnail(getBytesFromUrl(mediaItemUrl), 48, 48, 100);
+//                            FileUtils.writeToFile(thumb, thumbLocation);
+//
+//                            byte[] storyImg = ImageUtils.generateThumbnail(getBytesFromUrl(mediaItemUrl), 200, 100, 100);
+//                            FileUtils.writeToFile(storyImg, storyLocation);
+//
+//                            convertJpgToPng(thumbLocation, thumbPNGLocation);
+//                            convertJpgToPng(storyLocation, storyPNGLocation);
+//
+//                            File f = new File(thumbLocation);
+//                            if (f.delete()) {
+//                                LOG.log(Level.INFO, "{0} deleted", thumbLocation);
+//                            } else {
+//                                LOG.log(Level.INFO, "{0} could not be deleted", thumbLocation);
+//                            }
+//
+//                            f = new File(storyLocation);
+//                            if (f.delete()) {
+//                                LOG.log(Level.INFO, "{0} deleted", storyLocation);
+//                            } else {
+//                                LOG.log(Level.INFO, "{0} could not be deleted", storyLocation);
+//                            }
+//
+//                            newsItem.setThumbUrl(imgUrl + "/" + mediaItem.getId() + "-thumb.png");
+//                            newsItem.setImgUrl(imgUrl + "/" + mediaItem.getId() + ".png");
+//                        } catch (Exception e) {
+//                            LOG.log(Level.WARNING, "Could not generate thumb");
+//                        }
 
                     } else {
                         // No media items - use categoy image
                         //newsItem.setThumbUrl(imgUrl + "/empty-thumb.png");
                         //newsItem.setImgUrl(imgUrl + "/empty.png");
-                        newsItem.setThumbUrl(imgUrl + "/category/" + item.getSection().getId() + "-thumb.png");
-                        newsItem.setImgUrl(imgUrl + "/category/" + item.getSection().getId() + ".png");
+                        newsItem.setThumbUrl(imgUrl + "/category/" + item.
+                                getSection().getId() + "-thumb.png");
+                        newsItem.setImgUrl(imgUrl + "/category/" + item.
+                                getSection().getId() + ".png");
                     }
 
-                    newsItem.setSection(findSectionByExternalId(item.getSection().getId()));
-                    LOG.log(Level.INFO, "Adding new story {0} in {1}", new Object[]{newsItem.getHeadline(), newsItem.getSection().getTitle()});
+                    newsItem.setSection(findSectionByExternalId(item.getSection().
+                            getId()));
+                    LOG.log(Level.INFO, "Adding new story {0} in {1}",
+                            new Object[]{newsItem.getHeadline(), newsItem.
+                                getSection().getTitle()});
                     em.persist(newsItem);
                 } else {
-                    em.createQuery("UPDATE NewsItem ni SET ni.available = ?1 WHERE ni.externalId = ?2").setParameter(1, true).setParameter(2, item.getId()).executeUpdate();
+                    em.createQuery(
+                            "UPDATE NewsItem ni SET ni.available = ?1 WHERE ni.externalId = ?2").
+                            setParameter(1, true).setParameter(2, item.getId()).
+                            executeUpdate();
                 }
             }
 
+
         } catch (MalformedURLException ex) {
-            Logger.getLogger(WakeupService.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(WakeupService.class.getName()).log(Level.SEVERE,
+                    null, ex);
         }
         return "";
     }
@@ -208,7 +284,8 @@ public class WakeupService {
             test.openConnection();
             return true;
         } catch (IOException ex) {
-            Logger.getLogger(WakeupService.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(WakeupService.class.getName()).log(Level.SEVERE,
+                    null, ex);
             return false;
         }
     }
@@ -216,6 +293,7 @@ public class WakeupService {
     static class MyAuthenticator extends Authenticator {
 
         private String username = "";
+
         private String password = "";
 
         public MyAuthenticator(String username, String password) {
@@ -225,7 +303,8 @@ public class WakeupService {
 
         @Override
         public PasswordAuthentication getPasswordAuthentication() {
-            return (new PasswordAuthentication(this.username, this.password.toCharArray()));
+            return (new PasswordAuthentication(this.username, this.password.
+                    toCharArray()));
         }
     }
 
@@ -235,19 +314,22 @@ public class WakeupService {
         Root subs = cq.from(dk.i2m.converge.mobile.server.domain.Section.class);
         cq.select(subs).where(cb.equal(subs.get("externalId"), section));
 
-        List<dk.i2m.converge.mobile.server.domain.Section> matches = em.createQuery(cq).getResultList();
+        List<dk.i2m.converge.mobile.server.domain.Section> matches = em.
+                createQuery(cq).getResultList();
 
 
         return matches.isEmpty();
     }
 
-    private dk.i2m.converge.mobile.server.domain.Section findSectionByExternalId(Long id) {
+    private dk.i2m.converge.mobile.server.domain.Section findSectionByExternalId(
+            Long id) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery cq = cb.createQuery();
         Root subs = cq.from(dk.i2m.converge.mobile.server.domain.Section.class);
         cq.select(subs).where(cb.equal(subs.get("externalId"), id));
 
-        List<dk.i2m.converge.mobile.server.domain.Section> matches = em.createQuery(cq).getResultList();
+        List<dk.i2m.converge.mobile.server.domain.Section> matches = em.
+                createQuery(cq).getResultList();
 
 
         if (matches.isEmpty()) {
@@ -257,13 +339,15 @@ public class WakeupService {
         }
     }
 
-    private dk.i2m.converge.mobile.server.domain.NewsItem findNewsItemByExternalId(Long id) {
+    private dk.i2m.converge.mobile.server.domain.NewsItem findNewsItemByExternalId(
+            Long id) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery cq = cb.createQuery();
         Root subs = cq.from(dk.i2m.converge.mobile.server.domain.NewsItem.class);
         cq.select(subs).where(cb.equal(subs.get("externalId"), id));
 
-        List<dk.i2m.converge.mobile.server.domain.NewsItem> matches = em.createQuery(cq).getResultList();
+        List<dk.i2m.converge.mobile.server.domain.NewsItem> matches = em.
+                createQuery(cq).getResultList();
 
 
         if (matches.isEmpty()) {
@@ -279,7 +363,8 @@ public class WakeupService {
         Root subs = cq.from(dk.i2m.converge.mobile.server.domain.NewsItem.class);
         cq.select(subs).where(cb.equal(subs.get("externalId"), externalId));
 
-        List<dk.i2m.converge.mobile.server.domain.NewsItem> matches = em.createQuery(cq).getResultList();
+        List<dk.i2m.converge.mobile.server.domain.NewsItem> matches = em.
+                createQuery(cq).getResultList();
 
 
         return !matches.isEmpty();
@@ -297,7 +382,8 @@ public class WakeupService {
                 bais.write(byteChunk, 0, n);
             }
         } catch (IOException e) {
-            System.err.printf("Failed while reading bytes from %s: %s", url.toExternalForm(), e.getMessage());
+            System.err.printf("Failed while reading bytes from %s: %s", url.
+                    toExternalForm(), e.getMessage());
             e.printStackTrace();
             // Perform any other exception handling that's appropriate.
         } finally {

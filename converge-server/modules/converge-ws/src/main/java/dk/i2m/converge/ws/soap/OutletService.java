@@ -146,6 +146,7 @@ public class OutletService {
      * Obtains the published news items in a given edition.
      *
      * @param id Unique identifier of the {@link Edition}
+     * @param rendition {@link Rendition} of the content to receive for the {@link Edition}
      * @return {@link Edition} containing the published {@link NewsItem}s
      */
     @WebMethod(operationName = "getPublishedEdition")
