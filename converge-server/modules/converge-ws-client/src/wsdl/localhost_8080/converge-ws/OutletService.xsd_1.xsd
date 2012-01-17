@@ -88,8 +88,16 @@
 <xs:element name="caption" type="xs:string" minOccurs="0"></xs:element>
 <xs:element name="contentType" type="xs:string" minOccurs="0"></xs:element>
 <xs:element name="id" type="xs:long" minOccurs="0"></xs:element>
-<xs:element name="rendition" type="xs:string" minOccurs="0"></xs:element>
+<xs:element name="priority" type="xs:int" minOccurs="0"></xs:element>
+<xs:element name="renditions" type="tns:mediaItemRendition" nillable="true" minOccurs="0" maxOccurs="unbounded"></xs:element>
 <xs:element name="title" type="xs:string" minOccurs="0"></xs:element>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="mediaItemRendition">
+<xs:sequence>
+<xs:element name="contentType" type="xs:string" minOccurs="0"></xs:element>
+<xs:element name="name" type="xs:string" minOccurs="0"></xs:element>
 <xs:element name="url" type="xs:string" minOccurs="0"></xs:element>
 </xs:sequence>
 </xs:complexType>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,7 @@ package dk.i2m.converge.core.content.catalogue;
 
 import java.io.File;
 import java.io.Serializable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.FilenameUtils;
@@ -549,7 +541,11 @@ public class MediaItemRendition implements Serializable {
      *         is a video, otherwise {@code false}
      */
     public boolean isVideo() {
-        return getContentType().startsWith("video");
+        try {
+            return getContentType().startsWith("video");
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     /**
@@ -559,7 +555,11 @@ public class MediaItemRendition implements Serializable {
      *         is an audio clip, otherwise {@code false}
      */
     public boolean isAudio() {
-        return getContentType().startsWith("audio");
+        try{
+            return getContentType().startsWith("audio");
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     /**
@@ -569,7 +569,11 @@ public class MediaItemRendition implements Serializable {
      *         is an image, otherwise {@code false}
      */
     public boolean isImage() {
-        return getContentType().startsWith("image");
+        try {
+            return getContentType().startsWith("image");
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     /**
@@ -579,25 +583,28 @@ public class MediaItemRendition implements Serializable {
      *         is a document, otherwise {@code false}
      */
     public boolean isDocument() {
-        System.out.println(getContentType());
-        if (getContentType().startsWith("text")) {
-            return true;
-        }
+        try {
+            if (getContentType().startsWith("text")) {
+                return true;
+            }
 
-        if (getContentType().startsWith("application/xhtml")) {
-            return true;
-        }
+            if (getContentType().startsWith("application/xhtml")) {
+                return true;
+            }
 
-        if (getContentType().startsWith("application/pdf")) {
-            return true;
-        }
+            if (getContentType().startsWith("application/pdf")) {
+                return true;
+            }
 
-        if (getContentType().startsWith("application/msword")) {
-            return true;
-        }
+            if (getContentType().startsWith("application/msword")) {
+                return true;
+            }
 
-        if (getContentType().startsWith("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
-            return true;
+            if (getContentType().startsWith("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+                return true;
+            }
+        } catch (Exception ex) {
+            return false;
         }
 
         return false;

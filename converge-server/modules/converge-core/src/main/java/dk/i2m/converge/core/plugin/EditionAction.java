@@ -16,6 +16,8 @@
  */
 package dk.i2m.converge.core.plugin;
 
+import dk.i2m.converge.core.content.NewsItem;
+import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.OutletEditionAction;
 import java.util.Map;
@@ -30,14 +32,51 @@ public interface EditionAction extends Plugin {
     /**
      * Executes the {@link EditionAction}.
      *
-     * @param ctx
-     *           Context for which the plug-in is being executed
-     * @param edition
-     *          {@link Edition} being processed
-     * @param action
-     *          {@link OutletEditionAction} to be executed
+     * @param ctx     Context for which the plug-in is being executed
+     * @param edition {@link Edition} being processed
+     * @param action  {@link OutletEditionAction} to be executed
      */
-    public abstract void execute(PluginContext ctx, Edition edition, OutletEditionAction action);
+    public abstract void execute(PluginContext ctx, Edition edition,
+            OutletEditionAction action);
+
+    /**
+     * Executes the {@link EditionAction} on a single {@link NewsItemPlacement}.
+     *
+     * @param ctx       Context for which the plug-in is being executed
+     * @param placement {@link NewsItemPlacement} being processed
+     * @param edition   {@link Edition} of the {@link NewsItem} being processed
+     * @param action    {@link OutletEditionAction} to be executed
+     */
+    public abstract void executePlacement(PluginContext ctx,
+            NewsItemPlacement placement,
+            Edition edition, OutletEditionAction action);
+
+    /**
+     * Determines if the {@link EditionAction} supports execution on
+     * {@link Edition}s. If this method returns {@code false},
+     * {@link EditionAction#execute(dk.i2m.converge.core.plugin.PluginContext,
+     * dk.i2m.converge.core.workflow.Edition,
+     * dk.i2m.converge.core.workflow.OutletEditionAction) } should return
+     * {@link UnsupportedOperationException}.
+     *
+     * @return {@code true} if the {@link EditionAction} supports execution on
+     *         {@link Edition}s, otherwise {@code false}
+     */
+    public boolean isSupportEditionExecute();
+
+    /**
+     * Determines if the {@link EditionAction} supports execution on
+     * {@link NewsItemPlacement}s. If this method returns {@code false},
+     * {@link EditionAction#executePlacement(dk.i2m.converge.core.plugin.PluginContext,
+     * dk.i2m.converge.core.content.NewsItem,
+     * dk.i2m.converge.core.workflow.Edition,
+     * dk.i2m.converge.core.workflow.OutletEditionAction) } should return
+     * {@link UnsupportedOperationException}.
+     *
+     * @return {@code true} if the {@link EditionAction} supports execution on
+     *         {@link Edition}s, otherwise {@code false}
+     */
+    public boolean isSupportPlacementExecute();
 
     /**
      * Provides a map of possible properties for the action.
@@ -45,5 +84,4 @@ public interface EditionAction extends Plugin {
      * @return Map of possible action properties
      */
     public abstract Map<String, String> getAvailableProperties();
-    
 }

@@ -17,6 +17,7 @@
 package dk.i2m.converge.ejb.services;
 
 import dk.i2m.converge.core.plugin.PluginContext;
+import dk.i2m.converge.core.security.UserAccount;
 import javax.ejb.Local;
 
 /**
@@ -27,4 +28,5 @@ import javax.ejb.Local;
 @Local
 public interface PluginContextBeanLocal extends PluginContext {
 
+    void setCurrentUserAccount(UserAccount userAccount);
 }

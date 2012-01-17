@@ -22,6 +22,7 @@ import dk.i2m.converge.domain.search.SearchResult;
 import dk.i2m.converge.domain.search.SearchResults;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
+import dk.i2m.converge.ejb.messaging.NewswireDecoderMessageBean;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.DateFormat;
@@ -32,9 +33,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
-import javax.ejb.EJB;
-import javax.ejb.SessionContext;
-import javax.ejb.Stateless;
+import javax.ejb.*;
 import javax.jms.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -57,9 +56,11 @@ import org.apache.solr.common.SolrInputDocument;
 @Stateless
 public class NewswireServiceBean implements NewswireServiceLocal {
 
-    private static final Logger LOG = Logger.getLogger(NewswireServiceBean.class.getName());
+    private static final Logger LOG =
+            Logger.getLogger(NewswireServiceBean.class.getName());
 
-    private ResourceBundle msgs = ResourceBundle.getBundle("dk.i2m.converge.i18n.Messages");
+    private ResourceBundle msgs = ResourceBundle.getBundle(
+            "dk.i2m.converge.i18n.Messages");
 
     @EJB private ConfigurationServiceLocal cfgService;
 
@@ -127,14 +128,15 @@ public class NewswireServiceBean implements NewswireServiceLocal {
 
     /**
      * Gets all the {@ink NewswireBasket}s of a particular user.
-     * 
+     *
      * @param userId
-     *          Unique identifier of the user
+* Unique identifier of the user
      * @return {@link List} of {@link NewswireAlert}s of the particular user
      */
     @Override
     public List<NewswireBasket> findBasketsByUser(Long userId) {
-        Map<String, Object> params = QueryBuilder.with("uid", userId).parameters();
+        Map<String, Object> params =
+                QueryBuilder.with("uid", userId).parameters();
         return daoService.findWithNamedQuery(NewswireBasket.FIND_BY_USER, params);
     }
 
@@ -142,9 +144,12 @@ public class NewswireServiceBean implements NewswireServiceLocal {
     @Override
     public List<NewswireItem> getNews() {
         try {
-            UserAccount user = userFacade.findById(ctx.getCallerPrincipal().getName());
-            Map<String, Object> params = QueryBuilder.with("user", user).parameters();
-            return daoService.findWithNamedQuery(NewswireItem.FIND_BY_USER, params);
+            UserAccount user = userFacade.findById(ctx.getCallerPrincipal().
+                    getName());
+            Map<String, Object> params = QueryBuilder.with("user", user).
+                    parameters();
+            return daoService.findWithNamedQuery(NewswireItem.FIND_BY_USER,
+                    params);
         } catch (DataNotFoundException ex) {
             return Collections.EMPTY_LIST;
         }
@@ -154,9 +159,12 @@ public class NewswireServiceBean implements NewswireServiceLocal {
     @Override
     public List<NewswireItem> getNews(Long newswireServiceId) {
         try {
-            NewswireService service = daoService.findById(NewswireService.class, newswireServiceId);
-            Map<String, Object> params = QueryBuilder.with("newswireService", service).parameters();
-            return daoService.findWithNamedQuery(NewswireItem.FIND_BY_SERVICE, params);
+            NewswireService service = daoService.findById(NewswireService.class,
+                    newswireServiceId);
+            Map<String, Object> params = QueryBuilder.with("newswireService",
+                    service).parameters();
+            return daoService.findWithNamedQuery(NewswireItem.FIND_BY_SERVICE,
+                    params);
         } catch (DataNotFoundException ex) {
             return Collections.EMPTY_LIST;
         }
@@ -171,8 +179,10 @@ public class NewswireServiceBean implements NewswireServiceLocal {
     /** {@inheritDoc} */
     @Override
     public List<NewswireService> findActiveNewswireServices() {
-        Map<String, Object> params = QueryBuilder.with("active", true).parameters();
-        return daoService.findWithNamedQuery(NewswireService.FIND_BY_STATUS, params);
+        Map<String, Object> params = QueryBuilder.with("active", true).
+                parameters();
+        return daoService.findWithNamedQuery(NewswireService.FIND_BY_STATUS,
+                params);
     }
 
     /** {@inheritDoc} */
@@ -182,8 +192,12 @@ public class NewswireServiceBean implements NewswireServiceLocal {
 
         for (NewswireService service : services) {
             try {
-                Long subscribers = daoService.findObjectWithNamedQuery(Long.class, NewswireService.COUNT_SUBSCRIBERS, QueryBuilder.with("id", service.getId()).parameters());
-                Long items = daoService.findObjectWithNamedQuery(Long.class, NewswireService.COUNT_ITEMS, QueryBuilder.with("id", service.getId()).parameters());
+                Long subscribers = daoService.findObjectWithNamedQuery(
+                        Long.class, NewswireService.COUNT_SUBSCRIBERS,
+                        QueryBuilder.with("id", service.getId()).parameters());
+                Long items = daoService.findObjectWithNamedQuery(Long.class,
+                        NewswireService.COUNT_ITEMS, QueryBuilder.with("id",
+                        service.getId()).parameters());
                 service.setNumberOfSubscribers(subscribers);
                 service.setNumberOfItems(items);
 
@@ -215,75 +229,88 @@ public class NewswireServiceBean implements NewswireServiceLocal {
 
     /** {@inheritDoc} */
     @Override
-    public void delete(NewswireService newsFeed) {
-        daoService.delete(NewswireService.class, newsFeed.getId());
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void delete(Long id) throws DataNotFoundException {
+        // Remove log entries by the newswire service
+        systemFacade.removeLogEntries(NewswireService.class.getName(), "" + id);
+        // Remove items of the newswire service
+        emptyNewswireService(id);
+        // Delete the newswire service
         daoService.delete(NewswireService.class, id);
     }
-
-    @Override
-    public void downloadNewswireServicesSync() {
-        SolrServer solrServer = getSolrServer();
-
-        Map<String, Object> parameters = QueryBuilder.with("active", true).parameters();
-        List<NewswireService> services = daoService.findWithNamedQuery(NewswireService.FIND_BY_STATUS, parameters);
-
-        for (NewswireService service : services) {
-            fetchNewswire(service.getId(), solrServer);
-        }
-    }
+    
+//    @Override
+//    public void downloadNewswireServicesSync() {
+//        SolrServer solrServer = getSolrServer();
+//
+//        Map<String, Object> params =
+//                QueryBuilder.with("active", true).parameters();
+//        List<NewswireService> services =
+//                daoService.findWithNamedQuery(NewswireService.FIND_BY_STATUS,
+//                params);
+//
+//        for (NewswireService service : services) {
+//            if (!service.isProcessing()) {
+//                fetchNewswire(service.getId(), solrServer);
+//            }
+//        }
+//    }
 
     @Override
     public void purgeNewswires() {
         SolrServer solrServer = getSolrServer();
 
-        List<NewswireService> services = daoService.findAll(NewswireService.class);
+        List<NewswireService> services = daoService.findAll(
+                NewswireService.class);
 
         for (NewswireService service : services) {
             deleteExpiredItems(service.getId(), solrServer);
         }
     }
-    
+
     /**
      * Indexes a {@link NewswireItem} in the database.
-     * 
-     * @param item
-     *          {@link NewswireItem} to index.
-     * @throws SearchEngineIndexingException 
-     *          If the item could not be indexed
+     *
+     * @param item {@link NewswireItem} to index.
+     * @throws SearchEngineIndexingException * If the item could not be indexed
      */
     @Override
     public void index(NewswireItem item) throws SearchEngineIndexingException {
         SolrServer solrServer = getSolrServer();
         index(item, solrServer);
     }
-    
 
-    private void deleteExpiredItems(Long newswireServiceId, SolrServer solrServer) {
+    private void deleteExpiredItems(Long newswireServiceId,
+            SolrServer solrServer) {
         Long taskId = 0L;
         try {
-            NewswireService service = daoService.findById(NewswireService.class, newswireServiceId);
+            NewswireService service = daoService.findById(NewswireService.class,
+                    newswireServiceId);
             if (service.getDaysToKeep().intValue() < 1) {
                 // Ignore
                 return;
             }
 
-            taskId = systemFacade.createBackgroundTask("Expiring items from newswire service " + service.getSource());
+            taskId = systemFacade.createBackgroundTask("Expiring items from newswire service "
+                    + service.getSource());
             try {
-                solrServer.deleteByQuery("provider-id:" + newswireServiceId + " AND date:[* TO NOW-" + service.getDaysToKeep() + "DAY/DAY]");
+                solrServer.deleteByQuery("provider-id:" + newswireServiceId
+                        + " AND date:[* TO NOW-" + service.getDaysToKeep()
+                        + "DAY/DAY]");
                 Calendar expirationDate = Calendar.getInstance();
-                expirationDate.add(Calendar.DAY_OF_MONTH, -service.getDaysToKeep());
-                QueryBuilder qb = QueryBuilder.with("id", newswireServiceId).and("expirationDate", expirationDate);
+                expirationDate.add(Calendar.DAY_OF_MONTH,
+                        -service.getDaysToKeep());
+                QueryBuilder qb = QueryBuilder.with("id", newswireServiceId).and(
+                        "expirationDate", expirationDate);
                 daoService.executeQuery(NewswireService.DELETE_EXPIRED_ITEMS, qb);
 
             } catch (SolrServerException ex) {
-                LOG.log(Level.SEVERE, "Could not remove expired newswire items from index. {0} ", new Object[]{ex.getMessage()});
+                LOG.log(Level.SEVERE,
+                        "Could not remove expired newswire items from index. {0} ",
+                        new Object[]{ex.getMessage()});
             } catch (IOException ex) {
-                LOG.log(Level.SEVERE, "Could not remove expired newswire items from index. {0} ", new Object[]{ex.getMessage()});
+                LOG.log(Level.SEVERE,
+                        "Could not remove expired newswire items from index. {0} ",
+                        new Object[]{ex.getMessage()});
             }
 
         } catch (DataNotFoundException ex) {
@@ -296,25 +323,19 @@ public class NewswireServiceBean implements NewswireServiceLocal {
     private void fetchNewswire(Long newswireServiceId, SolrServer solrServer) {
         Long taskId = 0L;
         try {
-            NewswireService service = daoService.findById(NewswireService.class, newswireServiceId);
-            taskId = systemFacade.createBackgroundTask("Downloading newswire service " + service.getSource());
+            NewswireService service = daoService.findById(NewswireService.class,
+                    newswireServiceId);
+
+            startProcessingNewswireService(newswireServiceId);
+
+            taskId = systemFacade.createBackgroundTask("Downloading newswire service "
+                    + service.getSource());
             NewswireDecoder decoder = service.getDecoder();
-
-
-        
             decoder.decode(pluginContext, service);
-            
-
-//            for (NewswireItem newswireItem : items) {
-//                try {
-//                    index(newswireItem, solrServer);
-//                } catch (SearchEngineIndexingException seie) {
-//                    LOG.log(Level.SEVERE, "Could not index newswire item. " + seie.getMessage(), seie);
-//                }
-//            }
 
             service.setLastFetch(Calendar.getInstance());
             daoService.update(service);
+            stopProcessingNewswireService(newswireServiceId);
 
         } catch (DataNotFoundException ex) {
             LOG.log(Level.WARNING, ex.getMessage());
@@ -325,24 +346,31 @@ public class NewswireServiceBean implements NewswireServiceLocal {
         }
     }
 
-    private void index(NewswireItem ni, SolrServer solrServer) throws SearchEngineIndexingException {
+    private void index(NewswireItem ni, SolrServer solrServer) throws
+            SearchEngineIndexingException {
         SolrInputDocument solrDoc = new SolrInputDocument();
-        solrDoc.addField("id", ni.getId(), 1.0f);
-        solrDoc.addField("headline", ni.getTitle(), 1.0f);
-        solrDoc.addField("provider", ni.getNewswireService().getSource());
-        solrDoc.addField("provider-id", ni.getNewswireService().getId());
-        solrDoc.addField("story", dk.i2m.converge.core.utils.StringUtils.stripHtml(ni.getContent()));
-        solrDoc.addField("caption", ni.getSummary());
-        solrDoc.addField("author", ni.getAuthor());
-        solrDoc.addField("date", ni.getDate().getTime());
-        if (ni.isThumbnailAvailable()) {
-            solrDoc.addField("thumb-url", ni.getThumbnailUrl());
+        try {
+            solrDoc.addField("id", ni.getId(), 1.0f);
+            solrDoc.addField("headline", ni.getTitle(), 1.0f);
+            solrDoc.addField("provider", ni.getNewswireService().getSource());
+            solrDoc.addField("provider-id", ni.getNewswireService().getId());
+            solrDoc.addField("story", dk.i2m.converge.core.utils.StringUtils.
+                    stripHtml(ni.getContent()));
+            solrDoc.addField("caption", ni.getSummary());
+            solrDoc.addField("author", ni.getAuthor());
+            solrDoc.addField("date", ni.getDate().getTime());
+            if (ni.isThumbnailAvailable()) {
+                solrDoc.addField("thumb-url", ni.getThumbnailUrl());
+            }
+
+            for (ContentTag tag : ni.getTags()) {
+                solrDoc.addField("tag", tag.getTag().toLowerCase());
+            }
+        } catch (NullPointerException ex) {
+            throw new SearchEngineIndexingException(
+                    "A value was missing from the content to be indexed. ", ex);
         }
 
-        for (ContentTag tag : ni.getTags()) {
-            solrDoc.addField("tag", tag.getTag().toLowerCase());
-        }
-        
         try {
             solrServer.add(solrDoc);
         } catch (SolrServerException ex) {
@@ -357,25 +385,12 @@ public class NewswireServiceBean implements NewswireServiceLocal {
      */
     @Override
     public void downloadNewswireServices() {
-        Connection connection = null;
-        try {
-            connection = jmsConnectionFactory.createConnection();
-            Session session = connection.createSession(true, Session.AUTO_ACKNOWLEDGE);
-
-            MessageProducer producer = session.createProducer(destination);
-
-            MapMessage message = session.createMapMessage();
-            producer.send(message);
-            session.close();
-            connection.close();
-        } catch (JMSException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (Exception e) {
-                }
+        List<NewswireService> services = findActiveNewswireServices();
+        for (NewswireService service : services) {
+            try {
+                downloadNewswireService(service.getId());
+            } catch (DataNotFoundException ex) {
+                // Unknown newswire
             }
         }
     }
@@ -383,41 +398,56 @@ public class NewswireServiceBean implements NewswireServiceLocal {
     /**
      * Schedules the download of a single {@link NewswireService}.
      *
-     * @param newswireServiceId
-     *          Unique identifier of the {@link NewswireService}
+     * @param id Unique identifier of the {@link NewswireService}
+     * @throws DataNotFoundException If a {@link NewswireService} with the given id does not exist
      */
     @Override
-    public void downloadNewswireService(Long newswireServiceId) {
-        Connection connection = null;
+    public void downloadNewswireService(Long id) throws DataNotFoundException {
+
+        NewswireService service = findById(id);
+
+        if (service.isProcessing()) {
+            LOG.log(Level.INFO, "{0} is already being downloaded", service.
+                    getSource());
+            return;
+        } else {
+            startProcessingNewswireService(id);
+        }
+
+        Connection conn = null;
         try {
-            connection = jmsConnectionFactory.createConnection();
-            Session session = connection.createSession(true, Session.AUTO_ACKNOWLEDGE);
+            conn = jmsConnectionFactory.createConnection();
+            Session session = conn.createSession(true, Session.AUTO_ACKNOWLEDGE);
 
             MessageProducer producer = session.createProducer(destination);
 
-            MapMessage message = session.createMapMessage();
-            message.setLongProperty("newswireServiceId", newswireServiceId);
-            producer.send(message);
+            MapMessage msg = session.createMapMessage();
+            msg.setLongProperty(NewswireDecoderMessageBean.NEWSWIRE_SERVICE_ID,
+                    id);
+            producer.send(msg);
 
             session.close();
-            connection.close();
+            conn.close();
         } catch (JMSException ex) {
             LOG.log(Level.SEVERE, null, ex);
         } finally {
-            if (connection != null) {
+            if (conn != null) {
                 try {
-                    connection.close();
+                    conn.close();
                 } catch (Exception e) {
                 }
             }
         }
+        stopProcessingNewswireService(id);
     }
 
     @Override
-    public SearchResults search(String query, int start, int rows, String sortField, boolean sortOrder, String... filterQueries) {
+    public SearchResults search(String query, int start, int rows,
+            String sortField, boolean sortOrder, String... filterQueries) {
         long startTime = System.currentTimeMillis();
         SearchResults searchResults = new SearchResults();
-        final DateFormat ORIGINAL_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        final DateFormat ORIGINAL_FORMAT = new SimpleDateFormat(
+                "yyyy-MM-dd'T'HH:mm:ss'Z'");
         final DateFormat NEW_FORMAT = new SimpleDateFormat("MMMM yyyy");
 
         try {
@@ -440,7 +470,8 @@ public class NewswireServiceBean implements NewswireServiceLocal {
             solrQuery.setHighlight(true).setHighlightSnippets(1); //set other params as needed
             solrQuery.setParam("hl.fl", "headline,story,caption");
             solrQuery.setParam("hl.fragsize", "500");
-            solrQuery.setParam("hl.simple.pre", "<span class=\"searchHighlight\">");
+            solrQuery.setParam("hl.simple.pre",
+                    "<span class=\"searchHighlight\">");
             solrQuery.setParam("hl.simple.post", "</span>");
             solrQuery.setParam("facet.date", "date");
             solrQuery.setParam("facet.date.start", "NOW/YEAR-10YEAR");
@@ -459,7 +490,8 @@ public class NewswireServiceBean implements NewswireServiceLocal {
                 // Copy all fields to map for easy access
                 HashMap<String, Object> values = new HashMap<String, Object>();
 
-                for (Iterator<Map.Entry<String, Object>> i = d.iterator(); i.hasNext();) {
+                for (Iterator<Map.Entry<String, Object>> i = d.iterator(); i.
+                        hasNext();) {
                     Map.Entry<String, Object> e2 = i.next();
                     values.put(e2.getKey(), e2.getValue());
                 }
@@ -474,7 +506,8 @@ public class NewswireServiceBean implements NewswireServiceLocal {
                 StringBuilder title = new StringBuilder();
                 StringBuilder note = new StringBuilder();
 
-                Map<String, List<String>> highlighting = qr.getHighlighting().get(id);
+                Map<String, List<String>> highlighting = qr.getHighlighting().
+                        get(id);
 
                 boolean highlightingExist = highlighting != null;
 
@@ -483,11 +516,13 @@ public class NewswireServiceBean implements NewswireServiceLocal {
                         story.append(hl);
                     }
                 } else {
-                    story.append(StringUtils.abbreviate((String) values.get("caption"), 500));
+                    story.append(StringUtils.abbreviate((String) values.get(
+                            "caption"), 500));
                 }
 
                 if (highlightingExist && highlighting.get("headline") != null) {
-                    for (String hl : qr.getHighlighting().get(id).get("headline")) {
+                    for (String hl :
+                            qr.getHighlighting().get(id).get("headline")) {
                         title.append(hl);
                     }
                 } else {
@@ -501,12 +536,14 @@ public class NewswireServiceBean implements NewswireServiceLocal {
                         List<String> tags = (List<String>) values.get("tag");
                         hit.setTags(tags.toArray(new String[tags.size()]));
                     } else {
-                        LOG.warning("Unexpected (tag) value returned from search engine");
+                        LOG.warning(
+                                "Unexpected (tag) value returned from search engine");
                     }
                 }
 
                 note.append(values.get("provider"));
-                if (values.containsKey("author") && values.get("author") != null && !((String) values.get("author")).trim().isEmpty()) {
+                if (values.containsKey("author") && values.get("author") != null
+                        && !((String) values.get("author")).trim().isEmpty()) {
                     note.append(" - ").append(values.get("author"));
                 }
 
@@ -535,7 +572,8 @@ public class NewswireServiceBean implements NewswireServiceLocal {
                     } else if (values.get("date") instanceof List) {
                         hit.setDates((List<Date>) values.get("date"));
                     } else {
-                        LOG.warning("Unexpected (date) value returned from search engine");
+                        LOG.warning(
+                                "Unexpected (date) value returned from search engine");
                     }
                 }
 
@@ -549,11 +587,14 @@ public class NewswireServiceBean implements NewswireServiceLocal {
                 List<FacetField.Count> facetEntries = facet.getValues();
                 if (facetEntries != null) {
                     for (FacetField.Count fcount : facetEntries) {
-                        if (!searchResults.getFacets().containsKey(facet.getName())) {
-                            searchResults.getFacets().put(facet.getName(), new ArrayList<SearchFacet>());
+                        if (!searchResults.getFacets().containsKey(
+                                facet.getName())) {
+                            searchResults.getFacets().put(facet.getName(),
+                                    new ArrayList<SearchFacet>());
                         }
 
-                        SearchFacet sf = new SearchFacet(fcount.getName(), fcount.getAsFilterQuery(), fcount.getCount());
+                        SearchFacet sf = new SearchFacet(fcount.getName(),
+                                fcount.getAsFilterQuery(), fcount.getCount());
 
                         // Check if the filter query is already active
                         for (String fq : filterQueries) {
@@ -563,8 +604,10 @@ public class NewswireServiceBean implements NewswireServiceLocal {
                         }
 
                         // Ensure that the facet is not already there
-                        if (!searchResults.getFacets().get(facet.getName()).contains(sf)) {
-                            searchResults.getFacets().get(facet.getName()).add(sf);
+                        if (!searchResults.getFacets().get(facet.getName()).
+                                contains(sf)) {
+                            searchResults.getFacets().get(facet.getName()).add(
+                                    sf);
                         }
                     }
                 }
@@ -576,22 +619,27 @@ public class NewswireServiceBean implements NewswireServiceLocal {
                 if (facetEntries != null) {
                     for (FacetField.Count fcount : facetEntries) {
                         if (fcount.getCount() != 0) {
-                            if (!searchResults.getFacets().containsKey(facet.getName())) {
-                                searchResults.getFacets().put(facet.getName(), new ArrayList<SearchFacet>());
+                            if (!searchResults.getFacets().containsKey(facet.
+                                    getName())) {
+                                searchResults.getFacets().put(facet.getName(),
+                                        new ArrayList<SearchFacet>());
                             }
 
                             String facetLabel = "";
                             try {
-                                Date facetDate = ORIGINAL_FORMAT.parse(fcount.getName());
+                                Date facetDate = ORIGINAL_FORMAT.parse(fcount.
+                                        getName());
                                 facetLabel = NEW_FORMAT.format(facetDate);
                             } catch (ParseException ex) {
                                 LOG.log(Level.SEVERE, null, ex);
                                 facetLabel = fcount.getName();
                             }
 
-                            String realFilterQuery = "date:[" + fcount.getName() + " TO " + fcount.getName() + "+1MONTH]";
+                            String realFilterQuery = "date:[" + fcount.getName()
+                                    + " TO " + fcount.getName() + "+1MONTH]";
 
-                            SearchFacet sf = new SearchFacet(facetLabel, realFilterQuery, fcount.getCount());
+                            SearchFacet sf = new SearchFacet(facetLabel,
+                                    realFilterQuery, fcount.getCount());
 
                             // Check if the filter query is already active
                             for (String fq : filterQueries) {
@@ -601,8 +649,10 @@ public class NewswireServiceBean implements NewswireServiceLocal {
                             }
 
                             // Ensure that the facet is not already there
-                            if (!searchResults.getFacets().get(facet.getName()).contains(sf)) {
-                                searchResults.getFacets().get(facet.getName()).add(sf);
+                            if (!searchResults.getFacets().get(facet.getName()).
+                                    contains(sf)) {
+                                searchResults.getFacets().get(facet.getName()).
+                                        add(sf);
                             }
                         }
                     }
@@ -622,24 +672,32 @@ public class NewswireServiceBean implements NewswireServiceLocal {
         return searchResults;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Empties the items of a given {@link NewswireService}.
+     *
+     * @param id Unique identifier of the {@link NewswireService}
+     * @return Number of items deleted
+     */
     @Override
-    public int emptyNewswireService(Long newswireServiceId) {
+    public int emptyNewswireService(Long id) {
         int affectedRecords = 0;
         try {
-            NewswireService ns = daoService.findById(NewswireService.class, newswireServiceId);
+            NewswireService ns = daoService.findById(NewswireService.class, id);
             SolrServer solr = getSolrServer();
             for (NewswireItem item : ns.getItems()) {
                 try {
                     solr.deleteById(String.valueOf(item.getId()));
                 } catch (SolrServerException ex) {
-                    LOG.log(Level.SEVERE, "Could not remove newswire item from SolrServer", ex);
+                    LOG.log(Level.SEVERE,
+                            "Could not remove newswire item from SolrServer", ex);
                 } catch (IOException ex) {
-                    LOG.log(Level.SEVERE, "Could not remove newswire item from SolrServer", ex);
+                    LOG.log(Level.SEVERE,
+                            "Could not remove newswire item from SolrServer", ex);
                 }
             }
 
-            return daoService.executeQuery(NewswireItem.DELETE_BY_SERVICE, QueryBuilder.with("newswireService", ns));
+            return daoService.executeQuery(NewswireItem.DELETE_BY_SERVICE,
+                    QueryBuilder.with("newswireService", ns));
         } catch (DataNotFoundException ex) {
             return affectedRecords;
         }
@@ -648,8 +706,10 @@ public class NewswireServiceBean implements NewswireServiceLocal {
     /** {@inheritDoc} */
     @Override
     public List<NewswireItem> findByExternalId(String externalId) {
-        Map<String, Object> params = QueryBuilder.with("externalId", externalId).parameters();
-        return daoService.findWithNamedQuery(NewswireItem.FIND_BY_EXTERNAL_ID, params);
+        Map<String, Object> params = QueryBuilder.with("externalId", externalId).
+                parameters();
+        return daoService.findWithNamedQuery(NewswireItem.FIND_BY_EXTERNAL_ID,
+                params);
     }
 
     /** {@inheritDoc} */
@@ -669,24 +729,35 @@ public class NewswireServiceBean implements NewswireServiceLocal {
      *
      * @return Instance of the Apache Solr server
      * @throws IllegalStateException
-     *          If the search engine is not properly configured
+* If the search engine is not properly configured
      */
     private SolrServer getSolrServer() {
         try {
-            String url = cfgService.getString(ConfigurationKey.SEARCH_ENGINE_NEWSWIRE_URL);
-            Integer socketTimeout = cfgService.getInteger(ConfigurationKey.SEARCH_ENGINE_SOCKET_TIMEOUT);
-            Integer connectionTimeout = cfgService.getInteger(ConfigurationKey.SEARCH_ENGINE_CONNECTION_TIMEOUT);
-            Integer maxTotalConnectionsPerHost = cfgService.getInteger(ConfigurationKey.SEARCH_ENGINE_MAX_TOTAL_CONNECTIONS_PER_HOST);
-            Integer maxTotalConnections = cfgService.getInteger(ConfigurationKey.SEARCH_ENGINE_MAX_TOTAL_CONNECTIONS);
-            Integer maxRetries = cfgService.getInteger(ConfigurationKey.SEARCH_ENGINE_MAX_RETRIES);
-            Boolean followRedirects = cfgService.getBoolean(ConfigurationKey.SEARCH_ENGINE_FOLLOW_REDIRECTS);
-            Boolean allowCompression = cfgService.getBoolean(ConfigurationKey.SEARCH_ENGINE_ALLOW_COMPRESSION);
+            String url = cfgService.getString(
+                    ConfigurationKey.SEARCH_ENGINE_NEWSWIRE_URL);
+            Integer socketTimeout = cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_SOCKET_TIMEOUT);
+            Integer connectionTimeout = cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_CONNECTION_TIMEOUT);
+            Integer maxTotalConnectionsPerHost =
+                    cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_MAX_TOTAL_CONNECTIONS_PER_HOST);
+            Integer maxTotalConnections =
+                    cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_MAX_TOTAL_CONNECTIONS);
+            Integer maxRetries = cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_MAX_RETRIES);
+            Boolean followRedirects = cfgService.getBoolean(
+                    ConfigurationKey.SEARCH_ENGINE_FOLLOW_REDIRECTS);
+            Boolean allowCompression = cfgService.getBoolean(
+                    ConfigurationKey.SEARCH_ENGINE_ALLOW_COMPRESSION);
 
             CommonsHttpSolrServer solrServer = new CommonsHttpSolrServer(url);
             solrServer.setRequestWriter(new BinaryRequestWriter());
             solrServer.setSoTimeout(socketTimeout);
             solrServer.setConnectionTimeout(connectionTimeout);
-            solrServer.setDefaultMaxConnectionsPerHost(maxTotalConnectionsPerHost);
+            solrServer.setDefaultMaxConnectionsPerHost(
+                    maxTotalConnectionsPerHost);
             solrServer.setMaxTotalConnections(maxTotalConnections);
             solrServer.setFollowRedirects(followRedirects);
             solrServer.setAllowCompression(allowCompression);
@@ -694,20 +765,24 @@ public class NewswireServiceBean implements NewswireServiceLocal {
 
             return solrServer;
         } catch (MalformedURLException ex) {
-            LOG.log(Level.SEVERE, "Invalid search engine configuration. {0}", ex.getMessage());
+            LOG.log(Level.SEVERE, "Invalid search engine configuration. {0}",
+                    ex.getMessage());
             LOG.log(Level.FINE, "", ex);
-            throw new java.lang.IllegalStateException("Invalid search engine configuration", ex);
+            throw new java.lang.IllegalStateException(
+                    "Invalid search engine configuration", ex);
         }
     }
 
     @Override
-    public NewswireItem findNewswireItemById(Long id) throws DataNotFoundException {
+    public NewswireItem findNewswireItemById(Long id) throws
+            DataNotFoundException {
         return daoService.findById(NewswireItem.class, id);
     }
 
     @Override
     public List<NewswireService> findAvailableNewswireServices(Long id) {
-        List<NewswireService> servicesAvailable = new ArrayList<NewswireService>();
+        List<NewswireService> servicesAvailable =
+                new ArrayList<NewswireService>();
         try {
             UserAccount ua = daoService.findById(UserAccount.class, id);
             List<NewswireService> services = findActiveNewswireServices();
@@ -733,22 +808,35 @@ public class NewswireServiceBean implements NewswireServiceLocal {
     @Override
     public void dispatchBaskets() {
         Long taskId = 0L;
-        taskId = systemFacade.createBackgroundTask("Dispatching newswire baskets by e-mail");
-        SimpleDateFormat dateFormat = new SimpleDateFormat(msgs.getString("FORMAT_DATE_AND_TIME"));
+        taskId = systemFacade.createBackgroundTask(
+                "Dispatching newswire baskets by e-mail");
+        SimpleDateFormat dateFormat = new SimpleDateFormat(msgs.getString(
+                "FORMAT_DATE_AND_TIME"));
         final String NL = System.getProperty("line.separator");
-        final String SENDER = cfgService.getString(ConfigurationKey.NEWSWIRE_BASKET_MAIL);
-        final String HOME_URL = cfgService.getString(ConfigurationKey.CONVERGE_HOME_URL);
-        final String LBL_READ_MORE = msgs.getString("newswire_basket_mail_READ_MORE");
-        final String LBL_BASKET_SUMMARY = msgs.getString("newswire_basket_mail_BASKET_SUMMARY");
-        final String LBL_MATCHES = msgs.getString("newswire_basket_mail_MATCHES");
-        final String LBL_SEARCH_TERMS = msgs.getString("newswire_basket_mail_SEARCH_TERMS");
+        final String SENDER = cfgService.getString(
+                ConfigurationKey.NEWSWIRE_BASKET_MAIL);
+        final String HOME_URL = cfgService.getString(
+                ConfigurationKey.CONVERGE_HOME_URL);
+        final String LBL_READ_MORE = msgs.getString(
+                "newswire_basket_mail_READ_MORE");
+        final String LBL_BASKET_SUMMARY = msgs.getString(
+                "newswire_basket_mail_BASKET_SUMMARY");
+        final String LBL_MATCHES =
+                msgs.getString("newswire_basket_mail_MATCHES");
+        final String LBL_SEARCH_TERMS = msgs.getString(
+                "newswire_basket_mail_SEARCH_TERMS");
         final String LBL_TAGS = msgs.getString("newswire_basket_mail_TAGS");
-        final String LBL_SERVICES = msgs.getString("newswire_basket_mail_SERVICES");
-        final String LBL_SERVICES_ALL = msgs.getString("newswire_basket_mail_SERVICES_ALL");
-        final String LBL_BASKET_SUBJECT = msgs.getString("newswire_basket_mail_SUBJECT");
+        final String LBL_SERVICES = msgs.getString(
+                "newswire_basket_mail_SERVICES");
+        final String LBL_SERVICES_ALL = msgs.getString(
+                "newswire_basket_mail_SERVICES_ALL");
+        final String LBL_BASKET_SUBJECT = msgs.getString(
+                "newswire_basket_mail_SUBJECT");
 
         Calendar now = Calendar.getInstance();
-        List<NewswireBasket> baskets = daoService.findWithNamedQuery(NewswireBasket.FIND_BY_EMAIL_DISPATCH);
+        List<NewswireBasket> baskets =
+                daoService.findWithNamedQuery(
+                NewswireBasket.FIND_BY_EMAIL_DISPATCH);
         LOG.log(Level.FINE, "Preparing dispatch of {0} baskets", baskets.size());
 
         for (NewswireBasket basket : baskets) {
@@ -768,8 +856,10 @@ public class NewswireServiceBean implements NewswireServiceLocal {
             basket.setNextDelivery(next.getTime());
 
             StringBuilder query = new StringBuilder();
-            query.append("date:[NOW-").append(basket.getMailFrequency()).append("HOURS ").append(" TO NOW] && ").append(basket.getQuery());
-            SearchResults searchResults = search(query.toString(), 0, 1000, "score", false, new String[]{});
+            query.append("date:[NOW-").append(basket.getMailFrequency()).append(
+                    "HOURS ").append(" TO NOW] && ").append(basket.getQuery());
+            SearchResults searchResults = search(query.toString(), 0, 1000,
+                    "score", false, new String[]{});
 
             if (searchResults.getHits().size() > 0) {
                 dateFormat.setTimeZone(basket.getOwner().getTimeZone());
@@ -777,47 +867,75 @@ public class NewswireServiceBean implements NewswireServiceLocal {
                 StringBuilder htmlContent = new StringBuilder();
                 StringBuilder plainContent = new StringBuilder();
 
-                htmlContent.append("<html><head><title>").append(basket.getTitle()).append("</title>").append("</head><body>");
+                htmlContent.append("<html><head><title>").append(
+                        basket.getTitle()).append("</title>").append(
+                        "</head><body>");
 
-                htmlContent.append("<h1>").append(basket.getTitle()).append("</h1>");
-                plainContent.append(basket.getTitle().toUpperCase()).append(NL).append(NL);
+                htmlContent.append("<h1>").append(basket.getTitle()).append(
+                        "</h1>");
+                plainContent.append(basket.getTitle().toUpperCase()).append(NL).
+                        append(NL);
 
                 for (SearchResult sr : searchResults.getHits()) {
-                    String link = compileMsg(sr.getLink(), new Object[]{HOME_URL}, basket.getOwner().getPreferredLocale());
+                    String link = compileMsg(sr.getLink(),
+                            new Object[]{HOME_URL}, basket.getOwner().
+                            getPreferredLocale());
 
-                    htmlContent.append("<h2 style=\"margin-bottom: 0px; padding-top: 10px;\">").append(sr.getTitle()).append("</h2>");
+                    htmlContent.append(
+                            "<h2 style=\"margin-bottom: 0px; padding-top: 10px;\">").
+                            append(sr.getTitle()).append("</h2>");
                     htmlContent.append("<p style=\"margin-top: 0px;\">");
-                    htmlContent.append(" <span style=\"font-size: 0.9em; color: #0E774A; font-weight: bold; text-transform: uppercase;\">").append(sr.getNote()).append("</span>");
-                    htmlContent.append(" <span style=\"font-size: 0.9em; color: #4272DB; text-transform:  uppercase;\">&#160;").append(dateFormat.format(sr.getLatestDate())).append("</span>");
+                    htmlContent.append(
+                            " <span style=\"font-size: 0.9em; color: #0E774A; font-weight: bold; text-transform: uppercase;\">").
+                            append(sr.getNote()).append("</span>");
+                    htmlContent.append(
+                            " <span style=\"font-size: 0.9em; color: #4272DB; text-transform:  uppercase;\">&#160;").
+                            append(dateFormat.format(sr.getLatestDate())).append(
+                            "</span>");
                     htmlContent.append("</p>");
                     htmlContent.append("<p style=\"margin-top: 0px;\">");
                     if (sr.isPreview()) {
-                        htmlContent.append("<a href=\"").append(link).append("\"><img src=\"").append(sr.getPreviewLink()).append("\" style=\"border: 1px solid black; margin-right: 5px; margin-top: 5px;\" align=\"left\" alt=\"\" title=\"\" /></a>");
+                        htmlContent.append("<a href=\"").append(link).append(
+                                "\"><img src=\"").append(sr.getPreviewLink()).
+                                append(
+                                "\" style=\"border: 1px solid black; margin-right: 5px; margin-top: 5px;\" align=\"left\" alt=\"\" title=\"\" /></a>");
                     }
 
                     htmlContent.append(sr.getDescription()).append("</p>");
-                    htmlContent.append("<p><a href=\"").append(link).append("\">").append(LBL_READ_MORE).append("</a></p><div style=\"clear: both;\" />");
+                    htmlContent.append("<p><a href=\"").append(link).append(
+                            "\">").append(LBL_READ_MORE).append(
+                            "</a></p><div style=\"clear: both;\" />");
 
                     plainContent.append(sr.getTitle().toUpperCase()).append(NL);
-                    plainContent.append(sr.getNote().toUpperCase()).append(" ").append(sr.getLatestDate()).append(NL);
-                    plainContent.append(dk.i2m.converge.core.utils.StringUtils.stripHtml(sr.getDescription()).trim()).append(NL).append(NL);
-                    plainContent.append(LBL_READ_MORE).append(" ").append(link).append(NL).append("===").append(NL);
+                    plainContent.append(sr.getNote().toUpperCase()).append(" ").
+                            append(sr.getLatestDate()).append(NL);
+                    plainContent.append(dk.i2m.converge.core.utils.StringUtils.
+                            stripHtml(sr.getDescription()).trim()).append(NL).
+                            append(NL);
+                    plainContent.append(LBL_READ_MORE).append(" ").append(link).
+                            append(NL).append("===").append(NL);
                 }
 
-                htmlContent.append("<hr/><h3>").append(LBL_BASKET_SUMMARY).append("</h3>");
+                htmlContent.append("<hr/><h3>").append(LBL_BASKET_SUMMARY).
+                        append("</h3>");
                 plainContent.append(LBL_BASKET_SUMMARY.toUpperCase()).append(NL);
 
-                htmlContent.append("<p>").append(LBL_MATCHES).append(searchResults.getNumberOfResults()).append("</p>");
-                plainContent.append(LBL_MATCHES).append(searchResults.getNumberOfResults()).append(NL);
+                htmlContent.append("<p>").append(LBL_MATCHES).append(searchResults.
+                        getNumberOfResults()).append("</p>");
+                plainContent.append(LBL_MATCHES).append(searchResults.
+                        getNumberOfResults()).append(NL);
 
-                htmlContent.append("<p>").append(LBL_SEARCH_TERMS).append(basket.getSearchTerm()).append("</p>");
-                plainContent.append(LBL_SEARCH_TERMS).append(searchResults.getNumberOfResults()).append(NL);
+                htmlContent.append("<p>").append(LBL_SEARCH_TERMS).append(basket.
+                        getSearchTerm()).append("</p>");
+                plainContent.append(LBL_SEARCH_TERMS).append(searchResults.
+                        getNumberOfResults()).append(NL);
 
                 if (!basket.getTags().isEmpty()) {
                     htmlContent.append("<p>").append(LBL_TAGS).append("<ul>");
                     plainContent.append(LBL_TAGS).append(NL);
                     for (ContentTag tag : basket.getTags()) {
-                        htmlContent.append("<li>").append(tag.getTag()).append("</li>");
+                        htmlContent.append("<li>").append(tag.getTag()).append(
+                                "</li>");
                         plainContent.append("* ").append(tag.getTag()).append(NL);
                     }
                     htmlContent.append("</ul></p>");
@@ -828,12 +946,15 @@ public class NewswireServiceBean implements NewswireServiceLocal {
                 plainContent.append(LBL_SERVICES).append(NL);
 
                 if (basket.getAppliesTo().isEmpty()) {
-                    htmlContent.append("<li>").append(LBL_SERVICES_ALL).append("</li>");
+                    htmlContent.append("<li>").append(LBL_SERVICES_ALL).append(
+                            "</li>");
                     plainContent.append("* ").append(LBL_SERVICES_ALL);
                 } else {
                     for (NewswireService service : basket.getAppliesTo()) {
-                        htmlContent.append("<li>").append(service.getSource()).append("</li>");
-                        plainContent.append("* ").append(service.getSource()).append(NL);
+                        htmlContent.append("<li>").append(service.getSource()).
+                                append("</li>");
+                        plainContent.append("* ").append(service.getSource()).
+                                append(NL);
                     }
                 }
 
@@ -843,18 +964,25 @@ public class NewswireServiceBean implements NewswireServiceLocal {
                 htmlContent.append("</body></html>");
 
                 // Generate subject
-                String subject = compileMsg(LBL_BASKET_SUBJECT, new Object[]{searchResults.getHits().size(), basket.getTitle()}, basket.getOwner().getPreferredLocale());
+                String subject = compileMsg(LBL_BASKET_SUBJECT,
+                        new Object[]{searchResults.getHits().size(), basket.
+                            getTitle()}, basket.getOwner().getPreferredLocale());
 
                 // Dispatch mail
-                notificationService.dispatchMail(basket.getOwner().getEmail(), SENDER, subject, htmlContent.toString(), plainContent.toString());
+                notificationService.dispatchMail(basket.getOwner().getEmail(),
+                        SENDER, subject, htmlContent.toString(), plainContent.
+                        toString());
             } else {
-                LOG.log(Level.FINEST, "No hits in basket [{0}] for [{1}]", new Object[]{basket.getTitle(), basket.getOwner().getFullName()});
+                LOG.log(Level.FINEST, "No hits in basket [{0}] for [{1}]",
+                        new Object[]{basket.getTitle(), basket.getOwner().
+                            getFullName()});
             }
         }
         systemFacade.removeBackgroundTask(taskId);
     }
 
-    private String compileMsg(String pattern, Object[] arguments, Locale userLocale) {
+    private String compileMsg(String pattern, Object[] arguments,
+            Locale userLocale) {
         MessageFormat fmt = new MessageFormat(pattern);
         if (userLocale != null) {
             fmt.setLocale(userLocale);
@@ -863,15 +991,15 @@ public class NewswireServiceBean implements NewswireServiceLocal {
     }
 
     @Override
-    public NewswireItemAttachment findNewswireItemAttachmentById(Long id) throws DataNotFoundException {
+    public NewswireItemAttachment findNewswireItemAttachmentById(Long id) throws
+            DataNotFoundException {
         return daoService.findById(NewswireItemAttachment.class, id);
     }
 
     /**
      * Removes a given item from the newswire service and the search engine.
-     * 
-     * @param id 
-     *          Unique identifier of the newswire item
+     *
+     * @param id * Unique identifier of the newswire item
      */
     @Override
     public void removeItem(Long id) {
@@ -880,10 +1008,37 @@ public class NewswireServiceBean implements NewswireServiceLocal {
         try {
             solr.deleteById(String.valueOf(id));
         } catch (SolrServerException ex) {
-            LOG.log(Level.SEVERE, "Could not remove newswire item from SolrServer", ex);
+            LOG.log(Level.SEVERE,
+                    "Could not remove newswire item from SolrServer", ex);
         } catch (IOException ex) {
-            LOG.log(Level.SEVERE, "Could not remove newswire item from SolrServer", ex);
+            LOG.log(Level.SEVERE,
+                    "Could not remove newswire item from SolrServer", ex);
         }
+    }
 
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    @Override
+    public void startProcessingNewswireService(Long id) {
+        try {
+            NewswireService service = daoService.findById(NewswireService.class,
+                    id);
+            service.setProcessing(true);
+            daoService.update(service);
+        } catch (DataNotFoundException ex) {
+            LOG.log(Level.WARNING, ex.getMessage());
+        }
+    }
+
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    @Override
+    public void stopProcessingNewswireService(Long id) {
+        try {
+            NewswireService service = daoService.findById(NewswireService.class,
+                    id);
+            service.setProcessing(false);
+            daoService.update(service);
+        } catch (DataNotFoundException ex) {
+            LOG.log(Level.WARNING, ex.getMessage());
+        }
     }
 }

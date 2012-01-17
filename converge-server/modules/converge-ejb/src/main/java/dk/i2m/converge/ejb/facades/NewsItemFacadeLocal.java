@@ -346,4 +346,6 @@ public interface NewsItemFacadeLocal {
     java.util.List<dk.i2m.converge.core.views.InboxView> findOutletBox(java.lang.String username, dk.i2m.converge.core.workflow.Outlet outlet, dk.i2m.converge.core.workflow.WorkflowState state);
 
     java.util.List<dk.i2m.converge.core.views.InboxView> findOutletBox(java.lang.String username, dk.i2m.converge.core.workflow.Outlet outlet, dk.i2m.converge.core.workflow.WorkflowState state, int start, int results);
+
+    NewsItemPlacement findNewsItemPlacementById(Long id) throws DataNotFoundException;
 }

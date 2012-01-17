@@ -208,6 +208,12 @@ public class NewsMLDecoder implements NewswireDecoder {
 
 
             File[] xmlFilesToProcess = newswireDirectory.listFiles(xmlFiles);
+            
+            if (xmlFilesToProcess == null) {
+                LOG.log(Level.WARNING, "Location does not exist: {0}", new Object[]{location});
+                return;
+            }
+            
             int pending = xmlFilesToProcess.length;
             LOG.log(Level.INFO, "Starting to process {0} files", pending);
 

@@ -16,42 +16,16 @@
  */
 package dk.i2m.converge.core.content;
 
-import dk.i2m.converge.core.security.UserRole;
-import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.calendar.Event;
-import dk.i2m.converge.core.workflow.WorkflowState;
-import dk.i2m.converge.core.workflow.WorkflowStateTransition;
-import dk.i2m.converge.core.workflow.Department;
-import dk.i2m.converge.core.workflow.Edition;
-import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.metadata.Concept;
+import dk.i2m.converge.core.security.UserAccount;
+import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.utils.BeanComparator;
 import dk.i2m.converge.core.utils.StringUtils;
+import dk.i2m.converge.core.workflow.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import java.util.*;
+import javax.persistence.*;
 import org.eclipse.persistence.annotations.PrivateOwned;
 
 /**
@@ -253,7 +227,7 @@ public class NewsItem implements Serializable {
 
     @OneToMany(mappedBy = "newsItem", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<NewsItemPlacement> placements = new ArrayList<NewsItemPlacement>();
-
+    
     /**
      * Creates a new instance of {@link NewsItem}.
      */

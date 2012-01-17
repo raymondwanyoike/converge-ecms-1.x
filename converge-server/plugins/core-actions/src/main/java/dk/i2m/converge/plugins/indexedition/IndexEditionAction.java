@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2011 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,15 +16,16 @@
  */
 package dk.i2m.converge.plugins.indexedition;
 
+import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.plugin.EditionAction;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.OutletEditionAction;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * {@link EditionAction} for indexing the news items of an {@link Edition}.
@@ -34,37 +35,52 @@ import java.util.logging.Logger;
 @dk.i2m.converge.core.annotations.OutletAction
 public class IndexEditionAction implements EditionAction {
 
-    private static final Logger LOG =
-            Logger.getLogger(IndexEditionAction.class.getName());
-
     private Map<String, String> availableProperties = null;
 
     private ResourceBundle bundle = ResourceBundle.getBundle(
             "dk.i2m.converge.plugins.indexedition.Messages");
 
-    private Calendar releaseDate = new GregorianCalendar(2010, Calendar.AUGUST,
-            2, 0, 40);
-
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void execute(PluginContext ctx, Edition edition,
             OutletEditionAction action) {
         for (NewsItemPlacement placement : edition.getPlacements()) {
-            LOG.log(Level.INFO, "Indexing #{0}", placement.getNewsItem().
-                    getId());
-            if (placement.getNewsItem().isEndState()) {
-                try {
-                    ctx.index(placement.getNewsItem());
-                } catch (SearchEngineIndexingException ex) {
-                    LOG.log(Level.SEVERE, null, ex);
-                }
-            } else {
-                LOG.log(Level.INFO,
-                        "#{0} is not at the end state. Indexing skipped for #{0}",
-                        placement.getNewsItem().getId());
-            }
+            executePlacement(ctx, placement, edition, action);
         }
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void executePlacement(PluginContext ctx, NewsItemPlacement placement,
+            Edition edition, OutletEditionAction action) {
+
+        NewsItem newsItem = placement.getNewsItem();
+
+        ctx.log(LogSeverity.INFO, bundle.getString(
+                "LOG_INDEXING_NEWS_ITEM_X"), new Object[]{newsItem.getId()},
+                newsItem, newsItem.getId());
+        if (newsItem.isEndState()) {
+            try {
+                ctx.index(newsItem);
+            } catch (SearchEngineIndexingException ex) {
+                ctx.log(LogSeverity.SEVERE, bundle.getString(
+                        "LOG_INDEXING_FAILED"), new Object[]{newsItem.getId(),
+                            ex.getMessage()}, newsItem, newsItem.getId());
+            }
+        } else {
+            ctx.log(LogSeverity.INFO, bundle.getString(
+                    "LOG_INDEXING_NEWS_ITEM_X_NOT_END_STATE"),
+                    new Object[]{newsItem.getId()}, newsItem, newsItem.getId());
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Map<String, String> getAvailableProperties() {
         if (availableProperties == null) {
@@ -73,33 +89,73 @@ public class IndexEditionAction implements EditionAction {
         return availableProperties;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String getName() {
         return bundle.getString("PLUGIN_NAME");
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String getAbout() {
         return bundle.getString("PLUGIN_ABOUT");
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String getDescription() {
         return bundle.getString("PLUGIN_DESCRIPTION");
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String getVendor() {
         return bundle.getString("PLUGIN_VENDOR");
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Date getDate() {
-        return releaseDate.getTime();
+        try {
+            final String pattern = "yyyy-MM-dd HH:mm:ss";
+            SimpleDateFormat format = new SimpleDateFormat(pattern);
+            return format.parse(bundle.getString("PLUGIN_BUILD_TIME"));
+        } catch (Exception ex) {
+            return Calendar.getInstance().getTime();
+        }
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public ResourceBundle getBundle() {
         return bundle;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public boolean isSupportEditionExecute() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public boolean isSupportPlacementExecute() {
+        return true;
     }
 }

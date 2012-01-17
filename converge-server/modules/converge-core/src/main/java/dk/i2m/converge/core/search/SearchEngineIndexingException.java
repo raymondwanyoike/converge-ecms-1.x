@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 alc
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,8 +17,9 @@
 package dk.i2m.converge.core.search;
 
 /**
+ * Exception thrown if the search engine failed to index content.
  *
- * @author alc
+ * @author Allan Lykke Christensen
  */
 public class SearchEngineIndexingException extends Exception {
 

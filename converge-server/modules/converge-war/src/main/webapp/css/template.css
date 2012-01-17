@@ -774,6 +774,7 @@ div.photoSeriesFrame div.imageCount {
 
 .columnStatus { width: 150px; }
 .subColumnIcon { width: 18px; }
+.columnIconHeader {width: 18px; }
 .columnIcon { background-color: #eceff4; width: 18px; }
 .columnThumbnail { width: 160px; text-align: center; }
 .columnId { width: 60px; }
@@ -787,6 +788,8 @@ div.photoSeriesFrame div.imageCount {
 .columnDateTime { width: 135px; }
 .columnOneButton { width: 60px; }
 .columnField { width: 300px; }
+.columnSeverity { width: 70px; }
+.columnUser { width: 135px;}
 
 .left {
     text-align: left;
@@ -1685,6 +1688,7 @@ div.black h2 {
 
 .pluginPropertiesList { width: 98%; height: 300px; overflow:auto; position: relative; display: block; border: 0px; padding: 8px; font-family:'Lucida Grande', helvetica, verdana, sans-serif, arial; font-size: 1em; background-color: transparent; }
 .scrollableDialogContent { width: 98%; height: 300px; overflow:auto; position: relative; display: block; border: 0px; padding: 8px; font-family:'Lucida Grande', helvetica, verdana, sans-serif, arial; font-size: 1em; background-color: transparent; }
+.actionList, .logEntryList { width: 98%; height: 300px; overflow:auto; position: relative; display: block; border: 0px; padding: 8px; font-family:'Lucida Grande', helvetica, verdana, sans-serif, arial; font-size: 1em; background-color: transparent; }
 
 .endState, .endState a { background: green; color: white; }
 .intermediateState, .intermediateState a { background: yellow; color: black; }
@@ -1760,3 +1764,10 @@ div.black h2 {
 /* TextMetrics Plug-in for TinyMCE */
 div.metrics {float:right !important;}
 div.metrics > span {margin-left:0.5em !important;}
+
+.logEntrySeveritySEVERE { background: #f7e7e7; color: black; }
+.logEntrySeverityWARNING { background: #f9f6e7; color: black; }
+.logEntrySeverityINFO { background: #e7eedb }
+.logEntrySeverityFINE { background: #efefef; color: #333333; }
+.logEntrySeverityFINER { background: #f1f1f1; color: #666666; }
+.logEntrySeverityFINEST {background: #efefef; color: #999999; }

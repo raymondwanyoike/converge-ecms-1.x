@@ -3,7 +3,7 @@
 
     <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
 
-        <ui:define name="title">#{msgs.OUTLETS}</ui:define>
+        <ui:define name="title">#{i18n.administrator_Outlets_PAGE_TITLE}</ui:define>
 
         <ui:define name="body">
 
@@ -16,7 +16,7 @@
             <h:form id="frmPage">
                 <a4j:status onstart="Richfaces.showModalPanel('mpLoading')" onstop="Richfaces.hideModalPanel('mpLoading')" />
 
-                <converge:moduleHeader moduleTitle="#{msgs.OUTLETS}" />
+                <converge:moduleHeader moduleTitle="#{i18n.administrator_Outlets_PAGE_TITLE}" />
                 <div class="moduleContent">
 
                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
@@ -106,6 +106,14 @@
                             <h:outputText value="#{msgs.OUTLET_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
+                                <rich:componentControl for="mpOutletDetails" operation="hide" event="onclick"/>
+                            </h:graphicImage>
+                        </h:panelGroup>
+                    </f:facet>
+                    
                     <h:panelGrid id="pgOutletDetails" style="width: 480px;">
 
                         <rich:tabPanel id="tpOutlet" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive" selectedTab="#{administrator_Outlets.selectedOutletTab}">
@@ -193,7 +201,7 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabEditionPatterns" label="#{msgs.outlet_EDITIONS}">
+                            <rich:tab id="tabEditionPatterns" label="#{msgs.outlet_EDITIONS}" disabled="#{administrator_Outlets.outletAddMode}">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
@@ -267,7 +275,7 @@
 
 
 
-                            <rich:tab id="tabEvents" label="#{msgs.outlet_ACTIONS}">
+                            <rich:tab id="tabEvents" label="#{msgs.outlet_ACTIONS}" disabled="#{administrator_Outlets.outletAddMode}">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
@@ -336,12 +344,12 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveOutlet" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Outlets.onSaveOutlet}" reRender="frmPage" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpOutletDetails')}.hide(); return false; }" />
-                            <a4j:commandLink id="lnkApplyOutlet" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{administrator_Outlets.onSaveOutlet}" reRender="pgOutletDetails, frmPage"  />
-                            <a4j:commandLink id="lnkDeleteOutlet" rendered="#{administrator_Outlets.outletEditMode}" onclick="if (confirm('#{msgs.OUTLET_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteOutlet}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="frmPage">
+                            <a4j:commandLink id="lnkSaveOutlet" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Outlets.onSaveOutlet}" reRender="frmPage" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpOutletDetails')}.hide(); return false; }" />
+                            <a4j:commandLink id="lnkApplyOutlet" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Outlets.onSaveOutlet}" reRender="pgOutletDetails, frmPage"  />
+                            <a4j:commandLink id="lnkDeleteOutlet" rendered="#{administrator_Outlets.outletEditMode}" onclick="if (confirm('#{msgs.OUTLET_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteOutlet}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="frmPage">
                                 <rich:componentControl for="mpOutletDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
-                            <h:commandLink id="lnkCloseOutletForm" styleClass="dialogButton" value="#{msgs.CLOSE}" onclick="#{rich:component('mpOutletDetails')}.hide(); return false;" />
+                            <h:commandLink id="lnkCloseOutletForm" styleClass="dialogButton" value="#{i18n.Generic_CLOSE}" onclick="#{rich:component('mpOutletDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 
@@ -353,6 +361,13 @@
                     <f:facet name="header">
                         <h:panelGroup>
                             <h:outputText value="#{msgs.DEPARTMENT_DETAILS}" />
+                        </h:panelGroup>
+                    </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
+                                <rich:componentControl for="mpOutletDepartmentDetails" operation="hide" event="onclick"/>
+                            </h:graphicImage>
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgOutletDepartmentDetails" style="width: 480px;">
@@ -443,6 +458,13 @@
                             <h:outputText value="#{msgs.outlets_SECTION_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
+                                <rich:componentControl for="mpSectionDetails" operation="hide" event="onclick"/>
+                            </h:graphicImage>
+                        </h:panelGroup>
+                    </f:facet>
                     <h:panelGrid id="pgSectionDetails" style="width: 480px;">
 
                         <rich:tabPanel id="tpSection" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
@@ -488,6 +510,13 @@
                     <f:facet name="header">
                         <h:panelGroup>
                             <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_DETAILS}" />
+                        </h:panelGroup>
+                    </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
+                                <rich:componentControl for="mpOutletEventDetails" operation="hide" event="onclick"/>
+                            </h:graphicImage>
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgOutletEventDetails">
@@ -588,6 +617,13 @@
                     <f:facet name="header">
                         <h:panelGroup>
                             <h:outputText value="#{msgs.outlet_EDITION_PATTERN_DETAILS}" />
+                        </h:panelGroup>
+                    </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
+                                <rich:componentControl for="mpEditionPatternDetails" operation="hide" event="onclick"/>
+                            </h:graphicImage>
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgEditionPatternDetails" style="width: 480px;">

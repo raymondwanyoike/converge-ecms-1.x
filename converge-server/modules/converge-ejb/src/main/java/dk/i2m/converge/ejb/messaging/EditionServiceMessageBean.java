@@ -16,15 +16,21 @@
  */
 package dk.i2m.converge.ejb.messaging;
 
+import dk.i2m.converge.core.logging.LogEntry;
+import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.plugin.EditionAction;
+import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.EditionActionException;
 import dk.i2m.converge.core.workflow.OutletEditionAction;
 import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
+import dk.i2m.converge.ejb.facades.UserFacadeLocal;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.PluginContextBeanLocal;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
@@ -36,16 +42,44 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 
 /**
- * Message driven bean responding to edition service actions.
+ * Message driven bean responding to edition service actions. The bean is
+ * capable of executing {@link OutletEditionAction}s for {@link Edition}s and
+ * {@link NewsItemPlacement}s. The bean expects the following properties:
+ * <ul>
+ * <li>editionId</li>
+ * <li>actionId</li>
+ * <li>newsItemPlacementId (If the bean is to execute the action on a single
+ * placement rather than a complete edition)</li>
+ * </ul>
+ *
  *
  * @author Allan Lykke Christensen
  */
 @MessageDriven(mappedName = "jms/editionServiceQueue")
 public class EditionServiceMessageBean implements MessageListener {
 
-    private static final Logger LOG = Logger.getLogger(EditionServiceMessageBean.class.getName());
+    public enum Property {
 
-    @Resource private MessageDrivenContext mdc;
+        /**
+         * Mandatory property containing the identifier of the {@link UserAccount}.
+         */
+        USER_ACCOUNT_ID,
+        /**
+         * Mandatory property containing the identifier of the {@link Edition}.
+         */
+        EDITION_ID,
+        /**
+         * Mandatory property containing the identifier of the {@link OutletEditionAction}.
+         */
+        ACTION_ID,
+        /**
+         * Optional property containing the identifier of the {@link NewsItemPlacement}.
+         */
+        NEWS_ITEM_PLACEMENT_ID
+    }
+
+    private static final Logger LOG =
+            Logger.getLogger(EditionServiceMessageBean.class.getName());
 
     @EJB private OutletFacadeLocal outletFacade;
 
@@ -55,25 +89,62 @@ public class EditionServiceMessageBean implements MessageListener {
 
     @EJB private SystemFacadeLocal systemFacade;
 
+    @EJB private UserFacadeLocal userFacade;
+
+    @Resource private MessageDrivenContext mdc;
+
     @Override
     public void onMessage(Message msg) {
         Long id = 0L;
         try {
-            Long editionId = msg.getLongProperty("editionId");
-            Long actionId = msg.getLongProperty("actionId");
+            boolean placementExecution = false;
+            Long newsItemPlacementId = 0L;
+            
+            Long editionId = msg.getLongProperty(Property.EDITION_ID.name());
+            Long actionId = msg.getLongProperty(Property.ACTION_ID.name());
+            String uid = msg.getStringProperty(Property.USER_ACCOUNT_ID.name());
 
             try {
-                OutletEditionAction action = daoService.findById(OutletEditionAction.class, actionId);
-                id = systemFacade.createBackgroundTask(action.getAction().getName() + " - " + action.getLabel());
+                newsItemPlacementId = msg.getLongProperty(Property.NEWS_ITEM_PLACEMENT_ID.name());
+                placementExecution = true;
+            } catch (NumberFormatException ex) {
+                placementExecution = false;
+            }
+
+            try {
+                UserAccount ua = userFacade.findById(uid);
+                pluginContext.setCurrentUserAccount(ua);
+            } catch (Exception ex) {
+                LOG.log(Level.WARNING, "User with ID ''{0}'' could not be set",
+                        new Object[]{uid});
+            }
+
+            try {
+                OutletEditionAction action =
+                        daoService.findById(OutletEditionAction.class, actionId);
+                id = systemFacade.createBackgroundTask(action.getAction().
+                        getName() + " - " + action.getLabel());
                 EditionAction editionAction = action.getAction();
                 Edition edition = outletFacade.findEditionById(editionId);
                 // Fetch Placements
                 edition.getPlacements();
-                editionAction.execute(pluginContext, edition, action);
+
+                if (placementExecution) {
+                    NewsItemPlacement placement =
+                            daoService.findById(NewsItemPlacement.class,
+                            newsItemPlacementId);
+                    editionAction.executePlacement(pluginContext, placement,
+                            edition, action);
+                } else {
+                    editionAction.execute(pluginContext, edition, action);
+                }
+
             } catch (DataNotFoundException ex) {
-                LOG.log(Level.WARNING, ex.getMessage());
+                pluginContext.log(LogSeverity.WARNING, ex.getMessage(),
+                        new OutletEditionAction(), actionId);
             } catch (EditionActionException ex) {
-                LOG.log(Level.SEVERE, null, ex);
+                pluginContext.log(LogSeverity.WARNING, ex.getMessage(),
+                        new OutletEditionAction(), actionId);
             }
 
         } catch (JMSException ex) {

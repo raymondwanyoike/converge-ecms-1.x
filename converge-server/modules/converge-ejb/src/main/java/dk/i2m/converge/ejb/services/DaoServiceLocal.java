@@ -60,8 +60,12 @@ public interface DaoServiceLocal {
      * @return {@link List} of all entities of the given type
      */
      <T> List<T> findAll(Class<T> type);
+     
+     <T> List<T> findAll(Class<T> type, String orderBy, boolean asc);
 
      <T> List<T> findAll(Class<T> type, int start, int resultLimit);
+     
+     <T> List<T> findAll(Class<T> type, int start, int resultLimit, String orderBy, boolean asc);
 
      <T> Number count(Class<T> type, String field);
 
