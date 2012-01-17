@@ -112,6 +112,7 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
     @Override
     public void executePlacement(PluginContext ctx, NewsItemPlacement placement,
             Edition edition, OutletEditionAction action) {
+        this.pluginContext = ctx;
         loadSettings(action);
         JoomlaConnection connection = createConnection();
 
@@ -133,8 +134,9 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
                     try {
                         newArticle(connection, placement);
                     } catch (JoomlaActionException ex) {
-                        LOG.log(Level.SEVERE, ex.getMessage());
-                        LOG.log(Level.FINE, "", ex);
+                        pluginContext.log(LogSeverity.SEVERE, bundle.getString("LOG_COULD_NOT_UPLOAD_X_BECAUSE_Y"),
+                                new Object[]{placement.getNewsItem().getId(), ex.getMessage()}, placement.getNewsItem(),
+                                placement.getNewsItem().getId());
                     }
                 } else {
                     pluginContext.log(LogSeverity.INFO, bundle.getString(

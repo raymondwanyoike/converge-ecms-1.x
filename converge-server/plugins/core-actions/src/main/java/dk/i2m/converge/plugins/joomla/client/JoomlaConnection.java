@@ -286,7 +286,6 @@ public class JoomlaConnection {
             Object[] params = new Object[]{username, password, foreignId, title, intro, story, author, categoryId, showOnFrontPage, displayOrder, keywords, description, publishTime, expireTime};
 
             client.executeAsync(XMLRPC_METHOD_NEW_ARTICLE, params, callback);
-            //String articleId = (String) client.execute(XMLRPC_METHOD_NEW_ARTICLE, params);
 
             String articleId = (String) callback.waitForResponse();
 
