@@ -16,11 +16,16 @@
  */
 package dk.i2m.converge.plugins.decoders.newsml12;
 
+import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
+import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.logging.LogSeverity;
+import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.newswire.NewswireItem;
+import dk.i2m.converge.core.newswire.NewswireItemAttachment;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.newswire.NewswireServiceProperty;
+import dk.i2m.converge.core.plugin.ArchiveException;
 import dk.i2m.converge.core.plugin.NewswireDecoder;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
@@ -38,8 +43,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -61,9 +68,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 @dk.i2m.converge.core.annotations.NewswireDecoder
 public class NewsMLDecoder implements NewswireDecoder {
-
-    private static final Logger LOG = Logger.getLogger(NewsMLDecoder.class.
-            getName());
 
     private ResourceBundle bundle = ResourceBundle.getBundle(
             "dk.i2m.converge.plugins.decoders.newsml12.Messages");
@@ -88,7 +92,13 @@ public class NewsMLDecoder implements NewswireDecoder {
 
     private boolean deleteProcessed = false;
 
+    private boolean enrich = false;
+
     private NitfToHtmlTransformer nitfToHtmlTransformer = null;
+
+    private String dateFormat = "yyyyMMdd'T'HHmmss";
+
+    private DateFormat dateFormatter = null;
 
     /**
      * Creates a new instance of {@link NewsMLDecoder}.
@@ -151,6 +161,20 @@ public class NewsMLDecoder implements NewswireDecoder {
         this.newswireService = newswire;
         this.properties = newswire.getPropertiesMap();
 
+        if (this.properties.containsKey(
+                NewsMLDecoder.Property.DATE_FORMAT.name())) {
+            this.dateFormat =
+                    this.properties.get(
+                    NewsMLDecoder.Property.DATE_FORMAT.name());
+        }
+
+        if (this.properties.containsKey(NewsMLDecoder.Property.ENABLE_OPEN_CALAIS.
+                name())) {
+            this.enrich =
+                    Boolean.parseBoolean(this.properties.get(NewsMLDecoder.Property.ENABLE_OPEN_CALAIS.
+                    name()));
+        }
+
         readRenditionMappings();
         readAttachmentCatalogue();
         readLocations();
@@ -176,10 +200,9 @@ public class NewsMLDecoder implements NewswireDecoder {
         int pending = xmlFilesToProcess.length;
         log(LogSeverity.INFO, "{0} NewsML files ready for processing", pending);
         for (File file : xmlFilesToProcess) {
-            log(LogSeverity.INFO, "Processing {1}. {0} items to go",
-                    new Object[]{(pending--), file.getName()});
             processNewswireFile(file);
         }
+        log(LogSeverity.INFO, "{0} NewsML files processed", pending);
     }
 
     /**
@@ -192,8 +215,7 @@ public class NewsMLDecoder implements NewswireDecoder {
         List<NewswireItem> existing =
                 pluginCtx.findNewswireItemsByExternalId(file.getName());
         if (!existing.isEmpty()) {
-            log(LogSeverity.INFO, "{0} has already been processed. Skipping",
-                    new Object[]{file.getName()});
+            // Already processed
             return;
         }
 
@@ -201,7 +223,6 @@ public class NewsMLDecoder implements NewswireDecoder {
         item.setExternalId(file.getName());
         item.setNewswireService(this.newswireService);
 
-        long start = Calendar.getInstance().getTimeInMillis();
         NewsML newsMl = null;
         try {
             newsMl = unmarshal(file);
@@ -209,14 +230,37 @@ public class NewsMLDecoder implements NewswireDecoder {
             List<NIType> newsItem = newsMl.getNewsItem();
             NIType next = newsItem.iterator().next();
             NewsComponentType newsComponent = next.getNewsComponent();
+            NIType.NewsManagement newsManagement = next.getNewsManagement();
+            String newsItemType = "News";
+            try {
+                newsItemType = newsManagement.getNewsItemType().getFormalName();
+            } catch (Exception ex) {
+                log(LogSeverity.WARNING,
+                        "{0}: Could not extract type of news. {1}",
+                        new Object[]{file.getName(), ex.getMessage()});
+            }
 
-            List<ContentItem> contentItems = newsComponent.getContentItem();
-            ContentItem contentItem = contentItems.iterator().next();
+            // Process the Date of the item
+            Calendar newswireItemDate = Calendar.getInstance();
+            try {
+                String dateLineDate = newsComponent.getDescriptiveMetadata().
+                        getDateLineDate().getValue();
+                newswireItemDate.setTime(getDateFormat().parse(dateLineDate));
+                item.setDate(newswireItemDate);
+            } catch (Exception ex) {
+                try {
+                    newswireItemDate.setTime(getDateFormat().parse(newsManagement.
+                            getThisRevisionCreated().getValue()));
+                } catch (Exception ex2) {
+                    log(LogSeverity.WARNING,
+                            "{0}: Could not extract date. {1}",
+                            new Object[]{file.getName(), ex.getMessage()});
+                }
 
-            String contentFormat = contentItem.getFormat().getFormalName();
-            DataContent dc = contentItem.getDataContent();
+                item.setDate(newswireItemDate);
+            }
 
-
+            // Process the Headline / title of the item
             for (Object obj : newsComponent.getNewsLines().
                     getHeadLineAndSubHeadLineOrByLine()) {
                 if (obj instanceof HeadLine) {
@@ -236,34 +280,181 @@ public class NewsMLDecoder implements NewswireDecoder {
                 }
             }
 
-            for (Object obj : dc.getContent()) {
-                if (obj instanceof Node) {
-                    try {
-                        Node node = (Node) obj;
-                        String dataContent = extractXml(node, false, true);
-                        if (contentFormat.startsWith("NITF")) {
-                            String html = nitfToHtmlTransformer.transform(
-                                    dataContent);
-                            item.setContent(html);
-                        } else {
-                            item.setContent(dataContent);
+            // Process the Content Items in the parent NewsComponent
+            if (newsComponent.getContentItem() != null && !newsComponent.
+                    getContentItem().isEmpty()) {
+
+                for (ContentItem contentItem : newsComponent.getContentItem()) {
+
+                    String contentFormat =
+                            contentItem.getFormat().getFormalName();
+
+                    if (contentFormat.startsWith("NITF")) {
+
+                        DataContent dc = contentItem.getDataContent();
+                        for (Object obj : dc.getContent()) {
+                            if (obj instanceof Node) {
+                                try {
+                                    Node node = (Node) obj;
+                                    String dataContent = extractXml(node, false,
+                                            true);
+                                    String html = nitfToHtmlTransformer.
+                                            transform(
+                                            dataContent);
+                                    item.setContent(html);
+
+                                    String story = item.getContent();
+                                    String strippedStory =
+                                            StringUtils.stripHtml(
+                                            story);
+                                    String summary =
+                                            org.apache.commons.lang.StringUtils.
+                                            abbreviate(strippedStory, 600);
+                                    item.addSummary(summary);
+
+                                    if (newsItemType.equalsIgnoreCase("alert")) {
+                                        item.setTitle((item.getTitle() + " "
+                                                + strippedStory).trim());
+                                        item.getTags().add(pluginCtx.
+                                                findOrCreateContentTag(
+                                                "Alert"));
+                                    }
+
+                                } catch (TransformerException ex) {
+                                    log(LogSeverity.SEVERE,
+                                            "Could not transform NITF to HTML",
+                                            ex);
+                                }
+                            }
                         }
-
-                        String story = item.getContent();
-                        String stippedStory = StringUtils.stripHtml(story);
-                        String summary = org.apache.commons.lang.StringUtils.
-                                abbreviate(stippedStory, 600);
-                        item.addSummary(summary);
-
-                    } catch (TransformerException ex) {
-                        log(LogSeverity.SEVERE,
-                                "Could not transform NITF to HTML",
-                                ex);
                     }
+                }
+            } else if (newsComponent.getNewsComponent() != null) {
+                for (NewsComponentType innerComponent : newsComponent.
+                        getNewsComponent()) {
+                    String roleName = innerComponent.getRole().getFormalName();
+
+
+                    if (properties.containsKey(Property.STORY_ROLE_NAME.name())) {
+                        String captionRoleName =
+                                properties.get(Property.STORY_ROLE_NAME.name());
+                        if (roleName.equalsIgnoreCase(captionRoleName)) {
+                            for (ContentItem contentItem : innerComponent.
+                                    getContentItem()) {
+
+                                String contentFormat =
+                                        contentItem.getFormat().getFormalName();
+
+                                if (contentFormat.startsWith("NITF")) {
+
+                                    DataContent dc =
+                                            contentItem.getDataContent();
+                                    for (Object obj : dc.getContent()) {
+                                        if (obj instanceof Node) {
+                                            try {
+                                                Node node = (Node) obj;
+                                                String dataContent = extractXml(
+                                                        node, false,
+                                                        true);
+                                                String html =
+                                                        nitfToHtmlTransformer.
+                                                        transform(
+                                                        dataContent);
+                                                item.setContent(html);
+
+                                                String story = item.getContent();
+                                                String strippedStory =
+                                                        StringUtils.stripHtml(
+                                                        story);
+                                                String summary =
+                                                        org.apache.commons.lang.StringUtils.
+                                                        abbreviate(strippedStory,
+                                                        600);
+                                                item.addSummary(summary);
+                                                
+                                            } catch (TransformerException ex) {
+                                                log(LogSeverity.SEVERE,
+                                                        "Could not transform NITF to HTML",
+                                                        ex);
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
+                            continue;
+                        }
+                    }
+
+
+                    if (!renditionMapping.containsKey(roleName)) {
+                        continue;
+                    }
+                    if (innerComponent.getContentItem().isEmpty()) {
+                        continue;
+                    }
+                    ContentItem innerComponentContent = innerComponent.
+                            getContentItem().iterator().next();
+                    File innerContentFile = new File(location,
+                            innerComponentContent.getHref());
+
+                    if (isCatalogueAvailable()) {
+                        NewswireItemAttachment attachment =
+                                new NewswireItemAttachment();
+                        attachment.setCatalogue(catalogue);
+                        try {
+                            attachment.setContentType(innerComponentContent.
+                                    getFormat().getFormalName());
+                            attachment.setDescription(roleName);
+                            attachment.setFilename(
+                                    innerComponentContent.getHref());
+                            attachment.setSize(innerComponentContent.
+                                    getCharacteristics().getSizeInBytes().
+                                    getValue().intValue());
+                            attachment.setCataloguePath(pluginCtx.archive(
+                                    innerContentFile, catalogue.getId(),
+                                    innerContentFile.getName()));
+                            String renditionId = renditionMapping.get(roleName);
+                            Rendition rendition = pluginCtx.findRenditionByName(
+                                    renditionId);
+                            attachment.setRendition(rendition);
+
+                            if (catalogue.getPreviewRendition().equals(attachment.
+                                    getRendition())) {
+                                item.setThumbnailUrl(
+                                        attachment.getCatalogueUrl());
+                            }
+
+                            attachment.setNewswireItem(item);
+                            item.getAttachments().add(attachment);
+                        } catch (ArchiveException ex) {
+                            log(LogSeverity.WARNING, file.getName()
+                                    + ": Attachment missing for newswire. "
+                                    + ex.getMessage());
+                        }
+                    } else {
+                        log(LogSeverity.WARNING, "Attachment Catalogue ["
+                                + catalogue + "] not available");
+                    }
+
                 }
             }
 
             NewswireItem nwi = pluginCtx.createNewswireItem(item);
+
+            if (enrich) {
+                try {
+                    List<Concept> concepts = pluginCtx.enrich(StringUtils.
+                            stripHtml(nwi.getContent()));
+                    for (Concept concept : concepts) {
+                        nwi.getTags().add(pluginCtx.findOrCreateContentTag(concept.
+                                getName()));
+                    }
+                } catch (EnrichException ex) {
+                    log(LogSeverity.WARNING, ex.getMessage());
+                }
+            }
+
             try {
                 pluginCtx.index(nwi);
             } catch (SearchEngineIndexingException seie) {
@@ -275,14 +466,14 @@ public class NewsMLDecoder implements NewswireDecoder {
             if (moveProcessed) {
                 File newLocation = new File(this.processedLocation,
                         file.getName());
-                log(LogSeverity.INFO, "Moving {0} to {1}", new Object[]{file.
-                            getAbsolutePath(), newLocation.getAbsolutePath()});
-                file.renameTo(newLocation);
-            } else if (deleteProcessed) {
-                if (file.delete()) {
-                    log(LogSeverity.INFO, "{0} deleted", new Object[]{file.
+                if (!file.renameTo(newLocation)) {
+                    log(LogSeverity.WARNING,
+                            "Could not move file from {0} to {1}",
+                            new Object[]{file.getAbsolutePath(), newLocation.
                                 getAbsolutePath()});
-                } else {
+                }
+            } else if (deleteProcessed) {
+                if (!file.delete()) {
                     log(LogSeverity.WARNING, "{0} could not be deleted",
                             new Object[]{file.getAbsolutePath()});
                 }
@@ -291,11 +482,6 @@ public class NewsMLDecoder implements NewswireDecoder {
         } catch (NewsMLUnmarshalException ex) {
             log(LogSeverity.SEVERE, "{0} could not be unmarshalled. {1}",
                     new Object[]{file.getName(), ex.getMessage()});
-        } finally {
-            long end = Calendar.getInstance().getTimeInMillis();
-            long duration = end - start;
-            log(LogSeverity.INFO, "It took {0}ms to process {1}", new Object[]{
-                        duration, file.getName()});
         }
     }
 
@@ -455,6 +641,13 @@ public class NewsMLDecoder implements NewswireDecoder {
                 this.newswireService.getId());
     }
 
+    public DateFormat getDateFormat() {
+        if (this.dateFormatter == null) {
+            this.dateFormatter = new SimpleDateFormat(dateFormat);
+        }
+        return this.dateFormatter;
+    }
+
     /**
      * Enumeration of properties available for the {@link NewsMLDecoder}.
      */
@@ -483,9 +676,15 @@ public class NewsMLDecoder implements NewswireDecoder {
          * Mapping of renditions to content items (attachments).
          */
         RENDITION_MAPPING,
+        /** Name of the role containing the caption or story that should be used as the main body of the story. */
+        STORY_ROLE_NAME,
         /**
          * Date format used in the NewsML file.
          */
-        DATE_FORMAT
+        DATE_FORMAT,
+        /**
+         * Should stories be enriched by Open Calais.
+         */
+        ENABLE_OPEN_CALAIS
     }
 }
