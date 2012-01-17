@@ -1,11 +1,18 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2012 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.jsf.beans;
 
@@ -94,15 +101,16 @@ public class MediaItemDetails {
      * {@link dk.i2m.converge.core.metadata.Subject}s are not returned as they
      * are selected through the subject selection dialog.
      *
-     * @param suggestion
-     *          String for which to base the suggestions
+     * @param suggestion String for which to base the suggestions
      * @return {@link List} of suggested {@link Concept}s based on
      *         {@code suggestion}
      */
     public List<Concept> onConceptSuggestion(Object suggestion) {
         String conceptName = (String) suggestion;
-        List<Concept> suggestedConcepts = new ArrayList<Concept>();
-        suggestedConcepts = metaDataFacade.findConceptsByName(conceptName, Person.class, GeoArea.class, PointOfInterest.class, Organisation.class);
+        List<Concept> suggestedConcepts;
+        suggestedConcepts = metaDataFacade.findConceptsByName(conceptName, 
+                Person.class, GeoArea.class, PointOfInterest.class, 
+                Organisation.class);
 
         return suggestedConcepts;
     }

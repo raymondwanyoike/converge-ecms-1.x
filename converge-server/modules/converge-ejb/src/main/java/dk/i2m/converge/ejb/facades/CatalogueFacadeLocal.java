@@ -16,16 +16,12 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.core.content.catalogue.CatalogueHookInstance;
-import dk.i2m.converge.core.content.catalogue.MediaItem;
-import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
-import dk.i2m.converge.core.content.catalogue.Rendition;
-import dk.i2m.converge.core.content.catalogue.Catalogue;
+import dk.i2m.converge.core.content.catalogue.*;
 import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.security.UserAccount;
+import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.InvalidMediaRepositoryException;
 import dk.i2m.converge.ejb.services.MediaRepositoryIndexingException;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import javax.ejb.Local;
