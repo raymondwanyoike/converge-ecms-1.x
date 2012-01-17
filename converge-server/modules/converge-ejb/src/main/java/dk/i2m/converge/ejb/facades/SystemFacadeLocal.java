@@ -18,8 +18,10 @@ package dk.i2m.converge.ejb.facades;
 
 import dk.i2m.converge.core.Announcement;
 import dk.i2m.converge.core.ConfigurationKey;
-import dk.i2m.converge.core.content.Language;
 import dk.i2m.converge.core.logging.LogEntry;
+import dk.i2m.converge.core.content.Language;
+import dk.i2m.converge.core.logging.LogSubject;
+import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.domain.Property;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import java.util.List;
@@ -41,7 +43,7 @@ public interface SystemFacadeLocal {
      * Updates a {@link List} of system properties.
      *
      * @param properties
-     * {@link List} of system properties
+* {@link List} of system properties
      */
     void updateSystemProperties(List<Property> properties);
 
@@ -63,7 +65,7 @@ public interface SystemFacadeLocal {
      * Gets the {@link String} value of a given {@link ConfigurationKey}.
      *
      * @param key
-     * {@link ConfigurationKey} for which to obtain the {@link String}
+* {@link ConfigurationKey} for which to obtain the {@link String}
      * value
      * @return {@link String} value of the {@link ConfigurationKey}
      */
@@ -88,7 +90,7 @@ public interface SystemFacadeLocal {
      * Updates an existing {@link Announcement}.
      *
      * @param announcement
-     * {@link Announcement} to update
+* {@link Announcement} to update
      * @return Updated {@link Announcement}
      */
     Announcement updateAnnouncement(Announcement announcement);
@@ -97,7 +99,7 @@ public interface SystemFacadeLocal {
      * Creates a new {@link Announcement}.
      *
      * @param announcement
-     * {@link Announcement} to create
+* {@link Announcement} to create
      * @return Created {@link Announcement}
      */
     Announcement createAnnouncement(Announcement announcement);
@@ -106,7 +108,7 @@ public interface SystemFacadeLocal {
      * Delete an existing {@link Announcement}.
      *
      * @param id
-     * Unique identifier of the {@link Announcement}
+* Unique identifier of the {@link Announcement}
      */
     void deleteAnnouncement(Long id);
 
@@ -114,10 +116,10 @@ public interface SystemFacadeLocal {
      * Find existing {@link Announcement} in the database.
      *
      * @param id
-     * Unique identifier of the {@link Announcement}
+* Unique identifier of the {@link Announcement}
      * @return {@link Announcement} matching the {@code id}
      * @throws DataNotFoundException
-     * If no {@link Announcement} could be matched to the {@code id}
+* If no {@link Announcement} could be matched to the {@code id}
      */
     Announcement findAnnouncementById(Long id) throws DataNotFoundException;
 
@@ -153,6 +155,10 @@ public interface SystemFacadeLocal {
             java.lang.String message, java.lang.String origin,
             java.lang.String originId);
 
+    void log(dk.i2m.converge.core.logging.LogSeverity severity,
+            dk.i2m.converge.core.security.UserAccount actor,
+            java.lang.String message, java.util.List<LogSubject> subjects);
+
     java.util.List<dk.i2m.converge.core.logging.LogEntry> findLogEntries(
             java.lang.String origin,
             java.lang.String originId);
@@ -161,10 +167,13 @@ public interface SystemFacadeLocal {
             java.lang.Object origin,
             java.lang.String originId);
 
-    java.util.List<dk.i2m.converge.core.logging.LogEntry> findLogEntries(Object origin,
+    java.util.List<dk.i2m.converge.core.logging.LogEntry> findLogEntries(
+            Object origin,
             String originId, int start, int count);
 
     List<LogEntry> findLogEntries(int start, int count);
 
     List<LogEntry> findLogEntries();
+
+    void removeLogEntries(Object entryType, String entryId);
 }

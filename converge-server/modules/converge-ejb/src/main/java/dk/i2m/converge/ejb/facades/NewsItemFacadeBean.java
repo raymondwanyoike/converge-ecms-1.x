@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.ejb.facades;
 
+import dk.i2m.converge.core.logging.LogEntry;
 import dk.i2m.converge.core.content.*;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.logging.LogSeverity;

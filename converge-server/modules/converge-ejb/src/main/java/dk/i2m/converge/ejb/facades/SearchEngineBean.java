@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 - 2011 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ import dk.i2m.converge.core.search.IndexQueueEntry;
 import dk.i2m.converge.core.search.QueueEntryOperation;
 import dk.i2m.converge.core.search.QueueEntryType;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
-import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.utils.BeanComparator;
 import dk.i2m.converge.domain.search.IndexField;
 import dk.i2m.converge.domain.search.SearchFacet;
@@ -76,7 +75,8 @@ import org.apache.solr.common.SolrInputDocument;
 @Stateless
 public class SearchEngineBean implements SearchEngineLocal {
 
-    private static final Logger LOG = Logger.getLogger(SearchEngineBean.class.getName());
+    private static final Logger LOG = Logger.getLogger(SearchEngineBean.class.
+            getName());
 
     @EJB private ConfigurationServiceLocal cfgService;
 
@@ -90,13 +90,19 @@ public class SearchEngineBean implements SearchEngineLocal {
 
     @EJB private MetaDataServiceLocal metaDataService;
 
-    private DateFormat solrDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    private DateFormat solrDateFormat = new SimpleDateFormat(
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     @Override
-    public IndexQueueEntry addToIndexQueue(QueueEntryType type, Long id, QueueEntryOperation operation) {
+    public IndexQueueEntry addToIndexQueue(QueueEntryType type, Long id,
+            QueueEntryOperation operation) {
         IndexQueueEntry entry = new IndexQueueEntry(type, id, operation);
-        Map<String, Object> params = QueryBuilder.with("entryId", entry.getId()).and("type", entry.getType()).and("operation", entry.getOperation()).parameters();
-        List<IndexQueueEntry> entries = daoService.findWithNamedQuery(IndexQueueEntry.FIND_BY_TYPE_ID_AND_OPERATION, params);
+        Map<String, Object> params = QueryBuilder.with("entryId", entry.getId()).
+                and("type", entry.getType()).and("operation",
+                entry.getOperation()).parameters();
+        List<IndexQueueEntry> entries =
+                daoService.findWithNamedQuery(
+                IndexQueueEntry.FIND_BY_TYPE_ID_AND_OPERATION, params);
 
         if (entries.isEmpty()) {
             return daoService.create(entry);
@@ -128,34 +134,47 @@ public class SearchEngineBean implements SearchEngineLocal {
                     solrServer.deleteById(String.valueOf(entry.getEntryId()));
                     removeFromQueue(entry.getId());
                 } catch (Exception ex) {
-                    LOG.log(Level.WARNING, entry.getType().name() + " #{0} could not be removed from index", entry.getEntryId());
+                    LOG.log(Level.WARNING, entry.getType().name()
+                            + " #{0} could not be removed from index", entry.
+                            getEntryId());
                     LOG.log(Level.WARNING, ex.getMessage(), ex);
                 }
             } else {
                 switch (entry.getType()) {
                     case NEWS_ITEM:
                         try {
-                            NewsItem newsItem = newsItemFacade.findNewsItemById(entry.getEntryId());
+                            NewsItem newsItem =
+                                    newsItemFacade.findNewsItemById(entry.
+                                    getEntryId());
                             index(newsItem, solrServer);
                             removeFromQueue(entry.getId());
                         } catch (DataNotFoundException ex) {
-                            LOG.log(Level.WARNING, "NewsItem #{0} does not exist in the database. Skipping indexing.", entry.getEntryId());
+                            LOG.log(Level.WARNING,
+                                    "NewsItem #{0} does not exist in the database. Skipping indexing.",
+                                    entry.getEntryId());
                             removeFromQueue(entry.getId());
                         } catch (SearchEngineIndexingException ex) {
-                            LOG.log(Level.WARNING, "NewsItem #{0} could not be indexed", entry.getEntryId());
+                            LOG.log(Level.WARNING,
+                                    "NewsItem #{0} could not be indexed", entry.
+                                    getEntryId());
                             LOG.log(Level.WARNING, ex.getMessage(), ex);
                         }
                         break;
                     case MEDIA_ITEM:
                         try {
-                            MediaItem mediaItem = catalogueFacade.findMediaItemById(entry.getEntryId());
+                            MediaItem mediaItem = catalogueFacade.
+                                    findMediaItemById(entry.getEntryId());
                             index(mediaItem, solrServer);
                             removeFromQueue(entry.getId());
                         } catch (DataNotFoundException ex) {
-                            LOG.log(Level.WARNING, "MediaItem #{0} does not exist in the database. Skipping indexing.", entry.getEntryId());
+                            LOG.log(Level.WARNING,
+                                    "MediaItem #{0} does not exist in the database. Skipping indexing.",
+                                    entry.getEntryId());
                             removeFromQueue(entry.getId());
                         } catch (SearchEngineIndexingException ex) {
-                            LOG.log(Level.WARNING, "MediaItem #{0} could not be indexed", entry.getEntryId());
+                            LOG.log(Level.WARNING,
+                                    "MediaItem #{0} could not be indexed",
+                                    entry.getEntryId());
                             LOG.log(Level.WARNING, ex.getMessage(), ex);
                         }
                         break;
@@ -166,44 +185,42 @@ public class SearchEngineBean implements SearchEngineLocal {
 
     /** {@inheritDoc} */
     @Override
-    public SearchResults search(String query, int start, int rows, String... filterQueries) {
+    public SearchResults search(String query, int start, int rows,
+            String... filterQueries) {
         return search(query, start, rows, "score", false, filterQueries);
     }
 
     @Override
-    public SearchResults search(String query, int start, int rows, String sortField, boolean sortOrder, String... filterQueries) {
-        return search(query, start, rows, "score", false, null, null, filterQueries);
+    public SearchResults search(String query, int start, int rows,
+            String sortField, boolean sortOrder, String... filterQueries) {
+        return search(query, start, rows, "score", false, null, null,
+                filterQueries);
     }
 
     /**
      * Queries the search engine.
      *
-     * @param query
-     *          Query string
-     * @param start
-     *          First record to retrieve
-     * @param rows
-     *          Number of rows to retrieve
-     * @param sortField
-     *          Field to sort by
-     * @param sortOrder
-     *          Ascending ({@code true}) or descending ({@code false})
-     * @param dateFrom
-     *          Search results must not be older than this date
-     * @param dateTo
-     *          Search results must not be newer than this date
-     * @param filterQueries 
-     *          Filter queries to include in the search
+     * @param query         Query string
+     * @param start         First record to retrieve
+     * @param rows          Number of rows to retrieve
+     * @param sortField     Field to sort by
+     * @param sortOrder     Ascending ({@code true}) or descending ({@code false})
+     * @param dateFrom      Search results must not be older than this date
+     * @param dateTo        Search results must not be newer than this date
+     * @param filterQueries Filter queries to include in the search
      * @return {@link SearchResults} matching the {@code query}
      */
     @Override
-    public SearchResults search(String query, int start, int rows, String sortField, boolean sortOrder, Date dateFrom, Date dateTo, String... filterQueries) {
+    public SearchResults search(String query, int start, int rows,
+            String sortField, boolean sortOrder, Date dateFrom, Date dateTo,
+            String... filterQueries) {
         long startTime = System.currentTimeMillis();
         SearchResults searchResults = new SearchResults();
         try {
-            final DateFormat ORIGINAL_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            final DateFormat ORIGINAL_FORMAT = new SimpleDateFormat(
+                    "yyyy-MM-dd'T'HH:mm:ss'Z'");
             final DateFormat NEW_FORMAT = new SimpleDateFormat("MMMM yyyy");
-        
+
             SolrQuery solrQuery = new SolrQuery();
             solrQuery.setStart(start);
             solrQuery.setRows(rows);
@@ -264,7 +281,8 @@ public class SearchEngineBean implements SearchEngineLocal {
             solrQuery.setHighlight(true).setHighlightSnippets(1); //set other params as needed
             solrQuery.setParam("hl.fl", "title,story,caption");
             solrQuery.setParam("hl.fragsize", "500");
-            solrQuery.setParam("hl.simple.pre", "<span class=\"searchHighlight\">");
+            solrQuery.setParam("hl.simple.pre",
+                    "<span class=\"searchHighlight\">");
             solrQuery.setParam("hl.simple.post", "</span>");
             solrQuery.setParam("facet.date", "date");
             solrQuery.setParam("facet.date.start", "NOW/YEAR-10YEAR");
@@ -283,7 +301,8 @@ public class SearchEngineBean implements SearchEngineLocal {
                 // Copy all fields to map for easy access
                 HashMap<String, Object> values = new HashMap<String, Object>();
 
-                for (Iterator<Map.Entry<String, Object>> i = d.iterator(); i.hasNext();) {
+                for (Iterator<Map.Entry<String, Object>> i = d.iterator(); i.
+                        hasNext();) {
                     Map.Entry<String, Object> e2 = i.next();
                     values.put(e2.getKey(), e2.getValue());
                 }
@@ -309,11 +328,14 @@ public class SearchEngineBean implements SearchEngineLocal {
                 List<FacetField.Count> facetEntries = facet.getValues();
                 if (facetEntries != null) {
                     for (FacetField.Count fcount : facetEntries) {
-                        if (!searchResults.getFacets().containsKey(facet.getName())) {
-                            searchResults.getFacets().put(facet.getName(), new ArrayList<SearchFacet>());
+                        if (!searchResults.getFacets().containsKey(
+                                facet.getName())) {
+                            searchResults.getFacets().put(facet.getName(),
+                                    new ArrayList<SearchFacet>());
                         }
 
-                        SearchFacet sf = new SearchFacet(fcount.getName(), fcount.getAsFilterQuery(), fcount.getCount());
+                        SearchFacet sf = new SearchFacet(fcount.getName(),
+                                fcount.getAsFilterQuery(), fcount.getCount());
 
                         // Check if the filter query is already active
                         for (String fq : filterQueries) {
@@ -323,34 +345,41 @@ public class SearchEngineBean implements SearchEngineLocal {
                         }
 
                         // Ensure that the facet is not already there
-                        if (!searchResults.getFacets().get(facet.getName()).contains(sf)) {
-                            searchResults.getFacets().get(facet.getName()).add(sf);
+                        if (!searchResults.getFacets().get(facet.getName()).
+                                contains(sf)) {
+                            searchResults.getFacets().get(facet.getName()).add(
+                                    sf);
                         }
                     }
                 }
             }
-            
+
             for (FacetField facet : qr.getFacetDates()) {
                 List<FacetField.Count> facetEntries = facet.getValues();
                 if (facetEntries != null) {
                     for (FacetField.Count fcount : facetEntries) {
                         if (fcount.getCount() != 0) {
-                            if (!searchResults.getFacets().containsKey(facet.getName())) {
-                                searchResults.getFacets().put(facet.getName(), new ArrayList<SearchFacet>());
+                            if (!searchResults.getFacets().containsKey(facet.
+                                    getName())) {
+                                searchResults.getFacets().put(facet.getName(),
+                                        new ArrayList<SearchFacet>());
                             }
 
                             String facetLabel = "";
                             try {
-                                Date facetDate = ORIGINAL_FORMAT.parse(fcount.getName());
+                                Date facetDate = ORIGINAL_FORMAT.parse(fcount.
+                                        getName());
                                 facetLabel = NEW_FORMAT.format(facetDate);
                             } catch (ParseException ex) {
                                 LOG.log(Level.SEVERE, null, ex);
                                 facetLabel = fcount.getName();
                             }
 
-                            String realFilterQuery = "date:[" + fcount.getName() + " TO " + fcount.getName() + "+1MONTH]";
+                            String realFilterQuery = "date:[" + fcount.getName()
+                                    + " TO " + fcount.getName() + "+1MONTH]";
 
-                            SearchFacet sf = new SearchFacet(facetLabel, realFilterQuery, fcount.getCount());
+                            SearchFacet sf = new SearchFacet(facetLabel,
+                                    realFilterQuery, fcount.getCount());
 
                             // Check if the filter query is already active
                             for (String fq : filterQueries) {
@@ -360,16 +389,18 @@ public class SearchEngineBean implements SearchEngineLocal {
                             }
 
                             // Ensure that the facet is not already there
-                            if (!searchResults.getFacets().get(facet.getName()).contains(sf)) {
-                                searchResults.getFacets().get(facet.getName()).add(sf);
+                            if (!searchResults.getFacets().get(facet.getName()).
+                                    contains(sf)) {
+                                searchResults.getFacets().get(facet.getName()).
+                                        add(sf);
                             }
                         }
                     }
                 }
             }
-            
-            
-            
+
+
+
         } catch (SolrServerException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
@@ -420,8 +451,10 @@ public class SearchEngineBean implements SearchEngineLocal {
 
         Row row = overviewSheet.createRow(0);
         row.createCell(0).setCellValue("ID");
-        row.createCell(1).setCellValue("Title");
-        row.createCell(2).setCellValue("Outlet");
+        row.createCell(1).setCellValue("Date");
+        row.createCell(2).setCellValue("Title");
+        row.createCell(3).setCellValue("Outlet");
+        row.createCell(4).setCellValue("Section");
 
         for (int i = 0; i <= 2; i++) {
 //                row.getCell(i).setCellStyle(headerStyle);
@@ -429,12 +462,35 @@ public class SearchEngineBean implements SearchEngineLocal {
 
         overviewSheetRow++;
         for (SearchResult result : results.getHits()) {
-            row = overviewSheet.createRow(overviewSheetRow);
-            row.createCell(0).setCellValue(result.getId());
-            row.createCell(1).setCellValue(result.getTitle());
-            row.createCell(2).setCellValue(result.getNote());
+            try {
+                NewsItem newsItem =
+                        newsItemFacade.findNewsItemFromArchive(result.getId());
 
-            overviewSheetRow++;
+                if (newsItem.getPlacements().isEmpty()) {
+                    row = overviewSheet.createRow(overviewSheetRow);
+                    row.createCell(0).setCellValue(result.getId());
+                    row.createCell(1).setCellValue(newsItem.getUpdated());
+                    row.createCell(2).setCellValue(newsItem.getTitle());
+                    row.createCell(3).setCellValue(
+                            newsItem.getOutlet().getTitle());
+                    row.createCell(4).setCellValue("");
+                } else {
+                    for (NewsItemPlacement nip : newsItem.getPlacements()) {
+                        row = overviewSheet.createRow(overviewSheetRow);
+                        row.createCell(0).setCellValue(result.getId());
+                        row.createCell(1).setCellValue(nip.getEdition().
+                                getPublicationDate());
+                        row.createCell(2).setCellValue(newsItem.getTitle());
+                        row.createCell(3).setCellValue(
+                                nip.getOutlet().getTitle());
+                        row.createCell(4).setCellValue(nip.getSection().
+                                getFullName());
+                    }
+                }
+
+                overviewSheetRow++;
+            } catch (DataNotFoundException ex) {
+            }
         }
 
         // Auto-size
@@ -450,8 +506,10 @@ public class SearchEngineBean implements SearchEngineLocal {
 //        overviewSheet.getPrintSetup().setFitHeight((short)500);
 
         Footer footer = overviewSheet.getFooter();
-        footer.setLeft("Page " + HeaderFooter.page() + " of " + HeaderFooter.numPages());
-        footer.setRight("Generated on " + HeaderFooter.date() + " at " + HeaderFooter.time());
+        footer.setLeft("Page " + HeaderFooter.page() + " of " + HeaderFooter.
+                numPages());
+        footer.setRight("Generated on " + HeaderFooter.date() + " at "
+                + HeaderFooter.time());
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -463,7 +521,8 @@ public class SearchEngineBean implements SearchEngineLocal {
         return baos.toByteArray();
     }
 
-    private void index(NewsItem ni, SolrServer solrServer) throws SearchEngineIndexingException {
+    private void index(NewsItem ni, SolrServer solrServer) throws
+            SearchEngineIndexingException {
 
         SolrInputDocument solrDoc = new SolrInputDocument();
         solrDoc.addField(IndexField.ID.getName(), ni.getId(), 1.0f);
@@ -471,29 +530,38 @@ public class SearchEngineBean implements SearchEngineLocal {
         solrDoc.addField(IndexField.TYPE.getName(), "Story");
         solrDoc.addField(IndexField.BYLINE.getName(), ni.getByLine());
         solrDoc.addField(IndexField.BRIEF.getName(), ni.getBrief());
-        solrDoc.addField(IndexField.STORY.getName(), dk.i2m.converge.core.utils.StringUtils.stripHtml(ni.getStory()));
+        solrDoc.addField(IndexField.STORY.getName(),
+                dk.i2m.converge.core.utils.StringUtils.stripHtml(ni.getStory()));
         try {
-            solrDoc.addField(IndexField.LANG.getName(), ni.getLanguage().getCode());
+            solrDoc.addField(IndexField.LANG.getName(),
+                    ni.getLanguage().getCode());
         } catch (NullPointerException ex) {
         }
-        solrDoc.addField(IndexField.LANGUAGE.getName(), ni.getLanguage().getName());
+        solrDoc.addField(IndexField.LANGUAGE.getName(),
+                ni.getLanguage().getName());
         solrDoc.addField(IndexField.WORD_COUNT.getName(), ni.getWordCount());
 
         for (NewsItemPlacement placement : ni.getPlacements()) {
             if (placement.getEdition() != null) {
                 if (placement.getEdition().getPublicationDate() != null) {
-                    solrDoc.addField(IndexField.DATE.getName(), placement.getEdition().getPublicationDate().getTime());
+                    solrDoc.addField(IndexField.DATE.getName(), placement.
+                            getEdition().getPublicationDate().getTime());
                 }
-                solrDoc.addField(IndexField.EDITION_NUMBER.getName(), placement.getEdition().getNumber());
-                solrDoc.addField(IndexField.EDITION_VOLUME.getName(), placement.getEdition().getVolume());
+                solrDoc.addField(IndexField.EDITION_NUMBER.getName(), placement.
+                        getEdition().getNumber());
+                solrDoc.addField(IndexField.EDITION_VOLUME.getName(), placement.
+                        getEdition().getVolume());
             }
             if (placement.getSection() != null) {
-                solrDoc.addField(IndexField.SECTION.getName(), placement.getSection().getFullName());
+                solrDoc.addField(IndexField.SECTION.getName(), placement.
+                        getSection().getFullName());
             }
             if (placement.getOutlet() != null) {
-                solrDoc.addField(IndexField.OUTLET.getName(), placement.getOutlet().getTitle());
+                solrDoc.addField(IndexField.OUTLET.getName(), placement.
+                        getOutlet().getTitle());
             }
-            solrDoc.addField(IndexField.PLACEMENT.getName(), placement.toString());
+            solrDoc.addField(IndexField.PLACEMENT.getName(),
+                    placement.toString());
         }
 
 
@@ -504,32 +572,40 @@ public class SearchEngineBean implements SearchEngineLocal {
 
 
         for (NewsItemActor actor : ni.getActors()) {
-            solrDoc.addField(IndexField.ACTOR.getName(), actor.getUser().getFullName());
+            solrDoc.addField(IndexField.ACTOR.getName(), actor.getUser().
+                    getFullName());
             // Dynamic fields for the actors role
-            solrDoc.addField(actor.getRole().getName(), actor.getUser().getFullName());
+            solrDoc.addField(actor.getRole().getName(), actor.getUser().
+                    getFullName());
         }
 
         for (Concept concept : ni.getConcepts()) {
             if (concept instanceof Subject) {
-                solrDoc.addField(IndexField.SUBJECT.getName(), concept.getFullTitle());
+                solrDoc.addField(IndexField.SUBJECT.getName(), concept.
+                        getFullTitle());
             }
             if (concept instanceof Person) {
-                solrDoc.addField(IndexField.PERSON.getName(), concept.getFullTitle());
+                solrDoc.addField(IndexField.PERSON.getName(), concept.
+                        getFullTitle());
             }
 
             if (concept instanceof Organisation) {
-                solrDoc.addField(IndexField.ORGANISATION.getName(), concept.getFullTitle());
+                solrDoc.addField(IndexField.ORGANISATION.getName(), concept.
+                        getFullTitle());
             }
 
             if (concept instanceof GeoArea) {
-                solrDoc.addField(IndexField.LOCATION.getName(), concept.getFullTitle());
+                solrDoc.addField(IndexField.LOCATION.getName(), concept.
+                        getFullTitle());
             }
 
             if (concept instanceof PointOfInterest) {
-                solrDoc.addField(IndexField.POINT_OF_INTEREST.getName(), concept.getFullTitle());
+                solrDoc.addField(IndexField.POINT_OF_INTEREST.getName(),
+                        concept.getFullTitle());
             }
 
-            solrDoc.addField(IndexField.CONCEPT.getName(), concept.getFullTitle());
+            solrDoc.addField(IndexField.CONCEPT.getName(),
+                    concept.getFullTitle());
         }
         try {
             solrServer.add(solrDoc);
@@ -540,7 +616,8 @@ public class SearchEngineBean implements SearchEngineLocal {
         }
     }
 
-    public void index(MediaItem mi, SolrServer solrServer) throws SearchEngineIndexingException {
+    public void index(MediaItem mi, SolrServer solrServer) throws
+            SearchEngineIndexingException {
         LOG.log(Level.FINE, "Adding MediaItem #{0} to index", mi.getId());
 
         if (mi.isOriginalAvailable()) {
@@ -571,43 +648,59 @@ public class SearchEngineBean implements SearchEngineLocal {
             solrDoc.addField(IndexField.MEDIA_FORMAT.getName(), mediaFormat);
             solrDoc.addField(IndexField.TITLE.getName(), mi.getTitle(), 1.0f);
             solrDoc.addField(IndexField.BYLINE.getName(), mi.getByLine());
-            solrDoc.addField(IndexField.STORY.getName(), dk.i2m.converge.core.utils.StringUtils.stripHtml(mi.getDescription()) + " " + story);
-            solrDoc.addField(IndexField.CAPTION.getName(), dk.i2m.converge.core.utils.StringUtils.stripHtml(mi.getDescription()));
-            solrDoc.addField(IndexField.CONTENT_TYPE.getName(), mi.getOriginal().getContentType());
-            solrDoc.addField(IndexField.REPOSITORY.getName(), mi.getCatalogue().getName());
+            solrDoc.addField(IndexField.STORY.getName(),
+                    dk.i2m.converge.core.utils.StringUtils.stripHtml(mi.
+                    getDescription()) + " " + story);
+            solrDoc.addField(IndexField.CAPTION.getName(),
+                    dk.i2m.converge.core.utils.StringUtils.stripHtml(mi.
+                    getDescription()));
+            solrDoc.addField(IndexField.CONTENT_TYPE.getName(), mi.getOriginal().
+                    getContentType());
+            solrDoc.addField(IndexField.REPOSITORY.getName(), mi.getCatalogue().
+                    getName());
 
             if (mi.getMediaDate() != null) {
-                solrDoc.addField(IndexField.DATE.getName(), mi.getMediaDate().getTime());
+                solrDoc.addField(IndexField.DATE.getName(), mi.getMediaDate().
+                        getTime());
             }
 
             if (mi.isPreviewAvailable()) {
-                solrDoc.addField(IndexField.THUMB_URL.getName(), mi.getPreview().getAbsoluteFilename());
-                solrDoc.addField(IndexField.DIRECT_URL.getName(), mi.getPreview().getFileLocation());
+                solrDoc.addField(IndexField.THUMB_URL.getName(), mi.getPreview().
+                        getAbsoluteFilename());
+                solrDoc.addField(IndexField.DIRECT_URL.getName(),
+                        mi.getPreview().getFileLocation());
             }
 
-            solrDoc.addField(IndexField.ACTOR.getName(), mi.getOwner().getFullName());
+            solrDoc.addField(IndexField.ACTOR.getName(), mi.getOwner().
+                    getFullName());
 
             for (Concept concept : mi.getConcepts()) {
                 if (concept instanceof Subject) {
-                    solrDoc.addField(IndexField.SUBJECT.getName(), concept.getFullTitle());
+                    solrDoc.addField(IndexField.SUBJECT.getName(), concept.
+                            getFullTitle());
                 }
                 if (concept instanceof Person) {
-                    solrDoc.addField(IndexField.PERSON.getName(), concept.getFullTitle());
+                    solrDoc.addField(IndexField.PERSON.getName(), concept.
+                            getFullTitle());
                 }
 
                 if (concept instanceof Organisation) {
-                    solrDoc.addField(IndexField.ORGANISATION.getName(), concept.getFullTitle());
+                    solrDoc.addField(IndexField.ORGANISATION.getName(), concept.
+                            getFullTitle());
                 }
 
                 if (concept instanceof GeoArea) {
-                    solrDoc.addField(IndexField.LOCATION.getName(), concept.getFullTitle());
+                    solrDoc.addField(IndexField.LOCATION.getName(), concept.
+                            getFullTitle());
                 }
 
                 if (concept instanceof PointOfInterest) {
-                    solrDoc.addField(IndexField.POINT_OF_INTEREST.getName(), concept.getFullTitle());
+                    solrDoc.addField(IndexField.POINT_OF_INTEREST.getName(),
+                            concept.getFullTitle());
                 }
 
-                solrDoc.addField(IndexField.CONCEPT.getName(), concept.getFullTitle());
+                solrDoc.addField(IndexField.CONCEPT.getName(), concept.
+                        getFullTitle());
             }
 
             try {
@@ -618,7 +711,10 @@ public class SearchEngineBean implements SearchEngineLocal {
                 throw new SearchEngineIndexingException(ex);
             }
         } else {
-            LOG.log(Level.FINE, "Ignoring MediaItem #{0}. Missing original {1} rendition", new Object[]{mi.getId(), mi.getCatalogue().getOriginalRendition().getName()});
+            LOG.log(Level.FINE,
+                    "Ignoring MediaItem #{0}. Missing original {1} rendition",
+                    new Object[]{mi.getId(), mi.getCatalogue().
+                        getOriginalRendition().getName()});
         }
     }
 
@@ -637,12 +733,13 @@ public class SearchEngineBean implements SearchEngineLocal {
      * Generates a {link SearchResult} for a media item.
      *
      * @param qr
-     *          QueryResponse from Solr
+     * QueryResponse from Solr
      * @param values
-     *          Fields available
+     * Fields available
      * @return {@link SearchResult}
      */
-    private SearchResult generateMediaHit(QueryResponse qr, HashMap<String, Object> values) {
+    private SearchResult generateMediaHit(QueryResponse qr,
+            HashMap<String, Object> values) {
         String id = (String) values.get(IndexField.ID.getName());
 
         StringBuilder caption = new StringBuilder("");
@@ -650,21 +747,26 @@ public class SearchEngineBean implements SearchEngineLocal {
         StringBuilder note = new StringBuilder("");
 
         Map<String, List<String>> highlighting = qr.getHighlighting().get(id);
-        
+
         boolean highlightingExist = highlighting != null;
-        
-        if (highlightingExist && highlighting.get(IndexField.STORY.getName()) != null) {
+
+        if (highlightingExist && highlighting.get(IndexField.STORY.getName())
+                != null) {
             for (String hl : highlighting.get(IndexField.STORY.getName())) {
                 caption.append(hl);
             }
         } else if (highlighting.get(IndexField.STORY.getName()) != null) {
-            caption.append(StringUtils.abbreviate((String) values.get(IndexField.STORY.getName()), 500));
+            caption.append(StringUtils.abbreviate((String) values.get(IndexField.STORY.
+                    getName()), 500));
         } else {
-            caption.append(StringUtils.abbreviate((String) values.get(IndexField.CAPTION.getName()), 500));
+            caption.append(StringUtils.abbreviate((String) values.get(IndexField.CAPTION.
+                    getName()), 500));
         }
-        
-        if (highlightingExist && highlighting.get(IndexField.TITLE.getName()) != null) {
-            for (String hl : qr.getHighlighting().get(id).get(IndexField.TITLE.getName())) {
+
+        if (highlightingExist && highlighting.get(IndexField.TITLE.getName())
+                != null) {
+            for (String hl : qr.getHighlighting().get(id).get(IndexField.TITLE.
+                    getName())) {
                 title.append(hl);
             }
         } else {
@@ -684,14 +786,17 @@ public class SearchEngineBean implements SearchEngineLocal {
         hit.setTitle(title.toString());
         hit.setDescription(caption.toString());
         hit.setNote(note.toString());
-        hit.setLink("{0}/MediaItemArchive.xhtml?id=" + values.get(IndexField.ID.getName()));
+        hit.setLink("{0}/MediaItemArchive.xhtml?id=" + values.get(IndexField.ID.
+                getName()));
         hit.setType((String) values.get(IndexField.TYPE.getName()));
         hit.setFormat(format);
 
         if (values.containsKey(IndexField.THUMB_URL.getName())) {
             hit.setPreview(true);
-            hit.setPreviewLink((String) values.get(IndexField.THUMB_URL.getName()));
-            hit.setDirectLink((String) values.get(IndexField.DIRECT_URL.getName()));
+            hit.setPreviewLink((String) values.get(
+                    IndexField.THUMB_URL.getName()));
+            hit.setDirectLink((String) values.get(
+                    IndexField.DIRECT_URL.getName()));
 
         } else {
             hit.setPreview(false);
@@ -711,13 +816,12 @@ public class SearchEngineBean implements SearchEngineLocal {
     /**
      * Generates a {link SearchResult} for a story.
      *
-     * @param qr
-     *          QueryResponse from Solr
-     * @param values
-     *          Fields available
+     * @param qr     QueryResponse from Solr
+     * @param values Fields available
      * @return {@link SearchResult}
      */
-    private SearchResult generateStoryHit(QueryResponse qr, HashMap<String, Object> values) {
+    private SearchResult generateStoryHit(QueryResponse qr,
+            HashMap<String, Object> values) {
         String id = (String) values.get(IndexField.ID.getName());
 
         StringBuilder story = new StringBuilder();
@@ -728,16 +832,20 @@ public class SearchEngineBean implements SearchEngineLocal {
 
         boolean highlightingExist = highlighting != null;
 
-        if (highlightingExist && highlighting.get(IndexField.STORY.getName()) != null) {
+        if (highlightingExist && highlighting.get(IndexField.STORY.getName())
+                != null) {
             for (String hl : highlighting.get(IndexField.STORY.getName())) {
                 story.append(hl);
             }
         } else {
-            story.append(StringUtils.abbreviate((String) values.get(IndexField.STORY.getName()), 500));
+            story.append(StringUtils.abbreviate((String) values.get(IndexField.STORY.
+                    getName()), 500));
         }
 
-        if (highlightingExist && highlighting.get(IndexField.TITLE.getName()) != null) {
-            for (String hl : qr.getHighlighting().get(id).get(IndexField.TITLE.getName())) {
+        if (highlightingExist && highlighting.get(IndexField.TITLE.getName())
+                != null) {
+            for (String hl : qr.getHighlighting().get(id).get(IndexField.TITLE.
+                    getName())) {
                 title.append(hl);
             }
         } else {
@@ -748,7 +856,8 @@ public class SearchEngineBean implements SearchEngineLocal {
         note.append(" - Words: ");
 
         if (values.containsKey(IndexField.WORD_COUNT.getName())) {
-            note.append(String.valueOf(values.get(IndexField.WORD_COUNT.getName())));
+            note.append(String.valueOf(values.get(
+                    IndexField.WORD_COUNT.getName())));
         } else {
             note.append("Unknown");
         }
@@ -760,7 +869,8 @@ public class SearchEngineBean implements SearchEngineLocal {
             if (values.get(IndexField.PLACEMENT.getName()) instanceof String) {
                 note.append(values.get(IndexField.PLACEMENT.getName()));
             } else if (values.get(IndexField.PLACEMENT.getName()) instanceof List) {
-                List<String> placements = (List<String>) values.get(IndexField.PLACEMENT.getName());
+                List<String> placements =
+                        (List<String>) values.get(IndexField.PLACEMENT.getName());
                 for (String placement : placements) {
                     note.append(placement);
                     note.append("<br/>");
@@ -794,25 +904,35 @@ public class SearchEngineBean implements SearchEngineLocal {
      * Gets the instance of the Apache Solr server used for indexing.
      *
      * @return Instance of the Apache Solr server
-     * @throws IllegalStateException
-     *          If the search engine is not properly configured
+     * @throws IllegalStateException If the search engine is not properly configured
      */
     private SolrServer getSolrServer() {
         try {
-            String url = cfgService.getString(ConfigurationKey.SEARCH_ENGINE_URL);
-            Integer socketTimeout = cfgService.getInteger(ConfigurationKey.SEARCH_ENGINE_SOCKET_TIMEOUT);
-            Integer connectionTimeout = cfgService.getInteger(ConfigurationKey.SEARCH_ENGINE_CONNECTION_TIMEOUT);
-            Integer maxTotalConnectionsPerHost = cfgService.getInteger(ConfigurationKey.SEARCH_ENGINE_MAX_TOTAL_CONNECTIONS_PER_HOST);
-            Integer maxTotalConnections = cfgService.getInteger(ConfigurationKey.SEARCH_ENGINE_MAX_TOTAL_CONNECTIONS);
-            Integer maxRetries = cfgService.getInteger(ConfigurationKey.SEARCH_ENGINE_MAX_RETRIES);
-            Boolean followRedirects = cfgService.getBoolean(ConfigurationKey.SEARCH_ENGINE_FOLLOW_REDIRECTS);
-            Boolean allowCompression = cfgService.getBoolean(ConfigurationKey.SEARCH_ENGINE_ALLOW_COMPRESSION);
+            String url =
+                    cfgService.getString(ConfigurationKey.SEARCH_ENGINE_URL);
+            Integer socketTimeout = cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_SOCKET_TIMEOUT);
+            Integer connectionTimeout = cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_CONNECTION_TIMEOUT);
+            Integer maxTotalConnectionsPerHost =
+                    cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_MAX_TOTAL_CONNECTIONS_PER_HOST);
+            Integer maxTotalConnections =
+                    cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_MAX_TOTAL_CONNECTIONS);
+            Integer maxRetries = cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_MAX_RETRIES);
+            Boolean followRedirects = cfgService.getBoolean(
+                    ConfigurationKey.SEARCH_ENGINE_FOLLOW_REDIRECTS);
+            Boolean allowCompression = cfgService.getBoolean(
+                    ConfigurationKey.SEARCH_ENGINE_ALLOW_COMPRESSION);
 
             CommonsHttpSolrServer solrServer = new CommonsHttpSolrServer(url);
             solrServer.setRequestWriter(new BinaryRequestWriter());
             solrServer.setSoTimeout(socketTimeout);
             solrServer.setConnectionTimeout(connectionTimeout);
-            solrServer.setDefaultMaxConnectionsPerHost(maxTotalConnectionsPerHost);
+            solrServer.setDefaultMaxConnectionsPerHost(
+                    maxTotalConnectionsPerHost);
             solrServer.setMaxTotalConnections(maxTotalConnections);
             solrServer.setFollowRedirects(followRedirects);
             solrServer.setAllowCompression(allowCompression);
@@ -820,9 +940,11 @@ public class SearchEngineBean implements SearchEngineLocal {
 
             return solrServer;
         } catch (MalformedURLException ex) {
-            LOG.log(Level.SEVERE, "Invalid search engine configuration. {0}", ex.getMessage());
+            LOG.log(Level.SEVERE, "Invalid search engine configuration. {0}",
+                    ex.getMessage());
             LOG.log(Level.FINE, "", ex);
-            throw new IllegalStateException("Invalid search engine configuration", ex);
+            throw new IllegalStateException(
+                    "Invalid search engine configuration", ex);
         }
     }
 }

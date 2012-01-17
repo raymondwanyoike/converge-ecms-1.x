@@ -1765,9 +1765,9 @@ div.black h2 {
 div.metrics {float:right !important;}
 div.metrics > span {margin-left:0.5em !important;}
 
-.logEntrySeveritySEVERE { background: red; color: white; }
-.logEntrySeverityWARNING { background: yellow;}
-.logEntrySeverityINFO {}
-.logEntrySeverityFINE {}
-.logEntrySeverityFINER {}
-.logEntrySeverityFINEST {}
+.logEntrySeveritySEVERE { background: #f7e7e7; color: black; }
+.logEntrySeverityWARNING { background: #f9f6e7; color: black; }
+.logEntrySeverityINFO { background: #e7eedb }
+.logEntrySeverityFINE { background: #efefef; color: #333333; }
+.logEntrySeverityFINER { background: #f1f1f1; color: #666666; }
+.logEntrySeverityFINEST {background: #efefef; color: #999999; }

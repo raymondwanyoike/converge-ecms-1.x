@@ -49,13 +49,7 @@ public interface OutletFacadeLocal {
      */
     Edition createEdition(EditionCandidate editionCandidate);
 
-    /**
-     * Creates a new {@link Outlet}.
-     *
-     * @param outlet
-     * {@link Outlet} to create in the database
-     * @return {@link Outlet} containing generated values from the database
-     */
+    
     Outlet createOutlet(Outlet outlet);
 
     /**

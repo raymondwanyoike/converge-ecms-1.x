@@ -417,6 +417,7 @@
                                         <rich:spacer width="900" height="1" />
                                     </h:panelGrid>
                                 </rich:tab>
+
                                 <rich:tab id="tabLog" label="#{i18n.Editions_NEWS_ITEM_PLACEMENT_DETAILS_TAB_LOG}">
                                     <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
                                         <h:panelGroup layout="block" class="logEntryList"> 
@@ -430,7 +431,7 @@
                                                     <h:graphicImage value="#{i18n.resource_ICON_LOG_ENTRY}" />
                                                 </rich:column>
 
-                                                <rich:column styleClass="columnDateTime" headerClass="columnDateTime">
+                                                <rich:column styleClass="columnDateTime logEntrySeverity#{logEntry.severity}" headerClass="columnDateTime">
                                                     <f:facet name="header">
                                                         <h:outputText value="#{i18n.Editions_NEWS_ITEM_PLACEMENT_DETAILS_LOG_DATE}" />
                                                     </f:facet>
@@ -439,15 +440,15 @@
                                                     </h:outputText>
                                                 </rich:column>
 
-                                                <rich:column styleClass="columnSeverity" headerClass="columnSeverity">
+                                                <rich:column styleClass="columnSeverity logEntrySeverity#{logEntry.severity}" headerClass="columnSeverity">
                                                     <f:facet name="header">
                                                         <h:outputText value="#{i18n.Editions_NEWS_ITEM_PLACEMENT_DETAILS_LOG_SEVERITY}" />
                                                     </f:facet>
                                                     <c:set var="severity_key" value="LogEntry_SEVERITY_#{logEntry.severity}" />
                                                     <h:outputText value="#{i18n[severity_key]}" />
                                                 </rich:column>
-                                                
-                                                <rich:column styleClass="columnUser" headerClass="columnUser">
+
+                                                <rich:column styleClass="columnUser logEntrySeverity#{logEntry.severity}" headerClass="columnUser">
                                                     <f:facet name="header">
                                                         <h:outputText value="#{i18n.Editions_NEWS_ITEM_PLACEMENT_DETAILS_LOG_ACTOR}" />
                                                     </f:facet>
@@ -455,7 +456,7 @@
                                                     <h:outputText value="#{i18n.LogEntry_NO_ACTOR}" rendered="#{logEntry.actor == null}" />
                                                 </rich:column>
 
-                                                <rich:column>
+                                                <rich:column styleClass="logEntrySeverity#{logEntry.severity}">
                                                     <f:facet name="header">
                                                         <h:outputText value="#{i18n.Editions_NEWS_ITEM_PLACEMENT_DETAILS_LOG_LOG}" />
                                                     </f:facet>

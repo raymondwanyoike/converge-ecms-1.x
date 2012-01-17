@@ -1,11 +1,18 @@
 /*
- * Copyright 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later 
+ * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with 
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.core.newswire;
 
@@ -75,6 +82,9 @@ public class NewswireService implements Serializable {
 
     @Column(name = "active")
     private boolean active = true;
+    
+    @Column(name = "processing")
+    private boolean processing = false;
 
     @ManyToMany
     @JoinTable(name = "newswire_restriction",
@@ -102,8 +112,6 @@ public class NewswireService implements Serializable {
      *
      * @param source
      *          Source of the {@link NewswireService}
-     * @param url
-     *          URL of the {@link NewswireService}
      */
     public NewswireService(String source) {
         this.source = source;
@@ -281,6 +289,26 @@ public class NewswireService implements Serializable {
      */
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    /**
+     * Determines if the {@link NewswireService} is currently being processed.
+     * 
+     * @return {@code true} if the {@link NewswireService} is currently being 
+     *         processed, otherwise {@code false}.
+     */
+    public boolean isProcessing() {
+        return processing;
+    }
+
+    /**
+     * Determines if the {@link NewswireService} is currently being processed.
+     * 
+     * @param processing {@code true} if the {@link NewswireService} is
+     *                   currently being processed, otherwise {@code false}.
+     */
+    public void setProcessing(boolean processing) {
+        this.processing = processing;
     }
 
     public Long getNumberOfSubscribers() {

@@ -9,16 +9,16 @@
                 <converge:moduleHeader moduleTitle="#{i18n.Newswire_OPTIONS}" />
                 <div class="moduleContent">
                     <h:panelGrid columns="2">
-                        <h:graphicImage value="#{res.BULLET_ICON}" alt="" title="" />
+                        <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="" title="" />
                         <a4j:commandLink ajaxSingle="true">
                             <a4j:support event="oncomplete" actionListener="#{newswire.onShowTodaysNews}" reRender="frmPage,frmQuery" />
                             <h:outputText value="#{i18n.Newswire_OPTION_SHOW_LATEST_NEWS}" />
                         </a4j:commandLink>
-                        <h:graphicImage value="#{res.BULLET_ICON}" alt="" title="" />
+                        <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="" title="" />
                         <a4j:commandLink ajaxSingle="true" reRender="frmMyNewswireSubscriptions" oncomplete="#{rich:component('mpMyNewswireSubscriptions')}.show();">
                             <h:outputText value="#{i18n.Newswire_OPTION_SUBSCRIBE_TO_NEWSWIRES}" />
                         </a4j:commandLink>
-                        <h:graphicImage value="#{res.BULLET_ICON}" alt="" title="" />
+                        <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="" title="" />
                         <a4j:commandLink ajaxSingle="true" reRender="frmBasketDetail" actionListener="#{newswire.onNewBasket}" oncomplete="#{rich:component('mpBasketDetail')}.show();">
                             <h:outputText value="#{i18n.Newswire_OPTION_CREATE_BASKET}" />
                         </a4j:commandLink>
@@ -164,7 +164,7 @@
                                     </h2>
 
                                     <p style="margin-top: 1px; margin-bottom: 2px;">
-                                        <h:graphicImage url="#{item.previewLink}" rendered="#{item.preview}" style="border: 1px solid black; margin-right: 5px; margin-top: 5px; float: left;" />
+                                        <h:graphicImage url="#{item.previewLink}" rendered="#{item.preview}" style="border: 1px solid black; margin-right: 5px; margin-top: 5px; float: left; max-width: 120px;" />
                                         <h:outputText value="#{item.description}" escape="false" />
                                     </p>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,11 +43,15 @@ import org.apache.commons.lang.StringUtils;
 @Stateless(name = "UserServiceBean", mappedName = "ejb/UserServiceBean")
 public class UserServiceBean implements UserServiceLocal {
 
-    private static final Logger LOG = Logger.getLogger(UserServiceBean.class.getName());
+    private static final Logger LOG = Logger.getLogger(UserServiceBean.class.
+            getName());
 
     @EJB private DaoServiceLocal daoService;
 
     @EJB private ConfigurationServiceLocal cfgService;
+
+    /** Identifier (user id) of an anonymous user. */
+    private final String ANONYMOUS_USER = "ANONYMOUS";
 
     private SearchControls sc = new SearchControls();
 
@@ -67,7 +71,8 @@ public class UserServiceBean implements UserServiceLocal {
     public List<UserAccount> getMembers(Long departmentId) {
         List<UserAccount> members = new ArrayList<UserAccount>();
         try {
-            Department department = daoService.findById(Department.class, departmentId);
+            Department department = daoService.findById(Department.class,
+                    departmentId);
             members = department.getUserAccounts();
         } catch (DataNotFoundException ex) {
             LOG.log(Level.FINE, "Invalid Department", ex);
@@ -114,16 +119,18 @@ public class UserServiceBean implements UserServiceLocal {
 
     @Override
     public List<UserAccount> getDirectoryMembers() throws NamingException {
-        return getMembers(cfgService.getString(ConfigurationKey.LDAP_GROUP_USERS));
+        return getMembers(
+                cfgService.getString(ConfigurationKey.LDAP_GROUP_USERS));
     }
 
-    /** {@inheritDoc }*/
+    /** {@inheritDoc } */
     @Override
     public List<UserAccount> getMembers(String groupDn) throws NamingException {
         // Field containing the user unique identifier
         String uid = getFieldMapping(LdapFieldMapping.USER_MAPPING_USERNAME);
         // Field containinf the "member of" a group
-        String memberOf = getFieldMapping(LdapFieldMapping.GROUP_MAPPING_MEMBEROF);
+        String memberOf = getFieldMapping(
+                LdapFieldMapping.GROUP_MAPPING_MEMBEROF);
 
         List<UserAccount> members = new LinkedList<UserAccount>();
 
@@ -155,11 +162,16 @@ public class UserServiceBean implements UserServiceLocal {
                         String username = (String) attrs.get(uid).get();
 
                         // Look up user by UID in local database
-                        Map<String, Object> params = QueryBuilder.with("username", username).parameters();
-                        List<UserAccount> result = daoService.findWithNamedQuery(UserAccount.FIND_BY_UID, params);
+                        Map<String, Object> params = QueryBuilder.with(
+                                "username", username).parameters();
+                        List<UserAccount> result =
+                                daoService.findWithNamedQuery(
+                                UserAccount.FIND_BY_UID, params);
 
                         if (result.isEmpty()) {
-                            LOG.log(Level.FINE, "User {0} has not been setup in the local database, using information from directory", username);
+                            LOG.log(Level.FINE,
+                                    "User {0} has not been setup in the local database, using information from directory",
+                                    username);
                             ua = new UserAccount();
                         } else {
                             ua = result.iterator().next();
@@ -172,12 +184,14 @@ public class UserServiceBean implements UserServiceLocal {
                         // Add to results list
                         members.add(ua);
                     } catch (NamingException ex) {
-                        LOG.log(Level.WARNING, "User {0} does not exist in LDAP", userDn);
+                        LOG.log(Level.WARNING, "User {0} does not exist in LDAP",
+                                userDn);
                     }
                 }
             }
         } else {
-            LOG.log(Level.SEVERE, "Couldn't find search attributes ({0}) in {1}", new Object[]{memberOf, groupOfUsers});
+            LOG.log(Level.SEVERE, "Couldn't find search attributes ({0}) in {1}",
+                    new Object[]{memberOf, groupOfUsers});
         }
         closeDirectoryConnection(dirCtx);
 
@@ -196,13 +210,14 @@ public class UserServiceBean implements UserServiceLocal {
      * Determines if a given user exists in the LDAP directory.
      *
      * @param id
-     *          Unique identifier of the user
-     * @return <code>true</code> if the {@link UserAccount} exists in the LDAP
-     *         directory, otherwise <code>false</code>
+* Unique identifier of the user
+     * @return <
+     * code>true</code> if the {@link UserAccount} exists in the LDAP
+     * directory, otherwise
+     * <code>false</code>
      */
     @Override
     public boolean exists(String id) {
-        LOG.info("exists(id)");
         this.sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
         String uid = getFieldMapping(LdapFieldMapping.USER_MAPPING_USERNAME);
@@ -212,7 +227,8 @@ public class UserServiceBean implements UserServiceLocal {
         boolean exists = false;
         try {
             DirContext dirCtx = getDirectoryConnection();
-            NamingEnumeration results = dirCtx.search(this.groupOfUsers, filter, this.sc);
+            NamingEnumeration results = dirCtx.search(this.groupOfUsers, filter,
+                    this.sc);
             exists = results.hasMore();
             closeDirectoryConnection(dirCtx);
         } catch (NamingException e) {
@@ -224,12 +240,16 @@ public class UserServiceBean implements UserServiceLocal {
 
     /** {@inheritDoc} */
     @Override
-    public UserAccount syncWithDirectory(UserAccount userAccount) throws UserNotFoundException, DirectoryException {
+    public UserAccount syncWithDirectory(UserAccount userAccount) throws
+            UserNotFoundException, DirectoryException {
         if (userAccount == null) {
-            throw new UserNotFoundException("null user account passed to synchronisation");
+            throw new UserNotFoundException(
+                    "null user account passed to synchronisation");
         }
 
-        LOG.log(Level.INFO, "Synchronising [{0}/{1}/{2}] with directory", new Object[]{userAccount.getUsername(), userAccount.getDistinguishedName(), userAccount.getId()});
+        LOG.log(Level.INFO, "Synchronising [{0}/{1}/{2}] with directory",
+                new Object[]{userAccount.getUsername(), userAccount.
+                    getDistinguishedName(), userAccount.getId()});
         boolean found = false;
         this.sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
         String id = userAccount.getUsername();
@@ -239,7 +259,8 @@ public class UserServiceBean implements UserServiceLocal {
         try {
             String base = cfgService.getString(ConfigurationKey.LDAP_BASE);
             dirCtx = getDirectoryConnection();
-            NamingEnumeration results = dirCtx.search(base, "({0}={1})", new Object[]{uid, id}, this.sc);
+            NamingEnumeration results = dirCtx.search(base, "({0}={1})",
+                    new Object[]{uid, id}, this.sc);
 
             if (results.hasMoreElements() && !found) {
                 SearchResult sr = (SearchResult) results.next();
@@ -260,18 +281,35 @@ public class UserServiceBean implements UserServiceLocal {
 
 
         if (!found) {
-            throw new UserNotFoundException("User [" + id + "] was not found in directory");
+            throw new UserNotFoundException("User [" + id
+                    + "] was not found in directory");
         }
 
         return userAccount;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Finds a {@link UserAccount} by its unique identifier.
+     *
+     * @param id Unique identifier of the {@link UserAccount}
+     * @return {@link UserAccount} matching the unique identifier
+     * @throws UserNotFoundException If a {@link UserAccount} could not found with the given
+     * <code>id</code>
+     * @throws DirectoryException    If communication with the user directory failed
+     */
     @Override
-    public UserAccount findById(String id) throws UserNotFoundException, DirectoryException {
+    public UserAccount findById(String id) throws UserNotFoundException,
+            DirectoryException {
+
+        if (ANONYMOUS_USER.equalsIgnoreCase(id)) {
+            throw new UserNotFoundException(id + " is not a valid user");
+        }
+
         UserAccount ua;
 
-        List<UserAccount> matches = daoService.findWithNamedQuery(UserAccount.FIND_BY_UID, QueryBuilder.with("username", id).parameters());
+        List<UserAccount> matches = daoService.findWithNamedQuery(
+                UserAccount.FIND_BY_UID, QueryBuilder.with("username", id).
+                parameters());
 
         if (matches.size() == 1) {
             return ua = matches.iterator().next();
@@ -279,13 +317,16 @@ public class UserServiceBean implements UserServiceLocal {
             LOG.log(Level.FINE, "No user account found for {0} in database", id);
             ua = new UserAccount();
             ua.setUsername(id);
-            ua.setTimeZoneAsString(cfgService.getString(ConfigurationKey.TIME_ZONE));
+            ua.setTimeZoneAsString(cfgService.getString(
+                    ConfigurationKey.TIME_ZONE));
             try {
                 ua = syncWithDirectory(ua);
-                LOG.log(Level.FINE, "Creating user account in database for {0}", id);
+                LOG.log(Level.FINE, "Creating user account in database for {0}",
+                        id);
                 return daoService.create(ua);
             } catch (Exception ex) {
-                throw new UserNotFoundException("User [" + id + "] was not found in directory nor database", ex);
+                throw new UserNotFoundException("User [" + id
+                        + "] was not found in directory nor database", ex);
             }
         }
     }
@@ -299,34 +340,49 @@ public class UserServiceBean implements UserServiceLocal {
     /**
      * Sets the properties of a {@link UserAccount} based on a
      * {@link SearchResult} from the directory. The process will validate each
-     * {@link Attribute} to ensure no <code>null</code> values or exceptions
+     * {@link Attribute} to ensure no
+     * <code>null</code> values or exceptions
      * occur.
      *
-     * @param user
-     *          {@link UserAccount} to update
-     * @param sr
-     *          {@link SearchResult} containing the user information
+     * @param user {@link UserAccount} to update
+     * @param sr   {@link SearchResult} containing the user information
      */
     private void updateUser(UserAccount user, final Attributes attrs) {
 
-        String fieldUid = getFieldMapping(LdapFieldMapping.USER_MAPPING_USERNAME);
+        String fieldUid =
+                getFieldMapping(LdapFieldMapping.USER_MAPPING_USERNAME);
         String fieldMail = getFieldMapping(LdapFieldMapping.USER_MAPPING_EMAIL);
-        String fieldCommonName = getFieldMapping(LdapFieldMapping.USER_MAPPING_COMMON_NAME);
-        String fieldGivenName = getFieldMapping(LdapFieldMapping.USER_MAPPING_FIRST_NAME);
-        String fieldSurname = getFieldMapping(LdapFieldMapping.USER_MAPPING_LAST_NAME);
-        String fieldJobTitle = getFieldMapping(LdapFieldMapping.USER_MAPPING_JOB_TITLE);
-        String fieldMobile = getFieldMapping(LdapFieldMapping.USER_MAPPING_MOBILE);
-        String fieldOrganisation = getFieldMapping(LdapFieldMapping.USER_MAPPING_ORGANISATION);
+        String fieldCommonName = getFieldMapping(
+                LdapFieldMapping.USER_MAPPING_COMMON_NAME);
+        String fieldGivenName = getFieldMapping(
+                LdapFieldMapping.USER_MAPPING_FIRST_NAME);
+        String fieldSurname = getFieldMapping(
+                LdapFieldMapping.USER_MAPPING_LAST_NAME);
+        String fieldJobTitle = getFieldMapping(
+                LdapFieldMapping.USER_MAPPING_JOB_TITLE);
+        String fieldMobile = getFieldMapping(
+                LdapFieldMapping.USER_MAPPING_MOBILE);
+        String fieldOrganisation = getFieldMapping(
+                LdapFieldMapping.USER_MAPPING_ORGANISATION);
         String fieldPhone = getFieldMapping(LdapFieldMapping.USER_MAPPING_PHONE);
-        String fieldLanguage = getFieldMapping(LdapFieldMapping.USER_MAPPING_LANGUAGE);
-        String fieldPhoto = getFieldMapping(LdapFieldMapping.USER_MAPPING_JPEG_PHOTO);
-        String fieldEmploymentType = getFieldMapping(LdapFieldMapping.USER_MAPPING_EMPLOYMENT_TYPE);
-        String employmentTypeFreelance = getFieldMapping(LdapFieldMapping.EMPLOYMENT_TYPE_MAPPING_FREELANCE);
-        String employmentTypePermanent = getFieldMapping(LdapFieldMapping.EMPLOYMENT_TYPE_MAPPING_PERMANENT);
-        String fieldFeeType = getFieldMapping(LdapFieldMapping.USER_MAPPING_FEE_TYPE);
-        String feeTypeStory = getFieldMapping(LdapFieldMapping.FEE_TYPE_MAPPING_STORY);
-        String feeTypeFixed = getFieldMapping(LdapFieldMapping.FEE_TYPE_MAPPING_FIXED);
-        String feeTypeWord = getFieldMapping(LdapFieldMapping.FEE_TYPE_MAPPING_WORD);
+        String fieldLanguage = getFieldMapping(
+                LdapFieldMapping.USER_MAPPING_LANGUAGE);
+        String fieldPhoto = getFieldMapping(
+                LdapFieldMapping.USER_MAPPING_JPEG_PHOTO);
+        String fieldEmploymentType = getFieldMapping(
+                LdapFieldMapping.USER_MAPPING_EMPLOYMENT_TYPE);
+        String employmentTypeFreelance = getFieldMapping(
+                LdapFieldMapping.EMPLOYMENT_TYPE_MAPPING_FREELANCE);
+        String employmentTypePermanent = getFieldMapping(
+                LdapFieldMapping.EMPLOYMENT_TYPE_MAPPING_PERMANENT);
+        String fieldFeeType = getFieldMapping(
+                LdapFieldMapping.USER_MAPPING_FEE_TYPE);
+        String feeTypeStory = getFieldMapping(
+                LdapFieldMapping.FEE_TYPE_MAPPING_STORY);
+        String feeTypeFixed = getFieldMapping(
+                LdapFieldMapping.FEE_TYPE_MAPPING_FIXED);
+        String feeTypeWord = getFieldMapping(
+                LdapFieldMapping.FEE_TYPE_MAPPING_WORD);
 
         user.setUsername(LdapUtils.validateAttribute(attrs.get(fieldUid)));
         user.setEmail(LdapUtils.validateAttribute(attrs.get(fieldMail)));
@@ -334,15 +390,17 @@ public class UserServiceBean implements UserServiceLocal {
         user.setGivenName(LdapUtils.validateAttribute(attrs.get(fieldGivenName)));
         user.setJobTitle(LdapUtils.validateAttribute(attrs.get(fieldJobTitle)));
         user.setMobile(LdapUtils.validateAttribute(attrs.get(fieldMobile)));
-        user.setOrganisation(LdapUtils.validateAttribute(attrs.get(fieldOrganisation)));
+        user.setOrganisation(LdapUtils.validateAttribute(attrs.get(
+                fieldOrganisation)));
         user.setPhone(LdapUtils.validateAttribute(attrs.get(fieldPhone)));
-        
+
         // If the user does not have a preferred language, get the one specified
         // in the LDAP directory
         if (StringUtils.isBlank(user.getPreferredLanguage())) {
-            user.setPreferredLanguage(LdapUtils.validateAttribute(attrs.get(fieldLanguage)));
+            user.setPreferredLanguage(LdapUtils.validateAttribute(attrs.get(
+                    fieldLanguage)));
         }
-        
+
         // If no preferred language was specified in the profile nor in the LDAP
         // use the default language specified for the application
         if (StringUtils.isBlank(user.getPreferredLanguage())) {
@@ -364,7 +422,8 @@ public class UserServiceBean implements UserServiceLocal {
 //            }
 //        }
 
-        String employmentType = LdapUtils.validateAttribute(attrs.get(fieldEmploymentType));
+        String employmentType = LdapUtils.validateAttribute(attrs.get(
+                fieldEmploymentType));
         String feeType = LdapUtils.validateAttribute(attrs.get(fieldFeeType));
         if (employmentType.equalsIgnoreCase(employmentTypePermanent)) {
             user.setEmploymentType(EmploymentType.PERMANENT);
@@ -391,37 +450,63 @@ public class UserServiceBean implements UserServiceLocal {
     private void setupUserMapping() {
 
         groupOfUsers = cfgService.getString(ConfigurationKey.LDAP_GROUP_USERS);
-        groupOfAdministrators = cfgService.getString(ConfigurationKey.LDAP_GROUP_ADMINISTRATORS);
+        groupOfAdministrators = cfgService.getString(
+                ConfigurationKey.LDAP_GROUP_ADMINISTRATORS);
 
-        addMapping(LdapFieldMapping.USER_MAPPING_USERNAME, cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_USERNAME));
-        addMapping(LdapFieldMapping.USER_MAPPING_EMAIL, cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_EMAIL));
-        addMapping(LdapFieldMapping.USER_MAPPING_COMMON_NAME, cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_COMMON_NAME));
-        addMapping(LdapFieldMapping.USER_MAPPING_FIRST_NAME, cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_FIRST_NAME));
-        addMapping(LdapFieldMapping.USER_MAPPING_LAST_NAME, cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_LAST_NAME));
-        addMapping(LdapFieldMapping.USER_MAPPING_JOB_TITLE, cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_JOB_TITLE));
-        addMapping(LdapFieldMapping.USER_MAPPING_MOBILE, cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_MOBILE));
-        addMapping(LdapFieldMapping.USER_MAPPING_ORGANISATION, cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_ORGANISATION));
-        addMapping(LdapFieldMapping.USER_MAPPING_PHONE, cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_PHONE));
-        addMapping(LdapFieldMapping.USER_MAPPING_LANGUAGE, cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_LANGUAGE));
-        addMapping(LdapFieldMapping.USER_MAPPING_JPEG_PHOTO, cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_JPEG_PHOTO));
-        addMapping(LdapFieldMapping.USER_MAPPING_EMPLOYMENT_TYPE, cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_EMPLOYEE_TYPE));
-        addMapping(LdapFieldMapping.EMPLOYMENT_TYPE_MAPPING_FREELANCE, cfgService.getString(ConfigurationKey.LDAP_EMPLOYMENT_TYPE_MAPPING_FREELANCE));
-        addMapping(LdapFieldMapping.EMPLOYMENT_TYPE_MAPPING_PERMANENT, cfgService.getString(ConfigurationKey.LDAP_EMPLOYMENT_TYPE_MAPPING_PERMANENT));
-        addMapping(LdapFieldMapping.USER_MAPPING_FEE_TYPE, cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_FEE_TYPE));
-        addMapping(LdapFieldMapping.FEE_TYPE_MAPPING_STORY, cfgService.getString(ConfigurationKey.LDAP_FEE_TYPE_MAPPING_STORY));
-        addMapping(LdapFieldMapping.FEE_TYPE_MAPPING_FIXED, cfgService.getString(ConfigurationKey.LDAP_FEE_TYPE_MAPPING_FIXED));
-        addMapping(LdapFieldMapping.FEE_TYPE_MAPPING_WORD, cfgService.getString(ConfigurationKey.LDAP_FEE_TYPE_MAPPING_WORD));
-        addMapping(LdapFieldMapping.GROUP_MAPPING_NAME, cfgService.getString(ConfigurationKey.LDAP_GROUP_MAPPING_NAME));
-        addMapping(LdapFieldMapping.GROUP_MAPPING_MEMBEROF, cfgService.getString(ConfigurationKey.LDAP_GROUP_MAPPING_MEMBEROF));
+        addMapping(LdapFieldMapping.USER_MAPPING_USERNAME,
+                cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_USERNAME));
+        addMapping(LdapFieldMapping.USER_MAPPING_EMAIL,
+                cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_EMAIL));
+        addMapping(LdapFieldMapping.USER_MAPPING_COMMON_NAME, cfgService.
+                getString(ConfigurationKey.LDAP_USER_MAPPING_COMMON_NAME));
+        addMapping(LdapFieldMapping.USER_MAPPING_FIRST_NAME, cfgService.
+                getString(ConfigurationKey.LDAP_USER_MAPPING_FIRST_NAME));
+        addMapping(LdapFieldMapping.USER_MAPPING_LAST_NAME,
+                cfgService.getString(
+                ConfigurationKey.LDAP_USER_MAPPING_LAST_NAME));
+        addMapping(LdapFieldMapping.USER_MAPPING_JOB_TITLE,
+                cfgService.getString(
+                ConfigurationKey.LDAP_USER_MAPPING_JOB_TITLE));
+        addMapping(LdapFieldMapping.USER_MAPPING_MOBILE,
+                cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_MOBILE));
+        addMapping(LdapFieldMapping.USER_MAPPING_ORGANISATION, cfgService.
+                getString(ConfigurationKey.LDAP_USER_MAPPING_ORGANISATION));
+        addMapping(LdapFieldMapping.USER_MAPPING_PHONE,
+                cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_PHONE));
+        addMapping(LdapFieldMapping.USER_MAPPING_LANGUAGE,
+                cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_LANGUAGE));
+        addMapping(LdapFieldMapping.USER_MAPPING_JPEG_PHOTO, cfgService.
+                getString(ConfigurationKey.LDAP_USER_MAPPING_JPEG_PHOTO));
+        addMapping(LdapFieldMapping.USER_MAPPING_EMPLOYMENT_TYPE, cfgService.
+                getString(ConfigurationKey.LDAP_USER_MAPPING_EMPLOYEE_TYPE));
+        addMapping(LdapFieldMapping.EMPLOYMENT_TYPE_MAPPING_FREELANCE,
+                cfgService.getString(
+                ConfigurationKey.LDAP_EMPLOYMENT_TYPE_MAPPING_FREELANCE));
+        addMapping(LdapFieldMapping.EMPLOYMENT_TYPE_MAPPING_PERMANENT,
+                cfgService.getString(
+                ConfigurationKey.LDAP_EMPLOYMENT_TYPE_MAPPING_PERMANENT));
+        addMapping(LdapFieldMapping.USER_MAPPING_FEE_TYPE,
+                cfgService.getString(ConfigurationKey.LDAP_USER_MAPPING_FEE_TYPE));
+        addMapping(LdapFieldMapping.FEE_TYPE_MAPPING_STORY,
+                cfgService.getString(
+                ConfigurationKey.LDAP_FEE_TYPE_MAPPING_STORY));
+        addMapping(LdapFieldMapping.FEE_TYPE_MAPPING_FIXED,
+                cfgService.getString(
+                ConfigurationKey.LDAP_FEE_TYPE_MAPPING_FIXED));
+        addMapping(LdapFieldMapping.FEE_TYPE_MAPPING_WORD,
+                cfgService.getString(ConfigurationKey.LDAP_FEE_TYPE_MAPPING_WORD));
+        addMapping(LdapFieldMapping.GROUP_MAPPING_NAME,
+                cfgService.getString(ConfigurationKey.LDAP_GROUP_MAPPING_NAME));
+        addMapping(LdapFieldMapping.GROUP_MAPPING_MEMBEROF,
+                cfgService.getString(
+                ConfigurationKey.LDAP_GROUP_MAPPING_MEMBEROF));
     }
 
     /**
      * Adds a field mapping to the mapping table.
      *
-     * @param fieldIdentifier
-     *          Field identifier
-     * @param fieldName
-     *          Real name of the field
+     * @param fieldIdentifier Field identifier
+     * @param fieldName       Real name of the field
      */
     private void addMapping(String fieldIdentifier, String fieldName) {
         this.fieldMapping.put(fieldIdentifier, fieldName);
@@ -430,8 +515,7 @@ public class UserServiceBean implements UserServiceLocal {
     /**
      * Gets a field mapping from the mapping table.
      *
-     * @param fieldIdentifier
-     *          Field identifier
+     * @param fieldIdentifier Field identifier
      * @return Real name of the field given
      */
     private String getFieldMapping(String fieldIdentifier) {
@@ -456,32 +540,48 @@ public class UserServiceBean implements UserServiceLocal {
      *
      * @return Established connection to the used LDAP directory
      * @throws NamingException
-     *          If the connection could not be established
+* If the connection could not be established
      */
     private DirContext getDirectoryConnection() throws NamingException {
-        LOG.log(Level.INFO, "Opening directory connection");
+        LOG.log(Level.FINE, "Opening directory connection");
         DirContext dirContext = null;
 
         Properties p = new Properties();
-        p.put(Context.INITIAL_CONTEXT_FACTORY, cfgService.getString(ConfigurationKey.LDAP_CONNECTION_FACTORY));
+        p.put(Context.INITIAL_CONTEXT_FACTORY,
+                cfgService.getString(ConfigurationKey.LDAP_CONNECTION_FACTORY));
         p.put("com.sun.jndi.ldap.connect.pool", "true");
-        p.put("com.sun.jndi.ldap.read.timeout", cfgService.getString(ConfigurationKey.LDAP_READ_TIMEOUT));
-        p.put("com.sun.jndi.ldap.connect.timeout", cfgService.getString(ConfigurationKey.LDAP_CONNECT_TIMEOUT));
+        p.put("com.sun.jndi.ldap.read.timeout",
+                cfgService.getString(ConfigurationKey.LDAP_READ_TIMEOUT));
+        p.put("com.sun.jndi.ldap.connect.timeout",
+                cfgService.getString(ConfigurationKey.LDAP_CONNECT_TIMEOUT));
 
-        p.put(Context.PROVIDER_URL, cfgService.getString(ConfigurationKey.LDAP_PROVIDER_URL));
-        p.put(Context.SECURITY_AUTHENTICATION, cfgService.getString(ConfigurationKey.LDAP_SECURITY_AUTHENTICATION));
-        p.put(Context.SECURITY_PRINCIPAL, cfgService.getString(ConfigurationKey.LDAP_SECURITY_PRINCIPAL));
-        p.put(Context.SECURITY_CREDENTIALS, cfgService.getString(ConfigurationKey.LDAP_SECURITY_CREDENTIALS));
+        p.put(Context.PROVIDER_URL, cfgService.getString(
+                ConfigurationKey.LDAP_PROVIDER_URL));
+        p.put(Context.SECURITY_AUTHENTICATION,
+                cfgService.getString(
+                ConfigurationKey.LDAP_SECURITY_AUTHENTICATION));
+        p.put(Context.SECURITY_PRINCIPAL, cfgService.getString(
+                ConfigurationKey.LDAP_SECURITY_PRINCIPAL));
+        p.put(Context.SECURITY_CREDENTIALS,
+                cfgService.getString(ConfigurationKey.LDAP_SECURITY_CREDENTIALS));
 
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "INITIAL_CONTEXT_FACTORY: {0}", p.getProperty(Context.INITIAL_CONTEXT_FACTORY));
-            LOG.log(Level.FINE, "PROVIDER_URL: {0}", p.getProperty(Context.PROVIDER_URL));
-            LOG.log(Level.FINE, "SECURITY_AUTHENTICATION: {0}", p.getProperty(Context.SECURITY_AUTHENTICATION));
-            LOG.log(Level.FINE, "SECURITY_PRINCIPAL: {0}", p.getProperty(Context.SECURITY_PRINCIPAL));
-            LOG.log(Level.FINE, "SECURITY_CREDENTIALS: {0}", p.getProperty(Context.SECURITY_CREDENTIALS));
-            LOG.log(Level.FINE, "LDAP_BASE: {0}", cfgService.getString(ConfigurationKey.LDAP_BASE));
-            LOG.log(Level.FINE, "LDAP_CONNECTION_TIMEOUT: {0}", cfgService.getString(ConfigurationKey.LDAP_CONNECT_TIMEOUT));
-            LOG.log(Level.FINE, "LDAP_READ_TIMEOUT: {0}", cfgService.getString(ConfigurationKey.LDAP_READ_TIMEOUT));
+            LOG.log(Level.FINE, "INITIAL_CONTEXT_FACTORY: {0}",
+                    p.getProperty(Context.INITIAL_CONTEXT_FACTORY));
+            LOG.log(Level.FINE, "PROVIDER_URL: {0}", p.getProperty(
+                    Context.PROVIDER_URL));
+            LOG.log(Level.FINE, "SECURITY_AUTHENTICATION: {0}",
+                    p.getProperty(Context.SECURITY_AUTHENTICATION));
+            LOG.log(Level.FINE, "SECURITY_PRINCIPAL: {0}",
+                    p.getProperty(Context.SECURITY_PRINCIPAL));
+            LOG.log(Level.FINE, "SECURITY_CREDENTIALS: {0}",
+                    p.getProperty(Context.SECURITY_CREDENTIALS));
+            LOG.log(Level.FINE, "LDAP_BASE: {0}",
+                    cfgService.getString(ConfigurationKey.LDAP_BASE));
+            LOG.log(Level.FINE, "LDAP_CONNECTION_TIMEOUT: {0}", cfgService.
+                    getString(ConfigurationKey.LDAP_CONNECT_TIMEOUT));
+            LOG.log(Level.FINE, "LDAP_READ_TIMEOUT: {0}",
+                    cfgService.getString(ConfigurationKey.LDAP_READ_TIMEOUT));
         }
 
         dirContext = new InitialDirContext(p);
@@ -490,7 +590,7 @@ public class UserServiceBean implements UserServiceLocal {
     }
 
     private void closeDirectoryConnection(DirContext dirContext) {
-        LOG.log(Level.INFO, "Closing directory connection");
+        LOG.log(Level.FINE, "Closing directory connection");
         if (dirContext == null) {
             LOG.log(Level.WARNING, "Could not close DirContext as it is null");
             return;
@@ -518,8 +618,10 @@ public class UserServiceBean implements UserServiceLocal {
     /** {@inheritDoc } */
     @Override
     public List<UserAccount> findUserAccountsByUserRoleName(String name) {
-        Map<String, Object> params = QueryBuilder.with("roleName", name).parameters();
-        return daoService.findWithNamedQuery(UserAccount.FIND_BY_USER_ROLE, params);
+        Map<String, Object> params = QueryBuilder.with("roleName", name).
+                parameters();
+        return daoService.findWithNamedQuery(UserAccount.FIND_BY_USER_ROLE,
+                params);
     }
 
     /** {@inheritDoc } */

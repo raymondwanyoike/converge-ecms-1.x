@@ -20,6 +20,7 @@ import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.dto.EditionAssignmentView;
 import dk.i2m.converge.core.dto.EditionView;
 import dk.i2m.converge.core.dto.OutletActionView;
+import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.utils.BeanComparator;
 import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.messaging.EditionServiceMessageBean;
@@ -60,10 +61,32 @@ public class OutletFacadeBean implements OutletFacadeLocal {
     }
 
     /**
-     * {@inheritDoc}
+     * Ensures that the necessary data has been set on the {@link Outlet}.
+     * 
+     * @param outlet {@link Outlet} to validate
+     */
+    private void validateOutlet(Outlet outlet) {
+        // Ensure that the necessary roles have been added to the outlet
+        if (outlet.getWorkflow() != null) {
+            List<UserRole> mandatory = outlet.getWorkflow().
+                    getUserRolesInWorkflowStates();
+            for (UserRole role : mandatory) {
+                if (!outlet.getRoles().contains(role)) {
+                    outlet.getRoles().add(role);
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates a new {@link Outlet}.
+     *
+     * @param outlet {@link Outlet} to create in the database
+     * @return {@link Outlet} containing generated values from the database
      */
     @Override
     public Outlet createOutlet(Outlet outlet) {
+        validateOutlet(outlet);
         return daoService.create(outlet);
     }
 
@@ -88,6 +111,7 @@ public class OutletFacadeBean implements OutletFacadeLocal {
      */
     @Override
     public Outlet updateOutlet(Outlet outlet) {
+        validateOutlet(outlet);
         return daoService.update(outlet);
     }
 
@@ -146,15 +170,15 @@ public class OutletFacadeBean implements OutletFacadeLocal {
      * Creates an {@link Edition} for the given outlet.
      *
      * @param outletId
-       * Unique identifier of the {@link Outlet}
+     * Unique identifier of the {@link Outlet}
      * @param open
-           * Determines if the {@link Edition} is open for placements
+     * Determines if the {@link Edition} is open for placements
      * @param publicationDate
-* Date of publication of the {@link Edition}
+     * Date of publication of the {@link Edition}
      * @param expirationDate
- * Date of expiration of the {@link Edition}
+     * Date of expiration of the {@link Edition}
      * @param closeDate
-      * Date when the {@link Edition} closes for additions
+     * Date when the {@link Edition} closes for additions
      */
     @Override
     public Edition createEdition(Long outletId, Boolean open,
@@ -506,15 +530,15 @@ public class OutletFacadeBean implements OutletFacadeLocal {
      * Updates an existing {@link Edition} in the database.
      *
      * @param editionId
-      * Unique identifier of the {@link Edition} to update
+     * Unique identifier of the {@link Edition} to update
      * @param open
-           * Determines if the {@link Edition} should be open
+     * Determines if the {@link Edition} should be open
      * @param publicationDate
-* New publication date of the {@link Edition}
+     * New publication date of the {@link Edition}
      * @param expirationDate
- * New expiration date of the {@link Edition}
+     * New expiration date of the {@link Edition}
      * @param closeDate
-      * New close date of the {@link Edition}
+     * New close date of the {@link Edition}
      * @return Update {@link Edition}
      * @throws DataNotFoundException * If no {@link Edition} exist with the
      * given {@code editionId}
@@ -731,9 +755,10 @@ public class OutletFacadeBean implements OutletFacadeLocal {
     @Override
     public void scheduleNewsItemPlacementActions(Long editionId,
             Long newsItemPlacementId) {
-        
-        LOG.log(Level.INFO, "Called by user: {0}", ctx.getCallerPrincipal().getName());
-        
+
+        LOG.log(Level.INFO, "Called by user: {0}", ctx.getCallerPrincipal().
+                getName());
+
         Connection connection = null;
         try {
             Edition edition = daoService.findById(Edition.class, editionId);
@@ -788,7 +813,8 @@ public class OutletFacadeBean implements OutletFacadeLocal {
     @Override
     public void scheduleNewsItemPlacementAction(Long editionId, Long actionId,
             Long newsItemPlacementId) {
-        LOG.log(Level.INFO, "Called by user: {0}", ctx.getCallerPrincipal().getName());
+        LOG.log(Level.INFO, "Called by user: {0}", ctx.getCallerPrincipal().
+                getName());
         Connection connection = null;
         try {
             connection = jmsConnectionFactory.createConnection();
@@ -804,7 +830,7 @@ public class OutletFacadeBean implements OutletFacadeLocal {
                     name(), actionId);
             message.setLongProperty(EditionServiceMessageBean.Property.NEWS_ITEM_PLACEMENT_ID.
                     name(), newsItemPlacementId);
-            message.setString(EditionServiceMessageBean.Property.USER_ACCOUNT_ID.
+            message.setStringProperty(EditionServiceMessageBean.Property.USER_ACCOUNT_ID.
                     name(), ctx.getCallerPrincipal().getName());
             producer.send(message);
 

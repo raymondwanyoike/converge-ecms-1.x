@@ -21,7 +21,7 @@
                                 <h:graphicImage value="#{i18n.resource_ICON_LOG_ENTRY}" />
                             </rich:column>
 
-                            <rich:column styleClass="columnDateTime  logEntrySeverity#{logEntry.severity}" headerClass="columnDateTime">
+                            <rich:column styleClass="columnDateTime logEntrySeverity#{logEntry.severity}" headerClass="columnDateTime">
                                 <f:facet name="header">
                                     <h:outputText value="#{i18n.Editions_NEWS_ITEM_PLACEMENT_DETAILS_LOG_DATE}" />
                                 </f:facet>
@@ -30,7 +30,7 @@
                                 </h:outputText>
                             </rich:column>
 
-                            <rich:column styleClass="columnSeverity  logEntrySeverity#{logEntry.severity}" headerClass="columnSeverity">
+                            <rich:column styleClass="columnSeverity logEntrySeverity#{logEntry.severity}" headerClass="columnSeverity">
                                 <f:facet name="header">
                                     <h:outputText value="#{i18n.Editions_NEWS_ITEM_PLACEMENT_DETAILS_LOG_SEVERITY}" />
                                 </f:facet>
@@ -38,23 +38,21 @@
                                 <h:outputText value="#{i18n[severity_key]}" />
                             </rich:column>
 
-                            <rich:column styleClass="columnUser  logEntrySeverity#{logEntry.severity}" headerClass="columnUser">
+                            <rich:column styleClass="columnUser logEntrySeverity#{logEntry.severity}" headerClass="columnUser">
                                 <f:facet name="header">
                                     <h:outputText value="#{i18n.Editions_NEWS_ITEM_PLACEMENT_DETAILS_LOG_ACTOR}" />
                                 </f:facet>
                                 <h:outputText value="#{logEntry.actor.fullName}" rendered="#{logEntry.actor != null}" />
                                 <h:outputText value="#{i18n.LogEntry_NO_ACTOR}" rendered="#{logEntry.actor == null}" />
                             </rich:column>
-                                                       
+
                             <rich:column styleClass="logEntrySeverity#{logEntry.severity}">
                                 <f:facet name="header">
                                     <h:outputText value="#{i18n.Editions_NEWS_ITEM_PLACEMENT_DETAILS_LOG_LOG}" />
                                 </f:facet>
                                 <h:outputText value="#{logEntry.description}"  />
-                                <br/><h:outputText value="#{logEntry.origin}[id=#{logEntry.originId}]" style="font-size: 0.8em;" />
                             </rich:column>
                         </rich:dataTable>
-
                     </div>
                 </h:form>
             </a4j:region>

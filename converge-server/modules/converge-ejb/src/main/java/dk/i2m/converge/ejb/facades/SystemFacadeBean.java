@@ -24,6 +24,7 @@ import dk.i2m.converge.core.content.Language;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.logging.LogEntry;
 import dk.i2m.converge.core.logging.LogSeverity;
+import dk.i2m.converge.core.logging.LogSubject;
 import dk.i2m.converge.core.plugin.Plugin;
 import dk.i2m.converge.core.plugin.PluginManager;
 import dk.i2m.converge.core.security.UserAccount;
@@ -358,7 +359,7 @@ public class SystemFacadeBean implements SystemFacadeLocal {
             version.setMigrated(true);
             version.setMigratedDate(java.util.Calendar.getInstance().getTime());
 
-            version = daoService.update(version);
+            daoService.update(version);
 
             return true;
         }
@@ -369,8 +370,7 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     /**
      * Indicate that a {@link BackgroundTask} is running.
      *
-     * @param name
-     * Name of the {@link BackgroundTask}
+     * @param name Name of the {@link BackgroundTask}
      * @return Unique identifier of the {@link BackgroundTask}
      */
     @Override
@@ -411,19 +411,32 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void log(LogSeverity severity, UserAccount actor,
             String message, String origin, String originId) {
-        LogEntry entry = new LogEntry();
+        LogEntry entry = new LogEntry(severity, message, origin, originId);
         entry.setDate(Calendar.getInstance().getTime());
         entry.setActor(actor);
-        entry.setSeverity(severity);
-        entry.setDescription(message);
-        entry.setOrigin(origin);
-        entry.setOriginId(originId);
         daoService.create(entry);
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void log(dk.i2m.converge.core.logging.LogSeverity severity,
+            dk.i2m.converge.core.security.UserAccount actor,
+            java.lang.String message, java.util.List<LogSubject> subjects) {
+        LogEntry entry = new LogEntry(severity, message);
+        entry.setDate(Calendar.getInstance().getTime());
+        entry.setActor(actor);
+        for (LogSubject subject : subjects) {
+            entry.addSubject(subject);
+        }
+
+        daoService.create(entry);
+    }
+
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void log(LogSeverity severity, UserAccount actor,
             String message, Object origin, String originId) {
         log(severity, actor, message, origin.getClass().getName(), originId);
@@ -432,36 +445,47 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     @Override
     public List<LogEntry> findLogEntries(String origin, String originId) {
         Map<String, Object> parameters =
-                QueryBuilder.with("origin", origin).and("originId", originId).
+                QueryBuilder.with(LogEntry.PARAMETER_ENTITY, origin).and(
+                LogEntry.PARAMETER_ENTITY_ID, originId).
                 parameters();
-        return daoService.findWithNamedQuery(LogEntry.FIND_BY_ORIGIN, parameters);
+        return daoService.findWithNamedQuery(LogEntry.FIND_BY_ENTITY, parameters);
     }
 
     @Override
     public List<LogEntry> findLogEntries(Object origin, String originId) {
         Map<String, Object> parameters =
-                QueryBuilder.with("origin", origin.getClass().getName()).and(
-                "originId", originId).parameters();
-        return daoService.findWithNamedQuery(LogEntry.FIND_BY_ORIGIN, parameters);
+                QueryBuilder.with(LogEntry.PARAMETER_ENTITY, origin.getClass().
+                getName()).and(
+                LogEntry.PARAMETER_ENTITY_ID, originId).parameters();
+        return daoService.findWithNamedQuery(LogEntry.FIND_BY_ENTITY, parameters);
     }
 
     @Override
     public List<LogEntry> findLogEntries(Object origin, String originId,
             int start, int count) {
         Map<String, Object> parameters =
-                QueryBuilder.with("origin", origin.getClass().getName()).and(
-                "originId", originId).parameters();
-        return daoService.findWithNamedQuery(LogEntry.FIND_BY_ORIGIN, parameters,
+                QueryBuilder.with(LogEntry.PARAMETER_ENTITY, origin.getClass().
+                getName()).and(
+                LogEntry.PARAMETER_ENTITY_ID, originId).parameters();
+        return daoService.findWithNamedQuery(LogEntry.FIND_BY_ENTITY, parameters,
                 start, count);
     }
 
     @Override
     public List<LogEntry> findLogEntries(int start, int count) {
-        return daoService.findAll(LogEntry.class, start, count);
+        return daoService.findAll(LogEntry.class, start, count, "date", false);
     }
 
     @Override
     public List<LogEntry> findLogEntries() {
-        return daoService.findAll(LogEntry.class);
+        return daoService.findAll(LogEntry.class, "date", false);
+    }
+
+    @Override
+    public void removeLogEntries(Object entryType, String entryId) {
+        List<LogEntry> entries = findLogEntries(entryType, entryId);
+        for (LogEntry entry : entries) {
+            daoService.delete(LogEntry.class, entry.getId());
+        }
     }
 }

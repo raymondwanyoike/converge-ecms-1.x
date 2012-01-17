@@ -30,6 +30,7 @@ import dk.i2m.converge.ejb.facades.UserFacadeLocal;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.PluginContextBeanLocal;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
@@ -103,7 +104,6 @@ public class EditionServiceMessageBean implements MessageListener {
             Long actionId = msg.getLongProperty(Property.ACTION_ID.name());
             String uid = msg.getStringProperty(Property.USER_ACCOUNT_ID.name());
 
-            // TODO: User ID not extracted or put into the map properly
             try {
                 newsItemPlacementId = msg.getLongProperty(Property.NEWS_ITEM_PLACEMENT_ID.name());
                 placementExecution = true;

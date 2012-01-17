@@ -97,7 +97,7 @@ public class Outlet implements Serializable {
     public List<Section> getSections() {
         return sections;
     }
-
+    
     public void setSections(List<Section> sections) {
         this.sections = sections;
     }

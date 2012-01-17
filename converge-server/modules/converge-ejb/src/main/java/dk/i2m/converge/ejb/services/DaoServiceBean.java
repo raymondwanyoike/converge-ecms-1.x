@@ -273,12 +273,22 @@ public class DaoServiceBean implements DaoServiceLocal {
         return new LinkedList(this.em.createQuery("SELECT o from " + type.getSimpleName() + " AS o").getResultList());
     }
     
+    @Override
+    public <T> List<T> findAll(Class<T> type, String orderBy, boolean asc) {
+        String direction = asc ? "ASC" : "DESC";
+        return new LinkedList(this.em.createQuery("SELECT o from " + type.getSimpleName() + " AS o ORDER BY o." + orderBy + " " + direction).getResultList());
+    }
     
     @Override
     public <T> List<T> findAll(Class<T> type, int start, int resultLimit) {
         return new LinkedList(this.em.createQuery("SELECT o from " + type.getSimpleName() + " AS o").setFirstResult(start).setMaxResults(resultLimit).getResultList());
     }
     
+    @Override
+    public <T> List<T> findAll(Class<T> type, int start, int resultLimit, String orderBy, boolean asc) {
+       String direction = asc ? "ASC" : "DESC";
+       return new LinkedList(this.em.createQuery("SELECT o from " + type.getSimpleName() + " AS o ORDER BY o." + orderBy + " " + direction).setFirstResult(start).setMaxResults(resultLimit).getResultList());
+    }
     
     @Override
     public <T> Number count(Class<T> type, String field) {

@@ -41,17 +41,6 @@ public interface UserServiceLocal {
 
     boolean exists(String id);
 
-    /**
-     * Finds a {@link UserAccount} by its unique identifier.
-     *
-     * @param id
-     *          Unique identifier of the {@link UserAccount}
-     * @return {@link UserAccount} matching the unique identifier
-     * @throws UserNotFoundException
-     *          If a {@link UserAccount} could not found with the given <code>id</code>
-     * @throws DirectoryException
-     *          If communication with the user directory failed
-     */
     UserAccount findById(String id) throws UserNotFoundException, DirectoryException;
 
     /**

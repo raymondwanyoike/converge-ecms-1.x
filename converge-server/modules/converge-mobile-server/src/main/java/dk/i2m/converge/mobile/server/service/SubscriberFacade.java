@@ -29,6 +29,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -149,9 +150,12 @@ public class SubscriberFacade {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery cq = cb.createQuery();
         Root subs = cq.from(Subscriber.class);
-        cq.select(subs).where(cb.equal(subs.get("phone"), phone)).
-                where(cb.equal(subs.get("password"), password));
 
+        Predicate phoneMatch = cb.equal(subs.get("phone"), phone);
+        Predicate passwordMatch = cb.equal(subs.get("password"), password);
+        Predicate condition = cb.and(phoneMatch, passwordMatch);
+        cq.select(subs).where(condition);
+        
         List<Subscriber> matches = em.createQuery(cq).getResultList();
 
         if (matches.isEmpty()) {

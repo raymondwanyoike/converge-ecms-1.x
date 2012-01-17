@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,7 @@ import dk.i2m.converge.core.content.catalogue.*;
 import dk.i2m.converge.core.content.forex.Rate;
 import dk.i2m.converge.core.content.markets.MarketValue;
 import dk.i2m.converge.core.content.weather.Forecast;
+import dk.i2m.converge.core.logging.LogSubject;
 import dk.i2m.converge.core.newswire.NewswireDecoderException;
 import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.newswire.NewswireService;
@@ -92,6 +93,10 @@ public class PluginContextBean implements PluginContextBeanLocal {
 
     @Override
     public NewswireItem createNewswireItem(NewswireItem item) {
+        if (item.getTitle().trim().isEmpty()) {
+           // TODO: I18n
+           item.setTitle("Untitled");
+        }
         return newswireService.create(item);
     }
 
@@ -102,7 +107,11 @@ public class PluginContextBean implements PluginContextBeanLocal {
 
     @Override
     public void fetch(NewswireService service) throws NewswireDecoderException {
-        newswireService.downloadNewswireService(service.getId());
+        try {
+            newswireService.downloadNewswireService(service.getId());
+        } catch (DataNotFoundException ex) {
+            throw new NewswireDecoderException(ex);
+        }
     }
 
     @Override
@@ -190,9 +199,9 @@ public class PluginContextBean implements PluginContextBeanLocal {
             Catalogue catalogue = catalogueFacade.findCatalogueById(catalogueId);
             return catalogueFacade.archive(file, catalogue, fileName);
         } catch (DataNotFoundException ex) {
-            return null;
+            throw new ArchiveException(ex);
         } catch (IOException ex) {
-            return null;
+            throw new ArchiveException(ex);
         }
     }
 
@@ -265,5 +274,11 @@ public class PluginContextBean implements PluginContextBeanLocal {
                 originId));
     }
 
+    @Override
+    public void log(dk.i2m.converge.core.logging.LogSeverity severity,
+            java.lang.String message, java.lang.Object[] messageArguments,
+            List<LogSubject> subjects) {
+        systemFacade.log(severity, getCurrentUserAccount(), message, subjects);
+    }
     
 }

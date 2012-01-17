@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,9 @@ package dk.i2m.converge.core.logging;
 
 import dk.i2m.converge.core.security.UserAccount;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.*;
 
 /**
@@ -30,18 +32,26 @@ import javax.persistence.*;
 @Entity
 @Table(name = "log_entry")
 @NamedQueries({
-    @NamedQuery(name = LogEntry.FIND_BY_ORIGIN,
+    @NamedQuery(name = LogEntry.FIND_BY_ENTITY,
     query =
-    "SELECT l FROM LogEntry l WHERE l.origin = :origin AND l.originId = :originId ORDER BY l.date DESC")
+    "SELECT l FROM LogEntry l JOIN l.subjects s WHERE s.entity = :"
+    + LogEntry.PARAMETER_ENTITY + " AND s.entityId = :"
+    + LogEntry.PARAMETER_ENTITY_ID + " ORDER BY l.date DESC")
 })
 public class LogEntry implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Query for finding log entries by a given {@code origin} and {@code originId}.
+     * Query for finding log entries by a given {@link LogEntry#PARAMETER_ENTITY entity} and {@link LogEntry#PARAMETER_ENTITY_ID entityId}.
      */
-    public static final String FIND_BY_ORIGIN = "LogEntry.findByOrigin";
+    public static final String FIND_BY_ENTITY = "LogEntry.findByEntity";
+
+    /** Parameter used to specify the entity. */
+    public static final String PARAMETER_ENTITY = "entity";
+
+    /** Parameter used to specify the unique ID of the entity. */
+    public static final String PARAMETER_ENTITY_ID = "entityId";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,91 +69,185 @@ public class LogEntry implements Serializable {
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date date;
 
-    @Column(name = "origin")
-    private String origin = "";
-
-    @Column(name = "origin_id")
-    private String originId = "";
-
     @ManyToOne
     @JoinColumn(name = "actor_id")
     private UserAccount actor;
 
+    @OneToMany(mappedBy = "logEntry", cascade = CascadeType.ALL)
+    private List<LogSubject> subjects = new ArrayList<LogSubject>();
+
+    /**
+     * Creates a new instance of {@link LogEntry}.
+     */
     public LogEntry() {
+        this(LogSeverity.INFO, "");
     }
 
     /**
      * Creates a new {@link LogEntry}.
      *
-     * @param severity    {@link LogSeverity} of the {@link LogEntry}
+     * @param severity    {@link Severity} of the {@link LogEntry}
      * @param description Description of the {@link LogEntry}
-     * @param origin      Origin of the {@link LogEntry}
-     * @param originId    Identifier of the origin
      */
-    public LogEntry(LogSeverity severity, String description, String origin,
-            String originId) {
-        this.severity = severity;
-        this.description = description;
-        this.origin = origin;
-        this.originId = originId;
+    public LogEntry(LogSeverity severity, String description) {
+        this(severity, description, null, null, "");
     }
 
+    /**
+     * Creates a new {@link LogEntry}.
+     *
+     * @param severity    {@link Severity} of the {@link LogEntry}
+     * @param description Description of the {@link LogEntry}
+     * @param entity      Entity relating to the {@link LogEntry}
+     * @param entityId    Identifier of the entity
+     */
+    public LogEntry(LogSeverity severity, String description, String entity,
+            String entityId) {
+        this(severity, description, null, entity, entityId);
+    }
+
+    /**
+     * Creates a new {@link LogEntry}.
+     *
+     * @param severity    {@link Severity} of the {@link LogEntry}
+     * @param description Description of the {@link LogEntry}
+     * @param actor       {@link UserAccount} who invoked the {@link LogEntry}
+     * @param entity      Entity relating to the {@link LogEntry}
+     * @param entityId    Identifier of the entity
+     */
+    public LogEntry(LogSeverity severity, String description, UserAccount actor,
+            String entity,
+            String entityId) {
+        this.severity = severity;
+        this.description = description;
+        this.actor = actor;
+        if (entity != null) {
+            addSubject(entity, entityId);
+        }
+    }
+
+    /**
+     * Gets the unique identifier of the entry.
+     *
+     * @return Unique identifier of the entry
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * Sets the unique identifier of the entry.
+     *
+     * @param id Unique identifier of the entry
+     */
     public void setId(Long id) {
         this.id = id;
     }
 
+    /**
+     * Gets the date and time of the entry.
+     *
+     * @return Date and time of the entry
+     */
     public Date getDate() {
         return date;
     }
 
+    /**
+     * Sets the date and time of the entry.
+     *
+     * @param date Date and time of the entry
+     */
     public void setDate(Date date) {
         this.date = date;
     }
 
+    /**
+     * Gets the description / content of the entry.
+     *
+     * @return Description / content of the entry
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Sets the description / content of the entry.
+     *
+     * @param description Description / content of the entry
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public String getOrigin() {
-        return origin;
-    }
-
-    public void setOrigin(String origin) {
-        this.origin = origin;
-    }
-
-    public String getOriginId() {
-        return originId;
-    }
-
-    public void setOriginId(String originId) {
-        this.originId = originId;
-    }
-
+    /**
+     * Gets the severity of the entry.
+     *
+     * @return Severity of the entry
+     */
     public LogSeverity getSeverity() {
         return severity;
     }
 
+    /**
+     * Sets the severity of the entry.
+     *
+     * @param severity Severity of the entry
+     */
     public void setSeverity(LogSeverity severity) {
         this.severity = severity;
     }
 
+    /**
+     * Gets the user who invoked the entry.
+     *
+     * @return User who invoked the entry. If {@code null} is returned, the entry was created by Converge
+     */
     public UserAccount getActor() {
         return actor;
     }
 
+    /**
+     * Sets the user who invoked the entry.
+     *
+     * @param actor User who invoked the entry. If {@code actor} is null, it is assumed that the entry was created by Converge
+     */
     public void setActor(UserAccount actor) {
         this.actor = actor;
     }
 
+    /**
+     * Gets a {@link List} of subjects relating to the {@link LogEntry}.
+     *
+     * @return {@link List} of subjects relating to the {@link LogEntry}
+     */
+    public List<LogSubject> getSubjects() {
+        return subjects;
+    }
+
+    /**
+     * Adds an entity that relates to the {@link LogEntry}.
+     *
+     * @param subject {@link LogSubject} representing the entity
+     */
+    public void addSubject(LogSubject subject) {
+        subject.setLogEntry(this);
+        subjects.add(subject);
+    }
+
+    /**
+     * Adds an entity that relates to the {@link LogEntry}.
+     *
+     * @param entity   Entity relating to the {@link LogEntry}
+     * @param entityId Unique ID of the entity
+     */
+    public final void addSubject(String entity, String entityId) {
+        addSubject(new LogSubject(entity, entityId));
+    }
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public int hashCode() {
         int hash = 0;
@@ -151,6 +255,9 @@ public class LogEntry implements Serializable {
         return hash;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof LogEntry)) {
@@ -164,8 +271,11 @@ public class LogEntry implements Serializable {
         return true;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String toString() {
-        return "dk.i2m.converge.core.LogEntry[ id=" + id + " ]";
+        return getClass().getName() + "[id=" + id + "]";
     }
 }

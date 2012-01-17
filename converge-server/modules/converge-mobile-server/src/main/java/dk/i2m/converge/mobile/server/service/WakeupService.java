@@ -54,11 +54,14 @@ import javax.xml.ws.Service;
  * RESTful service for initiating the synchronisation with <em>Converge
  * Editorial</em>. The service is initiated by passing:
  * <ul>
- * <li>ID of the external outlet</li>
- * <li>ID of the edition to download</li>
- * <li>ID of the internal outlet</li>
- * <li>Key of the internal outlet</li>
+ * <li>ID of the external outlet ({@code eid})</li>
+ * <li>ID of the edition to download ({@code edition_id})</li>
+ * <li>ID of the internal outlet ({@code internal_outlet_id})</li>
+ * <li>Key of the internal outlet ({@code internal_outlet_key})</li>
  * </li>
+ * <p/>
+ * The parameters are passed in the URL path as followed:
+ * {@code /wakeup/[eid]/[edition_id]/[internal_outlet_id]/[internal_outlet_key]}
  *
  * @author Allan Lykke Christensen
  */
@@ -81,17 +84,11 @@ public class WakeupService {
 
     /**
      * Initiates the download of a given edition on <em>Converge Editorial</em>.
-     *
-     * @param externalId
- * Unique identifier of the Outlet on <em>Converge Editorial</em>
-     * @param internalId
- * Internal identifier of the Outlet on <em>Converge Mobile
-     * Server</em>
-     * @param internalKey
-* Internal key of the Outlet on <em>Converge Mobile Server</em>
-     * @param editionId
-  * Unique identifier of the Edition to download on <em>Converge
-     * Editorial</em>
+     * <p/>
+     * @param externalId  Unique identifier of the Outlet on <em>Converge Editorial</em>
+     * @param internalId  Internal identifier of the Outlet on <em>Converge Mobile Server</em>
+     * @param internalKey Internal key of the Outlet on <em>Converge Mobile Server</em>
+     * @param editionId   Unique identifier of the Edition to download on <em>Converge Editorial</em>
      * @return Empty string
      */
     @GET
@@ -101,8 +98,8 @@ public class WakeupService {
             @PathParam(value = "edition") String editionId) {
         try {
 
-            LOG.log(Level.INFO,
-                    "Synchronisation of External Outlet {0} with Internal Outlet {1} with key {2}",
+            LOG.log(Level.INFO, "Synchronisation of External Outlet {0} "
+                    + "with Internal Outlet {1} with key {2}",
                     new Object[]{externalId, internalId, internalKey});
 
             Outlet outlet = em.find(Outlet.class, Long.valueOf(internalId));

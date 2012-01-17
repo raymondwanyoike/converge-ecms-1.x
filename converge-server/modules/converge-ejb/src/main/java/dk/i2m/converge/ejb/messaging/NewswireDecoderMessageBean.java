@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,11 +23,9 @@ import dk.i2m.converge.core.plugin.NewswireDecoder;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.ejb.services.NewswireServiceLocal;
 import dk.i2m.converge.ejb.services.PluginContextBeanLocal;
-import dk.i2m.converge.ejb.services.QueryBuilder;
 import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -37,12 +35,17 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 
 /**
- * Message bean for downloading newswires.
+ * Message-driven bean for processing a {@link NewswireService}. The bean
+ * expects a single long property {@code newswireServiceId} containing the
+ * unique identifier of the {@link NewswireService} to be processed.
  *
  * @author Allan Lykke Christensen
  */
 @MessageDriven(mappedName = "jms/newswireServiceQueue")
 public class NewswireDecoderMessageBean implements MessageListener {
+
+    /** Long property for sending the unique identifier of the {@link NewswireService} to be processed. */
+    public static final String NEWSWIRE_SERVICE_ID = "newswireServiceId";
 
     private static final Logger LOG =
             Logger.getLogger(NewswireDecoderMessageBean.class.getName());
@@ -53,67 +56,55 @@ public class NewswireDecoderMessageBean implements MessageListener {
 
     @EJB private SystemFacadeLocal systemFacade;
 
+    @EJB private NewswireServiceLocal newswireServiceBean;
+
     @Override
     public void onMessage(Message msg) {
-        Long taskId = 0L;
         try {
-            Long newswireServiceId = null;
+            Long newswireServiceId;
             try {
-                newswireServiceId = msg.getLongProperty("newswireServiceId");
-                LOG.log(Level.INFO, "Fetching single newswire service");
-                taskId = systemFacade.createBackgroundTask(
-                        "Fetching newswire service manually");
+                newswireServiceId = msg.getLongProperty(NEWSWIRE_SERVICE_ID);
             } catch (NumberFormatException ex) {
-                LOG.log(Level.INFO, "Fetching all newswire services");
-                taskId = systemFacade.createBackgroundTask(
-                        "Fetching all newswire services manually");
+                // Invalid or missing value sent to bean
+                return;
             }
-
-            if (newswireServiceId == null) {
-                Map<String, Object> parameters = QueryBuilder.with("active",
-                        true).parameters();
-                List<NewswireService> services =
-                        daoService.findWithNamedQuery(
-                        NewswireService.FIND_BY_STATUS, parameters);
-
-                for (NewswireService service : services) {
-                    fetchNewswire(service.getId());
-                }
-            } else {
-                fetchNewswire(newswireServiceId);
-            }
-
+            fetchNewswire(newswireServiceId);
         } catch (JMSException ex) {
             LOG.log(Level.SEVERE, null, ex);
-        } finally {
-            systemFacade.removeBackgroundTask(taskId);
         }
     }
 
-    private void fetchNewswire(Long newswireServiceId) {
+    private void fetchNewswire(Long id) {
         Long taskId = 0L;
+
         try {
             NewswireService service = daoService.findById(NewswireService.class,
-                    newswireServiceId);
-            pluginContext.log(LogSeverity.SEVERE,
+                    id);
+
+            newswireServiceBean.startProcessingNewswireService(id);
+            pluginContext.log(LogSeverity.INFO,
                     "Fetching newswire service: {0}", new Object[]{service.
                         getSource()}, service, service.getId());
             taskId = systemFacade.createBackgroundTask("Fetching newswire service "
                     + service.getSource());
-            LOG.log(Level.INFO, "Newswire Service {0}", service.getSource());
             NewswireDecoder decoder = service.getDecoder();
             decoder.decode(pluginContext, service);
             service.setLastFetch(Calendar.getInstance());
             daoService.update(service);
-            pluginContext.log(LogSeverity.SEVERE,
+            pluginContext.log(LogSeverity.INFO,
                     "Finished fetching newswire service: {0}",
                     new Object[]{service.getSource()}, service, service.getId());
         } catch (DataNotFoundException ex) {
-            LOG.log(Level.WARNING, ex.getMessage());
+//            LOG.log(Level.WARNING, ex.getMessage());
+            pluginContext.log(LogSeverity.WARNING, ex.getMessage(),
+                    NewswireService.class.getName(), "" + id);
         } catch (NewswireDecoderException ex) {
-            LOG.log(Level.SEVERE, null, ex);
+            //LOG.log(Level.SEVERE, null, ex);
+            pluginContext.log(LogSeverity.SEVERE, ex.getMessage(),
+                    NewswireService.class.getName(), "" + id);
         } finally {
             systemFacade.removeBackgroundTask(taskId);
+            newswireServiceBean.stopProcessingNewswireService(id);
         }
     }
 }

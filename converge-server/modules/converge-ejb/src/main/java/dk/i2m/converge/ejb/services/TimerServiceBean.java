@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -160,7 +160,7 @@ public class TimerServiceBean implements TimerServiceLocal {
 
         try {
             if (timer.getInfo().equals(PeriodicTimer.NEWSWIRE.name())) {
-                newswireService.downloadNewswireServicesSync();
+                newswireService.downloadNewswireServices();
             }else if (timer.getInfo().equals(PeriodicTimer.NEWSWIRE_PURGE.name())) {
                 newswireService.purgeNewswires();
             } else if (timer.getInfo().equals(PeriodicTimer.EDITION.name())) {

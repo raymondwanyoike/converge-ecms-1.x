@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,23 +34,35 @@ public class Log {
 
     private DataModel logEntries = new ListDataModel();
 
+    /**
+     * Creates a new instance of {@link Log}.
+     */
     public Log() {
     }
 
+    /**
+     * Event handler invoked after construction of the page.
+     */
     @PostConstruct
     public void onInit() {
         onRefresh(null);
     }
 
+    /**
+     * Event handler for updating the log listing.
+     * <p/>
+     * @param event Event that invoked the handler
+     */
+    public void onRefresh(ActionEvent event) {
+        logEntries = new ListDataModel(systemFacade.findLogEntries(0, 2000));
+    }
+
+    /**
+     * Gets the log listing.
+     * <p/>
+     * @return {@link DataModel} containing the log listing
+     */
     public DataModel getLogEntries() {
         return logEntries;
-    }
-
-    public void setLogEntries(DataModel logEntries) {
-        this.logEntries = logEntries;
-    }
-
-    public void onRefresh(ActionEvent event) {
-        logEntries = new ListDataModel(systemFacade.findLogEntries(0, 100));
     }
 }
