@@ -22,3 +22,4 @@ CREATE INDEX `idx_entity_and_id` ON `log_subject` (`entity`, `entity_id`);
 CREATE INDEX `idx_entity` ON `log_subject` (`entity`);
 
 ALTER TABLE newswire_service ADD COLUMN `processing` TINYINT(1) DEFAULT '0';
+ALTER TABLE media_item ADD COLUMN `held` TINYINT(1) DEFAULT '0';

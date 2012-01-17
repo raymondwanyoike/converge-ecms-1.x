@@ -18,6 +18,11 @@
                 <h1 style="margin-bottom: 5px; padding-bottom: 0px;">#{mediaItemArchive.selectedMediaItem.title}</h1>
                 <h2 style="margin-top: 0px; padding-top: 0px;">#{mediaItemArchive.selectedMediaItem.byLine == '' ? mediaItemArchive.selectedMediaItem.owner.fullName : mediaItemArchive.selectedMediaItem.byLine}</h2>
 
+                
+                <h:panelGroup rendered="#{mediaItemArchive.selectedMediaItem.held}" layout="block" styleClass="mediaItemHeld">
+                    <h:outputText value="#{i18n.MediaItemArchive_MEDIA_ITEM_HELD}" />
+                </h:panelGroup>
+                
                 <h:graphicImage styleClass="searchResultThumb" url="#{mediaItemArchive.selectedMediaItem.preview.absoluteFilename}" style="float: left; padding-right: 10px; padding-bottom: 5px;" rendered="#{mediaItemArchive.selectedMediaItem.previewAvailable}" />
                 <h:outputText value="#{mediaItemArchive.selectedMediaItem.description}" escape="false" style="float: left;" />
 
@@ -55,7 +60,7 @@
                         </f:facet>
                         <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItemArchive.xhtml?id=#{usage.newsItemId}">
                             <h:outputText value="#{usage.newsItemId}">
-                                <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                                <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
                             </h:outputText>
                         </h:outputLink>
                     </rich:column>

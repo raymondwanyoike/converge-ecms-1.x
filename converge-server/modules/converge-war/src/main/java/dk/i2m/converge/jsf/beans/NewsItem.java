@@ -1018,14 +1018,11 @@ public class NewsItem {
             this.selectedAttachment.setNewsItem(selectedNewsItem);
 
             try {
-                this.selectedAttachment.setMediaItem(catalogueFacade.
-                        findMediaItemById(this.selectedMediaItemId));
+                MediaItem mi = catalogueFacade.findMediaItemById(this.selectedMediaItemId);
+                this.selectedAttachment.setMediaItem(mi);
                 this.selectedAttachment.setCaption(this.selectedAttachment.
                         getMediaItem().getDescription());
             } catch (DataNotFoundException ex) {
-                LOG.log(Level.WARNING,
-                        "Media Item #{0} does not exist in the database. Schedule removal from search engine",
-                        this.selectedMediaItemId);
                 searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM,
                         this.selectedMediaItemId, QueueEntryOperation.REMOVE);
             }

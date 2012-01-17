@@ -211,11 +211,16 @@ public class MediaItemDetails {
         return isEditor() || isOwner();
     }
 
+    /**
+     * Determine if the current user is an editor of the {@link Catalogue} of
+     * the {@link MediaItem}.
+     * 
+     * @return {@code true} if the user is an editor of the {@link Catalogue} of
+     *         the {@link MediaItem}, otherwise {@code false}
+     */
     public boolean isEditor() {
         UserRole editorRole = selectedMediaItem.getCatalogue().getEditorRole();
-        List<UserRole> userRoles = getUser().getUserRoles();
-
-        return userRoles.contains(editorRole);
+        return getUser().getUserRoles().contains(editorRole);
     }
 
     public boolean isOwner() {

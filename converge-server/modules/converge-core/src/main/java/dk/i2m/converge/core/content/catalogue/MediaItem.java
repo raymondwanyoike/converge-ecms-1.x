@@ -1,11 +1,18 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.core.content.catalogue;
 
@@ -19,8 +26,9 @@ import java.util.List;
 import javax.persistence.*;
 
 /**
- * Persisted model represents a media item belonging to a
- * {@link MediaRepository}. A {@link MediaItem} could be an image, audio recording or video clip.
+ * Persisted model represents a digital asset belonging to a {@link Catalogue}
+ * A {@link MediaItem} could be an image, audio recording, video clip or 
+ * document.
  *
  * @author Allan Lykke Christensen
  */
@@ -107,6 +115,9 @@ public class MediaItem implements Serializable {
     @javax.persistence.Version
     @Column(name = "opt_lock")
     private int versionIdentifier;
+    
+    @Column(name = "held")
+    private boolean held = false;
 
     /**
      * Creates a new instance of {@link MediaItem}.
@@ -216,6 +227,28 @@ public class MediaItem implements Serializable {
 
     public void setByLine(String byLine) {
         this.byLine = byLine;
+    }
+
+    /**
+     * Determines if the {@link MediaItem} is being held. That is, if usage of
+     * this item should be prevented.
+     * 
+     * @return {@code true} if the {@link MediaItem} is held, otherwise 
+     *         {@code false}
+     */
+    public boolean isHeld() {
+        return held;
+    }
+    
+    /**
+     * Set the "Held" status of the {@link MediaItem} is being held. That is, if 
+     * usage of this item should be prevented.
+     * 
+     * @param held {@code true} if the {@link MediaItem} is held, otherwise 
+     *             {@code false}
+     */
+    public void setHeld(boolean held) {
+        this.held = held;
     }
 
     /**
