@@ -3,8 +3,6 @@
   <persistence-unit name="converge-ejbPU" transaction-type="JTA">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <jta-data-source>jdbc/converge</jta-data-source>
-    <class>dk.i2m.converge.core.AppVersion</class>
-    <class>dk.i2m.converge.core.BackgroundTask</class>
     <properties>
       <property name="eclipselink.ddl-generation" value="none"/>
       <!--property name="eclipselink.ddl-generation" value="create-tables" /-->

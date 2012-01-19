@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,9 +28,11 @@ import java.text.SimpleDateFormat;
  */
 public class ModelConverter {
 
-    private static SimpleDateFormat DATE_LINE_FORMAT = new SimpleDateFormat("d MMMM yyyy");
+    private static SimpleDateFormat DATE_LINE_FORMAT = new SimpleDateFormat(
+            "d MMMM yyyy");
 
-    public static NewsItemActor toNewsItemActor(dk.i2m.converge.core.content.NewsItemActor actor) {
+    public static NewsItemActor toNewsItemActor(
+            dk.i2m.converge.core.content.NewsItemActor actor) {
         NewsItemActor nia = new NewsItemActor();
         nia.setUsername(actor.getUser().getUsername());
         nia.setName(actor.getUser().getFullName());
@@ -39,7 +41,8 @@ public class ModelConverter {
         return nia;
     }
 
-    public static Section toSection(dk.i2m.converge.core.workflow.Section section) {
+    public static Section toSection(
+            dk.i2m.converge.core.workflow.Section section) {
         Section s = new Section();
         s.setId(section.getId());
         s.setTitle(section.getFullName());
@@ -48,49 +51,54 @@ public class ModelConverter {
     }
 
     //TODO: Issue #488 (Support multiple renditions)
-    public static MediaItem toMediaItem(NewsItemMediaAttachment attachment) throws AttachmentNotAvailableException {
+    public static MediaItem toMediaItem(NewsItemMediaAttachment attachment)
+            throws AttachmentNotAvailableException {
         if (attachment.getMediaItem() != null) {
             MediaItem mediaItem = new MediaItem();
             mediaItem.setCaption(attachment.getCaption());
 
             mediaItem.setId(attachment.getMediaItem().getId());
-
-            if (attachment.getMediaItem().isOriginalAvailable()) {
-                mediaItem.setRendition(attachment.getMediaItem().getOriginal().getRendition().getName());
-                mediaItem.setContentType(attachment.getMediaItem().getOriginal().getContentType());
-                mediaItem.setUrl(attachment.getMediaItem().getOriginal().getAbsoluteFilename());
-            } else {
-                mediaItem.setRendition("");
-                mediaItem.setContentType("application/unknown");
-                mediaItem.setUrl("");
-            }
-
             mediaItem.setTitle(attachment.getMediaItem().getTitle());
+            for (dk.i2m.converge.core.content.catalogue.MediaItemRendition rendition :
+                    attachment.getMediaItem().getRenditions()) {
+                MediaItemRendition mir = new MediaItemRendition(rendition.
+                        getRendition().getName(),
+                        rendition.getAbsoluteFilename(), rendition.
+                        getContentType());
+                mediaItem.getRenditions().add(mir);
+            }
 
             return mediaItem;
         } else {
             throw new AttachmentNotAvailableException();
         }
-
     }
 
+    /**
+     * Converts a {@link NewsItemPlacement} to a {@link NewsItem}.
+     *
+     * @param nip {@link NewsItemPlacement} to convert
+     * @return {@link NewsItem} representation of the {@link NewsItemPlacement}
+     */
     public static NewsItem toNewsItem(NewsItemPlacement nip) {
         NewsItem item = new NewsItem();
         item.setId(nip.getNewsItem().getId());
         item.setTitle(nip.getNewsItem().getTitle());
         item.setBrief(nip.getNewsItem().getBrief());
         item.setByLine(nip.getNewsItem().getByLine());
-        item.setDateLine(DATE_LINE_FORMAT.format(nip.getEdition().getPublicationDate().getTime()));
+        item.setDateLine(DATE_LINE_FORMAT.format(nip.getEdition().
+                getPublicationDate().getTime()));
         item.setStory(nip.getNewsItem().getStory());
         item.setDisplayOrder(nip.getPosition());
         item.setStart(nip.getStart());
 
         // Convert Media Attachments
-        for (NewsItemMediaAttachment attachment : nip.getNewsItem().getMediaAttachments()) {
+        for (NewsItemMediaAttachment attachment : nip.getNewsItem().
+                getMediaAttachments()) {
             try {
                 item.getMedia().add(toMediaItem(attachment));
             } catch (AttachmentNotAvailableException ex) {
-                System.err.println("Couldn't fetch attachment, skipping");
+                // Attachment or rendition not available
             }
         }
 
@@ -99,11 +107,13 @@ public class ModelConverter {
         item.setSection(s);
 
         // Convert Actors
-        for (dk.i2m.converge.core.content.NewsItemActor actor : nip.getNewsItem().getActors()) {
+        for (dk.i2m.converge.core.content.NewsItemActor actor :
+                nip.getNewsItem().getActors()) {
             item.getActors().add(toNewsItemActor(actor));
         }
 
-        for (dk.i2m.converge.core.workflow.WorkflowStep step : nip.getNewsItem().getCurrentState().getNextStates()) {
+        for (dk.i2m.converge.core.workflow.WorkflowStep step : nip.getNewsItem().
+                getCurrentState().getNextStates()) {
             item.getWorkflowOptions().add(toWorkflowOption(step));
         }
 
@@ -126,7 +136,7 @@ public class ModelConverter {
             try {
                 item.getMedia().add(toMediaItem(attachment));
             } catch (AttachmentNotAvailableException ex) {
-                System.err.println("Couldn't fetch attachment, skipping");
+                // Attachment or rendition not available
             }
         }
 
@@ -137,14 +147,16 @@ public class ModelConverter {
             item.getActors().add(toNewsItemActor(actor));
         }
 
-        for (dk.i2m.converge.core.workflow.WorkflowStep step : ni.getCurrentState().getNextStates()) {
+        for (dk.i2m.converge.core.workflow.WorkflowStep step : ni.
+                getCurrentState().getNextStates()) {
             item.getWorkflowOptions().add(toWorkflowOption(step));
         }
 
         return item;
     }
 
-    private static WorkflowOption toWorkflowOption(dk.i2m.converge.core.workflow.WorkflowStep step) {
+    private static WorkflowOption toWorkflowOption(
+            dk.i2m.converge.core.workflow.WorkflowStep step) {
         WorkflowOption option = new WorkflowOption();
         option.setOptionId(step.getId());
         option.setLabel(step.getName());
@@ -154,13 +166,15 @@ public class ModelConverter {
         return option;
     }
 
-    public static Outlet toOutlet(dk.i2m.converge.core.workflow.Outlet convergeOutlet) {
+    public static Outlet toOutlet(
+            dk.i2m.converge.core.workflow.Outlet convergeOutlet) {
         Outlet outlet = new Outlet();
 
         outlet.setId(convergeOutlet.getId());
         outlet.setTitle(convergeOutlet.getTitle());
 
-        for (dk.i2m.converge.core.workflow.Section s : convergeOutlet.getActiveSections()) {
+        for (dk.i2m.converge.core.workflow.Section s : convergeOutlet.
+                getActiveSections()) {
             outlet.getSections().add(toSection(s));
         }
         return outlet;

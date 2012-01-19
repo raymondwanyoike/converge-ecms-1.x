@@ -208,38 +208,30 @@ public class JoomlaConnection {
      * Determines if the connection can communicate with the configured Joomla
      * instance.
      *
-     * @return {@code true} if the connection can communicate with the
-     *         configured Joomla instance, otherwise {@code false}
+     * @throws JoomlaException Exception thrown if a valid connection could not be established
+     * 
      */
-    public boolean isConnectionValid() {
+    public void validateConnection() throws JoomlaException {
         try {
             TimingOutCallback callback = new TimingOutCallback(getTimeout() * 1000);
             XmlRpcClient client = getXmlRpcClient();
             Object[] params = new Object[]{};
             client.executeAsync(XMLRPC_METHOD_VERSION, params, callback);
-            //String version = (String) client.execute(XMLRPC_METHOD_VERSION, params);
-
             String version = (String) callback.waitForResponse();
 
             if (version == null) {
-                logger.log(Level.WARNING, "Invalid return from XML-RPC plug-in");
-                return false;
+                throw new InvalidResponseException();
             } else {
                 if (version.startsWith(COMPATIBILITY)) {
-                    logger.log(Level.INFO, "Connection is configured to communicate with Joomla XML-RPC adapter version {0} at {1}", new Object[]{version, url});
-                    return true;
+                    return;
                 } else {
-                    logger.log(Level.WARNING, "API does not support plug-in version {0}", new Object[]{version});
-                    return false;
+                    throw new IncompatibleJoomlaPluginException(version);
                 }
             }
         } catch (TimeoutException e) {
-            logger.log(Level.WARNING, "Timeout connecting to XML-RPC service {0}", url);
-            return false;
+            throw new JoomlaTimeoutException(e);
         } catch (Throwable t) {
-            logger.log(Level.WARNING, "Invalid response from XML-RPC service {0}: {1}", new Object[]{url, t.getMessage()});
-            logger.log(Level.FINE, "", t);
-            return false;
+            throw new InvalidResponseException(t);
         }
     }
 
@@ -294,12 +286,10 @@ public class JoomlaConnection {
             Object[] params = new Object[]{username, password, foreignId, title, intro, story, author, categoryId, showOnFrontPage, displayOrder, keywords, description, publishTime, expireTime};
 
             client.executeAsync(XMLRPC_METHOD_NEW_ARTICLE, params, callback);
-            //String articleId = (String) client.execute(XMLRPC_METHOD_NEW_ARTICLE, params);
 
             String articleId = (String) callback.waitForResponse();
 
             if (articleId != null && !articleId.trim().isEmpty()) {
-                logger.log(Level.INFO, "Story #{0} created as Joomla article #{1}", new Object[]{foreignId, articleId});
                 return Integer.valueOf(articleId);
             } else {
                 throw new JoomlaException("Article was not uploaded to Joomla. Joomla ID was not received from XML-RPC service");

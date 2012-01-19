@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
-    <system systemId="http://localhost:8080/converge-ws/NewsItemService?wsdl" uri="wsdl/localhost_8080/converge-ws/NewsItemService.wsdl"/>
-    <system systemId="http://localhost:8080/converge-ws/NewsItemService?xsd=1" uri="wsdl/localhost_8080/converge-ws/NewsItemService.xsd_1.xsd"/>
     <system systemId="http://localhost:8080/converge-ws/OutletService?wsdl" uri="wsdl/localhost_8080/converge-ws/OutletService.wsdl"/>
     <system systemId="http://localhost:8080/converge-ws/OutletService?xsd=1" uri="wsdl/localhost_8080/converge-ws/OutletService.xsd_1.xsd"/>
+    <system systemId="http://localhost:8080/converge-ws/NewsItemService?wsdl" uri="wsdl/localhost_8080/converge-ws/NewsItemService.wsdl"/>
+    <system systemId="http://localhost:8080/converge-ws/NewsItemService?xsd=1" uri="wsdl/localhost_8080/converge-ws/NewsItemService.xsd_1.xsd"/>
     <system systemId="http://localhost:8080/converge-ws/ConceptService?wsdl" uri="wsdl/localhost_8080/converge-ws/ConceptService.wsdl"/>
     <system systemId="http://localhost:8080/converge-ws/ConceptService?xsd=1" uri="wsdl/localhost_8080/converge-ws/ConceptService.xsd_1.xsd"/>
 </catalog>

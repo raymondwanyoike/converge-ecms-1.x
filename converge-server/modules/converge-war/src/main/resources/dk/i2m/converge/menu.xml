@@ -125,6 +125,12 @@
                 <label>menu_SYSTEM_PROCESSES</label>
                 <role>ADMINISTRATOR</role>
             </children>
+            
+            <children id="lnkAdministrationLog" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/log</action>
+                <label>menu_SYSTEM_LOG</label>
+                <role>ADMINISTRATOR</role>
+            </children>
         </children>
         
         <children id="lnkAdministrationUsers" resetOnClick="false" sectionMenu="true">

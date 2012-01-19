@@ -3,7 +3,7 @@
 
     <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/administration.xhtml">
 
-        <ui:define name="title">#{msgs.WORKFLOWS}</ui:define>
+        <ui:define name="title">#{i18n.administrator_Workflows_PAGE_TITLE}</ui:define>
 
         <ui:define name="body">
             <a4j:keepAlive beanName="administrator_Workflows" />
@@ -13,10 +13,10 @@
             </a4j:outputPanel>
 
             <h:form id="frmPage">
-                <converge:moduleHeader moduleTitle="#{msgs.WORKFLOWS}" />
+                <converge:moduleHeader moduleTitle="#{i18n.administrator_Workflows_PAGE_TITLE}" />
                 <div class="moduleContent">
                     <h:panelGrid columns="1" columnClasses="right" style="width: 100%">
-                        <a4j:commandButton id="btnNewWorkflow" actionListener="#{administrator_Workflows.onNewWorkflow}" reRender="mpWorkflowDetails" ajaxSingle="true" styleClass="button dynamicButton" value="#{msgs.WORKFLOW_NEW}" title="#{msgs.WORKFLOW_NEW_TOOLTIP}" oncomplete="#{rich:component('mpWorkflowDetails')}.show()">
+                        <a4j:commandButton id="btnNewWorkflow" actionListener="#{administrator_Workflows.onNewWorkflow}" reRender="mpWorkflowDetails" ajaxSingle="true" styleClass="button dynamicButton" value="#{i18n.administrator_Workflows_NEW_WORKFLOW}" title="#{i18n.administrator_Workflows_NEW_WORKFLOW_TOOLTIP}" oncomplete="#{rich:component('mpWorkflowDetails')}.show()">
                             <f:setPropertyActionListener target="#{administrator_Workflows.selectedTab}" value="tabWorkflow" />
                         </a4j:commandButton>
                     </h:panelGrid>
@@ -59,8 +59,7 @@
                             <h:outputText value="#{msgs.workflows_WORKFLOW_VALID_VALID}" rendered="#{workflow.valid}" style="color: green; font-weight: bold;" />
                             <h:outputText value="#{msgs.workflows_WORKFLOW_VALID_INVALID}" rendered="#{!workflow.valid}" style="color: red; font-weight: bold;" />
                         </rich:column>
-
-
+                            
                     </rich:dataTable>
                     <rich:spacer height="30" />
                 </div>
@@ -71,6 +70,13 @@
                     <f:facet name="header">
                         <h:panelGroup>
                             <h:outputText value="#{msgs.WORKFLOW_DETAILS}" />
+                        </h:panelGroup>
+                    </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
+                                <rich:componentControl for="mpWorkflowDetails" operation="hide" event="onclick"/>
+                            </h:graphicImage>
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgWorkflowDetails" style="width: 480px;">
@@ -195,6 +201,13 @@
                     <f:facet name="header">
                         <h:panelGroup>
                             <h:outputText value="#{msgs.WORKFLOW_STATE_DETAILS}" />
+                        </h:panelGroup>
+                    </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
+                                <rich:componentControl for="mpWorkflowStateDetails" operation="hide" event="onclick"/>
+                            </h:graphicImage>
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid rendered="#{administrator_Workflows.selectedWorkflowState != null}" id="pgWorkflowStateDetails">
@@ -390,15 +403,23 @@
                 <rich:modalPanel id="mpWorkflowStepDetails" autosized="true" domElementAttachment="parent" >
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{msgs.WORKFLOW_STATE_OPTION_DETAILS}" />
+                            <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STATE_OPTION_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
+                                <rich:componentControl for="mpWorkflowStepDetails" operation="hide" event="onclick"/>
+                            </h:graphicImage>
+                        </h:panelGroup>
+                    </f:facet>
+
                     <h:panelGrid rendered="#{administrator_Workflows.selectedWorkflowStep != null}" id="pgWorkflowStepDetails">
 
                         <rich:tabPanel id="tpWorkflowStep" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive" selectedTab="#{administrator_Workflows.selectedWorkflowStepTab}">
 
-                            <rich:tab id="tabWorkflowStep" label="#{msgs.WORKFLOW_STATE_OPTION}">
-                                <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                            <rich:tab id="tabWorkflowStep" label="#{i18n.administrator_Workflows_WORKFLOW_STATE_OPTION_TAB}">
+                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:outputText value="#{msgs.WORKFLOW_STATE_OPTION_NAME}:" />
 
                                     <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_Workflows.selectedWorkflowStep.name}" title="#{msgs.WORKFLOW_STATE_OPTION_NAME_TOOLTIP}" required="true" requiredMessage="#{msgs.WORKFLOW_STATE_OPTIONNAME_REQUIRED}"/>
@@ -445,8 +466,8 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabWorkflowStepRestriction" label="#{i18n.administrator_Workflows_WORKFLOW_STEP_RESTRICTION}">
-                                <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                            <rich:tab id="tabWorkflowStepRestriction" label="#{i18n.administrator_Workflows_WORKFLOW_STEP_RESTRICTION}" disabled="#{administrator_Workflows.workflowStepAddMode}">
+                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
 
                                     <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALID_FOR}:"
                                                   title="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALID_FOR_TOOLTIP}" />
@@ -462,8 +483,8 @@
 
                             </rich:tab>
 
-                            <rich:tab id="tabWorkflowStepValidators" label="#{msgs.WORKFLOW_STEP_VALIDATION}">
-                                <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                            <rich:tab id="tabWorkflowStepValidators" label="#{msgs.WORKFLOW_STEP_VALIDATION}" disabled="#{administrator_Workflows.workflowStepAddMode}">
+                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
 
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                                         <h:outputText value="" />
@@ -501,7 +522,7 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabWorkflowStepActions" label="#{msgs.workflows_WORKFLOW_STEP_ACTIONS}">
+                            <rich:tab id="tabWorkflowStepActions" label="#{msgs.workflows_WORKFLOW_STEP_ACTIONS}" disabled="#{administrator_Workflows.workflowStepAddMode}">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
@@ -569,6 +590,14 @@
                             <h:outputText value="#{msgs.workflows_WORKFLOW_STEP_ACTION_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
+                                <rich:componentControl for="mpWorkflowStepActionDetails" operation="hide" event="onclick"/>
+                            </h:graphicImage>
+                        </h:panelGroup>
+                    </f:facet>
+                    
                     <h:panelGrid id="pgWorkflowStepActionDetails">
 
                         <rich:tabPanel id="tpWorkflowStepAction" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive" selectedTab="#{administrator_Workflows.selectedWorkflowStepActionTab}">
@@ -662,6 +691,13 @@
                     <f:facet name="header">
                         <h:panelGroup>
                             <h:outputText value="#{msgs.workflows_WORKFLOW_STEP_VALIDATOR_DETAILS}" />
+                        </h:panelGroup>
+                    </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
+                                <rich:componentControl for="mpWorkflowStepValidatorDetails" operation="hide" event="onclick"/>
+                            </h:graphicImage>
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgWorkflowStepValidatorDetails">

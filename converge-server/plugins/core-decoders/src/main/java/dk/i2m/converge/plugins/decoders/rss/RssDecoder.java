@@ -1,13 +1,18 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later 
+ * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with 
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.plugins.decoders.rss;
 
@@ -16,9 +21,11 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
-import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.DataExistsException;
+import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.content.ContentTag;
+import dk.i2m.converge.core.logging.LogSeverity;
+import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.newswire.NewswireDecoderException;
 import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.newswire.NewswireService;
@@ -32,13 +39,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import net.sf.json.JSONObject;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 
 /**
  * Newswire decoder for RSS feeds. The decoder has a single property, the
@@ -60,19 +60,16 @@ public class RssDecoder implements NewswireDecoder {
     /** Number of seconds to wait for the feed to be downloaded. */
     public static final int READ_TIMEOUT = 60 * 3;
 
-    private static final Logger LOG = Logger.getLogger(RssDecoder.class.getName());
-
     private Map<String, String> availableProperties = null;
 
-    private ResourceBundle bundle = ResourceBundle.getBundle("dk.i2m.converge.plugins.decoders.rss.Messages");
+    private ResourceBundle bundle = ResourceBundle.getBundle(
+            "dk.i2m.converge.plugins.decoders.rss.Messages");
 
     private PluginContext pluginContext;
 
+    private NewswireService newswireService;
+
     private boolean useOpenCalais = false;
-
-    private String openCalaisId = "";
-
-    private static final String OPENCALAIS_URL = "http://api.opencalais.com/tag/rs/enrich";
 
     /**
      * Creates a new instance of {@link RssDecoder}.
@@ -80,33 +77,28 @@ public class RssDecoder implements NewswireDecoder {
     public RssDecoder() {
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public Map<String, String> getAvailableProperties() {
-        if (availableProperties == null) {
-            availableProperties = new HashMap<String, String>();
-            for (Property p : Property.values()) {
-                availableProperties.put(bundle.getString(p.name()), p.name());
-            }
-        }
-        return this.availableProperties;
-    }
-
-    @Override
-    public void decode(PluginContext ctx, NewswireService newswire) throws NewswireDecoderException {
+    public void decode(PluginContext ctx, NewswireService newswire) throws
+            NewswireDecoderException {
         this.pluginContext = ctx;
+        this.newswireService = newswire;
         String url = newswire.getPropertiesMap().get(Property.URL.name());
 
-        if (newswire.getPropertiesMap().containsKey(Property.ENABLE_OPEN_CALAIS.name())) {
-            useOpenCalais = Boolean.parseBoolean(newswire.getPropertiesMap().get(Property.ENABLE_OPEN_CALAIS.name()));
+        if (newswire.getPropertiesMap().containsKey(Property.ENABLE_OPEN_CALAIS.
+                name())) {
+            useOpenCalais = Boolean.parseBoolean(newswire.getPropertiesMap().get(Property.ENABLE_OPEN_CALAIS.
+                    name()));
         } else {
             useOpenCalais = false;
         }
 
-        if (useOpenCalais) {
-            openCalaisId = ctx.getConfiguration(ConfigurationKey.OPEN_CALAIS_API_KEY);
-        }
+        ctx.log(LogSeverity.INFO, "Downloading webfeed {0} {1}",
+                new Object[]{newswire.getSource(), url}, this.newswireService,
+                this.newswireService.getId());
 
-        LOG.log(Level.FINE, "Downloading newswire webfeed {0} {1}", new Object[]{newswire.getSource(), url});
         int duplicates = 0;
         int newItems = 0;
 
@@ -137,19 +129,95 @@ public class RssDecoder implements NewswireDecoder {
             throw new NewswireDecoderException(ex);
         }
 
-        LOG.log(Level.INFO, "{2} had {0} {0, choice, 0#duplicates|1#duplicate|2#duplicates} and {1} new {1, choice, 0#items|1#item|2#items} ", new Object[]{
-                    duplicates, newItems, newswire.getSource()});
+        ctx.log(LogSeverity.INFO,
+                "{2} had {0} {0, choice, 0#duplicates|1#duplicate|2#duplicates} and {1} new {1, choice, 0#items|1#item|2#items} ",
+                new Object[]{
+                    duplicates, newItems, newswire.getSource()},
+                this.newswireService,
+                this.newswireService.getId());
     }
 
-    private void create(SyndEntry entry, NewswireService source) throws DataExistsException {
-        List<NewswireItem> results = pluginContext.findNewswireItemsByExternalId(entry.getUri());
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public Map<String, String> getAvailableProperties() {
+        if (availableProperties == null) {
+            availableProperties = new HashMap<String, String>();
+            for (Property p : Property.values()) {
+                availableProperties.put(bundle.getString(p.name()), p.name());
+            }
+        }
+        return this.availableProperties;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public String getName() {
+        return bundle.getString("PLUGIN_NAME");
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public String getAbout() {
+        return bundle.getString("PLUGIN_ABOUT");
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public String getDescription() {
+        return bundle.getString("PLUGIN_DESCRIPTION");
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public String getVendor() {
+        return bundle.getString("PLUGIN_VENDOR");
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public Date getDate() {
+        final String FORMAT = "yyyy-MM-dd HH:mm:ss";
+        try {
+
+            SimpleDateFormat format = new SimpleDateFormat(FORMAT);
+            return format.parse(bundle.getString("PLUGIN_BUILD_TIME"));
+        } catch (Exception ex) {
+            return Calendar.getInstance().getTime();
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public ResourceBundle getBundle() {
+        return bundle;
+    }
+
+    private void create(SyndEntry entry, NewswireService source) throws
+            DataExistsException {
+        List<NewswireItem> results =
+                pluginContext.findNewswireItemsByExternalId(entry.getUri());
 
         if (results.isEmpty()) {
 
             NewswireItem item = new NewswireItem();
             item.setExternalId(entry.getUri());
             item.setTitle(StringUtils.stripHtml(entry.getTitle()));
-            item.setSummary(StringUtils.stripHtml(entry.getDescription().getValue()));
+            item.setSummary(StringUtils.stripHtml(entry.getDescription().
+                    getValue()));
             item.setUrl(entry.getLink());
             item.setNewswireService(source);
             item.setAuthor(entry.getAuthor());
@@ -173,89 +241,32 @@ public class RssDecoder implements NewswireDecoder {
             try {
                 pluginContext.index(nwi);
             } catch (SearchEngineIndexingException ex) {
-                Logger.getLogger(RssDecoder.class.getName()).log(Level.SEVERE, null, ex);
+                pluginContext.log(LogSeverity.SEVERE, ex.getMessage(),
+                        this.newswireService, this.newswireService.getId());
             }
         } else {
-            throw new DataExistsException("NewswireItem with external id [" + entry.getUri() + "] already downloaded");
+            throw new DataExistsException("NewswireItem with external id ["
+                    + entry.getUri() + "] already downloaded");
         }
-    }
-
-    @Override
-    public String getName() {
-        return bundle.getString("PLUGIN_NAME");
-    }
-
-    @Override
-    public String getAbout() {
-        return bundle.getString("PLUGIN_ABOUT");
-    }
-
-    @Override
-    public String getDescription() {
-        return bundle.getString("PLUGIN_DESCRIPTION");
-    }
-
-    @Override
-    public String getVendor() {
-        return bundle.getString("PLUGIN_VENDOR");
-    }
-
-    @Override
-    public Date getDate() {
-        try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            return format.parse(bundle.getString("PLUGIN_BUILD_TIME"));
-        } catch (Exception ex) {
-            return Calendar.getInstance().getTime();
-        }
-    }
-
-    @Override
-    public ResourceBundle getBundle() {
-        return bundle;
     }
 
     private void enrich(PluginContext ctx, NewswireItem item) {
-        PostMethod method = new PostMethod(OPENCALAIS_URL);
-        method.setRequestHeader("x-calais-licenseID", openCalaisId);
-        method.setRequestHeader("Content-Type", "text/raw; charset=UTF-8");
-        method.setRequestHeader("Accept", "application/json");
-        method.setRequestHeader("enableMetadataType", "SocialTags");
-        method.setRequestEntity(new StringRequestEntity(item.getTitle() + " "
-                + item.getSummary() + " " + item.getContent()));
+        StringBuilder story = new StringBuilder();
+        story.append(item.getTitle());
+        story.append(item.getSummary());
+        story.append(item.getContent());
         try {
-            HttpClient client = new HttpClient();
-            int returnCode = client.executeMethod(method);
-            if (returnCode == HttpStatus.SC_NOT_IMPLEMENTED) {
-                // still consume the response body
-                method.getResponseBodyAsString();
-            } else if (returnCode == HttpStatus.SC_OK) {
+            List<Concept> concepts = ctx.enrich(story.toString());
 
-                JSONObject response = JSONObject.fromObject(method.getResponseBodyAsString());
-
-                for (Object key : response.keySet()) {
-                    String sKey = (String) key;
-
-                    if (sKey.startsWith("http://d.opencalais.com/")) {
-                        JSONObject entity = response.getJSONObject(sKey);
-
-                        if (entity.containsKey("name")) {
-                            String name = ((String) entity.get("name")).replaceAll("_", " ");
-                            ContentTag tag = ctx.findOrCreateContentTag(name);
-                            if (!item.getTags().contains(tag)) {
-                                item.getTags().add(tag);
-                            }
-                        }
-                    }
+            for (Concept concept : concepts) {
+                ContentTag tag = ctx.findOrCreateContentTag(concept.getName());
+                if (!item.getTags().contains(tag)) {
+                    item.getTags().add(tag);
                 }
-            } else {
-                LOG.log(Level.WARNING, "Invalid response received from OpenCalais [{0}] {1}", new Object[]{returnCode, method.getResponseBodyAsString()});
             }
-
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "", e);
-        } finally {
-            method.releaseConnection();
+        } catch (EnrichException ex) {
+            ctx.log(LogSeverity.WARNING, ex.getMessage(), this.newswireService,
+                    this.newswireService.getId());
         }
     }
 }

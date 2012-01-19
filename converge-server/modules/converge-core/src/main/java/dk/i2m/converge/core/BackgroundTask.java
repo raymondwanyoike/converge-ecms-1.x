@@ -19,13 +19,7 @@ package dk.i2m.converge.core;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
+import javax.persistence.*;
 
 /**
  * Entity representing a background task. This entity is purely for
@@ -52,33 +46,69 @@ public class BackgroundTask implements Serializable {
     @Column(name = "task_start")
     private Date taskStart;
 
+    /**
+     * Creates a new instance of {@link BackgroundTask}.
+     */
+    public BackgroundTask() {
+    }
+
+    /**
+     * Gets the unique identifier of the task.
+     *
+     * @return Unique identifier of the task
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * Sets the unique identifier of the task.
+     *
+     * @param id Unique identifier of the task
+     */
     public void setId(Long id) {
         this.id = id;
     }
 
+    /**
+     * Gets the name of the task.
+     *
+     * @return Name of the task
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the name of the task.
+     *
+     * @param name Name of the task
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Gets the date and time when the task started.
+     *
+     * @return Date and time when the task started
+     */
     public Date getTaskStart() {
         return taskStart;
     }
 
+    /**
+     * Sets the date and time when the task started.
+     *
+     * @param taskStart Date and time when the task started
+     */
     public void setTaskStart(Date taskStart) {
         this.taskStart = taskStart;
     }
 
     /**
      * Calculate for how long the background tasks has been running.
-     * 
+     *
      * @return Duration of the task in milliseconds
      */
     public Long getDuration() {
@@ -89,6 +119,7 @@ public class BackgroundTask implements Serializable {
         return now.getTimeInMillis() - start.getTimeInMillis();
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         int hash = 0;
@@ -96,21 +127,23 @@ public class BackgroundTask implements Serializable {
         return hash;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof BackgroundTask)) {
             return false;
         }
         BackgroundTask other = (BackgroundTask) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null
+                && !this.id.equals(other.id))) {
             return false;
         }
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
-        return "dk.i2m.converge.core.BackgroundTask[ id=" + id + " ]";
+        return getClass().getName() + "[id=" + id + "]";
     }
 }

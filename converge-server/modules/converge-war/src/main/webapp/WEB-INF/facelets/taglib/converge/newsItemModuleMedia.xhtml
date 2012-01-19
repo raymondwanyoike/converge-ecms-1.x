@@ -241,7 +241,7 @@
                     <h:panelGrid style="width: 480px;">
                         <rich:tabPanel id="tpMediaItemSelected" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
                             <rich:tab label="#{i18n.NewsItem_MEDIA_SELECTED_ITEM}">
-                                <h:panelGrid columnClasses="tabSheet center" styleClass="tabSheetGrid">
+                                <h:panelGrid columnClasses="tabSheet center" styleClass="tabSheetGrid" rendered="#{!newsItem.selectedAttachment.mediaItem.held}">
                                     <h:outputLink target="_blank" value="#{newsItem.selectedAttachment.mediaItem.original.absoluteFilename}">
                                         <h:graphicImage style="border: 1px solid #aaaaaa; margin-left: 1%; margin-right: 1%;" url="/images/unknown-media-item.png" rendered="#{!newsItem.selectedAttachment.mediaItem.previewAvailable}" title="#{newsItem.selectedAttachment.mediaItem.title}" />
                                         <h:graphicImage style="border: 1px solid #aaaaaa; margin-left: 1%; margin-right: 1%;" url="#{newsItem.selectedAttachment.mediaItem.preview.absoluteFilename}" rendered="#{newsItem.selectedAttachment.mediaItem.previewAvailable}" title="#{newsItem.selectedAttachment.mediaItem.title}" />
@@ -253,17 +253,20 @@
                                     <h:inputText value="#{newsItem.selectedAttachment.mediaItem.byLine}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text mediumInput" disabled="true" rendered="#{newsItem.selectedAttachment.mediaItem.status != 'SELF_UPLOAD' &amp;&amp; newsItem.selectedAttachment.mediaItem.byLine != ''}"/>
                                     <h:inputText value="#{newsItem.selectedAttachment.mediaItem.owner.fullName}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text mediumInput" disabled="true" rendered="#{newsItem.selectedAttachment.mediaItem.status != 'SELF_UPLOAD' &amp;&amp; newsItem.selectedAttachment.mediaItem.byLine == ''}"/>
                                 </h:panelGrid>
+                                <h:panelGrid columnClasses="tabSheet center" styleClass="tabSheetGrid" rendered="#{newsItem.selectedAttachment.mediaItem.held}">
+                                    <h:outputText value="#{i18n.NewsItem_MEDIA_SELECTED_IS_HELD}" />                                
+                                </h:panelGrid>
                             </rich:tab>
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkUpdateAttachment" actionListener="#{newsItem.onUpdateAttachment}" styleClass="dialogButton" value="#{msgs.UPDATE}" reRender="dtMediaFiles" rendered="#{newsItem.selectedAttachment.id != null}">
+                            <a4j:commandLink id="lnkUpdateAttachment" actionListener="#{newsItem.onUpdateAttachment}" styleClass="dialogButton" value="#{i18n.Generic_UPDATE}" reRender="dtMediaFiles" rendered="#{newsItem.selectedAttachment.id != null}">
                                 <rich:componentControl for="mpMediaItemSelected" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
-                            <a4j:commandLink id="lnkUseAttachment" actionListener="#{newsItem.onUseAttachment}" styleClass="dialogButton" value="#{msgs.ADD}" reRender="dtMediaFiles,searchResults,pgMediaItemUpload" rendered="#{newsItem.selectedAttachment.id == null}">
+                            <a4j:commandLink id="lnkUseAttachment" actionListener="#{newsItem.onUseAttachment}" styleClass="dialogButton" value="#{i18n.Generic_ADD}" reRender="dtMediaFiles,searchResults,pgMediaItemUpload" rendered="#{newsItem.selectedAttachment.id == null &amp;&amp; !newsItem.selectedAttachment.mediaItem.held}">
                                 <rich:componentControl for="mpMediaItemSelected" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
-                            <h:commandLink id="lnkCloseMediaItemSelection" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpMediaItemSelected')}.hide(); return false;" />
+                            <h:commandLink id="lnkCloseMediaItemSelection" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpMediaItemSelected')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 

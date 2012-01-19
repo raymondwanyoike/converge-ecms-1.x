@@ -1,7 +1,9 @@
+= Catalogues {{anchor id=app-editorial-catalogues /}} =
+
 This chapter shows how to set-up a catalogue for storing digital
 assets.
 
-= About =
+== About ==
 
 Catalogues are used for storing digital assets such as images,
 sound bites, video footage and documents. Approved items in a 
@@ -23,7 +25,7 @@ A catalogue has two physical locations
 //Note: The drop directory functionality is not available until Converge 1.2//
 
 
-= Setting up a new Catalogue =
+== Setting up a new Catalogue ==
 
 Note: You must be a Converge administrator to set-up a catalogue.
 
@@ -32,7 +34,7 @@ you will be storing for each digital asset in the catalogue. It also
 requires that you know the physically location where you want to
 store the renditions.
 
-== Create Renditions ==
+=== Create Renditions ===
 
 Renditions can be re-used across catalogues. Converge comes with a
 set of default renditions.
@@ -60,7 +62,7 @@ If these renditions are not sufficient, you can create new renditions by followi
 1. If the rendition is used for images, you can specify a default height and width for images of this rendition under the Images Defaults tab. The entered dimensions will automatically be used when generating Renditions using the cropping tool.
 1. Click Save
 
-== Preparing Disk Space ==
+=== Preparing Disk Space ===
 
 Every catalogue must have a physically location where renditions of the digital assets are stored.
 The location must be available on the file system and through a web server (HTTP/HTTPS location). It
@@ -81,7 +83,7 @@ You should be able to access the directories by entering ##http:/192.168.0.1/cat
 the web browser.
 
 
-== Creating a Catalogue ==
+=== Creating a Catalogue ===
 
 Once you have renditions set-up and disk space set-up, you are ready to create the Catalogue.
 

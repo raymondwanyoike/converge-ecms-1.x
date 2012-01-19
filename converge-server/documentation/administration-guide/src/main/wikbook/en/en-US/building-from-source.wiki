@@ -53,12 +53,10 @@ Currently Adobe InDesign and OpenOffice.org extensions are under development.
 
 = Building Converge using Maven =
 
-To build #converge-server#> you must use Maven 3 available at 
-http://maven.apache.org/. Once Maven 3 has been installed on your system follow 
-the steps below:
+To build ##converge-server## you must use Maven 3 available at http://maven.apache.org/. Once Maven 3 has been installed on your system follow the steps below:
 
-# go the the ##converge-server## directory
-# execute: ##mvn clean install##
+1. go the the ##converge-server## directory
+1. execute: ##mvn clean install##
 
 The Maven building should end with the following:
 

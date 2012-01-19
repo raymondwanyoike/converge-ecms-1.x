@@ -16,8 +16,10 @@
  */
 package dk.i2m.converge.ejb.facades;
 
+import dk.i2m.converge.core.logging.LogEntry;
 import dk.i2m.converge.core.content.*;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.plugin.WorkflowAction;
 import dk.i2m.converge.core.search.QueueEntryOperation;
 import dk.i2m.converge.core.search.QueueEntryType;
@@ -203,6 +205,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         UserAccount ua = null;
         try {
             ua = userService.findById(uid);
+            pluginContext.setCurrentUserAccount(ua);
         } catch (Exception ex) {
             throw new WorkflowStateTransitionException("Could not resolve transition initator", ex);
         }
@@ -257,14 +260,16 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
 
         // Actions
-        LOG.log(Level.INFO, "Executing workflow step actions");
+        pluginContext.log(LogSeverity.INFO, "Executing workflow step actions", newsItem, newsItem.getId());
+        //LOG.log(Level.INFO, "Executing workflow step actions");
 
         for (WorkflowStepAction action : transitionStep.getActions()) {
             try {
                 WorkflowAction act = action.getAction();
                 act.execute(pluginContext, newsItem, action, ua);
             } catch (WorkflowActionException ex) {
-                LOG.log(Level.SEVERE, "Could not execute action {0}", action.getLabel());
+                //LOG.log(Level.SEVERE, "Could not execute action {0}", action.getLabel());
+                pluginContext.log(LogSeverity.SEVERE, "Could not execute action {0}", new Object[]{action.getLabel()}, newsItem, newsItem.getId());
             }
         }
 
@@ -715,6 +720,11 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     public NewsItem findNewsItemById(Long id) throws DataNotFoundException {
         return daoService.findById(NewsItem.class, id);
     }
+    
+    @Override
+    public NewsItemPlacement findNewsItemPlacementById(Long id) throws DataNotFoundException {
+        return daoService.findById(NewsItemPlacement.class, id);
+    }
 
     /** {@inheritDoc } */
     @Override
@@ -806,6 +816,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
         try {
             user = userService.findById(ctx.getCallerPrincipal().getName());
+            pluginContext.setCurrentUserAccount(user);
         } catch (UserNotFoundException ex) {
             LOG.log(Level.SEVERE, null, ex);
         } catch (DirectoryException ex) {
@@ -819,18 +830,21 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
         if (newsItem.isLocked() && !newsItem.getCheckedOutBy().equals(user)) {
             // The item has been checked out and the check-out user is not the same as the one who has already checked it out
-            LOG.log(Level.INFO, "News Item #{0} is locked by {1}", new Object[]{id, newsItem.getCheckedOutBy()});
+            //LOG.log(Level.INFO, "News Item #{0} is locked by {1}", new Object[]{id, newsItem.getCheckedOutBy()});
+            pluginContext.log(LogSeverity.INFO, "News Item #{0} is locked by {1}", new Object[]{id, newsItem.getCheckedOutBy()}, newsItem, id);
             checkedOut = false;
             readOnly = true;
         } else if (newsItem.isLocked() && newsItem.getCheckedOutBy().equals(user)) {
-            LOG.log(Level.INFO, "News Item #{0} is already locked by {1}", new Object[]{id, newsItem.getCheckedOutBy()});
+            //LOG.log(Level.INFO, "News Item #{0} is already locked by {1}", new Object[]{id, newsItem.getCheckedOutBy()});
+            pluginContext.log(LogSeverity.INFO, "News Item #{0} is already locked by {1}", new Object[]{id, newsItem.getCheckedOutBy()}, newsItem, id);
             // The item has been checked out but the same user asking to check it out again
             checkedOut = true;
             readOnly = false;
         } else {
             LOG.log(Level.INFO, "News Item #{0} is not locked", new Object[]{id});
             if (permission == ContentItemPermission.USER || permission == ContentItemPermission.ROLE) {
-                LOG.log(Level.INFO, "Locking News Item #{0} for {1}", new Object[]{id, user});
+                pluginContext.log(LogSeverity.INFO, "Locking News Item #{0} for {1}", new Object[]{id, user}, newsItem, id);
+                //LOG.log(Level.INFO, "Locking News Item #{0} for {1}", new Object[]{id, user});
                 // Check-out user is the same as the current user or role of the content item
                 newsItem.setCheckedOut(Calendar.getInstance());
                 newsItem.setCheckedOutBy(user);

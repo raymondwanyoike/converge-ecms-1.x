@@ -14,7 +14,7 @@
     <artifactId>administration-guide</artifactId>
     <packaging>jar</packaging>
 
-    <name>Administration Guide</name>
+    <name>Converge - Administration Guide</name>
 
     <dependencies>
         <dependency>
