@@ -12,7 +12,7 @@
           xmlns:v="http://converge.i2m.dk"
           xmlns:converge="http://com.interactivemediamanagement.converge/tags">
 
-    <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
+    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/administration.xhtml">
         <ui:define name="title">#{msgs.calendar_CATEGORIES}</ui:define>
 
         <ui:define name="body">

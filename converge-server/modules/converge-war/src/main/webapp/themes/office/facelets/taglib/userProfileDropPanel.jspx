@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
+    <ui:composition>
+         <div id="userProfile">
+                        <h:form id="frmSubHeader">
+                            <div id="top-stuff">
+                                <div id="top-bar-out">
+                                    <div id="container">
+                                        <div id="topnav">
+                                            <div class="active-links">
+                                                <div id="session">
+                                                    <h:form id="#{id}frmProfile">           
+                                                        <div class="moduleContent" style="margin-top:0px;">
+                                                            <h:panelGrid columns="2">
+                                                                <h:panelGrid>                       
+                                                                    <h:outputText styleClass="profileLastName" value="#{user.fullName}" title="#{user.fullName}">
+                                                                        <f:converter converterId="i2m.abbreviationDisplay" />
+                                                                        <f:attribute name="maxLength" value="50" />
+                                                                    </h:outputText>                       
+                                                                </h:panelGrid>
+                                                                <h:graphicImage styleClass="profilePhoto"
+                                                                                value="/UserPhoto?uid=#{user.id}"
+                                                                                alt="#{user.fullName}"
+                                                                                title="#{user.fullName}" height="25" width="25" />
+
+                                                            </h:panelGrid>
+                                                        </div>
+                                                    </h:form>
+                                                    <div style="clear: both; padding-bottom: 12px;"></div>
+                                                </div>
+                                                <div id="signin-dropdown">                                                          
+                                                    <!-- Sub header start -->
+                                                      <div>
+                                                        <h:panelGrid columns="2">
+                                                            <h:panelGrid columns="1">
+                                                                <h:graphicImage styleClass="profilePhoto"
+                                                                                value="/UserPhoto?uid=#{userSession.user.id}"
+                                                                                alt="#{userSession.user.fullName}"
+                                                                                title="#{userSession.user.fullName}" height="95" width="95" />
+                                                            </h:panelGrid>
+
+                                                            <h:panelGrid columns="1">
+                                                                <f:facet name="header">
+                                                                    <h:panelGrid columns="3">
+                                                                        <h:outputText styleClass="profileLastName"  value="#{userSession.user.fullName} " title="#{userSession.user.fullName}">
+                                                                            <f:converter converterId="i2m.abbreviationDisplay" />
+                                                                            <f:attribute name="maxLength" value="50" />
+                                                                        </h:outputText>                                                                       
+                                                                    </h:panelGrid>
+                                                                </f:facet>
+                                                                <h:outputText styleClass="profileTitle" value="#{userSession.user.jobTitle}" title="#{userSession.user.jobTitle}">
+                                                                    <f:converter converterId="i2m.abbreviationDisplay" />
+                                                                    <f:attribute name="maxLength" value="23" />
+                                                                </h:outputText>
+                                                                <h:outputText styleClass="profileTitle" value="#{userSession.user.email}" title="#{userSession.user.email}">
+                                                                    <f:converter converterId="i2m.abbreviationDisplay" />
+                                                                    <f:attribute name="maxLength" value="23" />
+                                                                </h:outputText>
+                                                                <h:column>
+                                                                    <ui:repeat value="#{userSession.submenuItems}" var="menuItem">                                                                        
+                                                                        <h:commandLink action="#{menuItem.action}" styleClass="dropbox_link">    
+                                                                            <span style="z-index:2;">#{i18n[menuItem.label]}</span>
+                                                                        </h:commandLink>                                                                        
+                                                                    </ui:repeat>
+                                                                </h:column>
+
+                                                                <h:column>
+                                                                    <c:if test="#{userSession.administrator}">                                                                        
+                                                                        <h:commandLink id="#{userSession.administration.id}" styleClass="dropbox_link" action="#{userSession.administration.action}" >
+                                                                            <span onclick="document.getElementById('frmSubHeader:#{userSession.administration.id}').onclick();">#{i18n.menu_ADMINISTRATION}</span>
+                                                                        </h:commandLink>                                                                        
+                                                                    </c:if>
+                                                                </h:column>
+                                                                <h:column>                   
+                                                                        
+                                                                   <h:outputLink  id="btnSignOut" value="" ></h:outputLink>
+                                                                   <span  onclick="window.location.href = '#{facesContext.externalContext.request.contextPath}/logout.jsp';" style="z-index: 2;" class="dropbox_link_logout_link">#{i18n.Generic_SIGN_OUT}</span>
+                                                                   
+                                                                                                                                            
+                                                                </h:column>
+
+                                                            
+
+                                                            </h:panelGrid>
+
+                                                        </h:panelGrid>                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </h:form>
+
+        </div>
+    </ui:composition>
+</jsp:root>

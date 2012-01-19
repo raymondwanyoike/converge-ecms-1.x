@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <jsp:root version="2.0" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
 
-    <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
+    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/administration.xhtml">
         <ui:define name="title">#{msgs.ADMINISTRATION_ROLES}</ui:define>
 
         <ui:define name="body">
