@@ -35,13 +35,13 @@
         <label>menu_SEARCH</label>
         <action>/search</action>
     </item>
-
+    <!--
     <item id="lnkListings">
         <label>menu_LISTINGS</label>
         <action>/listings</action>
         <privilege>LISTINGS</privilege>
     </item>
-
+    -->
     <item id="lnkConcepts">
         <label>menu_CONCEPTS</label>
         <action>/concepts</action>
@@ -53,29 +53,39 @@
         <privilege>CONTACTS_MANAGE</privilege>
         <privilege>CONTACTS_READ</privilege>
     </item>
-
+    <item id="lnkReporting" >
+        <label>menu_REPORTING</label>
+        <action>/reporting</action>
+        <privilege>REPORTING</privilege>
+    </item>
+    <item id="lnkNewsreader" >
+        <label>menu_NEWS_READER</label>
+        <action>/newsreader</action>
+        <privilege>NEWS_READER</privilege>
+    </item>
+    <!--
     <item id="lnkHelp" type="submenu">
         <label>menu_HELP</label>
         <action>/help</action>
     </item>
-
+    -->
     <item id="lnkMyProfile" type="submenu">
         <label>menu_MY_PROFILE</label>
         <action>/myprofile</action>
-    </item>
+    </item>    
     
+    <!--
     <item id="lnkReporting" type="submenu">
         <label>menu_REPORTING</label>
         <action>/reporting</action>
         <privilege>REPORTING</privilege>
     </item>
-    
     <item id="lnkNewsreader" type="submenu">
         <label>menu_NEWS_READER</label>
         <action>/newsreader</action>
         <privilege>NEWS_READER</privilege>
     </item>
-
+    -->
     <item id="lnkAdministration" type="admin">
         <label>menu_ADMINISTRATION</label>
         <action>/administration/administration</action>

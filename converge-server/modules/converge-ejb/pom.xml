@@ -328,6 +328,11 @@
             <url>https://repository.jboss.org/nexus/content/groups/public/</url>
             <layout>default</layout>
         </repository>
+        <repository>
+            <id>xuggleRepository</id>
+            <name>Xuggle Repository</name>
+            <url>http://xuggle.googlecode.com/svn/trunk/repo/share/java</url>
+        </repository>
     </repositories>
     <properties />
 </project>
