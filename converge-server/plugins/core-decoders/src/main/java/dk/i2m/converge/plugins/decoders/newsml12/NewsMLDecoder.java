@@ -17,6 +17,7 @@
 package dk.i2m.converge.plugins.decoders.newsml12;
 
 import dk.i2m.converge.core.EnrichException;
+import dk.i2m.converge.core.content.ContentTag;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.logging.LogSeverity;
@@ -39,20 +40,16 @@ import dk.i2m.converge.plugins.decoders.newsml12.binding.NewsComponentType.NewsL
 import dk.i2m.converge.plugins.decoders.newsml12.binding.NewsML;
 import dk.i2m.converge.plugins.decoders.newsml12.transformer.NamespaceFilter;
 import dk.i2m.converge.plugins.decoders.newsml12.transformer.NitfToHtmlTransformer;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXSource;
+import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
@@ -223,6 +220,8 @@ public class NewsMLDecoder implements NewswireDecoder {
         item.setExternalId(file.getName());
         item.setNewswireService(this.newswireService);
 
+        List<File> moveOrDelete = new ArrayList<File>();
+
         NewsML newsMl = null;
         try {
             newsMl = unmarshal(file);
@@ -371,7 +370,7 @@ public class NewsMLDecoder implements NewswireDecoder {
                                                         abbreviate(strippedStory,
                                                         600);
                                                 item.addSummary(summary);
-                                                
+
                                             } catch (TransformerException ex) {
                                                 log(LogSeverity.SEVERE,
                                                         "Could not transform NITF to HTML",
@@ -414,6 +413,7 @@ public class NewsMLDecoder implements NewswireDecoder {
                             attachment.setCataloguePath(pluginCtx.archive(
                                     innerContentFile, catalogue.getId(),
                                     innerContentFile.getName()));
+                            moveOrDelete.add(innerContentFile);
                             String renditionId = renditionMapping.get(roleName);
                             Rendition rendition = pluginCtx.findRenditionByName(
                                     renditionId);
@@ -436,23 +436,13 @@ public class NewsMLDecoder implements NewswireDecoder {
                         log(LogSeverity.WARNING, "Attachment Catalogue ["
                                 + catalogue + "] not available");
                     }
-
                 }
             }
 
             NewswireItem nwi = pluginCtx.createNewswireItem(item);
 
             if (enrich) {
-                try {
-                    List<Concept> concepts = pluginCtx.enrich(StringUtils.
-                            stripHtml(nwi.getContent()));
-                    for (Concept concept : concepts) {
-                        nwi.getTags().add(pluginCtx.findOrCreateContentTag(concept.
-                                getName()));
-                    }
-                } catch (EnrichException ex) {
-                    log(LogSeverity.WARNING, ex.getMessage());
-                }
+                enrich(item);
             }
 
             try {
@@ -463,25 +453,59 @@ public class NewsMLDecoder implements NewswireDecoder {
                         new Object[]{nwi.getId(), seie.getMessage()});
             }
 
-            if (moveProcessed) {
-                File newLocation = new File(this.processedLocation,
-                        file.getName());
-                if (!file.renameTo(newLocation)) {
-                    log(LogSeverity.WARNING,
-                            "Could not move file from {0} to {1}",
-                            new Object[]{file.getAbsolutePath(), newLocation.
-                                getAbsolutePath()});
-                }
-            } else if (deleteProcessed) {
-                if (!file.delete()) {
-                    log(LogSeverity.WARNING, "{0} could not be deleted",
-                            new Object[]{file.getAbsolutePath()});
-                }
+            moveOrDelete.add(file);
+            for (File f : moveOrDelete) {
+                onPostProcess(f);
             }
 
         } catch (NewsMLUnmarshalException ex) {
             log(LogSeverity.SEVERE, "{0} could not be unmarshalled. {1}",
                     new Object[]{file.getName(), ex.getMessage()});
+        }
+    }
+
+    /**
+     * Post processing of a {@link File}. If the processed files were set to
+     * be moved, they will be relocated to the processed location. If they were
+     * set to be deleted, they will be deleted from their original location.
+     * <p/>
+     * @param file {@link File} to process
+     */
+    private void onPostProcess(File file) {
+        if (this.moveProcessed) {
+            File moveTo = new File(this.processedLocation, file.getName());
+            try {
+                FileUtils.moveFile(file, moveTo);
+            } catch (IOException ex) {
+                log(LogSeverity.WARNING,
+                        "Could not move file from {0} to {1}",
+                        new Object[]{file.getAbsolutePath(), moveTo.
+                            getAbsolutePath()});
+            }
+        } else if (this.deleteProcessed) {
+            if (!file.delete()) {
+                log(LogSeverity.WARNING, "{0} could not be deleted",
+                        new Object[]{file.getAbsolutePath()});
+            }
+        }
+    }
+
+    /**
+     * Enrich a {@link NewswireItem} with {@link ContentTag}s.
+     * 
+     * @param item {@link NewswireItem} to enrich
+     */
+    private void enrich(NewswireItem item) {
+        try {
+            String plainText = StringUtils.stripHtml(item.getContent());
+            List<Concept> concepts = pluginCtx.enrich(plainText);
+
+            for (Concept c : concepts) {
+                ContentTag tag = pluginCtx.findOrCreateContentTag(c.getName());
+                item.getTags().add(tag);
+            }
+        } catch (EnrichException ex) {
+            log(LogSeverity.WARNING, ex.getMessage());
         }
     }
 
