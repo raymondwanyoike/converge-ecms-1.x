@@ -728,8 +728,7 @@ public class NewswireServiceBean implements NewswireServiceLocal {
      * Gets the instance of the Apache Solr server used for indexing.
      *
      * @return Instance of the Apache Solr server
-     * @throws IllegalStateException
-* If the search engine is not properly configured
+     * @throws IllegalStateException If the search engine is not properly configured
      */
     private SolrServer getSolrServer() {
         try {
