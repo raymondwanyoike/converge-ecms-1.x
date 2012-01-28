@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
 
-    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/mediaitem_archive.xhtml">
+    <ui:composition template="/WEB-INF/facelets/templates//mediaitem_archive.xhtml">
         <ui:define name="title">#{mediaItemArchive.selectedMediaItem.title}</ui:define>
         <ui:define name="body">
             <a4j:keepAlive beanName="mediaItemArchive" />
@@ -18,11 +18,6 @@
                 <h1 style="margin-bottom: 5px; padding-bottom: 0px;">#{mediaItemArchive.selectedMediaItem.title}</h1>
                 <h2 style="margin-top: 0px; padding-top: 0px;">#{mediaItemArchive.selectedMediaItem.byLine == '' ? mediaItemArchive.selectedMediaItem.owner.fullName : mediaItemArchive.selectedMediaItem.byLine}</h2>
 
-                
-                <h:panelGroup rendered="#{mediaItemArchive.selectedMediaItem.held}" layout="block" styleClass="mediaItemHeld">
-                    <h:outputText value="#{i18n.MediaItemArchive_MEDIA_ITEM_HELD}" />
-                </h:panelGroup>
-                
                 <h:graphicImage styleClass="searchResultThumb" url="#{mediaItemArchive.selectedMediaItem.preview.absoluteFilename}" style="float: left; padding-right: 10px; padding-bottom: 5px;" rendered="#{mediaItemArchive.selectedMediaItem.previewAvailable}" />
                 <h:outputText value="#{mediaItemArchive.selectedMediaItem.description}" escape="false" style="float: left;" />
 
@@ -60,7 +55,7 @@
                         </f:facet>
                         <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItemArchive.xhtml?id=#{usage.newsItemId}">
                             <h:outputText value="#{usage.newsItemId}">
-                                <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
+                                <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
                             </h:outputText>
                         </h:outputLink>
                     </rich:column>

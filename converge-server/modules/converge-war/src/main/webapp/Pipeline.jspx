@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root version="2.0" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:v="http://converge.i2m.dk" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
 
-    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/planning.xhtml">
+    <ui:composition template="/WEB-INF/facelets/templates//planning.xhtml">
 
         <ui:define name="body">
             <a4j:keepAlive beanName="planning" />
@@ -31,7 +31,7 @@
                                 <f:selectItems value="#{planning.outletWorkflowStates}" />
                             </h:selectOneMenu>
                             &#160;
-                            <a4j:commandButton styleClass="button mediumButton" value="#{msgs.REFRESH}" reRender="dtPipeline" actionListener="#{planning.onRefreshPipeline}" />
+                            <a4j:commandButton styleClass="button mediumButton" value="#{i18n.Pipeline_REFRESH}" reRender="dtPipeline" actionListener="#{planning.onRefreshPipeline}" />
                         </h:column>
                     </h:panelGrid>
 
@@ -58,7 +58,7 @@
 
                         <rich:column sortBy="#{ni.title}">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.TITLE}" />
+                                <h:outputText value="#{i18n.Generic_TITLE}" />
                             </f:facet>
                             <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml">
                                 <f:param value="#{ni.id}" name="id" />
@@ -108,7 +108,7 @@
                                 <h:outputText value="#{msgs.planning_NEWS_ITEM_DEADLINE}" />
                             </f:facet>
                             <h:outputText value="#{ni.deadline.time}">
-                                <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
                         </rich:column>
 
@@ -131,7 +131,7 @@
                                 <a4j:support event="oncomplete" reRender="frmAssignmentDetails" actionListener="#{planning.onShowAssignment}">
                                     <rich:componentControl for="mpAssignmentDetails" operation="show" event="oncomplete" />
                                 </a4j:support>
-                                <h:graphicImage value="#{res.UPDATE_ICON}" alt="#{msgs.UPDATE}" title="#{msgs.UPDATE}" />
+                                <h:graphicImage value="#{res.UPDATE_ICON}" alt="#{i18n.Generic_UPDATE}" title="#{i18n.Generic_UPDATE}" />
                             </a4j:commandLink>
                         </rich:column>
 
@@ -140,7 +140,7 @@
                             <a4j:commandLink onclick="if (confirm('#{msgs.planning_ASSIGNMENT_PROMPT_DELETE}') != true){ return false; };">
                                 <f:setPropertyActionListener value="#{ni}" target="#{planning.selectedAssignment}" />
                                 <a4j:support event="oncomplete" actionListener="#{planning.onDeleteAssignment}" reRender="frmPage" />
-                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{msgs.DELETE}" title="#{msgs.DELETE}" />
+                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
                             </a4j:commandLink>
                         </rich:column>
                     </rich:dataTable>

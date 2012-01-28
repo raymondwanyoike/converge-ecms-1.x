@@ -18,11 +18,11 @@
                             <rich:tab id="tabStory" label="#{msgs.STORY}">
                                 <h:panelGrid id="pgStory" columnClasses="tabSheet" style="padding: 10px; width: 100%">
 
-                                    <h:outputText value="#{msgs.TITLE}:" />
+                                    <h:outputText value="#{i18n.Generic_TITLE}:" />
                                     <h:inputText id="txtStoryTitle" required="true" requiredMessage="#{msgs.planning_NEWS_ITEM_TITLE_REQUIRED}" value="#{bean.assignment.title}" styleClass="text mediumInput" disabled="#{!bean.currentActor || bean.readOnly}" />
 
                                     <h:outputText value="#{msgs.planning_NEWS_ITEM_DEADLINE}:" />
-                                    <rich:calendar id="calDeadline" popup="true" required="true" requiredMessage="#{msgs.planning_NEWS_ITEM_DEADLINE_REQUIRED}" value="#{bean.assignment.deadline.time}" datePattern="#{msgs.FORMAT_DATE_AND_TIME}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}" disabled="#{!bean.currentActor || bean.readOnly}" />
+                                    <rich:calendar id="calDeadline" popup="true" required="true" requiredMessage="#{msgs.planning_NEWS_ITEM_DEADLINE_REQUIRED}" value="#{bean.assignment.deadline.time}" datePattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}" disabled="#{!bean.currentActor || bean.readOnly}" />
 
                                     <h:outputText value="#{msgs.newsitem_TARGET_WORD_COUNT}:" />
                                     <h:inputText id="txtTargetWordCount" required="true" requiredMessage="#{msgs.planning_TARGET_WORD_COUNT_REQUIRED}" value="#{bean.assignment.targetWordCount}" styleClass="text mediumInput" disabled="#{!bean.currentActor || bean.readOnly}" />
@@ -74,7 +74,7 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabBriefing" label="#{msgs.planning_ASSIGNMENT_BRIEFING}">
+                                            <rich:tab id="tabBriefing" label="#{i18n.Assignment_planning_ASSIGNMENT_BRIEFING}">
                                 <h:panelGrid id="pgBriefing" columnClasses="tabSheet" style="padding: 10px; width: 100%; text-align:center">
                                     <rich:editor id="edBriefing" value="#{bean.assignment.assignmentBriefing}" theme="advanced" plugins="safari,spellchecker,inlinepopups,paste,fullscreen" rendered="true" skin="default" style="margin-left: 1%; margin-right: 1%" height="300" readonly="#{!bean.editable}" dialogType="window" inputElementType="input">
                                         <f:param name="theme_advanced_buttons1" value="bold,italic,underline,separator,bullist,numlist,separator,outdent,indent,separator,cut,copy,paste,pastetext,pasteword,separator,spellchecker,separator,link,unlink,separator,fullscreen"/>
@@ -111,10 +111,10 @@
 
                                     <h:outputText value="#{msgs.EVENT_START_TIME}" rendered="#{bean.assignment.event != null}" />
 
-                                    <rich:calendar id="calStartDate" value="#{bean.assignment.event.startDate.time}" popup="true" disabled="true" timeZone="#{userSession.user.timeZone}" rendered="#{bean.assignment.event != null}" datePattern="#{bean.assignment.event.allDayEvent ? msgs.FORMAT_DATE : msgs.FORMAT_DATE_AND_TIME}" />
+                                    <rich:calendar id="calStartDate" value="#{bean.assignment.event.startDate.time}" popup="true" disabled="true" timeZone="#{userSession.user.timeZone}" rendered="#{bean.assignment.event != null}" datePattern="#{bean.assignment.event.allDayEvent ? i18n.Generic_FORMAT_DATE : i18n.Generic_FORMAT_DATE_AND_TIME}" />
                                     <h:outputText value="#{msgs.EVENT_END_TIME}" rendered="#{bean.assignment.event != null}" />
 
-                                    <rich:calendar id="calEndDate" value="#{bean.assignment.event.endDate.time}" popup="true" disabled="true" timeZone="#{userSession.user.timeZone}" rendered="#{bean.assignment.event != null}" datePattern="#{bean.assignment.event.allDayEvent ? msgs.FORMAT_DATE : msgs.FORMAT_DATE_AND_TIME}" />
+                                    <rich:calendar id="calEndDate" value="#{bean.assignment.event.endDate.time}" popup="true" disabled="true" timeZone="#{userSession.user.timeZone}" rendered="#{bean.assignment.event != null}" datePattern="#{bean.assignment.event.allDayEvent ? i18n.Generic_FORMAT_DATE : i18n.Generic_FORMAT_DATE_AND_TIME}" />
                                     <h:outputText value="#{msgs.EVENT_ALL_DAY_EVENT}" rendered="#{bean.assignment.event != null}" />
 
                                     <h:selectBooleanCheckbox value="#{bean.assignment.event.allDayEvent}" disabled="true" rendered="#{bean.assignment.event != null}" />
@@ -163,10 +163,10 @@
 
                                         <rich:column styleClass="columnDate left" sortBy="#{placement.edition.publicationDate}" sortOrder="ASCENDING">
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.DATE}" />
+                                                <h:outputText value="#{i18n.Generic_DATE}" />
                                             </f:facet>
                                             <h:outputText value="#{placement.edition.publicationDate.time}">
-                                                <f:convertDateTime timeZone="#{userSession.user.timeZone}" pattern="#{msgs.FORMAT_SHORT_DATE}" />
+                                                <f:convertDateTime timeZone="#{userSession.user.timeZone}" pattern="#{i18n.Generic_FORMAT_SHORT_DATE_DATE}" />
                                             </h:outputText>
                                         </rich:column>
 
@@ -216,13 +216,13 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons" id="grpAssignmentDetailsButtons">
-                            <a4j:commandLink id="lnkSaveAssignment" styleClass="dialogButton #{!bean.editable ? 'disabledTextButton' : ''}" value="#{msgs.SAVE}" disabled="#{!bean.editable}" actionListener="#{bean.onSaveAssignment}" reRender="frmPage" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpAssignmentDetails')}.hide(); return false; }" />
-                            <a4j:commandLink id="lnkApplyAssignment" styleClass="dialogButton #{!bean.editable ? 'disabledTextButton' : ''}" value="#{msgs.APPLY}" disabled="#{!bean.editable}" actionListener="#{bean.onApplyAssignment}" reRender="frmPage, pgAssignmentDetails" />
-                            <a4j:commandLink id="lnkDeleteAssignment" rendered="#{bean.editMode}" disabled="#{!bean.editable}" onclick="if (confirm('#{msgs.planning_ASSIGNMENT_PROMPT_DELETE}') != true){ return false; };" actionListener="#{bean.onDeleteAssignment}" styleClass="dialogButton #{!bean.editable ? 'disabledTextButton' : ''}" ajaxSingle="true" value="#{msgs.DELETE}" reRender="frmPage" >
+                            <a4j:commandLink id="lnkSaveAssignment" styleClass="dialogButton #{!bean.editable ? 'disabledTextButton' : ''}" value="#{i18n.Generic_SAVE}" disabled="#{!bean.editable}" actionListener="#{bean.onSaveAssignment}" reRender="frmPage" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpAssignmentDetails')}.hide(); return false; }" />
+                            <a4j:commandLink id="lnkApplyAssignment" styleClass="dialogButton #{!bean.editable ? 'disabledTextButton' : ''}" value="#{i18n.Generic_APPLY}" disabled="#{!bean.editable}" actionListener="#{bean.onApplyAssignment}" reRender="frmPage, pgAssignmentDetails" />
+                            <a4j:commandLink id="lnkDeleteAssignment" rendered="#{bean.editMode}" disabled="#{!bean.editable}" onclick="if (confirm('#{msgs.planning_ASSIGNMENT_PROMPT_DELETE}') != true){ return false; };" actionListener="#{bean.onDeleteAssignment}" styleClass="dialogButton #{!bean.editable ? 'disabledTextButton' : ''}" ajaxSingle="true" value="#{i18n.Generic_DELETE}" reRender="frmPage" >
                                 <rich:componentControl for="mpAssignmentDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
                             <a4j:commandLink id="lnkRemoveEvent" title="#{msgs.planning_REMOVE_EVENT_TOOLTIP}" disabled="#{!bean.editable}" styleClass="dialogButton #{!bean.editable ? 'disabledTextButton' : ''}" value="#{msgs.planning_REMOVE_EVENT}" reRender="pgEvent, grpAssignmentDetailsButtons" rendered="#{enableRemoveEvent &amp;&amp; bean.assignment.event != null}" ajaxSingle="true" actionListener="#{bean.onRemoveEventFromAssignment}" />
-                            <a4j:commandLink id="lnkCloseAssignmentDetails" styleClass="dialogButton" value="#{msgs.CANCEL}" actionListener="#{bean.onCancelAssignment}" immediate="true">
+                            <a4j:commandLink id="lnkCloseAssignmentDetails" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" actionListener="#{bean.onCancelAssignment}" immediate="true">
                                 <rich:componentControl for="mpAssignmentDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
                         </h:panelGroup>
@@ -256,7 +256,7 @@
 
                                     <h:outputText value="#{msgs.newsitem_EDITION}" />
                                     <h:column>
-                                        <rich:calendar id="calEditionDate" value="#{bean.editionDate}" popup="true" timeZone="#{userSession.user.timeZone}" datePattern="#{msgs.FORMAT_DATE}">
+                                        <rich:calendar id="calEditionDate" value="#{bean.editionDate}" popup="true" timeZone="#{userSession.user.timeZone}" datePattern="#{i18n.Generic_FORMAT_DATE}">
                                             <a4j:support event="onchanged" reRender="somEditions" />
                                         </rich:calendar>
                                         <h:selectOneMenu id="somEditions" value="#{bean.editionCandidate}" converter="#{converters.editionCandidateConverter}">
@@ -284,9 +284,9 @@
 
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSavePlacement" styleClass="dialogButton" value="#{msgs.CREATE}" actionListener="#{bean.onAddPlacement}" reRender="dtAssignmentPlacements" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpAssignmentPlacement')}.hide(); return false; }" rendered="#{bean.selectedNewsItemPlacement.id == null}" />
-                            <a4j:commandLink id="lnkUpdatePlacement" styleClass="dialogButton" value="#{msgs.UPDATE}" actionListener="#{bean.onUpdatePlacement}" reRender="dtAssignmentPlacements" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpAssignmentPlacement')}.hide(); return false; }" rendered="#{bean.selectedNewsItemPlacement.id != null}" />
+                            <a4j:commandLink id="lnkUpdatePlacement" styleClass="dialogButton" value="#{i18n.Generic_UPDATE}" actionListener="#{bean.onUpdatePlacement}" reRender="dtAssignmentPlacements" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpAssignmentPlacement')}.hide(); return false; }" rendered="#{bean.selectedNewsItemPlacement.id != null}" />
                             <a4j:commandLink id="lnkRemovePlacement" styleClass="dialogButton" value="#{msgs.REMOVE_FROM_PLACEMENT}" actionListener="#{bean.onRemovePlacement}" reRender="dtPlacements" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpAssignmentPlacement')}.hide(); return false; }" rendered="#{bean.selectedNewsItemPlacement.id != null}" />
-                            <h:commandLink id="lnkCancelPlacement" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpPlacement')}.hide(); return false;" />
+                            <h:commandLink id="lnkCancelPlacement" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpPlacement')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 

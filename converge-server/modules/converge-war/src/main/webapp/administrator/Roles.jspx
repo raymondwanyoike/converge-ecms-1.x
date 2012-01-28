@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <jsp:root version="2.0" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
 
-    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/administration.xhtml">
+    <ui:composition template="/WEB-INF/facelets/templates//administration.xhtml">
         <ui:define name="title">#{msgs.ADMINISTRATION_ROLES}</ui:define>
 
         <ui:define name="body">
@@ -116,7 +116,7 @@
                             </rich:tabPanel>
                             <h:panelGroup styleClass="dialogueButtons">
 
-                                <a4j:commandLink id="lnkSave" actionListener="#{administrator_Roles.onSave}" styleClass="dialogButton" value="#{msgs.SAVE}" reRender="frmPage">
+                                <a4j:commandLink id="lnkSave" actionListener="#{administrator_Roles.onSave}" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" reRender="frmPage">
                                     <rich:componentControl for="mpUserRoleForm" operation="hide" event="oncomplete" />
                                 </a4j:commandLink>
 
@@ -125,7 +125,7 @@
                                                  onclick="if (confirm('Are you sure that you want to delete this role?') != true){ return false; };"
                                                  actionListener="#{administrator_Roles.onDelete}"
                                                  styleClass="dialogButton"
-                                                 value="#{msgs.DELETE}"
+                                                 value="#{i18n.Generic_DELETE}"
                                                  reRender="frmPage">
                                     <rich:componentControl for="mpUserRoleForm"
                                                            operation="hide"
@@ -134,7 +134,7 @@
 
                                 <h:commandLink id="lnkCloseForm"
                                                styleClass="dialogButton"
-                                               value="#{msgs.CANCEL}"
+                                               value="#{i18n.Generic_CANCEL}"
                                                onclick="#{rich:component('mpUserRoleForm')}.hide(); return false;" />
                             </h:panelGroup>
 

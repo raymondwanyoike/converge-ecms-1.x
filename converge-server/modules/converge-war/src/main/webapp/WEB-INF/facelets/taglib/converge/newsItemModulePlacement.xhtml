@@ -31,10 +31,10 @@
 
                     <rich:column styleClass="columnDate left" sortBy="#{placement.edition.publicationDate}" sortOrder="ASCENDING">
                         <f:facet name="header">
-                            <h:outputText value="#{msgs.DATE}" />
+                            <h:outputText value="#{i18n.Generic_DATE}" />
                         </f:facet>
                         <h:outputText value="#{placement.edition.publicationDate.time}">
-                            <f:convertDateTime timeZone="#{common.systemTimeZone}" pattern="#{msgs.FORMAT_SHORT_DATE}" />
+                            <f:convertDateTime timeZone="#{common.systemTimeZone}" pattern="#{i18n.Generic_FORMAT_SHORT_DATE_DATE}" />
                         </h:outputText>
                     </rich:column>
 

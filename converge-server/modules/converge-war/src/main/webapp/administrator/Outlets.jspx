@@ -1,8 +1,7 @@
-<<<<<<< HEAD
 <?xml version='1.0' encoding='UTF-8' ?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
 
-    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/administration.xhtml">
+    <ui:composition template="/WEB-INF/facelets/templates//administration.xhtml">
 
         <ui:define name="title">#{msgs.OUTLETS}</ui:define>
 
@@ -337,9 +336,9 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveOutlet" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Outlets.onSaveOutlet}" reRender="frmPage" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpOutletDetails')}.hide(); return false; }" />
-                            <a4j:commandLink id="lnkApplyOutlet" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{administrator_Outlets.onSaveOutlet}" reRender="pgOutletDetails, frmPage"  />
-                            <a4j:commandLink id="lnkDeleteOutlet" rendered="#{administrator_Outlets.outletEditMode}" onclick="if (confirm('#{msgs.OUTLET_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteOutlet}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="frmPage">
+                            <a4j:commandLink id="lnkSaveOutlet" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Outlets.onSaveOutlet}" reRender="frmPage" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpOutletDetails')}.hide(); return false; }" />
+                            <a4j:commandLink id="lnkApplyOutlet" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Outlets.onSaveOutlet}" reRender="pgOutletDetails, frmPage"  />
+                            <a4j:commandLink id="lnkDeleteOutlet" rendered="#{administrator_Outlets.outletEditMode}" onclick="if (confirm('#{msgs.OUTLET_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteOutlet}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="frmPage">
                                 <rich:componentControl for="mpOutletDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
                             <h:commandLink id="lnkCloseOutletForm" styleClass="dialogButton" value="#{msgs.CLOSE}" onclick="#{rich:component('mpOutletDetails')}.hide(); return false;" />
@@ -401,7 +400,7 @@
                     <h:panelGroup styleClass="dialogueButtons">
                         <a4j:commandLink id="lnkSaveOutletDepartment"
                                          styleClass="dialogButton"
-                                         value="#{msgs.SAVE}"
+                                         value="#{i18n.Generic_SAVE}"
                                          actionListener="#{administrator_Outlets.onSaveOutletDepartment}"
                                          reRender="dtDepartments">
                             <rich:componentControl for="mpOutletDepartmentDetails"
@@ -411,7 +410,7 @@
 
                         <a4j:commandLink id="lnkApplyOutletDepartment"
                                          styleClass="dialogButton"
-                                         value="#{msgs.APPLY}"
+                                         value="#{i18n.Generic_APPLY}"
                                          actionListener="#{administrator_Outlets.onSaveOutletDepartment}"
                                          reRender="dtDepartments" />
 
@@ -420,7 +419,7 @@
                                          onclick="if (confirm('#{msgs.DEPARTMENT_PROMPT_DELETE}') != true){ return false; };"
                                          actionListener="#{administrator_Outlets.onDeleteOutletDepartment}"
                                          styleClass="dialogButton"
-                                         value="#{msgs.DELETE}"
+                                         value="#{i18n.Generic_DELETE}"
                                          reRender="dtDepartments">
                             <rich:componentControl for="mpOutletDepartmentDetails"
                                                    operation="hide"
@@ -430,7 +429,7 @@
 
                         <h:commandLink id="lnkCloseOutletDepartmentForm"
                                        styleClass="dialogButton"
-                                       value="#{msgs.CANCEL}"
+                                       value="#{i18n.Generic_CANCEL}"
                                        onclick="#{rich:component('mpOutletDepartmentDetails')}.hide(); return false;" />
                     </h:panelGroup>
 
@@ -469,14 +468,14 @@
                     </h:panelGrid>
 
                     <h:panelGroup styleClass="dialogueButtons">
-                        <a4j:commandLink id="lnkSaveSection" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Outlets.onSaveSection}" reRender="dtSections">
+                        <a4j:commandLink id="lnkSaveSection" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Outlets.onSaveSection}" reRender="dtSections">
                             <rich:componentControl for="mpSectionDetails" operation="hide" event="oncomplete" />
                         </a4j:commandLink>
-                        <a4j:commandLink id="lnkApplySection" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{administrator_Outlets.onSaveSection}" reRender="dtSections" />
-                        <a4j:commandLink id="lnkDeleteSection" rendered="#{administrator_Outlets.sectionEditMode}" onclick="if (confirm('#{msgs.outlets_SECTION_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteSection}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="dtSections">
+                        <a4j:commandLink id="lnkApplySection" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Outlets.onSaveSection}" reRender="dtSections" />
+                        <a4j:commandLink id="lnkDeleteSection" rendered="#{administrator_Outlets.sectionEditMode}" onclick="if (confirm('#{msgs.outlets_SECTION_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteSection}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="dtSections">
                             <rich:componentControl for="mpSectionDetails" operation="hide" event="oncomplete" />
                         </a4j:commandLink>
-                        <h:commandLink id="lnkCloseSectionDetails" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpSectionDetails')}.hide(); return false;" />
+                        <h:commandLink id="lnkCloseSectionDetails" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpSectionDetails')}.hide(); return false;" />
                     </h:panelGroup>
 
                 </rich:modalPanel>
@@ -561,7 +560,7 @@
                                         <rich:column styleClass="center columnIcon">
                                             <a4j:commandLink id="lnkRemoveActionProperty" reRender="pgActionProperties" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{administrator_Outlets.deleteProperty}" value="#{property}" />
-                                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{msgs.DELETE}" title="#{msgs.DELETE}" />
+                                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -572,12 +571,12 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveAction" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Outlets.onSaveOutletAction}" reRender="dtEvents" oncomplete="#{rich:component('mpOutletEventDetails')}.hide(); return false;" />
-                            <a4j:commandLink id="lnkApplyAction" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{administrator_Outlets.onSaveOutletAction}" reRender="dtEvents,pgOutletEventDetails" />
-                            <a4j:commandLink id="lnkDeleteAction" ajaxSingle="true" rendered="#{administrator_Outlets.actionEditMode}" onclick="if (confirm('Are you sure that you want to remove this action?') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteOutletAction}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="dtEvents">
+                            <a4j:commandLink id="lnkSaveAction" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Outlets.onSaveOutletAction}" reRender="dtEvents" oncomplete="#{rich:component('mpOutletEventDetails')}.hide(); return false;" />
+                            <a4j:commandLink id="lnkApplyAction" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Outlets.onSaveOutletAction}" reRender="dtEvents,pgOutletEventDetails" />
+                            <a4j:commandLink id="lnkDeleteAction" ajaxSingle="true" rendered="#{administrator_Outlets.actionEditMode}" onclick="if (confirm('Are you sure that you want to remove this action?') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteOutletAction}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="dtEvents">
                                 <rich:componentControl for="mpOutletEventDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
-                            <h:commandLink id="lnkCloseActionDetails" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpOutletEventDetails')}.hide(); return false;" />
+                            <h:commandLink id="lnkCloseActionDetails" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpOutletEventDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
                 </rich:modalPanel>
@@ -601,10 +600,10 @@
                                     <h:inputText id="txtEditionPatternTitle" styleClass="text mediumInput" value="#{administrator_Outlets.selectedEditionPattern.title}" title="#{msgs.outlet_EDITION_PATTERN_TITLE_TOOLTIP}" required="true" requiredMessage="#{msgs.outlet_EDITION_PATTERN_TITLE_REQUIRED}"/>
 
                                     <h:outputText value="#{msgs.outlet_EDITION_PATTERN_ACTIVE_FROM}:" />
-                                    <rich:calendar id="calActiveFrom" value="#{administrator_Outlets.selectedEditionPattern.activeFrom}" popup="true" timeZone="#{userSession.user.timeZone}" datePattern="#{msgs.FORMAT_DATE}" />
+                                    <rich:calendar id="calActiveFrom" value="#{administrator_Outlets.selectedEditionPattern.activeFrom}" popup="true" timeZone="#{userSession.user.timeZone}" datePattern="#{i18n.Generic_FORMAT_DATE}" />
 
                                     <h:outputText value="#{msgs.outlet_EDITION_PATTERN_ACTIVE_TO}:" />
-                                    <rich:calendar id="calActiveTo" value="#{administrator_Outlets.selectedEditionPattern.activeTo}" popup="true" timeZone="#{userSession.user.timeZone}" datePattern="#{msgs.FORMAT_DATE}" />
+                                    <rich:calendar id="calActiveTo" value="#{administrator_Outlets.selectedEditionPattern.activeTo}" popup="true" timeZone="#{userSession.user.timeZone}" datePattern="#{i18n.Generic_FORMAT_DATE}" />
 
                                     <h:outputText value="#{msgs.outlet_EDITION_PATTERN_DAY}:" />
                                     <h:selectOneMenu id="somDay" value="#{administrator_Outlets.selectedEditionPattern.day}" required="true" requiredMessage="#{msgs.outlet_EDITION_PATTERN_DAY_REQUIRED}">
@@ -642,12 +641,12 @@
                     </h:panelGrid>
 
                     <h:panelGroup styleClass="dialogueButtons">
-                        <a4j:commandLink id="lnkSaveEditionPattern" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Outlets.onSaveEditionPattern}" reRender="pgEditionPatternDetails,dtEditionPatterns" oncomplete="if (#{converge:isAllValid()}) { Richfaces.hideModalPanel('mpEditionPatternDetails'); return false;}" />
-                        <a4j:commandLink id="lnkApplyEditionPattern" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{administrator_Outlets.onSaveEditionPattern}" reRender="pgEditionPatternDetails,dtEditionPatterns" />
-                        <a4j:commandLink id="lnkDeleteEditionPattern" rendered="#{administrator_Outlets.editionPatternEditMode}" onclick="if (confirm('#{msgs.outlet_EDITION_PATTERN_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteEditionPattern}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="dtEditionPatterns">
+                        <a4j:commandLink id="lnkSaveEditionPattern" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Outlets.onSaveEditionPattern}" reRender="pgEditionPatternDetails,dtEditionPatterns" oncomplete="if (#{converge:isAllValid()}) { Richfaces.hideModalPanel('mpEditionPatternDetails'); return false;}" />
+                        <a4j:commandLink id="lnkApplyEditionPattern" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Outlets.onSaveEditionPattern}" reRender="pgEditionPatternDetails,dtEditionPatterns" />
+                        <a4j:commandLink id="lnkDeleteEditionPattern" rendered="#{administrator_Outlets.editionPatternEditMode}" onclick="if (confirm('#{msgs.outlet_EDITION_PATTERN_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteEditionPattern}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="dtEditionPatterns">
                             <rich:componentControl for="mpEditionPatternDetails" operation="hide" event="oncomplete" />
                         </a4j:commandLink>
-                        <h:commandLink id="lnkCloseEditionPatternForm" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpEditionPatternDetails')}.hide(); return false;" />
+                        <h:commandLink id="lnkCloseEditionPatternForm" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpEditionPatternDetails')}.hide(); return false;" />
                     </h:panelGroup>
 
                 </rich:modalPanel>
@@ -656,699 +655,4 @@
 
         </ui:define>
     </ui:composition>
-=======
-<?xml version='1.0' encoding='UTF-8' ?>
-<jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
-
-    <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
-
-        <ui:define name="title">#{i18n.administrator_Outlets_PAGE_TITLE}</ui:define>
-
-        <ui:define name="body">
-
-            <a4j:keepAlive beanName="administrator_Outlets" />
-
-            <a4j:outputPanel ajaxRendered="true">
-                <v:message />
-            </a4j:outputPanel>
-
-            <h:form id="frmPage">
-                <a4j:status onstart="Richfaces.showModalPanel('mpLoading')" onstop="Richfaces.hideModalPanel('mpLoading')" />
-
-                <converge:moduleHeader moduleTitle="#{i18n.administrator_Outlets_PAGE_TITLE}" />
-                <div class="moduleContent">
-
-                    <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
-                        <h:outputText value="" />
-                        <a4j:commandButton id="btnNewOutlet" styleClass="button dynamicButton" value="#{msgs.OUTLET_NEW}" title="#{msgs.OUTLET_NEW_TOOLTIP}" actionListener="#{administrator_Outlets.onNewOutlet}" reRender="frmOutletDetails" ajaxSingle="true">
-                            <rich:componentControl for="mpOutletDetails" operation="show" event="oncomplete" />
-                        </a4j:commandButton>
-                    </h:panelGrid>
-
-                    <rich:dataTable id="dtOutlets" value="#{administrator_Outlets.outlets}" var="outlet" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
-
-                        <rich:column styleClass="center columnIcon">
-                            <f:facet name="header">&#160;</f:facet>
-                            <a4j:commandLink reRender="frmOutletDetails" ajaxSingle="true">
-                                <f:setPropertyActionListener value="#{outlet}" target="#{administrator_Outlets.selectedOutlet}" />
-                                <f:setPropertyActionListener value="tabOutlet" target="#{administrator_Outlets.selectedOutletTab}" />
-                                <rich:componentControl for="mpOutletDetails" operation="show" event="oncomplete" />
-                                <h:graphicImage alt="#{msgs.OUTLET}" title="#{msgs.OUTLET}" value="/images/icons/outlet.gif" />
-                            </a4j:commandLink>
-                        </rich:column>
-
-                        <rich:column styleClass="right columnId" sortBy="#{outlet.id}">
-                            <f:facet name="header">
-                                <h:outputText value="#{msgs.OUTLET_ID}" title="#{msgs.OUTLET_ID_TOOLTIP}" />
-                            </f:facet>
-                            <a4j:commandLink reRender="frmOutletDetails" ajaxSingle="true">
-                                <f:setPropertyActionListener value="#{outlet}" target="#{administrator_Outlets.selectedOutlet}" />
-                                <f:setPropertyActionListener value="tabOutlet" target="#{administrator_Outlets.selectedOutletTab}" />
-                                <rich:componentControl for="mpOutletDetails" operation="show" event="oncomplete" />
-                                <h:outputText value="#{outlet.id}">
-                                    <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
-                                </h:outputText>
-                            </a4j:commandLink>
-                        </rich:column>
-
-                        <rich:column id="colTitle" sortBy="#{outlet.title}" sortOrder="ASCENDING">
-                            <f:facet name="header">
-                                <h:outputText value="#{msgs.OUTLET_TITLE}" title="#{msgs.OUTLET_TITLE_TOOLTIP}" />
-                            </f:facet>
-                            <a4j:commandLink reRender="frmOutletDetails" ajaxSingle="true">
-                                <f:setPropertyActionListener value="#{outlet}" target="#{administrator_Outlets.selectedOutlet}" />
-                                <f:setPropertyActionListener value="tabOutlet" target="#{administrator_Outlets.selectedOutletTab}" />
-                                <rich:componentControl for="mpOutletDetails" operation="show" event="oncomplete" />
-                                <h:outputText value="#{outlet.title}" />
-                            </a4j:commandLink>
-                        </rich:column>
-
-                        <rich:column sortBy="#{outlet.type}">
-                            <f:facet name="header">
-                                <h:outputText value="#{msgs.OUTLET_TYPE}" title="#{msgs.OUTLET_TYPE_TOOLTIP}" />
-                            </f:facet>
-                            <c:set var="key" value="OUTLET_TYPE_#{outlet.type}" />
-                            <h:outputText value="#{msgs[key]}" />
-                        </rich:column>
-
-                        <rich:column id="colLanguage" sortBy="#{outlet.language.name}">
-                            <f:facet name="header">
-                                <h:outputText value="#{msgs.LANGUAGE}" />
-                            </f:facet>
-                            <h:outputText value="#{outlet.language.name}" />
-                        </rich:column>
-
-                        <rich:column sortBy="#{outlet.workflow}">
-                            <f:facet name="header">
-                                <h:outputText value="#{msgs.OUTLET_WORKFLOW}" title="#{msgs.OUTLET_WORKFLOW_TOOLTIP}" />
-                            </f:facet>
-                            <h:outputText value="#{outlet.workflow.name}" title="#{outlet.workflow.description}" />
-                        </rich:column>
-
-                        <rich:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{i18n.administrator_Outlets_OUTLET_STATUS}" title="#{i18n.administrator_Outlets_OUTLET_STATUS_TOOLTIP}" />
-                            </f:facet>
-                            <h:outputText value="#{i18n.administrator_Outlets_OUTLET_STATUS_VALID}" rendered="#{outlet.valid}" styleClass="validOutlet" />
-                            <h:outputText value="#{i18n.administrator_Outlets_OUTLET_STATUS_INVALID}" rendered="#{!outlet.valid}" styleClass="invalidOutlet" />
-                        </rich:column>
-                    </rich:dataTable>
-
-                    <rich:spacer height="30" />
-                </div>
-            </h:form>
-
-            <h:form id="frmOutletDetails">
-                <rich:modalPanel id="mpOutletDetails" autosized="true" domElementAttachment="parent" rendered="#{administrator_Outlets.selectedOutlet != null}">
-                    <f:facet name="header">
-                        <h:panelGroup>
-                            <h:outputText value="#{msgs.OUTLET_DETAILS}" />
-                        </h:panelGroup>
-                    </f:facet>
-                    <f:facet name="controls">
-                        <h:panelGroup>
-                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
-                                <rich:componentControl for="mpOutletDetails" operation="hide" event="onclick"/>
-                            </h:graphicImage>
-                        </h:panelGroup>
-                    </f:facet>
-                    
-                    <h:panelGrid id="pgOutletDetails" style="width: 480px;">
-
-                        <rich:tabPanel id="tpOutlet" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive" selectedTab="#{administrator_Outlets.selectedOutletTab}">
-
-                            <rich:tab id="tabOutlet" label="#{msgs.OUTLET}">
-                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
-                                    <h:outputText value="#{msgs.OUTLET_TITLE}:" />
-                                    <h:inputText id="txtTitle" styleClass="text mediumInput" value="#{administrator_Outlets.selectedOutlet.title}" title="#{msgs.OUTLET_TITLE_TOOLTIP}" required="true" requiredMessage="#{msgs.OUTLET_TITLE_REQUIRED}"/>
-
-                                    <h:outputText value="#{msgs.OUTLET_TYPE}:" />
-                                    <h:selectOneRadio id="radOutletType" value="#{administrator_Outlets.selectedOutlet.type}" title="#{msgs.OUTLET_TYPE_TOOLTIP}" required="true" requiredMessage="#{msgs.OUTLET_TYPE_REQUIRED}">
-                                        <f:converter converterId="i2m.enumTypeConverter" />
-                                        <f:selectItems value="#{common.outletTypes}" />
-                                    </h:selectOneRadio>
-
-                                    <h:outputText value="#{msgs.LANGUAGE}:" />
-                                    <h:selectOneMenu id="somLanguage" value="#{administrator_Outlets.selectedOutlet.language}" converter="#{converters.languageConverter}" required="true" requiredMessage="#{msgs.outlets_LANGUAGE_REQUIRED}">
-                                        <f:selectItem itemLabel=""  />
-                                        <f:selectItems value="#{common.languages}" />
-                                    </h:selectOneMenu>
-
-                                    <h:outputText value="#{msgs.OUTLET_WORKFLOW}:" />
-                                    <h:selectOneMenu id="selWorkflow" value="#{administrator_Outlets.selectedOutlet.workflow}" title="#{msgs.OUTLET_WORKFLOW_TOOLTIP}" converter="#{converters.workflowConverter}" required="false" requiredMessage="#{msgs.OUTLET_WORKFLOW_REQUIRED}">
-                                        <f:selectItem itemLabel=""  />
-                                        <f:selectItems value="#{common.workflows}" />
-                                    </h:selectOneMenu>
-                                </h:panelGrid>
-                            </rich:tab>
-
-                            <rich:tab id="tabRoles" label="#{msgs.OUTLET_USER_ROLES}" disabled="#{administrator_Outlets.outletAddMode}">
-                                <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
-                                    <h:outputText value="#{msgs.OUTLET_USER_ROLES}:" />
-                                    <converge:message for="plUserRoles" />
-                                    <rich:pickList id="plUserRoles"
-                                                   value="#{administrator_Outlets.selectedOutlet.roles}"
-                                                   showButtonsLabel="false"
-                                                   sourceListWidth="350"
-                                                   targetListWidth="350"
-                                                   converter="#{converters.userRoleConverter}">
-                                        <f:selectItems value="#{common.userRoles}" />
-                                    </rich:pickList>
-                                </h:panelGrid>
-                            </rich:tab>
-
-                            <rich:tab id="tabSections" label="#{msgs.SECTIONS}" disabled="#{administrator_Outlets.outletAddMode}">
-                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
-
-                                    <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
-                                        <h:outputText value="" />
-                                        <a4j:commandButton styleClass="button mediumButton" value="#{msgs.NEW}" reRender="frmSectionDetails" ajaxSingle="true" actionListener="#{administrator_Outlets.onNewSection}" >
-                                            <rich:componentControl for="mpSectionDetails" operation="show" event="oncomplete" />
-                                        </a4j:commandButton>
-                                    </h:panelGrid>
-
-                                    <rich:dataTable id="dtSections" value="#{administrator_Outlets.selectedOutlet.sections}" var="section" styleClass="table pluginPropertiesList" headerClass="tableHeader" rowClasses="odd, even">
-
-                                        <rich:column styleClass="center columnIcon">
-                                            <f:facet name="header">&#160;</f:facet>
-                                            <a4j:commandLink reRender="frmSectionDetails" ajaxSingle="true">
-                                                <rich:componentControl for="mpSectionDetails" operation="show" event="oncomplete" />
-                                                <f:setPropertyActionListener value="#{section}" target="#{administrator_Outlets.selectedSection}" />
-                                                <h:graphicImage value="/images/icons/edition_template.png" />
-                                            </a4j:commandLink>
-                                        </rich:column>
-
-                                        <rich:column styleClass="left" sortBy="#{section.fullName}" sortOrder="ASCENDING">
-                                            <f:facet name="header">
-                                                <h:outputText value="#{msgs.SECTION}" />
-                                            </f:facet>
-                                            <a4j:commandLink reRender="frmSectionDetails" ajaxSingle="true">
-                                                <rich:componentControl for="mpSectionDetails" operation="show" event="oncomplete" />
-                                                <f:setPropertyActionListener value="#{section}" target="#{administrator_Outlets.selectedSection}" />
-                                                <h:outputText value="#{section.fullName}" />
-                                            </a4j:commandLink>
-                                        </rich:column>
-
-                                        <rich:column styleClass="left" sortBy="#{section.id}">
-                                            <f:facet name="header">
-                                                <h:outputText value="#{msgs.ID}" />
-                                            </f:facet>
-                                            <h:outputText value="#{section.id}" />
-                                        </rich:column>
-
-                                    </rich:dataTable>
-                                </h:panelGrid>
-                            </rich:tab>
-
-                            <rich:tab id="tabEditionPatterns" label="#{msgs.outlet_EDITIONS}" disabled="#{administrator_Outlets.outletAddMode}">
-
-                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
-                                    <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
-                                        <h:outputText value="" />
-                                        <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.NEW}" reRender="frmEditionPatternDetails" ajaxSingle="true" actionListener="#{administrator_Outlets.onNewEditionPattern}">
-                                            <rich:componentControl for="mpEditionPatternDetails" operation="show" event="oncomplete" />
-                                        </a4j:commandButton>
-                                    </h:panelGrid>
-
-                                    <rich:dataTable id="dtEditionPatterns" value="#{administrator_Outlets.selectedOutlet.editionPatterns}" var="editionPattern" styleClass="table pluginPropertiesList" headerClass="tableHeader" rowClasses="odd, even">
-
-                                        <rich:column styleClass="columnIcon center">
-                                            <f:facet name="header">&#160;</f:facet>
-                                            <a4j:commandLink reRender="frmEditionPatternDetails" ajaxSingle="true">
-                                                <f:setPropertyActionListener target="#{administrator_Outlets.selectedEditionPattern}" value="#{editionPattern}" />
-                                                <rich:componentControl for="mpEditionPatternDetails" operation="show" event="oncomplete" />
-                                                <h:graphicImage value="#{res.EDITION_OPEN_ICON}" />
-                                            </a4j:commandLink>
-                                        </rich:column>
-
-                                        <rich:column styleClass="left">
-                                            <f:facet name="header">#{msgs.outlet_EDITION_PATTERN_TITLE}</f:facet>
-                                            <a4j:commandLink reRender="frmEditionPatternDetails" ajaxSingle="true">
-                                                <f:setPropertyActionListener target="#{administrator_Outlets.selectedEditionPattern}" value="#{editionPattern}" />
-                                                <rich:componentControl for="mpEditionPatternDetails" operation="show" event="oncomplete" />
-                                                <h:outputText value="#{editionPattern.title}" />
-                                            </a4j:commandLink>
-                                        </rich:column>
-
-                                        <rich:column styleClass="left">
-                                            <f:facet name="header">#{msgs.outlet_EDITION_PATTERN_DAY}</f:facet>
-                                            <c:set var="key" value="DAY_#{editionPattern.day}" />
-                                            <h:outputText value="#{msgs[key]}" />
-                                        </rich:column>
-
-                                        <rich:column styleClass="left">
-                                            <f:facet name="header">#{msgs.outlet_EDITION_PATTERN_START_TIME_SHORT}</f:facet>
-                                            <h:outputText value="#{editionPattern.startHour}">
-                                                <f:convertNumber maxFractionDigits="0"
-                                                                 maxIntegerDigits="2"
-                                                                 minIntegerDigits="2"
-                                                                 type="number"/>
-                                            </h:outputText>
-                                            <h:outputText value=":" />
-                                            <h:outputText value="#{editionPattern.startMinute}">
-                                                <f:convertNumber maxFractionDigits="0"
-                                                                 maxIntegerDigits="2"
-                                                                 minIntegerDigits="2"
-                                                                 type="number"/>
-                                            </h:outputText>
-                                        </rich:column>
-
-                                        <rich:column styleClass="left">
-                                            <f:facet name="header">#{msgs.outlet_EDITION_PATTERN_END_AFTER_SHORT}</f:facet>
-                                            <h:outputText value="#{editionPattern.endHour}h" />
-                                            <h:outputText value=" " />
-                                            <h:outputText value="#{editionPattern.endMinute}">
-                                                <f:convertNumber maxFractionDigits="0"
-                                                                 maxIntegerDigits="2"
-                                                                 minIntegerDigits="2"
-                                                                 type="number"/>
-                                            </h:outputText>
-                                            <h:outputText value="m " />
-                                        </rich:column>
-
-                                    </rich:dataTable>
-                                    <rich:spacer width="450" height="1" />
-                                </h:panelGrid>
-
-                            </rich:tab>
-
-
-
-                            <rich:tab id="tabEvents" label="#{msgs.outlet_ACTIONS}" disabled="#{administrator_Outlets.outletAddMode}">
-
-                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
-                                    <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
-                                        <h:outputText value="" />
-                                        <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.outlet_ACTIONS_NEW}" reRender="frmOutletEventDetails" ajaxSingle="true" actionListener="#{administrator_Outlets.onNewOutletAction}">
-                                            <rich:componentControl for="mpOutletEventDetails" operation="show" event="oncomplete" />
-                                            <f:setPropertyActionListener target="#{administrator_Outlets.selectedOutletEditionDetailsTab}" value="tabOutletEvent" />
-                                        </a4j:commandButton>
-                                    </h:panelGrid>
-
-                                    <rich:dataTable id="dtEvents" value="#{administrator_Outlets.selectedOutlet.editionActions}" var="action" styleClass="table pluginPropertiesList" headerClass="tableHeader" rowClasses="odd, even">
-
-                                        <rich:column styleClass="columnIcon center">
-                                            <f:facet name="header">&#160;</f:facet>
-                                            <a4j:commandLink reRender="frmOutletEventDetails" ajaxSingle="true">
-                                                <f:setPropertyActionListener target="#{administrator_Outlets.selectedOutletEditionAction}" value="#{action}" />
-                                                <f:setPropertyActionListener target="#{administrator_Outlets.selectedOutletEditionDetailsTab}" value="tabOutletEvent" />
-                                                <rich:componentControl for="mpOutletEventDetails" operation="show" event="oncomplete" />
-                                                <h:graphicImage value="#{res.WORKFLOW_STEP_ACTION_ICON}" />
-                                            </a4j:commandLink>
-                                        </rich:column>
-
-                                        <rich:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="#{msgs.workflows_WORKFLOW_STEP_ACTION_LABEL}" />
-                                            </f:facet>
-                                            <a4j:commandLink reRender="frmOutletEventDetails" ajaxSingle="true">
-                                                <f:setPropertyActionListener target="#{administrator_Outlets.selectedOutletEditionAction}" value="#{action}" />
-                                                <f:setPropertyActionListener target="#{administrator_Outlets.selectedOutletEditionDetailsTab}" value="tabOutletEvent" />
-                                                <rich:componentControl for="mpOutletEventDetails" operation="show" event="oncomplete" />
-                                                <h:outputText value="#{action.label}" />
-                                            </a4j:commandLink>
-                                        </rich:column>
-
-                                        <rich:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="#{msgs.workflows_WORKFLOW_STEP_ACTION_TYPE}" />
-                                            </f:facet>
-                                            <h:outputText value="#{action.action.name}" />
-                                        </rich:column>
-
-                                        <rich:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Manual" />
-                                            </f:facet>
-                                            <h:outputText value="#{msgs.YES}" rendered="#{action.manualAction}" />
-                                            <h:outputText value="#{msgs.NO}" rendered="#{!action.manualAction}" />
-                                        </rich:column>
-
-
-                                        <rich:column styleClass="columnIcon center">
-                                            <f:facet name="header">
-                                                <a4j:commandLink id="lnkRecloseOutlet" title="#{msgs.outlets_EXECUTE_ALL_ACTIONS}" actionListener="#{administrator_Outlets.onRecloseEditions}" reRender="pgOutletDetails, frmPage" >
-                                                    <h:graphicImage value="#{res.RUN_ALL_ICON}" />
-                                                </a4j:commandLink>
-                                            </f:facet>
-                                            <a4j:commandLink ajaxSingle="true" title="#{msgs.outlets_EXECUTE_ACTION}">
-                                                <f:setPropertyActionListener target="#{administrator_Outlets.executeAction}" value="#{action}" />
-                                                <h:graphicImage value="#{res.RUN_ICON}" />
-                                            </a4j:commandLink>
-                                        </rich:column>
-                                    </rich:dataTable>
-                                    <rich:spacer width="450" height="1" />
-                                </h:panelGrid>
-                            </rich:tab>
-                        </rich:tabPanel>
-
-                        <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveOutlet" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Outlets.onSaveOutlet}" reRender="frmPage" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpOutletDetails')}.hide(); return false; }" />
-                            <a4j:commandLink id="lnkApplyOutlet" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Outlets.onSaveOutlet}" reRender="pgOutletDetails, frmPage"  />
-                            <a4j:commandLink id="lnkDeleteOutlet" rendered="#{administrator_Outlets.outletEditMode}" onclick="if (confirm('#{msgs.OUTLET_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteOutlet}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="frmPage">
-                                <rich:componentControl for="mpOutletDetails" operation="hide" event="oncomplete" />
-                            </a4j:commandLink>
-                            <h:commandLink id="lnkCloseOutletForm" styleClass="dialogButton" value="#{i18n.Generic_CLOSE}" onclick="#{rich:component('mpOutletDetails')}.hide(); return false;" />
-                        </h:panelGroup>
-                    </h:panelGrid>
-
-                </rich:modalPanel>
-            </h:form>
-
-            <h:form id="frmOutletDepartmentDetails">
-                <rich:modalPanel id="mpOutletDepartmentDetails" autosized="true" domElementAttachment="parent" >
-                    <f:facet name="header">
-                        <h:panelGroup>
-                            <h:outputText value="#{msgs.DEPARTMENT_DETAILS}" />
-                        </h:panelGroup>
-                    </f:facet>
-                    <f:facet name="controls">
-                        <h:panelGroup>
-                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
-                                <rich:componentControl for="mpOutletDepartmentDetails" operation="hide" event="onclick"/>
-                            </h:graphicImage>
-                        </h:panelGroup>
-                    </f:facet>
-                    <h:panelGrid id="pgOutletDepartmentDetails" style="width: 480px;">
-
-                        <rich:tabPanel id="tpOutletDepartment" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
-
-                            <rich:tab label="#{msgs.DEPARTMENT}">
-                                <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
-                                    <h:column>
-                                        <h:outputText value="#{msgs.DEPARTMENT_NAME}:" />
-                                        <converge:message for="txtDepartmentName" />
-                                    </h:column>
-                                    <h:inputText id="txtDepartmentName"
-                                                 styleClass="text mediumInput"
-                                                 value="#{administrator_Outlets.selectedDepartment.name}"
-                                                 title="#{msgs.DEPARTMENT_NAME_TOOLTIP}"
-                                                 required="true" requiredMessage="#{msgs.DEPARTMENT_NAME_REQUIRED}"/>
-
-                                    <h:outputText value="#{msgs.DEPARTMENT_ACTIVE}:" />
-                                    <h:selectBooleanCheckbox value="#{administrator_Outlets.selectedDepartment.active}"
-                                                             title="#{msgs.DEPARTMENT_ACTIVE_TOOLTIP}" />
-
-                                </h:panelGrid>
-                            </rich:tab>
-
-                            <rich:tab label="#{msgs.USERS}">
-                                <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
-                                    <h:column>
-                                        <h:outputText value="#{msgs.USERS}:" />
-                                        <converge:message for="plEditors" />
-                                    </h:column>
-                                    <rich:pickList id="plEditors"
-                                                   value="#{administrator_Outlets.selectedDepartment.userAccounts}"
-                                                   showButtonsLabel="false"
-                                                   sourceListWidth="350"
-                                                   targetListWidth="350"
-                                                   converter="#{converters.userAccountConverter}">
-                                        <f:selectItems value="#{common.users}" />
-                                    </rich:pickList>
-                                </h:panelGrid>
-                            </rich:tab>
-                        </rich:tabPanel>
-                    </h:panelGrid>
-
-                    <h:panelGroup styleClass="dialogueButtons">
-                        <a4j:commandLink id="lnkSaveOutletDepartment"
-                                         styleClass="dialogButton"
-                                         value="#{msgs.SAVE}"
-                                         actionListener="#{administrator_Outlets.onSaveOutletDepartment}"
-                                         reRender="dtDepartments">
-                            <rich:componentControl for="mpOutletDepartmentDetails"
-                                                   operation="hide"
-                                                   event="oncomplete" />
-                        </a4j:commandLink>
-
-                        <a4j:commandLink id="lnkApplyOutletDepartment"
-                                         styleClass="dialogButton"
-                                         value="#{msgs.APPLY}"
-                                         actionListener="#{administrator_Outlets.onSaveOutletDepartment}"
-                                         reRender="dtDepartments" />
-
-                        <a4j:commandLink id="lnkDeleteOutletDepartment"
-                                         rendered="#{administrator_Outlets.departmentEditMode}"
-                                         onclick="if (confirm('#{msgs.DEPARTMENT_PROMPT_DELETE}') != true){ return false; };"
-                                         actionListener="#{administrator_Outlets.onDeleteOutletDepartment}"
-                                         styleClass="dialogButton"
-                                         value="#{msgs.DELETE}"
-                                         reRender="dtDepartments">
-                            <rich:componentControl for="mpOutletDepartmentDetails"
-                                                   operation="hide"
-                                                   event="oncomplete" />
-                        </a4j:commandLink>
-
-
-                        <h:commandLink id="lnkCloseOutletDepartmentForm"
-                                       styleClass="dialogButton"
-                                       value="#{msgs.CANCEL}"
-                                       onclick="#{rich:component('mpOutletDepartmentDetails')}.hide(); return false;" />
-                    </h:panelGroup>
-
-                </rich:modalPanel>
-            </h:form>
-
-            <h:form id="frmSectionDetails">
-                <rich:modalPanel id="mpSectionDetails" autosized="true" domElementAttachment="parent" rendered="#{administrator_Outlets.selectedSection != null}">
-                    <f:facet name="header">
-                        <h:panelGroup>
-                            <h:outputText value="#{msgs.outlets_SECTION_DETAILS}" />
-                        </h:panelGroup>
-                    </f:facet>
-                    <f:facet name="controls">
-                        <h:panelGroup>
-                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
-                                <rich:componentControl for="mpSectionDetails" operation="hide" event="onclick"/>
-                            </h:graphicImage>
-                        </h:panelGroup>
-                    </f:facet>
-                    <h:panelGrid id="pgSectionDetails" style="width: 480px;">
-
-                        <rich:tabPanel id="tpSection" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
-                            <rich:tab label="#{msgs.SECTION}">
-                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
-                                    <h:outputText value="#{msgs.outlets_SECTION_NAME}:" />
-                                    <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_Outlets.selectedSection.name}" required="true" requiredMessage="#{msgs.outlets_SECTION_NAME_REQUIRED}"/>
-
-                                    <h:outputText value="#{msgs.outlets_SECTION_DESCRIPTION}:" />
-                                    <h:inputTextarea id="txtDescription" styleClass="text mediumInput" value="#{administrator_Outlets.selectedSection.description}" />
-
-                                    <h:outputText value="#{msgs.outlets_SECTION_PARENT}:" />
-                                    <h:selectOneMenu id="somSectionParent" value="#{administrator_Outlets.selectedSection.parent}" styleClass="mediumInput" converter="#{converters.sectionConverter}">
-                                        <f:selectItem itemLabel="None" />
-                                        <f:selectItems value="#{administrator_Outlets.activeSections}" />
-                                    </h:selectOneMenu>
-
-                                    <h:outputText value="#{msgs.outlets_SECTION_ACTIVE}:" />
-                                    <h:selectBooleanCheckbox value="#{administrator_Outlets.selectedSection.active}" />
-                                </h:panelGrid>
-                            </rich:tab>
-                        </rich:tabPanel>
-                    </h:panelGrid>
-
-                    <h:panelGroup styleClass="dialogueButtons">
-                        <a4j:commandLink id="lnkSaveSection" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Outlets.onSaveSection}" reRender="dtSections">
-                            <rich:componentControl for="mpSectionDetails" operation="hide" event="oncomplete" />
-                        </a4j:commandLink>
-                        <a4j:commandLink id="lnkApplySection" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{administrator_Outlets.onSaveSection}" reRender="dtSections" />
-                        <a4j:commandLink id="lnkDeleteSection" rendered="#{administrator_Outlets.sectionEditMode}" onclick="if (confirm('#{msgs.outlets_SECTION_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteSection}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="dtSections">
-                            <rich:componentControl for="mpSectionDetails" operation="hide" event="oncomplete" />
-                        </a4j:commandLink>
-                        <h:commandLink id="lnkCloseSectionDetails" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpSectionDetails')}.hide(); return false;" />
-                    </h:panelGroup>
-
-                </rich:modalPanel>
-            </h:form>
-
-
-            <h:form id="frmOutletEventDetails">
-
-                <rich:modalPanel id="mpOutletEventDetails" autosized="true" domElementAttachment="parent" rendered="#{administrator_Outlets.selectedOutletEditionAction != null}">
-                    <f:facet name="header">
-                        <h:panelGroup>
-                            <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_DETAILS}" />
-                        </h:panelGroup>
-                    </f:facet>
-                    <f:facet name="controls">
-                        <h:panelGroup>
-                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
-                                <rich:componentControl for="mpOutletEventDetails" operation="hide" event="onclick"/>
-                            </h:graphicImage>
-                        </h:panelGroup>
-                    </f:facet>
-                    <h:panelGrid id="pgOutletEventDetails">
-                        <rich:tabPanel id="tpOutletEventDetails" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive" selectedTab="#{administrator_Outlets.selectedOutletEditionDetailsTab}">
-                            <rich:tab id="tabOutletEvent" label="#{i18n.administrator_Outlets_EDITION_ACTION_ACTION}">
-                                <h:panelGrid columns="2" columnClasses="dialogueFieldLabel nowrap, dialogueFieldValue" styleClass="dialogue">
-                                    <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_LABEL}" />
-                                    <h:inputText styleClass="text mediumInput" value="#{administrator_Outlets.selectedOutletEditionAction.label}" />
-
-                                    <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_MANUAL}" />
-                                    <h:selectBooleanCheckbox value="#{administrator_Outlets.selectedOutletEditionAction.manualAction}" />
-
-                                    <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_ORDER_OF_EXECUTION}" />
-                                    <rich:inputNumberSpinner id="insExecutionOrder" value="#{administrator_Outlets.selectedOutletEditionAction.executeOrder}" disableBrowserAutoComplete="true" enableManualInput="true" minValue="1" step="1" required="true" requiredMessage="#{msgs.workflows_WORKFLOW_STEP_ACTION_EXECUTION_ORDER_REQUIRED}" />
-
-                                    <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_TYPE}" />
-                                    <h:selectOneMenu id="somActions" value="#{administrator_Outlets.selectedOutletEditionAction.actionClass}">
-                                        <f:selectItems value="#{common.outletActions}" />
-                                        <a4j:support event="onchange" reRender="pgActionProperties, aboutAction" />
-                                    </h:selectOneMenu>
-                                    
-                                    <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_ABOUT}" />
-                                    <h:panelGroup id="aboutAction" styleClass="pluginInstanceAbout mediumInput" layout="block">
-                                        <h:outputText value="#{administrator_Outlets.selectedOutletEditionAction.action.about}" escape="false" />
-                                    </h:panelGroup>
-                                </h:panelGrid>
-                            </rich:tab>
-
-                            <rich:tab id="tabOutletEventProperties" label="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTIES}">
-                                <h:panelGrid id="pgActionProperties" columns="1" styleClass="dialogue">
-                                    <h:column>
-                                        <h:panelGrid columns="3">
-
-                                            <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTY_INPUT}" />
-                                            <h:selectOneMenu id="somActionProperties" value="#{administrator_Outlets.selectedOutletEditionActionProperty.key}" styleClass="text mediumInput">
-                                                <f:selectItem itemLabel="#{i18n.administrator_Outlets_EDITION_ACTION_SELECT_PROPERTY}" />
-                                                <f:selectItems value="#{administrator_Outlets.selectedOutletEditionAction.action.availableProperties}" />
-                                                <a4j:support event="onchange" reRender="colHelp" />
-                                            </h:selectOneMenu>
-                                            
-                                            <h:panelGroup id="colHelp">
-                                                <c:set var="help_key" value="#{administrator_Outlets.selectedOutletEditionActionProperty.key}_HELP" />
-                                                <c:set var="help_text" value="#{converge:message(administrator_Outlets.selectedOutletEditionAction.action.bundle, help_key)}" />
-                                                <h:graphicImage url="#{res.HELP_ICON}" title="#{help_text}" rendered="#{help_text != ''}" />
-                                                <h:outputText value="&#160;" rendered="#{help_text == ''}" />
-                                            </h:panelGroup>
-                                            
-                                            <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTY_VALUE_INPUT}" />
-                                            <h:inputText styleClass="text mediumInput" value="#{administrator_Outlets.selectedOutletEditionActionProperty.value}" />
-                                            <a4j:commandButton id="btnAdd" value="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTY_ADD}" actionListener="#{administrator_Outlets.onAddActionProperty}" reRender="pgActionProperties" styleClass="button dynamicButton" />
-                                        </h:panelGrid>
-                                    </h:column>
-
-                                    <rich:dataTable value="#{administrator_Outlets.outletEditionActionProperties}" var="property" styleClass="table pluginPropertiesList" headerClass="tableHeader" rowClasses="odd, even">
-                                        <rich:column sortBy="#{property.key}" sortOrder="ASCENDING">
-                                            <f:facet name="header">
-                                                <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTY}" />
-                                            </f:facet>
-                                            <c:set var="help_key" value="#{property.key}_HELP" />
-                                            <h:outputText value="#{converge:message(administrator_Outlets.selectedOutletEditionAction.action.bundle, property.key)}" title="#{converge:message(administrator_Outlets.selectedOutletEditionAction.action.bundle, help_key)}" />
-                                        </rich:column>
-
-                                        <rich:column sortyBy="#{property.value}">
-                                            <f:facet name="header">
-                                                <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTY_VALUE}" />
-                                            </f:facet>
-                                            <rich:inplaceInput required="true" value="#{property.value}" viewClass="propertyInplace" viewHoverClass="propertyInplaceHover" />
-                                        </rich:column>
-
-                                        <rich:column styleClass="center columnIcon">
-                                            <a4j:commandLink id="lnkRemoveActionProperty" reRender="pgActionProperties" ajaxSingle="true">
-                                                <f:setPropertyActionListener target="#{administrator_Outlets.deleteProperty}" value="#{property}" />
-                                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{msgs.DELETE}" title="#{msgs.DELETE}" />
-                                            </a4j:commandLink>
-                                        </rich:column>
-
-                                    </rich:dataTable>
-
-                                </h:panelGrid>
-                            </rich:tab>
-                        </rich:tabPanel>
-
-                        <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveAction" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Outlets.onSaveOutletAction}" reRender="dtEvents" oncomplete="#{rich:component('mpOutletEventDetails')}.hide(); return false;" />
-                            <a4j:commandLink id="lnkApplyAction" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{administrator_Outlets.onSaveOutletAction}" reRender="dtEvents,pgOutletEventDetails" />
-                            <a4j:commandLink id="lnkDeleteAction" ajaxSingle="true" rendered="#{administrator_Outlets.actionEditMode}" onclick="if (confirm('Are you sure that you want to remove this action?') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteOutletAction}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="dtEvents">
-                                <rich:componentControl for="mpOutletEventDetails" operation="hide" event="oncomplete" />
-                            </a4j:commandLink>
-                            <h:commandLink id="lnkCloseActionDetails" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpOutletEventDetails')}.hide(); return false;" />
-                        </h:panelGroup>
-                    </h:panelGrid>
-                </rich:modalPanel>
-            </h:form>
-
-
-            <h:form id="frmEditionPatternDetails">
-                <rich:modalPanel id="mpEditionPatternDetails" autosized="true" domElementAttachment="parent" >
-                    <f:facet name="header">
-                        <h:panelGroup>
-                            <h:outputText value="#{msgs.outlet_EDITION_PATTERN_DETAILS}" />
-                        </h:panelGroup>
-                    </f:facet>
-                    <f:facet name="controls">
-                        <h:panelGroup>
-                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
-                                <rich:componentControl for="mpEditionPatternDetails" operation="hide" event="onclick"/>
-                            </h:graphicImage>
-                        </h:panelGroup>
-                    </f:facet>
-                    <h:panelGrid id="pgEditionPatternDetails" style="width: 480px;">
-
-                        <rich:tabPanel id="tpEditionPattern" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive" rendered="#{administrator_Outlets.selectedEditionPattern != null}">
-
-                            <rich:tab label="#{msgs.outlet_EDITION_PATTERN}">
-                                <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
-                                    <h:outputText value="#{msgs.outlet_EDITION_PATTERN_TITLE}:" />
-                                    <h:inputText id="txtEditionPatternTitle" styleClass="text mediumInput" value="#{administrator_Outlets.selectedEditionPattern.title}" title="#{msgs.outlet_EDITION_PATTERN_TITLE_TOOLTIP}" required="true" requiredMessage="#{msgs.outlet_EDITION_PATTERN_TITLE_REQUIRED}"/>
-
-                                    <h:outputText value="#{msgs.outlet_EDITION_PATTERN_ACTIVE_FROM}:" />
-                                    <rich:calendar id="calActiveFrom" value="#{administrator_Outlets.selectedEditionPattern.activeFrom}" popup="true" timeZone="#{userSession.user.timeZone}" datePattern="#{msgs.FORMAT_DATE}" />
-
-                                    <h:outputText value="#{msgs.outlet_EDITION_PATTERN_ACTIVE_TO}:" />
-                                    <rich:calendar id="calActiveTo" value="#{administrator_Outlets.selectedEditionPattern.activeTo}" popup="true" timeZone="#{userSession.user.timeZone}" datePattern="#{msgs.FORMAT_DATE}" />
-
-                                    <h:outputText value="#{msgs.outlet_EDITION_PATTERN_DAY}:" />
-                                    <h:selectOneMenu id="somDay" value="#{administrator_Outlets.selectedEditionPattern.day}" required="true" requiredMessage="#{msgs.outlet_EDITION_PATTERN_DAY_REQUIRED}">
-                                        <f:selectItem itemLabel="#{msgs.DAY_1}" itemValue="1" />
-                                        <f:selectItem itemLabel="#{msgs.DAY_2}" itemValue="2" />
-                                        <f:selectItem itemLabel="#{msgs.DAY_3}" itemValue="3" />
-                                        <f:selectItem itemLabel="#{msgs.DAY_4}" itemValue="4" />
-                                        <f:selectItem itemLabel="#{msgs.DAY_5}" itemValue="5" />
-                                        <f:selectItem itemLabel="#{msgs.DAY_6}" itemValue="6" />
-                                        <f:selectItem itemLabel="#{msgs.DAY_7}" itemValue="7" />
-                                    </h:selectOneMenu>
-
-                                    <h:outputText value="#{msgs.outlet_EDITION_PATTERN_START_TIME}:" />
-                                    <h:panelGrid columns="3">
-                                        <rich:inputNumberSpinner value="#{administrator_Outlets.selectedEditionPattern.startHour}" minValue="0" maxValue="23" enableManualInput="true" inputSize="2" />:
-                                        <rich:inputNumberSpinner value="#{administrator_Outlets.selectedEditionPattern.startMinute}" minValue="0" maxValue="59" enableManualInput="true" inputSize="2" />
-                                    </h:panelGrid>
-
-                                    <h:outputText value="#{msgs.outlet_EDITION_PATTERN_END_AFTER}:" />
-
-                                    <h:panelGrid columns="3">
-                                        <rich:inputNumberSpinner value="#{administrator_Outlets.selectedEditionPattern.endHour}" minValue="0" maxValue="99999" enableManualInput="true" inputSize="2" />:
-                                        <rich:inputNumberSpinner value="#{administrator_Outlets.selectedEditionPattern.endMinute}" minValue="0" maxValue="59" enableManualInput="true" inputSize="2" />
-                                    </h:panelGrid>
-
-                                    <h:outputText value="#{msgs.outlet_EDITION_PATTERN_CLOSE_AFTER}:" />
-                                    <h:panelGrid columns="3">
-                                        <rich:inputNumberSpinner value="#{administrator_Outlets.selectedEditionPattern.closeHour}" minValue="-100" maxValue="99999" enableManualInput="true" inputSize="2" />:
-                                        <rich:inputNumberSpinner value="#{administrator_Outlets.selectedEditionPattern.closeMinute}" minValue="0" maxValue="59" enableManualInput="true" inputSize="2" />
-                                    </h:panelGrid>
-                                </h:panelGrid>
-                            </rich:tab>
-
-                        </rich:tabPanel>
-                    </h:panelGrid>
-
-                    <h:panelGroup styleClass="dialogueButtons">
-                        <a4j:commandLink id="lnkSaveEditionPattern" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Outlets.onSaveEditionPattern}" reRender="pgEditionPatternDetails,dtEditionPatterns" oncomplete="if (#{converge:isAllValid()}) { Richfaces.hideModalPanel('mpEditionPatternDetails'); return false;}" />
-                        <a4j:commandLink id="lnkApplyEditionPattern" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{administrator_Outlets.onSaveEditionPattern}" reRender="pgEditionPatternDetails,dtEditionPatterns" />
-                        <a4j:commandLink id="lnkDeleteEditionPattern" rendered="#{administrator_Outlets.editionPatternEditMode}" onclick="if (confirm('#{msgs.outlet_EDITION_PATTERN_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteEditionPattern}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="dtEditionPatterns">
-                            <rich:componentControl for="mpEditionPatternDetails" operation="hide" event="oncomplete" />
-                        </a4j:commandLink>
-                        <h:commandLink id="lnkCloseEditionPatternForm" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpEditionPatternDetails')}.hide(); return false;" />
-                    </h:panelGroup>
-
-                </rich:modalPanel>
-            </h:form>
-
-
-        </ui:define>
-    </ui:composition>
->>>>>>> 3d0edc707af82a4bae15530f0e9d1fba6bf0dd12
 </jsp:root>

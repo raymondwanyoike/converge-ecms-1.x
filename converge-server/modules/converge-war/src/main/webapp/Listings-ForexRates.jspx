@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
 
-    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/listings.xhtml">
+    <ui:composition template="/WEB-INF/facelets/templates//listings.xhtml">
 
         <ui:define name="leftColumnBottom">
             <converge:moduleHeader moduleTitle="#{msgs.OPTIONS}" />
@@ -32,7 +32,7 @@
                             <f:facet name="header">
                                 <a4j:status id="staForexRates">
                                     <f:facet name="start">
-                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" title="#{msgs.UPDATING}" />
+                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" title="#{i18n.Generic_UPDATING}" />
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>
@@ -115,7 +115,7 @@
                                     </h:inputText>
 
                                     <h:outputText value="#{msgs.listing_UPDATED}" />
-                                    <rich:calendar id="calUpdated" value="#{listings.selectedForexRate.updated}" popup="true" timeZone="#{userSession.user.timeZone}" datePattern="#{msgs.FORMAT_DATE_AND_TIME}" />
+                                    <rich:calendar id="calUpdated" value="#{listings.selectedForexRate.updated}" popup="true" timeZone="#{userSession.user.timeZone}" datePattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" />
 
                                 </h:panelGrid>
 
@@ -124,9 +124,9 @@
 
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveForexRate" styleClass="dialogButton" value="#{msgs.CREATE}" actionListener="#{listings.onAddForexRate}" reRender="dtForexRates" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpForexRate')}.hide(); return false; }" rendered="#{listings.selectedForexRate.id == null}" />
-                            <a4j:commandLink id="lnkUpdateForexRate" styleClass="dialogButton" value="#{msgs.UPDATE}" actionListener="#{listings.onUpdateForexRate}" reRender="dtForexRates" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpForexRate')}.hide(); return false; }" rendered="#{listings.selectedForexRate.id != null}" />
-                            <a4j:commandLink id="lnkRemoveForexRate" styleClass="dialogButton" value="#{msgs.DELETE}" actionListener="#{listings.onDeleteForexRate}" reRender="dtForexRates" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpForexRate')}.hide(); return false; }" rendered="#{listings.selectedForexRate.id != null}" />
-                            <h:commandLink id="lnkCancelForexRate" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpForexRate')}.hide(); return false;" />
+                            <a4j:commandLink id="lnkUpdateForexRate" styleClass="dialogButton" value="#{i18n.Generic_UPDATE}" actionListener="#{listings.onUpdateForexRate}" reRender="dtForexRates" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpForexRate')}.hide(); return false; }" rendered="#{listings.selectedForexRate.id != null}" />
+                            <a4j:commandLink id="lnkRemoveForexRate" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" actionListener="#{listings.onDeleteForexRate}" reRender="dtForexRates" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpForexRate')}.hide(); return false; }" rendered="#{listings.selectedForexRate.id != null}" />
+                            <h:commandLink id="lnkCancelForexRate" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpForexRate')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 
@@ -242,9 +242,9 @@
 
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveCurrency" styleClass="dialogButton" value="#{msgs.CREATE}" actionListener="#{listings.onAddCurrency}" reRender="dtCurrencies" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpCurrency')}.hide(); return false; }" rendered="#{listings.selectedCurrency.id == null}" />
-                            <a4j:commandLink id="lnkUpdateCurrency" styleClass="dialogButton" value="#{msgs.UPDATE}" actionListener="#{listings.onUpdateCurrency}" reRender="dtCurrencies" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpCurrency')}.hide(); return false; }" rendered="#{listings.selectedCurrency.id != null}" />
-                            <a4j:commandLink id="lnkRemoveCurrency" styleClass="dialogButton" value="#{msgs.DELETE}" actionListener="#{listings.onDeleteCurrency}" reRender="dtCurrencies" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpCurrency')}.hide(); return false; }" rendered="#{listings.selectedCurrency.id != null}" />
-                            <h:commandLink id="lnkCancelCurrency" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpCurrency')}.hide(); return false;" />
+                            <a4j:commandLink id="lnkUpdateCurrency" styleClass="dialogButton" value="#{i18n.Generic_UPDATE}" actionListener="#{listings.onUpdateCurrency}" reRender="dtCurrencies" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpCurrency')}.hide(); return false; }" rendered="#{listings.selectedCurrency.id != null}" />
+                            <a4j:commandLink id="lnkRemoveCurrency" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" actionListener="#{listings.onDeleteCurrency}" reRender="dtCurrencies" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpCurrency')}.hide(); return false; }" rendered="#{listings.selectedCurrency.id != null}" />
+                            <h:commandLink id="lnkCancelCurrency" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpCurrency')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 

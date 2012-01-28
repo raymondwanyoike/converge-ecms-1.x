@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:v="http://converge.i2m.dk" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
 
-    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/concepts.xhtml">
+    <ui:composition template="/WEB-INF/facelets/templates//concepts.xhtml">
 
         <ui:define name="body">
             <a4j:keepAlive beanName="concepts" />
@@ -19,21 +19,21 @@
                 <div class="moduleContent">
                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                         <h:column>
-                            <h:outputText value="#{msgs.LAST_UPDATE}&#160;" style="font-style: italic;" rendered="#{!concepts.updatingConcept}"  />
+                            <h:outputText value="#{i18n.concepts_LAST_UPDATE}&#160;" style="font-style: italic;" rendered="#{!concepts.updatingConcept}"  />
                             <h:outputText value="#{concepts.selectedConcept.updated.time}" style="font-style: italic;" rendered="#{!concepts.updatingConcept}">
-                                <f:convertDateTime pattern="#{msgs.FORMAT_MEDIUM_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_MEDIUM_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
                             <h:outputText value="&#160;by&#160;" style="font-style: italic;" rendered="#{!concepts.updatingConcept}"  />
                             <h:outputText value="#{concepts.selectedConcept.updatedBy.fullName}" style="font-style: italic;" rendered="#{!concepts.updatingConcept &amp;&amp; concepts.selectedConcept.updatedBy != null}"  />
-                            <h:outputText value="#{msgs.UNKNOWN}" style="font-style: italic;" rendered="#{!concepts.updatingConcept &amp;&amp; concepts.selectedConcept.updatedBy == null}"  />
+                            <h:outputText value="#{i18n.concepts_UNKNOWN}" style="font-style: italic;" rendered="#{!concepts.updatingConcept &amp;&amp; concepts.selectedConcept.updatedBy == null}"  />
                         </h:column>
                         <h:column>
-                            <a4j:commandButton id="btnEditConcept" ajaxSingle="true" styleClass="button mediumButton" value="#{msgs.concepts_EDIT}" actionListener="#{concepts.onEditConcept}" reRender="frmConceptDisplay" rendered="#{!concepts.updatingConcept}" />
+                            <a4j:commandButton id="btnEditConcept" ajaxSingle="true" styleClass="button mediumButton" value="#{i18n.concepts_EDIT}" actionListener="#{concepts.onEditConcept}" reRender="frmConceptDisplay" rendered="#{!concepts.updatingConcept}" />
 
                             <a4j:commandButton id="btnPickSameAs"
                                                styleClass="button dynamicButton"
                                                style="margin-left: 5px;"
-                                               value="#{msgs.concepts_SAME_AS_CONCEPTS}"
+                                               value="#{i18n.concepts_SAME_AS_CONCEPTS}"
                                                actionListener="#{concepts.onSelectMetaDataSameAs}"
                                                reRender="ajaxPage"
                                                rendered="#{concepts.updatingConcept}">
@@ -45,7 +45,7 @@
                             <a4j:commandButton id="btnPickRelated"
                                                styleClass="button dynamicButton"
                                                style="margin-left: 5px;"
-                                               value="#{msgs.concepts_RELATED_CONCEPTS}"
+                                               value="#{i18n.concepts_RELATED_CONCEPTS}"
                                                actionListener="#{concepts.onSelectMetaDataRelated}"
                                                reRender="ajaxPage"
                                                rendered="#{concepts.updatingConcept}">
@@ -57,7 +57,7 @@
                             <a4j:commandButton id="btnPickBroader"
                                                styleClass="button dynamicButton"
                                                style="margin-left: 5px;"
-                                               value="#{msgs.concepts_BROADER_CONCEPTS}"
+                                               value="#{i18n.concepts_BROADER_CONCEPTS}"
                                                actionListener="#{concepts.onSelectMetaDataBroader}"
                                                reRender="ajaxPage"
                                                rendered="#{concepts.updatingConcept}">
@@ -69,7 +69,7 @@
                             <a4j:commandButton id="btnPickNarrower"
                                                styleClass="button dynamicButton"
                                                style="margin-left: 5px;"
-                                               value="#{msgs.concepts_NARROWER_CONCEPTS}"
+                                               value="#{i18n.concepts_NARROWER_CONCEPTS}"
                                                actionListener="#{concepts.onSelectMetaDataNarrower}"
                                                reRender="ajaxPage"
                                                rendered="#{concepts.updatingConcept}">
@@ -81,11 +81,11 @@
                             <a4j:commandButton id="btnDeleteConcept"
                                                styleClass="button dynamicButton"
                                                style="margin-left: 5px;"
-                                               value="#{msgs.concepts_DELETE}"
+                                               value="#{i18n.concepts_DELETE}"
                                                actionListener="#{concepts.onDeleteConcept}"
                                                reRender="ajaxPage"
                                                ajaxSingle="true"
-                                               onclick="if (confirm('#{msgs.concepts_PROMPT_DELETE}') != true){ return false; };"
+                                               onclick="if (confirm('#{i18n.concepts_PROMPT_DELETE}') != true){ return false; };"
                                                rendered="#{concepts.updatingConcept}">
                                 <a4j:support event="oncomplete" reRender="ajaxPage" />
                             </a4j:commandButton>
@@ -94,7 +94,7 @@
                             <a4j:commandButton id="btnSaveConcept"
                                                style="margin-left: 5px;"
                                                styleClass="button dynamicButton"
-                                               value="#{msgs.concepts_SAVE}"
+                                               value="#{i18n.concepts_SAVE}"
                                                actionListener="#{concepts.onSaveConcept}"
                                                reRender="ajaxPage"
                                                rendered="#{concepts.updatingConcept}">
@@ -104,7 +104,7 @@
                                                ajaxSingle="true"
                                                style="margin-left: 5px;"
                                                styleClass="button dynamicButton"
-                                               value="#{msgs.CANCEL}"
+                                               value="#{i18n.Generic_CANCEL}"
                                                actionListener="#{concepts.onCancelConcept}"
                                                reRender="ajaxPage"
                                                rendered="#{concepts.updatingConcept}">
@@ -114,7 +114,7 @@
 
                     <h:panelGrid columns="2" style="width: 100%" columnClasses="left top, geoLeft" rendered="#{!concepts.updatingConcept}">
                         <h:outputText value="#{concepts.selectedConcept.definition}" escape="false" style="float:left" rendered="#{concepts.selectedConcept.definition != ''}" />
-                        <h:outputFormat value="#{msgs.concepts_NO_DEFINITION}" escape="false" style="font-size: 1.4em; float:left" rendered="#{concepts.selectedConcept.definition == ''}">
+                        <h:outputFormat value="#{i18n.concepts_NO_DEFINITION}" escape="false" style="font-size: 1.4em; float:left" rendered="#{concepts.selectedConcept.definition == ''}">
                             <f:param value="#{concepts.selectedConcept.name}" />
                         </h:outputFormat>
 
@@ -126,29 +126,29 @@
                                                     style="border: 1px solid #aaaaaa;" />
                                 </h:outputLink>
 
-                                <h:outputText value="#{msgs.concepts_GEOAREA_LATITUDE}:" styleClass="bold" rendered="#{concepts.selectedConcept.latitude != '0.0'}" />
+                                <h:outputText value="#{i18n.concepts_GEOAREA_LATITUDE}:" styleClass="bold" rendered="#{concepts.selectedConcept.latitude != '0.0'}" />
                                 <h:outputText value="#{concepts.selectedConcept.latitude}" rendered="#{concepts.selectedConcept.latitude != '0.0'}" />
 
-                                <h:outputText value="#{msgs.concepts_GEOAREA_LONGITUDE}:"  styleClass="bold" rendered="#{concepts.selectedConcept.longitude != '0.0'}" />
+                                <h:outputText value="#{i18n.concepts_GEOAREA_LONGITUDE}:"  styleClass="bold" rendered="#{concepts.selectedConcept.longitude != '0.0'}" />
                                 <h:outputText value="#{concepts.selectedConcept.longitude}" rendered="#{concepts.selectedConcept.longitude != '0.0'}" />
 
-                                <h:outputText value="#{msgs.concepts_GEOAREA_ALTITUDE}:" styleClass="bold" rendered="#{concepts.selectedConcept.altitude != '0'}" />
+                                <h:outputText value="#{i18n.concepts_GEOAREA_ALTITUDE}:" styleClass="bold" rendered="#{concepts.selectedConcept.altitude != '0'}" />
                                 <h:outputText value="#{concepts.selectedConcept.altitude}" rendered="#{concepts.selectedConcept.altitude != '0'}"  />
                             </h:panelGrid>
 
                             <h:panelGrid rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.Organisation'}">
-                                <h:outputText value="#{msgs.concepts_ORG_FOUNDED}:" styleClass="bold" rendered="#{concepts.selectedConcept.founded != ''}"  />
+                                <h:outputText value="#{i18n.concepts_ORG_FOUNDED}:" styleClass="bold" rendered="#{concepts.selectedConcept.founded != ''}"  />
                                 <h:outputText value="#{concepts.selectedConcept.founded}" rendered="#{concepts.selectedConcept.founded != ''}" escape="false" />
 
-                                <h:outputText value="#{msgs.concepts_ORG_DISSOLVED}:" styleClass="bold" rendered="#{concepts.selectedConcept.dissolved != ''}" />
+                                <h:outputText value="#{i18n.concepts_ORG_DISSOLVED}:" styleClass="bold" rendered="#{concepts.selectedConcept.dissolved != ''}" />
                                 <h:outputText value="#{concepts.selectedConcept.dissolved}"  rendered="#{concepts.selectedConcept.dissolved != ''}" escape="false" />
                             </h:panelGrid>
 
                             <h:panelGrid rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.Person'}">
-                                <h:outputText value="#{msgs.concepts_PERSON_BORN}:" styleClass="bold" rendered="#{concepts.selectedConcept.born != ''}" />
+                                <h:outputText value="#{i18n.concepts_PERSON_BORN}:" styleClass="bold" rendered="#{concepts.selectedConcept.born != ''}" />
                                 <h:outputText value="#{concepts.selectedConcept.born}" rendered="#{concepts.selectedConcept.born != ''}" escape="false" />
 
-                                <h:outputText value="#{msgs.concepts_PERSON_DIED}:" styleClass="bold" rendered="#{concepts.selectedConcept.died != ''}" />
+                                <h:outputText value="#{i18n.concepts_PERSON_DIED}:" styleClass="bold" rendered="#{concepts.selectedConcept.died != ''}" />
                                 <h:outputText value="#{concepts.selectedConcept.died}" rendered="#{concepts.selectedConcept.died != ''}" escape="false" />
                             </h:panelGrid>
 
@@ -159,27 +159,27 @@
                                                     style="border: 1px solid #aaaaaa;" />
                                 </h:outputLink>
 
-                                <h:outputText value="#{msgs.concepts_POI_OPEN_HOURS}:" styleClass="bold" rendered="#{concepts.selectedConcept.openHours != ''}" />
+                                <h:outputText value="#{i18n.concepts_POI_OPEN_HOURS}:" styleClass="bold" rendered="#{concepts.selectedConcept.openHours != ''}" />
                                 <h:outputText value="#{concepts.selectedConcept.openHours}" rendered="#{concepts.selectedConcept.openHours != ''}" escape="false" />
 
-                                <h:outputText value="#{msgs.concepts_POI_ADDRESS_INFO}:" styleClass="bold" rendered="#{concepts.selectedConcept.addressInfo != ''}" />
+                                <h:outputText value="#{i18n.concepts_POI_ADDRESS_INFO}:" styleClass="bold" rendered="#{concepts.selectedConcept.addressInfo != ''}" />
                                 <h:outputText value="#{concepts.selectedConcept.addressInfo}" rendered="#{concepts.selectedConcept.addressInfo != ''}"  escape="false" />
 
-                                <h:outputText value="#{msgs.concepts_POI_CAPACITY}:" styleClass="bold" rendered="#{concepts.selectedConcept.capacity != ''}" />
+                                <h:outputText value="#{i18n.concepts_POI_CAPACITY}:" styleClass="bold" rendered="#{concepts.selectedConcept.capacity != ''}" />
                                 <h:outputText value="#{concepts.selectedConcept.capacity}" rendered="#{concepts.selectedConcept.capacity != ''}"  escape="false" />
 
-                                <h:outputText value="#{msgs.concepts_POI_CONTACT_INFO}:" styleClass="bold" rendered="#{concepts.selectedConcept.contactInfo != ''}" />
+                                <h:outputText value="#{i18n.concepts_POI_CONTACT_INFO}:" styleClass="bold" rendered="#{concepts.selectedConcept.contactInfo != ''}" />
                                 <h:outputText value="#{concepts.selectedConcept.contactInfo}" rendered="#{concepts.selectedConcept.contactInfo != ''}"  escape="false" />
 
-                                <h:outputText value="#{msgs.concepts_POI_LATITUDE}:" styleClass="bold"  rendered="#{concepts.selectedConcept.latitude != '0.0'}" />
+                                <h:outputText value="#{i18n.concepts_POI_LATITUDE}:" styleClass="bold"  rendered="#{concepts.selectedConcept.latitude != '0.0'}" />
                                 <h:outputText value="#{concepts.selectedConcept.latitude}" rendered="#{concepts.selectedConcept.latitude != '0.0'}"  escape="false" />
 
-                                <h:outputText value="#{msgs.concepts_POI_LONGITUDE}:" styleClass="bold"  rendered="#{concepts.selectedConcept.longitude != '0.0'}" />
+                                <h:outputText value="#{i18n.concepts_POI_LONGITUDE}:" styleClass="bold"  rendered="#{concepts.selectedConcept.longitude != '0.0'}" />
                                 <h:outputText value="#{concepts.selectedConcept.longitude}"  rendered="#{concepts.selectedConcept.longitude != '0.0'}"  escape="false" />
                             </h:panelGrid>
 
                             <h:panelGrid>
-                                <h:outputText value="#{msgs.concepts_SAME_AS_CONCEPTS}:" styleClass="bold" rendered="#{!empty concepts.selectedConcept.sameAs}" />
+                                <h:outputText value="#{i18n.concepts_SAME_AS_CONCEPTS}:" styleClass="bold" rendered="#{!empty concepts.selectedConcept.sameAs}" />
 
                                 <h:dataTable var="relatedConcept" value="#{concepts.selectedConcept.sameAs}" rendered="#{!empty concepts.selectedConcept.sameAs}">
                                     <h:column>
@@ -198,7 +198,7 @@
                                 </h:dataTable>
 
 
-                                <h:outputText value="#{msgs.concepts_BROADER_CONCEPTS}:" styleClass="bold" rendered="#{!empty concepts.selectedConcept.broader}" />
+                                <h:outputText value="#{i18n.concepts_BROADER_CONCEPTS}:" styleClass="bold" rendered="#{!empty concepts.selectedConcept.broader}" />
 
                                 <h:dataTable var="relatedConcept" value="#{concepts.selectedConcept.broader}" rendered="#{!empty concepts.selectedConcept.broader}">
                                     <h:column>
@@ -216,7 +216,7 @@
                                     </h:column>
                                 </h:dataTable>
 
-                                <h:outputText value="#{msgs.concepts_NARROWER_CONCEPTS}:" styleClass="bold" rendered="#{!empty concepts.selectedConcept.narrower}" />
+                                <h:outputText value="#{i18n.concepts_NARROWER_CONCEPTS}:" styleClass="bold" rendered="#{!empty concepts.selectedConcept.narrower}" />
 
                                 <h:dataTable var="relatedConcept" value="#{concepts.selectedConcept.narrower}" rendered="#{!empty concepts.selectedConcept.narrower}">
                                     <h:column>
@@ -235,7 +235,7 @@
                                 </h:dataTable>
 
 
-                                <h:outputText value="#{msgs.concepts_RELATED_CONCEPTS}:" styleClass="bold" rendered="#{!empty concepts.selectedConcept.related}" />
+                                <h:outputText value="#{i18n.concepts_RELATED_CONCEPTS}:" styleClass="bold" rendered="#{!empty concepts.selectedConcept.related}" />
 
                                 <h:dataTable var="relatedConcept" value="#{concepts.selectedConcept.related}" rendered="#{!empty concepts.selectedConcept.related}">
                                     <h:column>
@@ -259,9 +259,9 @@
                     </h:panelGrid>
 
                     <h:panelGrid rendered="#{concepts.updatingConcept}" styleClass="propertySheet">
-                        <h:outputText value="#{msgs.concepts_NAME}:" />
+                        <h:outputText value="#{i18n.concepts_NAME}:" />
                         <h:inputText value="#{concepts.selectedConcept.name}" styleClass="text" style="width: 98%" />
-                        <h:outputText value="#{msgs.concepts_DEFINITION}:" />
+                        <h:outputText value="#{i.concepts_DEFINITION}:" />
                         <rich:editor id="edDefinition"
                                      value="#{concepts.selectedConcept.definition}"
                                      theme="advanced"
@@ -294,47 +294,47 @@
                             <f:param name="width" value="100%" />
                         </rich:editor>
 
-                        <h:outputText value="#{msgs.concepts_GEOAREA_LATITUDE}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.GeoArea'}" />
+                        <h:outputText value="#{i18n.concepts_GEOAREA_LATITUDE}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.GeoArea'}" />
                         <h:inputText value="#{concepts.selectedConcept.latitude}"  rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.GeoArea'}" styleClass="text" style="width: 99%" />
 
-                        <h:outputText value="#{msgs.concepts_GEOAREA_LONGITUDE}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.GeoArea'}" />
+                        <h:outputText value="#{i18n.concepts_GEOAREA_LONGITUDE}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.GeoArea'}" />
                         <h:inputText value="#{concepts.selectedConcept.longitude}"  rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.GeoArea'}" styleClass="text" style="width: 99%" />
 
-                        <h:outputText value="#{msgs.concepts_GEOAREA_ALTITUDE}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.GeoArea'}" />
+                        <h:outputText value="#{i18n.concepts_GEOAREA_ALTITUDE}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.GeoArea'}" />
                         <h:inputText value="#{concepts.selectedConcept.altitude}"  rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.GeoArea'}" styleClass="text" style="width: 99%" />
 
-                        <h:outputText value="#{msgs.concepts_ORG_FOUNDED}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.Organisation'}" />
+                        <h:outputText value="#{i18n.concepts_ORG_FOUNDED}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.Organisation'}" />
                         <h:inputText value="#{concepts.selectedConcept.founded}"  rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.Organisation'}" styleClass="text" style="width: 99%" />
 
-                        <h:outputText value="#{msgs.concepts_ORG_DISSOLVED}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.Organisation'}" />
+                        <h:outputText value="#{i18n.concepts_ORG_DISSOLVED}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.Organisation'}" />
                         <h:inputText value="#{concepts.selectedConcept.dissolved}"  rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.Organisation'}" styleClass="text" style="width: 99%" />
 
-                        <h:outputText value="#{msgs.concepts_PERSON_BORN}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.Person'}" />
+                        <h:outputText value="#{i18n.concepts_PERSON_BORN}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.Person'}" />
                         <h:inputText value="#{concepts.selectedConcept.born}"  rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.Person'}" styleClass="text" style="width: 99%" />
 
-                        <h:outputText value="#{msgs.concepts_PERSON_DIED}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.Person'}" />
+                        <h:outputText value="#{i18n.concepts_PERSON_DIED}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.Person'}" />
                         <h:inputText value="#{concepts.selectedConcept.died}"  rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.Person'}" styleClass="text" style="width: 99%" />
 
-                        <h:outputText value="#{msgs.concepts_POI_OPEN_HOURS}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" />
+                        <h:outputText value="#{i18n.concepts_POI_OPEN_HOURS}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" />
                         <h:inputText value="#{concepts.selectedConcept.openHours}"  rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" styleClass="text" style="width: 99%" />
 
-                        <h:outputText value="#{msgs.concepts_POI_ADDRESS_INFO}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" />
+                        <h:outputText value="#{i18n.concepts_POI_ADDRESS_INFO}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" />
                         <h:inputTextarea value="#{concepts.selectedConcept.addressInfo}"  rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" styleClass="text" style="width: 99%; height: 150px;" />
 
-                        <h:outputText value="#{msgs.concepts_POI_CAPACITY}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" />
+                        <h:outputText value="#{i18n.concepts_POI_CAPACITY}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" />
                         <h:inputText value="#{concepts.selectedConcept.capacity}"  rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" styleClass="text" style="width: 99%" />
 
-                        <h:outputText value="#{msgs.concepts_POI_CONTACT_INFO}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" />
+                        <h:outputText value="#{i18n.concepts_POI_CONTACT_INFO}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" />
                         <h:inputText value="#{concepts.selectedConcept.contactInfo}"  rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" styleClass="text" style="width: 99%; height: 150px;" />
 
-                        <h:outputText value="#{msgs.concepts_POI_LATITUDE}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" />
+                        <h:outputText value="#{i18n.concepts_POI_LATITUDE}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" />
                         <h:inputText value="#{concepts.selectedConcept.latitude}"  rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" styleClass="text" style="width: 99%" />
 
-                        <h:outputText value="#{msgs.concepts_POI_LONGITUDE}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" />
+                        <h:outputText value="#{i18n.concepts_POI_LONGITUDE}:" rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" />
                         <h:inputText value="#{concepts.selectedConcept.longitude}"  rendered="#{concepts.selectedConcept.type == 'dk.i2m.converge.core.metadata.PointOfInterest'}" styleClass="text" style="width: 99%" />
 
 
-                        <h:outputText value="#{msgs.concepts_SAME_AS_CONCEPTS}:" styleClass="bold"  />
+                        <h:outputText value="#{i18n.concepts_SAME_AS_CONCEPTS}:" styleClass="bold"  />
                         <h:dataTable id="dtConceptSameAsConcepts" var="relatedConcept" value="#{concepts.selectedConcept.sameAs}">
                             <h:column>
                                 <c:set var="key" value="#{relatedConcept.type}_SHORT" />
@@ -351,12 +351,12 @@
                                 <a4j:commandLink ajaxSingle="true">
                                     <f:setPropertyActionListener value="#{relatedConcept}" target="#{concepts.selectedMetaDataConcept}" />
                                     <a4j:support event="oncomplete" actionListener="#{concepts.onRemoveSameAsFromConcept}" reRender="dtConceptSameAsConcepts" />
-                                    <h:graphicImage value="#{res.DELETE_ICON}" alt="#{msgs.concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{msgs.concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
+                                    <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{i18n.concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
                                 </a4j:commandLink>
                             </h:column>
                         </h:dataTable>
 
-                        <h:outputText value="#{msgs.concepts_RELATED_CONCEPTS}:" styleClass="bold"  />
+                        <h:outputText value="#{i18n.concepts_RELATED_CONCEPTS}:" styleClass="bold"  />
                         <h:dataTable id="dtConceptRelatedConcepts" var="relatedConcept" value="#{concepts.selectedConcept.related}">
 
                             <h:column>
@@ -374,14 +374,14 @@
                                 <a4j:commandLink ajaxSingle="true" >
                                     <a4j:support event="oncomplete" actionListener="#{concepts.onRemoveRelatedFromConcept}" reRender="dtConceptRelatedConcepts" />
                                     <f:setPropertyActionListener value="#{relatedConcept}" target="#{concepts.selectedMetaDataConcept}" />
-                                    <h:graphicImage value="#{res.DELETE_ICON}" alt="#{msgs.concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{msgs.concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
+                                    <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{i18n.concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
                                 </a4j:commandLink>
                             </h:column>
 
                         </h:dataTable>
 
 
-                        <h:outputText value="#{msgs.concepts_BROADER_CONCEPTS}:" styleClass="bold"  />
+                        <h:outputText value="#{i18n.concepts_BROADER_CONCEPTS}:" styleClass="bold"  />
                         <h:dataTable id="dtConceptBroaderConcepts" var="relatedConcept" value="#{concepts.selectedConcept.broader}">
                             <h:column>
                                 <c:set var="key" value="#{relatedConcept.type}_SHORT" />
@@ -398,13 +398,13 @@
                                 <a4j:commandLink ajaxSingle="true">
                                     <a4j:support event="oncomplete" actionListener="#{concepts.onRemoveBroaderFromConcept}" reRender="dtConceptBroaderConcepts" />
                                     <f:setPropertyActionListener value="#{relatedConcept}" target="#{concepts.selectedMetaDataConcept}" />
-                                    <h:graphicImage value="#{res.DELETE_ICON}" alt="#{msgs.concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{msgs.concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
+                                    <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{i18n.concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
                                 </a4j:commandLink>
                             </h:column>
                         </h:dataTable>
 
 
-                        <h:outputText value="#{msgs.concepts_NARROWER_CONCEPTS}:" styleClass="bold"  />
+                        <h:outputText value="#{i18n.concepts_NARROWER_CONCEPTS}:" styleClass="bold"  />
                         <h:dataTable id="dtConceptNarrowerConcepts" var="relatedConcept" value="#{concepts.selectedConcept.narrower}">
                             <h:column>
                                 <c:set var="key" value="#{relatedConcept.type}_SHORT" />
@@ -421,7 +421,7 @@
                                 <a4j:commandLink ajaxSingle="true">
                                     <a4j:support event="oncomplete" actionListener="#{concepts.onRemoveNarrowerFromConcept}" reRender="dtConceptNarrowerConcepts" />
                                     <f:setPropertyActionListener value="#{relatedConcept}" target="#{concepts.selectedMetaDataConcept}" />
-                                    <h:graphicImage value="#{res.DELETE_ICON}" alt="#{msgs.concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{msgs.concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
+                                    <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{i18n.concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
                                 </a4j:commandLink>
                             </h:column>
                         </h:dataTable>
@@ -430,7 +430,7 @@
             </h:form>
 
             <h:form id="frmSearchResults" rendered="#{concepts.showSearchResults}">
-                <converge:moduleHeader moduleTitle="#{msgs.concepts_SEARCH_RESULTS}" />
+                <converge:moduleHeader moduleTitle="#{i18n.concepts_SEARCH_RESULTS}" />
                 <div class="moduleContent">
 
                     <rich:dataTable id="dtSearchResults"
@@ -454,7 +454,7 @@
 
                         <rich:column sortBy="#{concept.name}" filterBy="#{concept.name}" filterEvent="onkeyup" >
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.concepts_CONCEPT}" />
+                                <h:outputText value="#{i18n.concepts_CONCEPT}" />
                             </f:facet>
                             <a4j:commandLink actionListener="#{concepts.onShowConcept}" reRender="ajaxPage">
                                 <f:setPropertyActionListener target="#{concepts.selectedConcept}" value="#{concept}" />
@@ -473,7 +473,7 @@
                 <rich:modalPanel id="mpImport" autosized="true" domElementAttachment="parent" rendered="#{userSession.privileged['MANAGE_CONCEPTS']}">
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{msgs.SUBJECTS_IMPORT}" />
+                            <h:outputText value="#{i18n.concepts_SUBJECTS_IMPORT}" />
                         </h:panelGroup>
                     </f:facet>
                     <f:facet name="controls">
@@ -489,14 +489,14 @@
                     </f:facet>
 
                     <h:panelGrid id="pgImport">
-                        <h:outputText value="#{msgs.SUBJECTS_IMPORT_FILE}" />
+                        <h:outputText value="#{i18n.concepts_SUBJECTS_IMPORT_FILE}" />
                         <h:column>
                             <rich:fileUpload id="fuConceptFile" acceptedTypes="xml" fileUploadListener="#{concepts.onUploadConcepts}" immediateUpload="true" allowFlash="true">
                                 <a4j:support event="onuploadcomplete" actionListener="#{concepts.onReadAvailableLanguages}" reRender="sltLanguage" />
                             </rich:fileUpload>
                         </h:column>
 
-                        <h:outputText value="#{msgs.SUBJECTS_IMPORT_LANGUAGE}" />
+                        <h:outputText value="#{msgs.concepts_SUBJECTS_IMPORT_LANGUAGE}" />
                         <h:column>
                             <h:selectOneMenu id="sltLanguage" value="#{concepts.importLanguage}" >
                                 <f:selectItems value="#{concepts.availableImportLanguages}" />
@@ -504,9 +504,9 @@
                             </h:selectOneMenu>
                         </h:column>
 
-                        <h:outputText value="#{msgs.SUBJECTS_IMPORT_FORMAT}" />
+                        <h:outputText value="#{i18n.concepts_SUBJECTS_IMPORT_FORMAT}" />
                         <h:selectOneRadio value="#{concepts.importFormat}">
-                            <f:selectItem itemLabel="#{msgs.SUBJECTS_IMPORT_FORMAT_NEWSML_G2_KNOWLEDGE_ITEM}"
+                            <f:selectItem itemLabel="#{i18n.concepts_SUBJECTS_IMPORT_FORMAT_NEWSML_G2_KNOWLEDGE_ITEM}"
                                           itemValue="NEWSML_G2_KNOWLEDGE_ITEM" />
                         </h:selectOneRadio>
 
@@ -514,7 +514,7 @@
                             <a4j:commandLink id="lnkImportSubjects"
                                              actionListener="#{concepts.onImport}"
                                              styleClass="dialogButton"
-                                             value="#{msgs.SUBJECTS_IMPORT}"
+                                             value="#{i18n.concepts_SUBJECTS_IMPORT}"
                                              reRender="ajaxPage">
                                 <rich:componentControl for="mpImport"
                                                        operation="hide"
@@ -524,7 +524,7 @@
 
                             <h:commandLink id="lnkCloseImportSubjects"
                                            styleClass="dialogButton"
-                                           value="#{msgs.CANCEL}"
+                                           value="#{i18n.Generic_CANCEL}"
                                            onclick="#{rich:component('mpImport')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
@@ -535,7 +535,7 @@
                 <rich:modalPanel id="mpConceptDetails" autosized="true" domElementAttachment="parent" rendered="#{userSession.privileged['MANAGE_CONCEPTS'] || userSession.privileged['NEW_CONCEPTS']}">
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{msgs.concepts_CONCEPT_DETAILS}" />
+                            <h:outputText value="#{i18n.concepts_CONCEPT_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
                     <f:facet name="controls">
@@ -550,29 +550,29 @@
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgMetaDataSelect" columnClasses="tabSheet" style="padding: 10px; width: 100%">
-                        <h:outputText value="#{msgs.concepts_NAME}" />
+                        <h:outputText value="#{i18n.concepts_NAME}" />
                         <h:inputText value="#{concepts.newName}" styleClass="text mediumInput" />
 
-                        <h:outputText value="#{msgs.concepts_TYPE}" />
+                        <h:outputText value="#{i18n.concepts_TYPE}" />
                         <h:selectOneRadio value="#{concepts.newType}">
-                            <f:selectItem itemLabel="#{msgs['dk.i2m.converge.core.metadata.Subject_NAME']}" itemValue="dk.i2m.converge.core.metadata.Subject" />
-                            <f:selectItem itemLabel="#{msgs['dk.i2m.converge.core.metadata.Organisation_NAME']}" itemValue="dk.i2m.converge.core.metadata.Organisation" />
-                            <f:selectItem itemLabel="#{msgs['dk.i2m.converge.core.metadata.Person_NAME']}" itemValue="dk.i2m.converge.core.metadata.Person" />
-                            <f:selectItem itemLabel="#{msgs['dk.i2m.converge.core.metadata.GeoArea_NAME']}" itemValue="dk.i2m.converge.core.metadata.GeoArea" />
-                            <f:selectItem itemLabel="#{msgs['dk.i2m.converge.core.metadata.PointOfInterest_NAME']}" itemValue="dk.i2m.converge.core.metadata.PointOfInterest" />
+                            <f:selectItem itemLabel="#{i18n['dk.i2m.converge.core.metadata.Subject_NAME']}" itemValue="dk.i2m.converge.core.metadata.Subject" />
+                            <f:selectItem itemLabel="#{i18n['dk.i2m.converge.core.metadata.Organisation_NAME']}" itemValue="dk.i2m.converge.core.metadata.Organisation" />
+                            <f:selectItem itemLabel="#{i18n['dk.i2m.converge.core.metadata.Person_NAME']}" itemValue="dk.i2m.converge.core.metadata.Person" />
+                            <f:selectItem itemLabel="#{i18n['dk.i2m.converge.core.metadata.GeoArea_NAME']}" itemValue="dk.i2m.converge.core.metadata.GeoArea" />
+                            <f:selectItem itemLabel="#{i18n['dk.i2m.converge.core.metadata.PointOfInterest_NAME']}" itemValue="dk.i2m.converge.core.metadata.PointOfInterest" />
                         </h:selectOneRadio>
 
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveConceptDetails"
                                              styleClass="dialogButton"
-                                             value="#{msgs.SAVE}"
+                                             value="#{i18n.Generic_SAVE}"
                                              actionListener="#{concepts.onSaveNewConcept}"
                                              reRender="ajaxPage"
                                              oncomplete="if (#{converge:isAllValid()}) { Richfaces.hideModalPanel('mpConceptDetails'); return false;}" />
 
                             <h:commandLink id="lnkCancelConceptDetails"
                                            styleClass="dialogButton"
-                                           value="#{msgs.CANCEL}"
+                                           value="#{i18n.Generic_CANCEL}"
                                            onclick="#{rich:component('mpConceptDetails')}.hide(); return false;">
                             </h:commandLink>
                         </h:panelGroup>
@@ -586,7 +586,7 @@
                 <rich:modalPanel id="mpMetaDataSelect" autosized="true" domElementAttachment="parent">
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{msgs.concepts_SELECT_META_DATA}" />
+                            <h:outputText value="#{i18n.concepts_SELECT_META_DATA}" />
                         </h:panelGroup>
                     </f:facet>
                     <f:facet name="controls">
@@ -607,7 +607,7 @@
                                        activeTabClass="tabActive"
                                        inactiveTabClass="tabInactive">
 
-                            <rich:tab id="tabSubjects" label="#{msgs.concepts_SUBJECTS}">
+                            <rich:tab id="tabSubjects" label="#{i18n.concepts_SUBJECTS}">
 
                                 <h:panelGrid id="pgSubjects" columnClasses="tabSheet" style="padding: 10px; width: 100%">
 
@@ -632,7 +632,7 @@
 
                                         <rich:column sortBy="#{concept.name}" filterBy="#{concept.name}" filterEvent="onkeyup" >
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.concepts_CONCEPT}" />
+                                                <h:outputText value="#{i18n.concepts_CONCEPT}" />
                                             </f:facet>
                                             <a4j:commandLink id="lnkSelectMetaDataSubject" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{concepts.selectedMetaDataConcept}" value="#{concept}" />
@@ -649,7 +649,7 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabPerson" label="#{msgs.concepts_PERSONS}">
+                            <rich:tab id="tabPerson" label="#{i18n.concepts_PERSONS}">
 
                                 <h:panelGrid id="pgPersons" columnClasses="tabSheet" style="padding: 10px; width: 100%">
 
@@ -674,7 +674,7 @@
 
                                         <rich:column sortBy="#{concept.name}" filterBy="#{concept.name}" filterEvent="onkeyup" >
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.concepts_CONCEPT}" />
+                                                <h:outputText value="#{i18n.concepts_CONCEPT}" />
                                             </f:facet>
                                             <a4j:commandLink id="lnkSelectMetaDataPerson" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{concepts.selectedMetaDataConcept}" value="#{concept}" />
@@ -691,7 +691,7 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabOrganisation" label="#{msgs.concepts_ORGANISATIONS}">
+                            <rich:tab id="tabOrganisation" label="#{i18n.concepts_ORGANISATIONS}">
 
                                 <h:panelGrid id="pgOrganisations" columnClasses="tabSheet" style="padding: 10px; width: 100%">
 
@@ -716,7 +716,7 @@
 
                                         <rich:column sortBy="#{concept.name}" filterBy="#{concept.name}" filterEvent="onkeyup" >
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.concepts_CONCEPT}" />
+                                                <h:outputText value="#{i18n.concepts_CONCEPT}" />
                                             </f:facet>
                                             <a4j:commandLink id="lnkSelectMetaDataOrganisation" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{concepts.selectedMetaDataConcept}" value="#{concept}" />
@@ -733,7 +733,7 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabLocations" label="#{msgs.concepts_LOCATIONS}">
+                            <rich:tab id="tabLocations" label="#{i18n.concepts_LOCATIONS}">
 
                                 <h:panelGrid id="pgLocations" columnClasses="tabSheet" style="padding: 10px; width: 100%">
 
@@ -758,7 +758,7 @@
 
                                         <rich:column sortBy="#{concept.name}" filterBy="#{concept.name}" filterEvent="onkeyup" >
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.concepts_CONCEPT}" />
+                                                <h:outputText value="#{i18n.concepts_CONCEPT}" />
                                             </f:facet>
                                             <a4j:commandLink id="lnkSelectMetaDataLocation" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{concepts.selectedMetaDataConcept}" value="#{concept}" />
@@ -781,7 +781,7 @@
                         <h:panelGroup styleClass="dialogueButtons">
                             <h:commandLink id="lnkCancelConceptDetails"
                                            styleClass="dialogButton"
-                                           value="#{msgs.CLOSE}"
+                                           value="#{i18n.Generic_CLOSE}"
                                            onclick="#{rich:component('mpMetaDataSelect')}.hide(); return false;">
                             </h:commandLink>
                         </h:panelGroup>

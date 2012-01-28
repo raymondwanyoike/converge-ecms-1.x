@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
 
-    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/inbox.xhtml">
+    <ui:composition template="/WEB-INF/facelets/templates//inbox.xhtml">
 
         <ui:define name="body">
             <a4j:keepAlive beanName="inbox" />
@@ -38,7 +38,7 @@
 
                         <rich:column sortBy="#{item.title}" styleClass="left">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.TITLE}" title="#{msgs.ARTICLE_TITLE_TOOLTIP}" />
+                                <h:outputText value="#{i18n.Generic_TITLE}" title="#{msgs.ARTICLE_TITLE_TOOLTIP}" />
                             </f:facet>
                             <h:panelGrid>
                                 <h:outputText value="#{item.slugline}" title="" rendered="#{item.slugline != null || item.slugline != ''}" />
@@ -76,7 +76,7 @@
                                 <h:outputText value="#{msgs.inbox_DEADLINE}" title="#{msgs.inbox_DEADLINE_TOOLTIP}" />
                             </f:facet>
                             <h:outputText value="#{item.deadline}">
-                                <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
                         </rich:column>
 
@@ -85,7 +85,7 @@
                                 <h:outputText value="#{msgs.UPDATED}" title="#{msgs.ARTICLE_UPDATED_TOOLTIP}" />
                             </f:facet>
                             <h:outputText value="#{item.updated}">
-                                <f:convertDateTime type="both" pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime type="both" pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
                         </rich:column>
 
@@ -129,7 +129,7 @@
 
                         <rich:column sortBy="#{item.title}" styleClass="left">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.TITLE}" title="#{msgs.ARTICLE_TITLE_TOOLTIP}" />
+                                <h:outputText value="#{i18n.Generic_TITLE}" title="#{msgs.ARTICLE_TITLE_TOOLTIP}" />
                             </f:facet>
                             <h:panelGrid>
                                 <h:panelGrid>
@@ -141,7 +141,7 @@
 
                         <rich:column sortBy="#{item.owner}" styleClass="left">
                             <f:facet name="header">
-                                <h:outputText value="Submitter" />
+                                <h:outputText value="#{i18n.inbox_Submitter}" />
                             </f:facet>
                             <h:panelGrid>
                                 <h:outputText value="#{item.owner.fullName}" title="" />
@@ -150,7 +150,7 @@
 
                         <rich:column sortBy="#{item.status}">
                             <f:facet name="header">
-                                <h:outputText value="Status" />
+                                <h:outputText value="#{i18n.inbox_status}" />
                             </f:facet>
                             <h:outputText value="#{item.status}" rendered="#{!inbox.catalogueEditor}" />
                             <h:panelGroup layout="block" rendered="#{inbox.catalogueEditor}">
@@ -170,7 +170,7 @@
                                 <h:outputText value="#{msgs.UPDATED}" />
                             </f:facet>
                             <h:outputText value="#{item.updated.time}">
-                                <f:convertDateTime type="both" pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime type="both" pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
                         </rich:column>
 
@@ -188,26 +188,19 @@
                             <h:outputText value="#{msgs.inbox_NEW_ASSIGNMENT}" />
                         </h:panelGroup>
                     </f:facet>
-                    <f:facet name="controls">
-                        <h:panelGroup>
-                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" >
-                                <rich:componentControl for="mpNewAssignment" operation="hide" event="onclick"/>
-                            </h:graphicImage>
-                        </h:panelGroup>
-                    </f:facet>
                     <h:panelGrid style="width: 480px;">
 
                         <rich:tabPanel id="tpNewAssignment" switchType="ajax" immediate="true" activeTabClass="tabActive" inactiveTabClass="tabInactive"
                                        selectedTab="#{inbox.newAssignmentType}">
 
-                            <rich:tab id="tabStory" label="Story">
+                            <rich:tab id="tabStory" label="#{i18n.inbox_tabStory_label}">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:outputText value="#{msgs.assignment_ASSIGNMENT_TITLE}" />
                                     <h:inputText id="txtStoryTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" required="true" requiredMessage="#{msgs.inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
 
                                     <h:outputText value="#{msgs.assignment_ASSIGNMENT_DEADLINE}" />
-                                    <rich:calendar popup="true" required="true" requiredMessage="#{msgs.inbox_NEWS_ITEM_DEADLINE_REQUIRED}" value="#{inbox.newAssignment.assignment.deadline.time}" datePattern="#{msgs.FORMAT_DATE_AND_TIME}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}"/>
+                                    <rich:calendar popup="true" required="true" requiredMessage="#{msgs.inbox_NEWS_ITEM_DEADLINE_REQUIRED}" value="#{inbox.newAssignment.assignment.deadline.time}" datePattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}"/>
 
                                     <h:outputText value="#{msgs.assignment_ASSIGNMENT_OUTLET}" />
                                     <h:selectOneMenu id="somOutlet" styleClass="text mediumInput" value="#{inbox.newAssignment.newsItem.outlet}" converter="#{converters.outletConverter}">
@@ -220,7 +213,7 @@
                                 </h:panelGrid>
 
                             </rich:tab>
-                            <rich:tab id="tabMedia" label="Media">
+                            <rich:tab id="tabMedia" label="#{i18n.inbox_tabMedia_label}">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:outputText value="#{msgs.assignment_ASSIGNMENT_TITLE}" />
@@ -247,7 +240,7 @@
                                          reRender="frmInbox"
                                          oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpNewAssignment')}.hide(); window.location='#{facesContext.externalContext.request.contextPath}/#{inbox.createdItemLink}'; return false; }" />
 
-                        <h:commandLink id="lnkCancelAssignment" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpNewAssignment')}.hide(); return false;" />
+                        <h:commandLink id="lnkCancelAssignment" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpNewAssignment')}.hide(); return false;" />
                     </h:panelGroup>
 
                 </rich:modalPanel>
@@ -278,7 +271,7 @@
                                                    required="true"
                                                    requiredMessage="#{msgs.inbox_NEWS_ITEM_DEADLINE_REQUIRED}"
                                                    value="#{inbox.newAssignment.assignment.deadline.time}"
-                                                   datePattern="#{msgs.FORMAT_DATE_AND_TIME}"
+                                                   datePattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}"
                                                    firstWeekDay="1" timeZone="#{userSession.user.timeZone}"/>
 
 
@@ -311,7 +304,7 @@
 
                         <h:commandLink id="lnkCancelAssignment"
                                        styleClass="dialogButton"
-                                       value="#{msgs.CANCEL}"
+                                       value="#{i18n.Generic_CANCEL}"
                                        onclick="#{rich:component('mpDuplicateAssignment')}.hide(); return false;" />
                     </h:panelGroup>
 

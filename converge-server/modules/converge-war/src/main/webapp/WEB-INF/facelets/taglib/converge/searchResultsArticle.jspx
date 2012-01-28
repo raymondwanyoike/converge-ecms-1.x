@@ -56,34 +56,34 @@
 
             <rich:column sortBy="#{article.title}">
                 <f:facet name="header">
-                    <h:outputText value="#{msgs.TITLE}" title="#{msgs.ARTICLE_TITLE_TOOLTIP}" />
+                    <h:outputText value="#{i18n.Generic_TITLE}" title="#{msgs.ARTICLE_TITLE_TOOLTIP}" />
                 </f:facet>
                 <t:popup styleClass="popup">
                     <h:outputText value="#{article.title}" title="" />
                     <f:facet name="popup">
                         <h:panelGrid rowClasses="heading, text">
-                            <h:outputText value="#{msgs.BRIEF}" style="font-weight: bold;" />
+                            <h:outputText value="#{i18n.article_BRIEF}" style="font-weight: bold;" />
                             <h:outputText value="#{article.brief}&#160;" escape="false" />
 
-                            <h:outputText value="#{msgs.SUBJECTS}" style="font-weight: bold;" />
+                            <h:outputText value="#{i18n.article_SUBJECTS}" style="font-weight: bold;" />
                             <t:dataList value="#{article.subjects}" var="subject" rendered="#{not empty article.subjects}">
                                 <h:outputLink value="/search/BrowseBySubject.xhtml?ID=#{subject.id}&amp;CONTENT_TYPE=ARTICLE">#{subject.fullTitle}</h:outputLink>
                             </t:dataList>
                             <h:outputText value="&#160;" rendered="#{empty article.subjects}" />
 
-                            <h:outputText value="#{msgs.PERSONS}" style="font-weight: bold;" />
+                            <h:outputText value="#{i18n.article_PERSONS}" style="font-weight: bold;" />
                             <t:dataList value="#{article.persons}" var="person" rendered="#{not empty article.persons}">
                                 <h:outputLink value="/search/BrowseByPerson.xhtml?ID=#{person.id}&amp;CONTENT_TYPE=ARTICLE">#{person.firstName} #{person.lastName}</h:outputLink>
                             </t:dataList>
                             <h:outputText value="&#160;" rendered="#{empty article.persons}" />
 
-                            <h:outputText value="#{msgs.ORGANISATIONS}" style="font-weight: bold;" />
+                            <h:outputText value="#{i18n.article_ORGANISATIONS}" style="font-weight: bold;" />
                             <t:dataList value="#{article.organisations}" var="organisation" rendered="#{not empty article.organisations}">
                                 <h:outputLink value="/search/BrowseByOrganisation.xhtml?ID=#{organisation.id}&amp;CONTENT_TYPE=ARTICLE">#{organisation.name}</h:outputLink>
                             </t:dataList>
                             <h:outputText value="&#160;" rendered="#{empty article.organisations}" />
 
-                            <h:outputText value="#{msgs.LOCATIONS}" style="font-weight: bold;" />
+                            <h:outputText value="#{i18n.article_LOCATIONS}" style="font-weight: bold;" />
                             <t:dataList value="#{article.locations}" var="location" rendered="#{not empty article.locations}">
                                 <h:outputLink value="/search/BrowseByLocation.xhtml?ID=#{location.id}&amp;CONTENT_TYPE=ARTICLE">#{location.name}</h:outputLink>
                             </t:dataList>
@@ -130,7 +130,7 @@
                     <h:outputText value="#{msgs.UPDATED}"  title="#{msgs.ARTICLE_UPDATED_TOOLTIP}" />
                 </f:facet>
                 <h:outputText value="#{article.updated.time}">
-                    <f:convertDateTime type="both" pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                    <f:convertDateTime type="both" pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                 </h:outputText>
             </rich:column>
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
 
-    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/newswires.xhtml">
+    <ui:composition template="/WEB-INF/facelets/templates//newswires.xhtml">
 
         <ui:define name="leftColumnTop">
 
@@ -9,16 +9,16 @@
                 <converge:moduleHeader moduleTitle="#{i18n.Newswire_OPTIONS}" />
                 <div class="moduleContent">
                     <h:panelGrid columns="2">
-                        <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="" title="" />
+                        <h:graphicImage value="#{res.BULLET_ICON}" alt="" title="" />
                         <a4j:commandLink ajaxSingle="true">
                             <a4j:support event="oncomplete" actionListener="#{newswire.onShowTodaysNews}" reRender="frmPage,frmQuery" />
                             <h:outputText value="#{i18n.Newswire_OPTION_SHOW_LATEST_NEWS}" />
                         </a4j:commandLink>
-                        <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="" title="" />
+                        <h:graphicImage value="#{res.BULLET_ICON}" alt="" title="" />
                         <a4j:commandLink ajaxSingle="true" reRender="frmMyNewswireSubscriptions" oncomplete="#{rich:component('mpMyNewswireSubscriptions')}.show();">
                             <h:outputText value="#{i18n.Newswire_OPTION_SUBSCRIBE_TO_NEWSWIRES}" />
                         </a4j:commandLink>
-                        <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="" title="" />
+                        <h:graphicImage value="#{res.BULLET_ICON}" alt="" title="" />
                         <a4j:commandLink ajaxSingle="true" reRender="frmBasketDetail" actionListener="#{newswire.onNewBasket}" oncomplete="#{rich:component('mpBasketDetail')}.show();">
                             <h:outputText value="#{i18n.Newswire_OPTION_CREATE_BASKET}" />
                         </a4j:commandLink>
@@ -92,11 +92,11 @@
                     <h:panelGrid columns="3" style="width: 100%" columnClasses="left,btnC,btnC">
                         <h:inputText id="txtSearchKeyword" styleClass="text searchInput" value="#{newswire.keyword}" title="" />
                         <a4j:commandButton type="submit" styleClass="button dynamicButton searchButton" value="#{msgs.newswire_SEARCH_BUTTON_LABEL}" actionListener="#{newswire.onSearch}" reRender="frmPage,frmQuery" />
-                        <a4j:commandButton styleClass="button dynamicButton searchButton" value="Clear" actionListener="#{newswire.onClear}" reRender="frmPage,frmQuery" />
+                        <a4j:commandButton styleClass="button dynamicButton searchButton" value="#{i18n.Newswire_Clear}" actionListener="#{newswire.onClear}" reRender="frmPage,frmQuery" />
                     </h:panelGrid>
 
                     <div style="float: left;">
-                        <h:outputText value="Show " />
+                        <h:outputText value="#{i18n.newswire_Show}" />
                         <h:selectOneMenu id="somShow" value="#{newswire.show}">
                             <f:selectItem  itemLabel="10" itemValue="10" />
                             <f:selectItem  itemLabel="20" itemValue="20" />
@@ -110,18 +110,18 @@
                             <f:selectItem  itemLabel="100" itemValue="100" />
                             <a4j:support event="onchange" actionListener="#{newswire.onSearch}" reRender="frmPage,frmQuery" />
                         </h:selectOneMenu>
-                        <h:outputText value=" Sort by " />
+                        <h:outputText value=" #{i18n.newswire_SortBy} " />
                         <h:selectOneMenu id="somSearchSortField" value="#{newswire.sortField}">
-                            <f:selectItem  itemLabel="Score" itemValue="score" />
-                            <f:selectItem  itemLabel="Date" itemValue="date" />
+                            <f:selectItem  itemLabel="#{i18n.Search_SORT_BY_SCORE}" itemValue="score" />
+                            <f:selectItem  itemLabel="#{i18n.Search_SORT_BY_DATE}" itemValue="date" />
                             <a4j:support event="onchange" actionListener="#{newswire.onSearch}" reRender="frmPage,frmQuery" />
                         </h:selectOneMenu>
                         <h:selectOneMenu id="somSearchSortOrder" value="#{newswire.sortOrder}">
-                            <f:selectItem  itemLabel="Ascending" itemValue="true" />
-                            <f:selectItem  itemLabel="Descending" itemValue="false" />
+                            <f:selectItem  itemLabel="#{i18n.Search_SORT_ORDER_ASCENDING}" itemValue="true" />
+                            <f:selectItem  itemLabel="#{i18n.Search_SORT_ORDER_DESCENDING}" itemValue="false" />
                             <a4j:support event="onchange" actionListener="#{newswire.onSearch}" reRender="frmPage,frmQuery" />
                         </h:selectOneMenu>
-                        <h:outputText value=" Display tags " />
+                        <h:outputText value="#{i18n.newswire_Display_Tags}" />
                         <h:selectBooleanCheckbox value="#{newswire.displayContentTags}">
                             <a4j:support event="onclick" ajaxSingle="true" />
                         </h:selectBooleanCheckbox>
@@ -133,7 +133,7 @@
             <converge:moduleSpacer />
 
             <h:form id="frmPage">
-                <converge:moduleHeader moduleTitle="Results" />
+                <converge:moduleHeader moduleTitle="#{i18n.Newswire_Results}" />
                 <div class="moduleContent">
 
                     <h:panelGrid style="width: 100%;" columns="2" columnClasses="results, facets">
@@ -164,7 +164,7 @@
                                     </h2>
 
                                     <p style="margin-top: 1px; margin-bottom: 2px;">
-                                        <h:graphicImage url="#{item.previewLink}" rendered="#{item.preview}" style="border: 1px solid black; margin-right: 5px; margin-top: 5px; float: left; max-width: 120px;" />
+                                        <h:graphicImage url="#{item.previewLink}" rendered="#{item.preview}" style="border: 1px solid black; margin-right: 5px; margin-top: 5px; float: left;" />
                                         <h:outputText value="#{item.description}" escape="false" />
                                     </p>
 
@@ -187,7 +187,7 @@
                                         <span class="searchResultDescription" style="font-weight: bold; text-transform: uppercase;"><h:outputText value="#{item.note}" escape="false" /></span>
                                         <span class="searchResultDate" style="text-transform:  uppercase;">&#160;
                                             <h:outputText value="#{item.earliestDate}" rendered="#{item.earliestDate != null}">
-                                                <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                                             </h:outputText>
                                         </span>
 
@@ -312,7 +312,7 @@
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:column>
                                         <h:outputText value="#{newswire.selectedItem.date.time}" style="font-style: italic;"  >
-                                            <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                            <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                                         </h:outputText>
                                         <h:outputText value=" - #{newswire.selectedItem.newswireService.source}" escape="false" style="font-style: italic; font-weight: bold; text-transform: uppercase;" />
                                         <h:outputText value=" - #{newswire.selectedItem.author}" escape="false" style="font-style: italic; font-weight: bold; text-transform: uppercase;" />
@@ -411,7 +411,7 @@
 
                                     <h:panelGrid columns="3">
                                         <h:inputText id="txtNewTag" styleClass="text mediumInput" value="#{newswire.basketTag}" />
-                                        <a4j:commandButton id="btnAdd" value="Add" actionListener="#{newswire.onAddTagSuggestion}" reRender="dtBasketTags,txtNewTag,sbNewTag" styleClass="button dynamicButton" />
+                                        <a4j:commandButton id="btnAdd" value="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTY_ADD}" actionListener="#{newswire.onAddTagSuggestion}" reRender="dtBasketTags,txtNewTag,sbNewTag" styleClass="button dynamicButton" />
                                         <rich:suggestionbox id="sbNewTag" for="txtNewTag" var="result" suggestionAction="#{newswire.onTagSuggestion}" ajaxSingle="true" fetchValue="#{result.tag}" minChars="2" nothingLabel="No match">
                                             <h:column>
                                                 <h:outputText value="#{result.tag}" />
@@ -420,8 +420,8 @@
                                     </h:panelGrid>
 
                                     <h:selectOneRadio value="#{newswire.selectedBasket.anyTags}" layout="pageDirection">
-                                        <f:selectItem itemLabel="Match any tag below" itemValue="#{true}" />
-                                        <f:selectItem itemLabel="Match all tags below" itemValue="#{false}" />
+                                        <f:selectItem itemLabel="#{i18n.newswire_Match_any_tag}" itemValue="#{true}" />
+                                        <f:selectItem itemLabel="#{i18n.newswire_Match_all_tag}" itemValue="#{false}" />
                                     </h:selectOneRadio>
 
                                     <rich:dataTable id="dtBasketTags" value="#{newswire.selectedBasket.tags}" var="tag" styleClass="table pluginPropertiesList" headerClass="tableHeader" rowClasses="odd, even">
@@ -431,7 +431,7 @@
                                         <rich:column styleClass="center columnIcon">
                                             <a4j:commandLink id="lnkRemoveTag" reRender="dtBasketTags" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{newswire.deleteTag}" value="#{tag}" />
-                                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{msgs.DELETE}" title="#{msgs.DELETE}" />
+                                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
                                             </a4j:commandLink>
                                         </rich:column>
                                     </rich:dataTable>
@@ -471,24 +471,24 @@
                                     <h:outputText value="Not yet delivered" rendered="#{newswire.selectedBasket.lastDelivery == null}" styleClass="italic" />
 
                                     <h:outputText value="#{newswire.selectedBasket.lastDelivery}" rendered="#{newswire.selectedBasket.lastDelivery != null}">
-                                        <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                        <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                                     </h:outputText>
 
                                     <h:outputText value="Next delivery" />
                                     <h:outputText value="Delivery not enabled" rendered="#{newswire.selectedBasket.nextDelivery == null}" styleClass="italic" />
 
                                     <h:outputText value="#{newswire.selectedBasket.nextDelivery}" rendered="#{newswire.selectedBasket.nextDelivery != null}">
-                                        <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                        <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                                     </h:outputText>
                                 </h:panelGrid>
                             </rich:tab>
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveBasket" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{newswire.onSaveBasket}" reRender="frmPage,frmQuery,frmBaskets" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpBasketDetail')}.hide(); return false; }" rendered="#{newswire.selectedBasket.id == null}" />
-                            <a4j:commandLink id="lnkUpdateBasket" styleClass="dialogButton" value="#{msgs.UPDATE}" actionListener="#{newswire.onSaveBasket}" reRender="frmPage,frmQuery,frmBaskets" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpBasketDetail')}.hide(); return false; }" rendered="#{newswire.selectedBasket.id != null}" />
-                            <a4j:commandLink id="lnkDeleteBasket" styleClass="dialogButton" value="#{msgs.DELETE}" actionListener="#{newswire.onDeleteBasket}" reRender="frmPage,frmQuery,frmBaskets" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpBasketDetail')}.hide(); return false; }" rendered="#{newswire.selectedBasket.id != null}" />
-                            <h:commandLink id="lnkCloseBasket" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpBasketDetail')}.hide(); return false;" />
+                            <a4j:commandLink id="lnkSaveBasket" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{newswire.onSaveBasket}" reRender="frmPage,frmQuery,frmBaskets" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpBasketDetail')}.hide(); return false; }" rendered="#{newswire.selectedBasket.id == null}" />
+                            <a4j:commandLink id="lnkUpdateBasket" styleClass="dialogButton" value="#{i18n.Generic_UPDATE}" actionListener="#{newswire.onSaveBasket}" reRender="frmPage,frmQuery,frmBaskets" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpBasketDetail')}.hide(); return false; }" rendered="#{newswire.selectedBasket.id != null}" />
+                            <a4j:commandLink id="lnkDeleteBasket" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" actionListener="#{newswire.onDeleteBasket}" reRender="frmPage,frmQuery,frmBaskets" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpBasketDetail')}.hide(); return false; }" rendered="#{newswire.selectedBasket.id != null}" />
+                            <h:commandLink id="lnkCloseBasket" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpBasketDetail')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
                 </rich:modalPanel>

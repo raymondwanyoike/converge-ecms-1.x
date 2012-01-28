@@ -4,11 +4,11 @@
         <h:panelGrid style="width: 100%" columnClasses="center">
             <h:outputText value="#{i18n.Generic_APPLICATION_TITLE}" style="font-weight: bold;" />
             <h:outputText value="#{common.applicationVersion}" />
-            <h:outputText value="#{i18n.Generic_COPYRIGHT}" escape="false" />
+            <h:outputText value="#{i18n.appinfo_COPYRIGHT}" escape="false" />
             <h:outputText value="&#160;" />
         </h:panelGrid>
         <h:panelGrid style="width: 100%" columnClasses="left">
-            <h:outputText escape="false" value="#{i18n.Generic_LICENSE}" />
+            <h:outputText escape="false" value="#{i18n.appinfo_LICENSE}" />
             <h:outputText value="&#160;" />
         </h:panelGrid>
     </ui:composition>

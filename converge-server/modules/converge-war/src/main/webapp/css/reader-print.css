@@ -44,5 +44,3 @@ div#controls {
 .imgAttachment { float: left; padding: 5px; }
 .rich-table-cell { font-size: 12px; }
 .table { width: 100%; }
-
-.mediaItemHeld { text-align: center; padding: 10px; margin-bottom: 10px; background-color: #ff0000; color: white; font-size: 18px; font-weight: bold; text-transform: uppercase; border: 1px solid #aaa; }

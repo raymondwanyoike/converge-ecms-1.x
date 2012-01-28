@@ -3,7 +3,7 @@
     <ui:composition>
         <rich:toolTip styleClass="tooltip" style="width: 300px; background: #ffcc66; border: 1px solid #cc9933;">
             <h:panelGrid rowClasses="center, left, left, left, left" style="width: 100%">
-                <h:outputText value="#{msgs.planning_ASSIGNMENT_BRIEFING}" styleClass="bold" style="font-size: 12px; text-decoration: underline;" />
+                <h:outputText value="#{i18n.Assignment_planning_ASSIGNMENT_BRIEFING}" styleClass="bold" style="font-size: 12px; text-decoration: underline;" />
                 <h:outputText value="Assigned by #{assignment.assignedBy.fullName}" rendered="#{assignment.assigned}" style="font-style: italic;" />
                 <h:outputText value="#{assignment.assignmentBriefing}" escape="false" rendered="#{assignment.assignmentBriefing != ''}" />
                 <h:outputText value="There is no briefing for this assignment" escape="false" rendered="#{assignment.assignmentBriefing == ''}" />

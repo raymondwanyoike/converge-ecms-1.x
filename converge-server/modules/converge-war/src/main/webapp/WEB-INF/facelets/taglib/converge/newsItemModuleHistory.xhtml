@@ -6,7 +6,7 @@
 
             <rich:column styleClass="left" sortOrder="ASCENDING" sortBy="#{history.timestamp}" selfSorted="false">
                 <h:outputText value="#{history.timestamp.time}">
-                    <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                    <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                 </h:outputText>
             </rich:column>
 
@@ -48,9 +48,9 @@
                             <h:outputText value="#{msgs.newsitem_ACTOR}" />
                             <h:inputText value="#{newsItem.selectedWorkflowStateTransition.user.fullName}" disabled="true" style="width: 100%" styleClass="text" />
 
-                            <h:outputText value="#{msgs.DATE}" />
+                            <h:outputText value="#{i18n.Generic_DATE}" />
                             <h:inputText value="#{newsItem.selectedWorkflowStateTransition.timestamp.time}" disabled="true" style="width: 100%" styleClass="text">
-                                <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                             </h:inputText>
 
                             <h:outputText value="#{msgs.newsitem_HEADLINE}" />

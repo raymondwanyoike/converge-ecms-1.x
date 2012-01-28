@@ -89,16 +89,6 @@ public class UserSession {
     private UserActivitySummary lastMonthActivity;
 
     private UserActivitySummary thisMonthActivity;
-    
-    private UILocale userLocale ;
-
-    public UILocale getUserLocale() {
-        return userLocale;
-    }
-
-    public void setUserLocale(UILocale userLocale) {
-        this.userLocale = userLocale;
-    }
 
     /**
      * Creates a new instance of {@link UserSession}.
@@ -518,9 +508,7 @@ public class UserSession {
      * @param locale {@link Locale} of the current user
      */
     private void setLocale(Locale locale) {
-        //FacesContext.getCurrentInstance().getViewRoot().setLocale(locale);
-        userLocale = new UILocale(locale);
-         //switch UI accorfing to givrn locale
-        userLocale.switchUILocale();
+        FacesContext.getCurrentInstance().getViewRoot().setLocale(locale);
+        
     }
 }

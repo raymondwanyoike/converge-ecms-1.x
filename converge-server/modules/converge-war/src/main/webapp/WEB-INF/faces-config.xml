@@ -46,11 +46,6 @@
             <redirect/>
         </navigation-case>
         <navigation-case>
-            <from-outcome>/administration/log</from-outcome>
-            <to-view-id>/administrator/Log.xhtml</to-view-id>
-            <redirect/>
-        </navigation-case>
-        <navigation-case>
             <from-outcome>/administration/system</from-outcome>
             <to-view-id>/administrator/System.xhtml</to-view-id>
             <redirect/>
@@ -421,13 +416,7 @@
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Administration</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
-
-    <managed-bean>
-        <managed-bean-name>administrator_Log</managed-bean-name>
-        <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Log</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-    </managed-bean>
-
+    
     <managed-bean>
         <managed-bean-name>administrator_OpenCalais</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.OpenCalais</managed-bean-class>

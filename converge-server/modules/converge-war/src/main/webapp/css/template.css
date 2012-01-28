@@ -774,7 +774,6 @@ div.photoSeriesFrame div.imageCount {
 
 .columnStatus { width: 150px; }
 .subColumnIcon { width: 18px; }
-.columnIconHeader {width: 18px; }
 .columnIcon { background-color: #eceff4; width: 18px; }
 .columnThumbnail { width: 160px; text-align: center; }
 .columnId { width: 60px; }
@@ -788,8 +787,6 @@ div.photoSeriesFrame div.imageCount {
 .columnDateTime { width: 135px; }
 .columnOneButton { width: 60px; }
 .columnField { width: 300px; }
-.columnSeverity { width: 70px; }
-.columnUser { width: 135px;}
 
 .left {
     text-align: left;
@@ -967,11 +964,11 @@ form {
 }
 
 .tooltip {
+    background: #ededed;
     border: 1px solid #aaaaaa;
     -moz-box-shadow: 0 0 5px 5px #888;
     -webkit-box-shadow: 0 0 5px 5px#888;
     box-shadow: 0 0 5px 5px #888;
-    background-color: #ffcc33;
 }
 
 .propertyValue {
@@ -1688,7 +1685,6 @@ div.black h2 {
 
 .pluginPropertiesList { width: 98%; height: 300px; overflow:auto; position: relative; display: block; border: 0px; padding: 8px; font-family:'Lucida Grande', helvetica, verdana, sans-serif, arial; font-size: 1em; background-color: transparent; }
 .scrollableDialogContent { width: 98%; height: 300px; overflow:auto; position: relative; display: block; border: 0px; padding: 8px; font-family:'Lucida Grande', helvetica, verdana, sans-serif, arial; font-size: 1em; background-color: transparent; }
-.actionList, .logEntryList { width: 98%; height: 300px; overflow:auto; position: relative; display: block; border: 0px; padding: 8px; font-family:'Lucida Grande', helvetica, verdana, sans-serif, arial; font-size: 1em; background-color: transparent; }
 
 .endState, .endState a { background: green; color: white; }
 .intermediateState, .intermediateState a { background: yellow; color: black; }
@@ -1724,7 +1720,6 @@ div.black h2 {
 .mediaItemPreview { text-align: center; }
 .mediaItemRenditionAvailable { padding: 2px; padding-left: 5px; padding-right: 5px; background-color: #00AA00; color: white; font-weight: bold; border: 1px solid black; text-transform: uppercase; }
 .mediaItemRenditionNotAvailable { padding: 2px;  padding-left: 5px; padding-right: 5px; background-color: #ff0000; color: white; font-weight: bold; border: 1px solid black; text-transform: uppercase; }
-.mediaItemProperty { width: 98%; margin-left: 1%; margin-right: 1%; }
 .disabledCriteria { color: #cccccc;}
 
 .colMediaAttachment { width: 250px; vertical-align: top; }
@@ -1765,14 +1760,3 @@ div.black h2 {
 /* TextMetrics Plug-in for TinyMCE */
 div.metrics {float:right !important;}
 div.metrics > span {margin-left:0.5em !important;}
-
-.logEntrySeveritySEVERE { background: #f7e7e7; color: black; }
-.logEntrySeverityWARNING { background: #f9f6e7; color: black; }
-.logEntrySeverityINFO { background: #e7eedb }
-.logEntrySeverityFINE { background: #efefef; color: #333333; }
-.logEntrySeverityFINER { background: #f1f1f1; color: #666666; }
-.logEntrySeverityFINEST {background: #efefef; color: #999999; }
-
-.classificationTooltip { width: 350px; }
-.renditionTooltip { width: 350px; }
-.mediaItemHeld { background-color: #ff0000; color: white; font-size: 2em; font-weight: bold; }

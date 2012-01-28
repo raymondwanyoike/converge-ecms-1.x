@@ -63,7 +63,7 @@
                                 <rich:column styleClass="columnIcon center">
                                     <a4j:commandLink onclick="if (confirm('#{msgs.newsitem_REMOVE_ACTOR_PROMPT}') != true){ return false; };" ajaxSingle="true" reRender="dtActorEdit, dtNewsItemActors">
                                         <f:setPropertyActionListener value="#{actor}" target="#{value.deleteActor}" />
-                                        <h:graphicImage alt="#{msgs.DELETE}" title="#{msgs.DELETE}" value="#{res.DELETE_ICON}"/>
+                                        <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{res.DELETE_ICON}"/>
                                     </a4j:commandLink>
                                 </rich:column>
                             </rich:dataTable>

@@ -11,18 +11,18 @@
           xmlns:rich="http://richfaces.org/rich"
           xmlns:converge="http://com.interactivemediamanagement.converge/tags">
 
-    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/administration.xhtml">
-        <ui:define name="title">#{msgs.ADMINISTRATION}</ui:define>
+    <ui:composition template="/WEB-INF/facelets/templates//administration.xhtml">
+        <ui:define name="title">#{i18n.ADMINISTRATION_Title}</ui:define>
         <ui:define name="body">
             <converge:message for="frmAboutConverge" />
             <h:form id="frmAboutConverge">
-                <converge:moduleHeader moduleTitle="#{msgs.ABOUT_CONVERGE}" />
+                <converge:moduleHeader moduleTitle="#{i18n.Administration_ABOUT_CONVERGE}" />
                 <div class="moduleContent">
                     <converge:appInfo />
                 </div>
 
                 <h:panelGroup layout="block" rendered="#{administrator_Administration.migrationAvailable}">
-                    <converge:moduleHeader moduleTitle="Migration" />
+                    <converge:moduleHeader moduleTitle="#{i18n.administrator_Migration}" />
                     <div class="moduleContent">
 
                         <h:panelGroup layout="block" style="padding: 3px; background-color: #ffff00; border: 1px solid silver; margin-bottom: 5px;">Below is a list of available migrations for your installation. Click the <span style="text-decoration: underline;">Migrate</span> link below to start the migration.</h:panelGroup>
@@ -55,7 +55,7 @@
                                 </f:facet>
                                 <h:commandLink>
                                     <f:setPropertyActionListener value="#{version}" target="#{administrator_Administration.migrateVersion}" />
-                                    <h:outputText value="Migrate" />
+                                    <h:outputText value="#{i18n.administrator_Migrate}" />
                                 </h:commandLink>
                             </rich:column>
                         </rich:dataTable>

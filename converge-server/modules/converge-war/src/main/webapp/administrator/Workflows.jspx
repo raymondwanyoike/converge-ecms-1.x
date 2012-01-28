@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:v="http://converge.i2m.dk" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
 
-    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/administration.xhtml">
+    <ui:composition template="/WEB-INF/facelets/templates//administration.xhtml">
 
-        <ui:define name="title">#{i18n.administrator_Workflows_PAGE_TITLE}</ui:define>
+        <ui:define name="title">#{msgs.WORKFLOWS}</ui:define>
 
         <ui:define name="body">
             <a4j:keepAlive beanName="administrator_Workflows" />
@@ -13,10 +13,10 @@
             </a4j:outputPanel>
 
             <h:form id="frmPage">
-                <converge:moduleHeader moduleTitle="#{i18n.administrator_Workflows_PAGE_TITLE}" />
+                <converge:moduleHeader moduleTitle="#{msgs.WORKFLOWS}" />
                 <div class="moduleContent">
                     <h:panelGrid columns="1" columnClasses="right" style="width: 100%">
-                        <a4j:commandButton id="btnNewWorkflow" actionListener="#{administrator_Workflows.onNewWorkflow}" reRender="mpWorkflowDetails" ajaxSingle="true" styleClass="button dynamicButton" value="#{i18n.administrator_Workflows_NEW_WORKFLOW}" title="#{i18n.administrator_Workflows_NEW_WORKFLOW_TOOLTIP}" oncomplete="#{rich:component('mpWorkflowDetails')}.show()">
+                        <a4j:commandButton id="btnNewWorkflow" actionListener="#{administrator_Workflows.onNewWorkflow}" reRender="mpWorkflowDetails" ajaxSingle="true" styleClass="button dynamicButton" value="#{msgs.WORKFLOW_NEW}" title="#{msgs.WORKFLOW_NEW_TOOLTIP}" oncomplete="#{rich:component('mpWorkflowDetails')}.show()">
                             <f:setPropertyActionListener target="#{administrator_Workflows.selectedTab}" value="tabWorkflow" />
                         </a4j:commandButton>
                     </h:panelGrid>
@@ -59,7 +59,8 @@
                             <h:outputText value="#{msgs.workflows_WORKFLOW_VALID_VALID}" rendered="#{workflow.valid}" style="color: green; font-weight: bold;" />
                             <h:outputText value="#{msgs.workflows_WORKFLOW_VALID_INVALID}" rendered="#{!workflow.valid}" style="color: red; font-weight: bold;" />
                         </rich:column>
-                            
+
+
                     </rich:dataTable>
                     <rich:spacer height="30" />
                 </div>
@@ -70,13 +71,6 @@
                     <f:facet name="header">
                         <h:panelGroup>
                             <h:outputText value="#{msgs.WORKFLOW_DETAILS}" />
-                        </h:panelGroup>
-                    </f:facet>
-                    <f:facet name="controls">
-                        <h:panelGroup>
-                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
-                                <rich:componentControl for="mpWorkflowDetails" operation="hide" event="onclick"/>
-                            </h:graphicImage>
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgWorkflowDetails" style="width: 480px;">
@@ -161,14 +155,14 @@
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="btnSave"
                                              styleClass="dialogButton"
-                                             value="#{msgs.SAVE}"
+                                             value="#{i18n.Generic_SAVE}"
                                              actionListener="#{administrator_Workflows.onSaveWorkflow}"
                                              reRender="frmPage"
                                              oncomplete="#{rich:component('mpWorkflowDetails')}.hide(); return false;" />
 
                             <a4j:commandLink id="btnApply"
                                              styleClass="dialogButton"
-                                             value="#{msgs.APPLY}"
+                                             value="#{i18n.Generic_APPLY}"
                                              actionListener="#{administrator_Workflows.onApplyWorkflow}"
                                              reRender="pgWorkflowDetails, frmPage" />
 
@@ -177,7 +171,7 @@
                                              onclick="if (confirm('#{msgs.WORKFLOW_PROMPT_DELETE}') != true){ return false; };"
                                              actionListener="#{administrator_Workflows.onDeleteWorkflow}"
                                              styleClass="dialogButton"
-                                             value="#{msgs.DELETE}"
+                                             value="#{i18n.Generic_DELETE}"
                                              reRender="frmPage">
                                 <rich:componentControl for="mpWorkflowDetails"
                                                        operation="hide"
@@ -187,7 +181,7 @@
 
                             <h:commandLink id="lnkCloseForm"
                                            styleClass="dialogButton"
-                                           value="#{msgs.CANCEL}"
+                                           value="#{i18n.Generic_CANCEL}"
                                            onclick="#{rich:component('mpWorkflowDetails')}.hide(); return false;" />
                         </h:panelGroup>
 
@@ -201,13 +195,6 @@
                     <f:facet name="header">
                         <h:panelGroup>
                             <h:outputText value="#{msgs.WORKFLOW_STATE_DETAILS}" />
-                        </h:panelGroup>
-                    </f:facet>
-                    <f:facet name="controls">
-                        <h:panelGroup>
-                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
-                                <rich:componentControl for="mpWorkflowStateDetails" operation="hide" event="onclick"/>
-                            </h:graphicImage>
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid rendered="#{administrator_Workflows.selectedWorkflowState != null}" id="pgWorkflowStateDetails">
@@ -364,14 +351,14 @@
 
                             <a4j:commandLink id="lnkSaveWorkflowState"
                                              styleClass="dialogButton"
-                                             value="#{msgs.SAVE}"
+                                             value="#{i18n.Generic_SAVE}"
                                              actionListener="#{administrator_Workflows.onSaveWorkflowState}"
                                              reRender="pgWorkflowDetailsProcess"
                                              oncomplete="#{rich:component('mpWorkflowStateDetails')}.hide(); return false;" />
 
                             <a4j:commandLink id="lnkApplyWorkflowState"
                                              styleClass="dialogButton"
-                                             value="#{msgs.APPLY}"
+                                             value="#{i18n.Generic_APPLY}"
                                              actionListener="#{administrator_Workflows.onApplyWorkflowState}"
                                              reRender="pgWorkflowDetailsProcess, pgWorkflowStateDetails" />
 
@@ -380,7 +367,7 @@
                                              onclick="if (confirm('#{msgs.WORKFLOW_STATE_PROMPT_DELETE}') != true){ return false; };"
                                              actionListener="#{administrator_Workflows.onDeleteWorkflowState}"
                                              styleClass="dialogButton"
-                                             value="#{msgs.DELETE}"
+                                             value="#{i18n.Generic_DELETE}"
                                              reRender="pgWorkflowDetailsProcess">
                                 <rich:componentControl for="mpWorkflowStateDetails"
                                                        operation="hide"
@@ -389,7 +376,7 @@
 
                             <h:commandLink id="lnkWorkflowStateForm"
                                            styleClass="dialogButton"
-                                           value="#{msgs.CANCEL}"
+                                           value="#{i18n.Generic_CANCEL}"
                                            onclick="#{rich:component('mpWorkflowStateDetails')}.hide(); return false;" />
                         </h:panelGroup>
 
@@ -403,23 +390,15 @@
                 <rich:modalPanel id="mpWorkflowStepDetails" autosized="true" domElementAttachment="parent" >
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STATE_OPTION_DETAILS}" />
+                            <h:outputText value="#{msgs.WORKFLOW_STATE_OPTION_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
-                    <f:facet name="controls">
-                        <h:panelGroup>
-                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
-                                <rich:componentControl for="mpWorkflowStepDetails" operation="hide" event="onclick"/>
-                            </h:graphicImage>
-                        </h:panelGroup>
-                    </f:facet>
-
                     <h:panelGrid rendered="#{administrator_Workflows.selectedWorkflowStep != null}" id="pgWorkflowStepDetails">
 
                         <rich:tabPanel id="tpWorkflowStep" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive" selectedTab="#{administrator_Workflows.selectedWorkflowStepTab}">
 
-                            <rich:tab id="tabWorkflowStep" label="#{i18n.administrator_Workflows_WORKFLOW_STATE_OPTION_TAB}">
-                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
+                            <rich:tab id="tabWorkflowStep" label="#{msgs.WORKFLOW_STATE_OPTION}">
+                                <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
                                     <h:outputText value="#{msgs.WORKFLOW_STATE_OPTION_NAME}:" />
 
                                     <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_Workflows.selectedWorkflowStep.name}" title="#{msgs.WORKFLOW_STATE_OPTION_NAME_TOOLTIP}" required="true" requiredMessage="#{msgs.WORKFLOW_STATE_OPTIONNAME_REQUIRED}"/>
@@ -466,8 +445,8 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabWorkflowStepRestriction" label="#{i18n.administrator_Workflows_WORKFLOW_STEP_RESTRICTION}" disabled="#{administrator_Workflows.workflowStepAddMode}">
-                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
+                            <rich:tab id="tabWorkflowStepRestriction" label="#{i18n.administrator_Workflows_WORKFLOW_STEP_RESTRICTION}">
+                                <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
 
                                     <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALID_FOR}:"
                                                   title="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALID_FOR_TOOLTIP}" />
@@ -483,8 +462,8 @@
 
                             </rich:tab>
 
-                            <rich:tab id="tabWorkflowStepValidators" label="#{msgs.WORKFLOW_STEP_VALIDATION}" disabled="#{administrator_Workflows.workflowStepAddMode}">
-                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
+                            <rich:tab id="tabWorkflowStepValidators" label="#{msgs.WORKFLOW_STEP_VALIDATION}">
+                                <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
 
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                                         <h:outputText value="" />
@@ -522,7 +501,7 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabWorkflowStepActions" label="#{msgs.workflows_WORKFLOW_STEP_ACTIONS}" disabled="#{administrator_Workflows.workflowStepAddMode}">
+                            <rich:tab id="tabWorkflowStepActions" label="#{msgs.workflows_WORKFLOW_STEP_ACTIONS}">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
@@ -572,12 +551,12 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveWorkflowStep" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Workflows.onSaveWorkflowStep}" reRender="pgWorkflowStateDetails" oncomplete="#{rich:component('mpWorkflowStepDetails')}.hide(); return false;" />
-                            <a4j:commandLink id="lnkApplyWorkflowStep" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{administrator_Workflows.onApplyWorkflowStep}" reRender="pgWorkflowStateDetails, pgWorkflowStepDetails" />
-                            <a4j:commandLink id="lnkDeleteWorkflowStep" ajaxSingle="true" rendered="#{administrator_Workflows.workflowStepEditMode}" onclick="if (confirm('#{msgs.WORKFLOW_STATE_OPTION_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Workflows.onDeleteWorkflowStep}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="pgWorkflowStateDetails">
+                            <a4j:commandLink id="lnkSaveWorkflowStep" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Workflows.onSaveWorkflowStep}" reRender="pgWorkflowStateDetails" oncomplete="#{rich:component('mpWorkflowStepDetails')}.hide(); return false;" />
+                            <a4j:commandLink id="lnkApplyWorkflowStep" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Workflows.onApplyWorkflowStep}" reRender="pgWorkflowStateDetails, pgWorkflowStepDetails" />
+                            <a4j:commandLink id="lnkDeleteWorkflowStep" ajaxSingle="true" rendered="#{administrator_Workflows.workflowStepEditMode}" onclick="if (confirm('#{msgs.WORKFLOW_STATE_OPTION_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Workflows.onDeleteWorkflowStep}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="pgWorkflowStateDetails">
                                 <rich:componentControl for="mpWorkflowStepDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
-                            <h:commandLink id="lnkCloseWorkflowStepForm" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpWorkflowStepDetails')}.hide(); return false;" />
+                            <h:commandLink id="lnkCloseWorkflowStepForm" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpWorkflowStepDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
                 </rich:modalPanel>
@@ -590,14 +569,6 @@
                             <h:outputText value="#{msgs.workflows_WORKFLOW_STEP_ACTION_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
-                    <f:facet name="controls">
-                        <h:panelGroup>
-                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
-                                <rich:componentControl for="mpWorkflowStepActionDetails" operation="hide" event="onclick"/>
-                            </h:graphicImage>
-                        </h:panelGroup>
-                    </f:facet>
-                    
                     <h:panelGrid id="pgWorkflowStepActionDetails">
 
                         <rich:tabPanel id="tpWorkflowStepAction" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive" selectedTab="#{administrator_Workflows.selectedWorkflowStepActionTab}">
@@ -664,7 +635,7 @@
                                         <rich:column styleClass="center columnIcon">
                                             <a4j:commandLink id="lnkRemoveActionProperty" reRender="pgActionProperties" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{administrator_Workflows.deleteProperty}" value="#{property}" />
-                                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{msgs.DELETE}" title="#{msgs.DELETE}" />
+                                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -675,12 +646,12 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveWorkflowStepAction" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Workflows.onSaveWorkflowStepAction}" reRender="dtWorkflowStepActions" oncomplete="#{rich:component('mpWorkflowStepActionDetails')}.hide(); return false;" />
-                            <a4j:commandLink id="lnkApplyWorkflowStepAction" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{administrator_Workflows.onSaveWorkflowStepAction}" reRender="dtWorkflowStepActions,pgWorkflowStepActionDetails" />
-                            <a4j:commandLink id="lnkDeleteWorkflowStepAction" ajaxSingle="true" rendered="#{administrator_Workflows.workflowStepActionEditMode}" onclick="if (confirm('#{msgs.workflows_WORKFLOW_STEP_ACTION_DELETE}') != true){ return false; };" actionListener="#{administrator_Workflows.onDeleteWorkflowStepAction}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="dtWorkflowStepActions">
+                            <a4j:commandLink id="lnkSaveWorkflowStepAction" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Workflows.onSaveWorkflowStepAction}" reRender="dtWorkflowStepActions" oncomplete="#{rich:component('mpWorkflowStepActionDetails')}.hide(); return false;" />
+                            <a4j:commandLink id="lnkApplyWorkflowStepAction" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Workflows.onSaveWorkflowStepAction}" reRender="dtWorkflowStepActions,pgWorkflowStepActionDetails" />
+                            <a4j:commandLink id="lnkDeleteWorkflowStepAction" ajaxSingle="true" rendered="#{administrator_Workflows.workflowStepActionEditMode}" onclick="if (confirm('#{msgs.workflows_WORKFLOW_STEP_ACTION_DELETE}') != true){ return false; };" actionListener="#{administrator_Workflows.onDeleteWorkflowStepAction}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="dtWorkflowStepActions">
                                 <rich:componentControl for="mpWorkflowStepActionDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
-                            <h:commandLink id="lnkCloseWorkflowStepActionDetails" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpWorkflowStepActionDetails')}.hide(); return false;" />
+                            <h:commandLink id="lnkCloseWorkflowStepActionDetails" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpWorkflowStepActionDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
                 </rich:modalPanel>
@@ -691,13 +662,6 @@
                     <f:facet name="header">
                         <h:panelGroup>
                             <h:outputText value="#{msgs.workflows_WORKFLOW_STEP_VALIDATOR_DETAILS}" />
-                        </h:panelGroup>
-                    </f:facet>
-                    <f:facet name="controls">
-                        <h:panelGroup>
-                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
-                                <rich:componentControl for="mpWorkflowStepValidatorDetails" operation="hide" event="onclick"/>
-                            </h:graphicImage>
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgWorkflowStepValidatorDetails">
@@ -767,7 +731,7 @@
                                         <rich:column styleClass="center columnIcon">
                                             <a4j:commandLink id="lnkRemoveValidatorProperty" reRender="pgValidatorProperties" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{administrator_Workflows.deleteValidatorProperty}" value="#{property}" />
-                                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{msgs.DELETE}" title="#{msgs.DELETE}" />
+                                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -778,12 +742,12 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveWorkflowStepValidator" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Workflows.onSaveWorkflowStepValidator}" reRender="dtWorkflowStepValidators" oncomplete="#{rich:component('mpWorkflowStepValidatorDetails')}.hide(); return false;" />
-                            <a4j:commandLink id="lnkApplyWorkflowStepValidator" styleClass="dialogButton" value="#{msgs.APPLY}" actionListener="#{administrator_Workflows.onSaveWorkflowStepValidator}" reRender="dtWorkflowStepValidators,pgWorkflowStepValidatorDetails" />
-                            <a4j:commandLink id="lnkDeleteWorkflowStepValidator" ajaxSingle="true" rendered="#{administrator_Workflows.workflowStepValidatorEditMode}" onclick="if (confirm('#{msgs.workflows_WORKFLOW_STEP_VALIDATOR_DELETE}') != true){ return false; };" actionListener="#{administrator_Workflows.onDeleteWorkflowStepValidator}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="dtWorkflowStepValidators">
+                            <a4j:commandLink id="lnkSaveWorkflowStepValidator" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Workflows.onSaveWorkflowStepValidator}" reRender="dtWorkflowStepValidators" oncomplete="#{rich:component('mpWorkflowStepValidatorDetails')}.hide(); return false;" />
+                            <a4j:commandLink id="lnkApplyWorkflowStepValidator" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Workflows.onSaveWorkflowStepValidator}" reRender="dtWorkflowStepValidators,pgWorkflowStepValidatorDetails" />
+                            <a4j:commandLink id="lnkDeleteWorkflowStepValidator" ajaxSingle="true" rendered="#{administrator_Workflows.workflowStepValidatorEditMode}" onclick="if (confirm('#{msgs.workflows_WORKFLOW_STEP_VALIDATOR_DELETE}') != true){ return false; };" actionListener="#{administrator_Workflows.onDeleteWorkflowStepValidator}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="dtWorkflowStepValidators">
                                 <rich:componentControl for="mpWorkflowStepValidatorDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
-                            <h:commandLink id="lnkCloseWorkflowStepValidatorDetails" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpWorkflowStepValidatorDetails')}.hide(); return false;" />
+                            <h:commandLink id="lnkCloseWorkflowStepValidatorDetails" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpWorkflowStepValidatorDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
                 </rich:modalPanel>
