@@ -37,18 +37,7 @@
                                 <c:set var="severity_key" value="LogEntry_SEVERITY_#{logEntry.severity}" />
                                 <h:outputText value="#{i18n[severity_key]}" />
                             </rich:column>
-
-<<<<<<< HEAD
-=======
-                            <rich:column styleClass="columnUser logEntrySeverity#{logEntry.severity}" headerClass="columnUser">
-                                <f:facet name="header">
-                                    <h:outputText value="#{i18n.Editions_NEWS_ITEM_PLACEMENT_DETAILS_LOG_ACTOR}" />
-                                </f:facet>
-                                <h:outputText value="#{logEntry.actor.fullName}" rendered="#{logEntry.actor != null}" />
-                                <h:outputText value="#{i18n.LogEntry_NO_ACTOR}" rendered="#{logEntry.actor == null}" />
-                            </rich:column>
-
->>>>>>> parent of 53176a2... WebUI Changes 1
+                            
                             <rich:column styleClass="logEntrySeverity#{logEntry.severity}">
                                 <f:facet name="header">
                                     <h:outputText value="#{i18n.Editions_NEWS_ITEM_PLACEMENT_DETAILS_LOG_LOG}" />

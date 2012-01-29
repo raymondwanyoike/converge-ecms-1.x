@@ -89,19 +89,6 @@ public class UserSession {
     private UserActivitySummary lastMonthActivity;
 
     private UserActivitySummary thisMonthActivity;
-<<<<<<< HEAD
-=======
-    
-    private UILocale userLocale ;
-
-    public UILocale getUserLocale() {
-        return userLocale;
-    }
-
-    public void setUserLocale(UILocale userLocale) {
-        this.userLocale = userLocale;
-    }
->>>>>>> parent of 53176a2... WebUI Changes 1
 
     /**
      * Creates a new instance of {@link UserSession}.
@@ -521,13 +508,6 @@ public class UserSession {
      * @param locale {@link Locale} of the current user
      */
     private void setLocale(Locale locale) {
-<<<<<<< HEAD
         FacesContext.getCurrentInstance().getViewRoot().setLocale(locale);
-=======
-        //FacesContext.getCurrentInstance().getViewRoot().setLocale(locale);
-        userLocale = new UILocale(locale);
-         //switch UI accorfing to givrn locale
-        userLocale.switchUILocale();
->>>>>>> parent of 53176a2... WebUI Changes 1
     }
 }

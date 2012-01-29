@@ -968,17 +968,10 @@ form {
 
 .tooltip {
     border: 1px solid #aaaaaa;
-<<<<<<< HEAD
     -moz-box-shadow: 0 0 4px 4px #888;
     -webkit-box-shadow: 0 0 5px 5px#888;
     box-shadow: 0 0 4px 4px #888;
     background-color: #dedede;
-=======
-    -moz-box-shadow: 0 0 5px 5px #888;
-    -webkit-box-shadow: 0 0 5px 5px#888;
-    box-shadow: 0 0 5px 5px #888;
-    background-color: #ffcc33;
->>>>>>> parent of 53176a2... WebUI Changes 1
 }
 
 .propertyValue {

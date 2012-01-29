@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
 
-<<<<<<< HEAD
     <ui:composition template="/WEB-INF/facelets/templates/search.xhtml">
-=======
-    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/search.xhtml">
->>>>>>> parent of 53176a2... WebUI Changes 1
 
         <ui:define name="body">
             <a4j:keepAlive beanName="search" />
@@ -130,18 +126,14 @@
                                 </div>
                                 <div style="clear: both; padding: 9px;" />
 
-<<<<<<< HEAD
                                 <a4j:repeat value="#{search.searchResults}" var="item">
-=======
-                                <ui:repeat value="#{search.searchResults}" var="item">
->>>>>>> parent of 53176a2... WebUI Changes 1
+
                                     <h2 style="padding-bottom: 0px;">
                                         <h:outputLink value="#{item.link}" target="_blank">
                                             <h:outputText value="#{item.title}" escape="false" />
                                         </h:outputLink></h2>
 
                                     <p style="margin-top: 1px;">
-<<<<<<< HEAD
                                         <h:graphicImage url="#{item.previewLink}" rendered="#{item.preview &amp;&amp; !item.previewVideo &amp;&amp; !item.previewAudio}" styleClass="searchResultThumb" />
                                         <h:panelGroup rendered="#{item.previewVideo || item.previewAudio}" styleClass="searchResultThumb">
                                         <converge:mediaPlayer id="#{item.id}" value="#{item.directLink}" height="150" width="150" controlbar="none" />
@@ -153,20 +145,13 @@
                                             <span class="contentTag">#{tag}</span>
                                         </a4j:repeat>
                                     </p>
-=======
-                                        <h:graphicImage url="#{item.previewLink}" rendered="#{item.preview &amp;&amp; !item.video &amp;&amp; !item.audio}" styleClass="searchResultThumb" />
-                                        <h:panelGroup rendered="#{item.video || item.audio}" styleClass="searchResultThumb">
-                                        <converge:mediaPlayer id="#{item.id}" value="#{item.directLink}" height="150" width="150" controlbar="none" />
-                                    </h:panelGroup>
-                                    <h:outputText value="#{item.description}" escape="false" /><br/>
->>>>>>> parent of 53176a2... WebUI Changes 1
+
                                     <span class="searchResultDescription"><h:outputText value="#{item.note}" escape="false" /></span>
                                     <span class="searchResultDate">#{i18n.Search_DATE}:&#160;
                                         <h:outputText value="#{item.earliestDate}" rendered="#{item.earliestDate != null}">
                                             <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE}" timeZone="#{common.systemTimeZone}" />
                                         </h:outputText>
                                         <h:outputText value="#{i18n.Search_DATE_UNKNOWN}" rendered="#{item.earliestDate == null}" />
-<<<<<<< HEAD
                                         <a4j:commandLink rendered="#{userSession.privileged['SEARCH_ENGINE_RESULT_REMOVE']}" ajaxSingle="true" style="margin-left: 10px;">
                                             <h:outputText value="#{i18n.Search_REMOVE}" escape="false" style="text-transform: uppercase; color: red" />
                                             <f:setPropertyActionListener target="#{search.removeItem}" value="#{item}" />
@@ -175,12 +160,6 @@
                                 </p>
                                 <converge:moduleSpacer />
                             </a4j:repeat>
-=======
-                                    </span>
-                                </p>
-                                <converge:moduleSpacer />
-                            </ui:repeat>
->>>>>>> parent of 53176a2... WebUI Changes 1
 
                             <h:panelGroup styleClass="searchPages" layout="block">
                                 <h:outputText value="#{i18n.Search_PAGES}" />
