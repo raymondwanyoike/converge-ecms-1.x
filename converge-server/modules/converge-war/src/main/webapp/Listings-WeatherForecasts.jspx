@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
 
-    <ui:composition template="/WEB-INF/facelets/templates//listings.xhtml">
+<<<<<<< HEAD
+    <ui:composition template="/WEB-INF/facelets/templates/listings.xhtml">
+=======
+    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/listings.xhtml">
+>>>>>>> parent of 53176a2... WebUI Changes 1
 
         <ui:define name="leftColumnBottom">
             <converge:moduleHeader moduleTitle="#{msgs.OPTIONS}" />
@@ -34,7 +38,7 @@
                             <f:facet name="header">
                                 <a4j:status id="staForecasts">
                                     <f:facet name="start">
-                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" title="#{i18n.Generic_UPDATING}" />
+                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" title="#{msgs.UPDATING}" />
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>
@@ -128,7 +132,7 @@
                                     </h:inputText>
 
                                     <h:outputText value="#{msgs.listing_UPDATED}" />
-                                    <rich:calendar id="calUpdated" value="#{listings.selectedForecast.updated}" popup="true" timeZone="#{userSession.user.timeZone}" datePattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" />
+                                    <rich:calendar id="calUpdated" value="#{listings.selectedForecast.updated}" popup="true" timeZone="#{userSession.user.timeZone}" datePattern="#{msgs.FORMAT_DATE_AND_TIME}" />
 
                                 </h:panelGrid>
 
@@ -137,9 +141,9 @@
 
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveForecast" styleClass="dialogButton" value="#{msgs.CREATE}" actionListener="#{listings.onAddForecast}" reRender="dtForecasts" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpForecast')}.hide(); return false; }" rendered="#{listings.selectedForecast.id == null}" />
-                            <a4j:commandLink id="lnkUpdateForecast" styleClass="dialogButton" value="#{i18n.Generic_UPDATE}" actionListener="#{listings.onUpdateForecast}" reRender="dtForecasts" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpForecast')}.hide(); return false; }" rendered="#{listings.selectedForecast.id != null}" />
-                            <a4j:commandLink id="lnkRemoveForecast" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" actionListener="#{listings.onDeleteForecast}" reRender="dtForecasts" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpForecast')}.hide(); return false; }" rendered="#{listings.selectedForecast.id != null}" />
-                            <h:commandLink id="lnkCancelForecast" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpForecast')}.hide(); return false;" />
+                            <a4j:commandLink id="lnkUpdateForecast" styleClass="dialogButton" value="#{msgs.UPDATE}" actionListener="#{listings.onUpdateForecast}" reRender="dtForecasts" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpForecast')}.hide(); return false; }" rendered="#{listings.selectedForecast.id != null}" />
+                            <a4j:commandLink id="lnkRemoveForecast" styleClass="dialogButton" value="#{msgs.DELETE}" actionListener="#{listings.onDeleteForecast}" reRender="dtForecasts" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpForecast')}.hide(); return false; }" rendered="#{listings.selectedForecast.id != null}" />
+                            <h:commandLink id="lnkCancelForecast" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpForecast')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 
@@ -241,9 +245,9 @@
 
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveLocation" styleClass="dialogButton" value="#{msgs.CREATE}" actionListener="#{listings.onAddLocation}" reRender="dtLocations" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpLocation')}.hide(); return false; }" rendered="#{listings.selectedLocation.id == null}" />
-                            <a4j:commandLink id="lnkUpdateLocation" styleClass="dialogButton" value="#{i18n.Generic_UPDATE}" actionListener="#{listings.onUpdateLocation}" reRender="dtLocations" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpLocation')}.hide(); return false; }" rendered="#{listings.selectedLocation.id != null}" />
-                            <a4j:commandLink id="lnkRemoveLocation" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" actionListener="#{listings.onDeleteLocation}" reRender="dtLocations" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpLocation')}.hide(); return false; }" rendered="#{listings.selectedLocation.id != null}" />
-                            <h:commandLink id="lnkCancelLocation" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpLocation')}.hide(); return false;" />
+                            <a4j:commandLink id="lnkUpdateLocation" styleClass="dialogButton" value="#{msgs.UPDATE}" actionListener="#{listings.onUpdateLocation}" reRender="dtLocations" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpLocation')}.hide(); return false; }" rendered="#{listings.selectedLocation.id != null}" />
+                            <a4j:commandLink id="lnkRemoveLocation" styleClass="dialogButton" value="#{msgs.DELETE}" actionListener="#{listings.onDeleteLocation}" reRender="dtLocations" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpLocation')}.hide(); return false; }" rendered="#{listings.selectedLocation.id != null}" />
+                            <h:commandLink id="lnkCancelLocation" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpLocation')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 
@@ -327,9 +331,9 @@
 
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveSituation" styleClass="dialogButton" value="#{msgs.CREATE}" actionListener="#{listings.onAddSituation}" reRender="dtSituations" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpSituation')}.hide(); return false; }" rendered="#{listings.selectedSituation.id == null}" />
-                            <a4j:commandLink id="lnkUpdateSituation" styleClass="dialogButton" value="#{i18n.Generic_UPDATE}" actionListener="#{listings.onUpdateSituation}" reRender="dtSituations" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpSituation')}.hide(); return false; }" rendered="#{listings.selectedSituation.id != null}" />
-                            <a4j:commandLink id="lnkRemoveSituation" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" actionListener="#{listings.onDeleteSituation}" reRender="dtSituations" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpSituation')}.hide(); return false; }" rendered="#{listings.selectedSituation.id != null}" />
-                            <h:commandLink id="lnkCancelSituation" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpSituation')}.hide(); return false;" />
+                            <a4j:commandLink id="lnkUpdateSituation" styleClass="dialogButton" value="#{msgs.UPDATE}" actionListener="#{listings.onUpdateSituation}" reRender="dtSituations" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpSituation')}.hide(); return false; }" rendered="#{listings.selectedSituation.id != null}" />
+                            <a4j:commandLink id="lnkRemoveSituation" styleClass="dialogButton" value="#{msgs.DELETE}" actionListener="#{listings.onDeleteSituation}" reRender="dtSituations" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpSituation')}.hide(); return false; }" rendered="#{listings.selectedSituation.id != null}" />
+                            <h:commandLink id="lnkCancelSituation" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpSituation')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 

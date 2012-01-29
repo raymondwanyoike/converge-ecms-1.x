@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
 
-    <ui:composition template="/WEB-INF/facelets/templates//search.xhtml">
+<<<<<<< HEAD
+    <ui:composition template="/WEB-INF/facelets/templates/search.xhtml">
+=======
+    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/search.xhtml">
+>>>>>>> parent of 53176a2... WebUI Changes 1
 
         <ui:define name="body">
             <a4j:keepAlive beanName="browse" />
@@ -11,10 +15,10 @@
             </a4j:outputPanel>
 
             <h:form id="frmPage">
-                <converge:moduleHeader moduleTitle="#{i18n.Search_BROWSE}"  />
+                <converge:moduleHeader moduleTitle="Browse"  />
                 <div class="moduleContent">
                     <h:panelGrid style="width: 100%" columnClasses="left, right" columns="2">
-                        <h:outputFormat value="#{i18n.Browse_search_X_RESULTS_FOUND}" styleClass="searchSummary">
+                        <h:outputFormat value="#{msgs.search_X_RESULTS_FOUND}" styleClass="searchSummary">
                             <f:param value="#{browse.results.numberOfResults}" />
                             <f:param value="#{browse.results.searchTimeInSeconds}" />
                             <f:param value="#{browse.results.numberOfPages}" />
@@ -61,7 +65,7 @@
                         </rich:column>
                     </rich:dataTable>
                     <converge:moduleSpacer />
-                    <h2>#{i18n.Newswire_Results}</h2>
+                    <h2>Results</h2>
                     <ui:repeat value="#{browse.searchResults}" var="item">
                         <h2 style="padding-bottom: 0px;">
                             <h:outputLink value="#{item.link}" target="_blank">
@@ -76,18 +80,18 @@
 
                         <h:outputText value="#{item.description}" escape="false" /><br/>
                         <span class="searchResultDescription"><h:outputText value="#{item.note}" escape="false" /></span>
-                        <span class="searchResultDate">#{i18n.Generic_DATE}:&#160;
+                        <span class="searchResultDate">#{msgs.DATE}:&#160;
                             <h:outputText value="#{item.earliestDate}" rendered="#{item.earliestDate != null}">
-                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime pattern="#{msgs.FORMAT_DATE}" timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
-                            <h:outputText value="#{i18n.Browse_Unknown}" rendered="#{item.earliestDate == null}" />
+                            <h:outputText value="#{msgs.UNKNOWN}" rendered="#{item.earliestDate == null}" />
                         </span>
                     </p>
                     <converge:moduleSpacer />
                 </ui:repeat>
 
                 <h:panelGroup styleClass="searchPages" layout="block">
-                    <h:outputText value="#{i18n.Browse_search_PAGES}" />
+                    <h:outputText value="#{msgs.search_PAGES}" />
                     <ui:repeat value="#{browse.pages}" var="page">
                         <a4j:commandLink styleClass="#{((browse.results.currentPage+1) == page.page) ? 'searchPageSelected' : 'searchPage'}" actionListener="#{browse.onChangePage}" reRender="frmPage" onclick="jQuery( 'html, body' ).animate( { scrollTop: 0 }, 'slow' );">
                             <f:param name="changePage" value="#{page.page}" />

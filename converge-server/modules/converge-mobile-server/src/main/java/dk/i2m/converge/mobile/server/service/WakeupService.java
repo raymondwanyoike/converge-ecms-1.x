@@ -16,8 +16,11 @@
  */
 package dk.i2m.converge.mobile.server.service;
 
+import dk.i2m.converge.mobile.server.domain.Config;
 import dk.i2m.converge.mobile.server.domain.NewsItem;
 import dk.i2m.converge.mobile.server.domain.Outlet;
+import dk.i2m.converge.mobile.server.facades.ConfigFacadeLocal;
+import dk.i2m.converge.mobile.server.facades.SectionFacadeLocal;
 import dk.i2m.converge.mobile.server.utils.BeanComparator;
 import dk.i2m.converge.wsclient.*;
 import java.awt.image.BufferedImage;
@@ -33,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.imageio.ImageIO;
 import javax.persistence.EntityManager;
@@ -67,6 +71,12 @@ import javax.xml.ws.Service;
 @Path("/wakeup/{eid}/{edition}/{iid}/{key}")
 public class WakeupService {
 
+    @EJB
+    private ConfigFacadeLocal cfgFacade;
+    
+    @EJB
+    private SectionFacadeLocal sectionFacade;
+
     @Context
     ServletContext context;
 
@@ -83,16 +93,10 @@ public class WakeupService {
     /**
      * Initiates the download of a given edition on <em>Converge Editorial</em>.
      *
-     * @param externalId
-     * Unique identifier of the Outlet on <em>Converge Editorial</em>
-     * @param internalId
-     * Internal identifier of the Outlet on <em>Converge Mobile
-     * Server</em>
-     * @param internalKey
-     * Internal key of the Outlet on <em>Converge Mobile Server</em>
-     * @param editionId
-     * Unique identifier of the Edition to download on <em>Converge
-     * Editorial</em>
+     * @param externalId  Unique identifier of the Outlet on <em>Converge Editorial</em>
+     * @param internalId  Internal identifier of the Outlet on <em>Converge Mobile Server</em>
+     * @param internalKey Internal key of the Outlet on <em>Converge Mobile Server</em>
+     * @param editionId   Unique identifier of the Edition to download on <em>Converge Editorial</em>
      * @return Empty string
      */
     @GET
@@ -127,7 +131,6 @@ public class WakeupService {
             dk.i2m.converge.wsclient.Outlet externalOutlet = os.getOutlet(
                     externalOutletId);
 
-            System.out.println(externalOutlet.getTitle());
             for (Section s : externalOutlet.getSections()) {
                 if (isNewSection(s.getId())) {
                     dk.i2m.converge.mobile.server.domain.Section section =
@@ -135,8 +138,6 @@ public class WakeupService {
                     section.setTitle(s.getTitle());
                     section.setExternalId(s.getId());
                     section.setDisplayOrder(1);
-                    LOG.log(Level.INFO, "Adding new section {0}",
-                            new Object[]{s.getTitle()});
                     em.persist(section);
                     outlet.getSections().add(section);
                     em.merge(outlet);
@@ -148,10 +149,12 @@ public class WakeupService {
             em.createQuery("UPDATE NewsItem ni " + "SET ni.available = ?1").
                     setParameter(1, false).executeUpdate();
 
-            String renditionThumb = context.getInitParameter("RENDITION_THUMB");
-            String renditionStory = context.getInitParameter("RENDITION_STORY");
-            String imgLocation = context.getInitParameter("IMG_LOCATION");
-            String imgUrl = context.getInitParameter("IMG_URL");
+            Config rndThumb = cfgFacade.find(Config.Property.RENDITION_THUMB);
+            Config rndStory = cfgFacade.find(Config.Property.RENDITION_STORY);
+            Config imgLocation = cfgFacade.find(Config.Property.IMAGE_LOCATION);
+            Config imgUrl = cfgFacade.find(Config.Property.IMAGE_URL);
+            Config imgTimeout = cfgFacade.find(Config.Property.IMAGE_DOWNLOAD_TIMEOUT);
+            int timeout = Integer.valueOf(imgTimeout.getValue());
 
             for (dk.i2m.converge.wsclient.NewsItem item : externalEdition.
                     getItems()) {
@@ -168,58 +171,68 @@ public class WakeupService {
                     // Generate thumbs
                     if (!item.getMedia().isEmpty()) {
 
-                        Collections.sort(item.getMedia(), new BeanComparator(
-                                "priority"));
+                        Collections.sort(item.getMedia(), new BeanComparator("priority"));
 
                         MediaItem img = item.getMedia().iterator().next();
-                        MediaItemRendition thumbImg = null;
-                        MediaItemRendition storyImg = null;
 
                         for (MediaItemRendition mir : img.getRenditions()) {
-                            if (mir.getName().equalsIgnoreCase(renditionThumb)) {
-                                thumbImg = mir;
-                            } else if (mir.getName().equalsIgnoreCase(
-                                    renditionStory)) {
-                                storyImg = mir;
+                            String postfix = "";
+                            
+                            boolean isThumbImg = false;
+                            boolean isStoryImg = false;
+                            
+                            
+                            if (mir.getName().equalsIgnoreCase(rndThumb.getValue())) {
+                                isThumbImg = true;
+                                postfix = "-thumb";
+                            } else if (mir.getName().equalsIgnoreCase(rndStory.getValue())) {
+                                isStoryImg = true;
+                                postfix = "-story";
+                            } else {
+                                // Rendition not available - skip
+                                continue;
                             }
 
                             try {
-                                org.apache.commons.io.FileUtils.copyURLToFile(new URL(thumbImg.
-                                        getUrl()), new File(imgLocation
-                                        + File.separator + img.getId()
-                                        + "-thumb"), 30000, 30000);
-                                newsItem.setThumbUrl(imgUrl + "/" + img.getId()
-                                        + "-thumb");
+                                String filename = "" + img.getId() + postfix;
+                                URL mirImg = new URL(mir.getUrl());
+                                File copyTo = new File(imgLocation.getValue(), filename);
+                                LOG.log(Level.INFO, "Downloading {0} to {1}",
+                                        new Object[]{mirImg.toExternalForm(),
+                                            copyTo.getCanonicalPath()});
+                                org.apache.commons.io.FileUtils.copyURLToFile(
+                                        mirImg, copyTo, timeout, timeout);
+
+                                if (isThumbImg) {
+                                    newsItem.setThumbUrl(imgUrl.getValue() + "/" + filename);
+                                } else if (isStoryImg) {
+                                    newsItem.setImgUrl(imgUrl.getValue() + "/" + filename);
+                                }
                             } catch (IOException ex) {
                                 LOG.log(Level.SEVERE, null, ex);
                             }
 
-                            try {
-                                org.apache.commons.io.FileUtils.copyURLToFile(new URL(storyImg.
-                                        getUrl()), new File(imgLocation
-                                        + File.separator + img.getId()
-                                        + "-story"), 30000, 30000);
-                                newsItem.setImgUrl(imgUrl + "/" + img.getId()
-                                        + "-story");
-                            } catch (IOException ex) {
-                                LOG.log(Level.SEVERE, null, ex);
-                            }
                         }
                     } else {
                         // No media items - use categoy image
-                        //newsItem.setThumbUrl(imgUrl + "/empty-thumb.png");
-                        //newsItem.setImgUrl(imgUrl + "/empty.png");
-                        newsItem.setThumbUrl(imgUrl + "/category/" + item.
-                                getSection().getId() + "-thumb.png");
-                        newsItem.setImgUrl(imgUrl + "/category/" + item.
-                                getSection().getId() + ".png");
+                        String sid = String.valueOf(item.getSection().getId());
+                        
+                        dk.i2m.converge.mobile.server.domain.Section s = sectionFacade.findByExternalId(item.getSection().getId());
+                        
+                        if (s.isDefaultStoryImageAvailable()) {
+                            newsItem.setImgUrl(s.getDefaultStoryImageUrl());
+                        }
+                        
+                        if (s.isDefaultStoryThumbImageAvailable()) {
+                            newsItem.setThumbUrl(s.getDefaultStoryThumbImageUrl());
+                        }
                     }
 
                     newsItem.setSection(findSectionByExternalId(item.getSection().
                             getId()));
-                    LOG.log(Level.INFO, "Adding new story {0} in {1}",
-                            new Object[]{newsItem.getHeadline(), newsItem.
-                                getSection().getTitle()});
+                    //LOG.log(Level.INFO, "Adding new story {0} in {1}",
+                    //        new Object[]{newsItem.getHeadline(), newsItem.
+                    //            getSection().getTitle()});
                     em.persist(newsItem);
                 } else {
                     em.createQuery(

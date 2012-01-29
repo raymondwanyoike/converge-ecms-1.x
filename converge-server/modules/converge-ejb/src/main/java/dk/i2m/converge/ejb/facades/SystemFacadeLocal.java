@@ -146,17 +146,14 @@ public interface SystemFacadeLocal {
     java.lang.String getShortApplicationVersion();
 
     void log(dk.i2m.converge.core.logging.LogSeverity severity,
-            dk.i2m.converge.core.security.UserAccount actor,
             java.lang.String message, java.lang.Object origin,
             java.lang.String originId);
 
     void log(dk.i2m.converge.core.logging.LogSeverity severity,
-            dk.i2m.converge.core.security.UserAccount actor,
             java.lang.String message, java.lang.String origin,
             java.lang.String originId);
 
     void log(dk.i2m.converge.core.logging.LogSeverity severity,
-            dk.i2m.converge.core.security.UserAccount actor,
             java.lang.String message, java.util.List<LogSubject> subjects);
 
     java.util.List<dk.i2m.converge.core.logging.LogEntry> findLogEntries(

@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
 
-    <ui:composition template="/WEB-INF/facelets/templates//listings.xhtml">
+<<<<<<< HEAD
+    <ui:composition template="/WEB-INF/facelets/templates/listings.xhtml">
+=======
+    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/listings.xhtml">
+>>>>>>> parent of 53176a2... WebUI Changes 1
 
         <ui:define name="leftColumnBottom">
             <converge:moduleHeader moduleTitle="#{msgs.OPTIONS}" />
@@ -31,7 +35,7 @@
                             <f:facet name="header">
                                 <a4j:status id="staMarketValues">
                                     <f:facet name="start">
-                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" title="#{i18n.Generic_UPDATING}" />
+                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" title="#{msgs.UPDATING}" />
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>
@@ -114,7 +118,7 @@
                                     </h:inputText>
 
                                     <h:outputText value="#{msgs.listing_UPDATED}" />
-                                    <rich:calendar id="calUpdated" value="#{listings.selectedMarketValue.updated}" popup="true" timeZone="#{userSession.user.timeZone}" datePattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" />
+                                    <rich:calendar id="calUpdated" value="#{listings.selectedMarketValue.updated}" popup="true" timeZone="#{userSession.user.timeZone}" datePattern="#{msgs.FORMAT_DATE_AND_TIME}" />
 
                                 </h:panelGrid>
 
@@ -123,9 +127,9 @@
 
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveMarketValue" styleClass="dialogButton" value="#{msgs.CREATE}" actionListener="#{listings.onAddMarketValue}" reRender="dtMarketValues" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpMarketValue')}.hide(); return false; }" rendered="#{listings.selectedMarketValue.id == null}" />
-                            <a4j:commandLink id="lnkUpdateMarketValue" styleClass="dialogButton" value="#{i18n.Generic_UPDATE}" actionListener="#{listings.onUpdateMarketValue}" reRender="dtMarketValues" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpMarketValue')}.hide(); return false; }" rendered="#{listings.selectedMarketValue.id != null}" />
-                            <a4j:commandLink id="lnkRemoveMarketValue" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" actionListener="#{listings.onDeleteMarketValue}" reRender="dtMarketValues" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpMarketValue')}.hide(); return false; }" rendered="#{listings.selectedMarketValue.id != null}" />
-                            <h:commandLink id="lnkCancelMarketValue" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpMarketValue')}.hide(); return false;" />
+                            <a4j:commandLink id="lnkUpdateMarketValue" styleClass="dialogButton" value="#{msgs.UPDATE}" actionListener="#{listings.onUpdateMarketValue}" reRender="dtMarketValues" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpMarketValue')}.hide(); return false; }" rendered="#{listings.selectedMarketValue.id != null}" />
+                            <a4j:commandLink id="lnkRemoveMarketValue" styleClass="dialogButton" value="#{msgs.DELETE}" actionListener="#{listings.onDeleteMarketValue}" reRender="dtMarketValues" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpMarketValue')}.hide(); return false; }" rendered="#{listings.selectedMarketValue.id != null}" />
+                            <h:commandLink id="lnkCancelMarketValue" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpMarketValue')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 
@@ -231,9 +235,9 @@
 
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveFinancialMarket" styleClass="dialogButton" value="#{msgs.CREATE}" actionListener="#{listings.onAddFinancialMarket}" reRender="dtFinancialMarkets" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpFinancialMarket')}.hide(); return false; }" rendered="#{listings.selectedFinancialMarket.id == null}" />
-                            <a4j:commandLink id="lnkUpdateFinancialMarket" styleClass="dialogButton" value="#{i18n.Generic_UPDATE}" actionListener="#{listings.onUpdateFinancialMarket}" reRender="dtFinancialMarkets" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpFinancialMarket')}.hide(); return false; }" rendered="#{listings.selectedFinancialMarket.id != null}" />
-                            <a4j:commandLink id="lnkRemoveFinancialMarket" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" actionListener="#{listings.onDeleteFinancialMarket}" reRender="dtFinancialMarkets" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpFinancialMarket')}.hide(); return false; }" rendered="#{listings.selectedFinancialMarket.id != null}" />
-                            <h:commandLink id="lnkCancelFinancialMarket" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpFinancialMarket')}.hide(); return false;" />
+                            <a4j:commandLink id="lnkUpdateFinancialMarket" styleClass="dialogButton" value="#{msgs.UPDATE}" actionListener="#{listings.onUpdateFinancialMarket}" reRender="dtFinancialMarkets" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpFinancialMarket')}.hide(); return false; }" rendered="#{listings.selectedFinancialMarket.id != null}" />
+                            <a4j:commandLink id="lnkRemoveFinancialMarket" styleClass="dialogButton" value="#{msgs.DELETE}" actionListener="#{listings.onDeleteFinancialMarket}" reRender="dtFinancialMarkets" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpFinancialMarket')}.hide(); return false; }" rendered="#{listings.selectedFinancialMarket.id != null}" />
+                            <h:commandLink id="lnkCancelFinancialMarket" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpFinancialMarket')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 

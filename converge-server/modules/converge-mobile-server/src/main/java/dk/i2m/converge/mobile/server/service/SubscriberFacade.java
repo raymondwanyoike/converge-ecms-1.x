@@ -12,12 +12,7 @@
  */
 package dk.i2m.converge.mobile.server.service;
 
-import dk.i2m.converge.mobile.server.domain.NewsItem;
-import dk.i2m.converge.mobile.server.domain.Outlet;
-import dk.i2m.converge.mobile.server.domain.Read;
-import dk.i2m.converge.mobile.server.domain.Section;
-import dk.i2m.converge.mobile.server.domain.SectionDefault;
-import dk.i2m.converge.mobile.server.domain.Subscriber;
+import dk.i2m.converge.mobile.server.domain.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -31,14 +26,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 
 /**
  * Facade for registration and update of {@link Subscriber}s.
@@ -51,17 +39,18 @@ public class SubscriberFacade {
 
     @PersistenceContext(unitName = "cmsPU")
     private EntityManager em;
-    private static final Logger LOG = Logger.getLogger(SubscriberFacade.class.getName());
+
+    private static final Logger LOG = Logger.getLogger(SubscriberFacade.class.
+            getName());
 
     /**
      * Registers a {@link Subscriber} in the database. If the {@link Subscriber}
      * already exist in the database, the HTTP status code 403 is returned.
-     * 
+     * <p/>
      * If a subscription data is missing from the request, HTTP status code 400
      * is returned.
-     * 
-     * @param subscriber 
-     *          {@link Subscriber} to add to the database
+     * <p/>
+     * @param subscriber * {@link Subscriber} to add to the database
      */
     @POST
     @Path("register")
@@ -73,7 +62,9 @@ public class SubscriberFacade {
         }
 
         if (subscriber.getId() != null) {
-            LOG.log(Level.WARNING, "ID of subscriber expected to be null, was {0}", subscriber.getId());
+            LOG.log(Level.WARNING,
+                    "ID of subscriber expected to be null, was {0}", subscriber.
+                    getId());
             throw new WebApplicationException(400);
         }
 
@@ -85,7 +76,8 @@ public class SubscriberFacade {
         List<Subscriber> matches = em.createQuery(cq).getResultList();
 
         if (matches.size() > 0) {
-            LOG.log(Level.WARNING, "{0} is already registered", subscriber.getPhone());
+            LOG.log(Level.WARNING, "{0} is already registered", subscriber.
+                    getPhone());
             throw new WebApplicationException(403);
         }
 
@@ -94,11 +86,13 @@ public class SubscriberFacade {
 
         // Subscribe to default categories
         CriteriaBuilder cbDefaults = em.getCriteriaBuilder();
-        CriteriaQuery<SectionDefault> cqDefaults = cbDefaults.createQuery(SectionDefault.class);
+        CriteriaQuery<SectionDefault> cqDefaults =
+                cbDefaults.createQuery(SectionDefault.class);
         Root<SectionDefault> defaults = cqDefaults.from(SectionDefault.class);
         //cqDefaults.select(defaults).where(cbDefaults.equal(defaults.get("section"), subscriber.getPhone()));
 
-        for (SectionDefault sectionDefault : em.createQuery(cqDefaults).getResultList()) {
+        for (SectionDefault sectionDefault : em.createQuery(cqDefaults).
+                getResultList()) {
             subscriber.getSubscriptions().add(sectionDefault.getSection());
         }
 
@@ -108,20 +102,20 @@ public class SubscriberFacade {
 
     /**
      * Updates an existing {@link Subscriber} profile.
-     * 
+     * <p/>
      * @param phone
-     *          Header parameter containing the phone number identifying the 
+     * Header parameter containing the phone number identifying the
      *          {@link Subscriber}
      * @param password
-     *          Header parameter containing the password matching the phone
-     *          number of the {@link Subscriber}
-     * @param subscriber 
-     *          Updated {@link Subscriber} profiler
+     * Header parameter containing the password matching the phone
+     * number of the {@link Subscriber}
+     * @param subscriber * Updated {@link Subscriber} profiler
      */
     @GET
     @Path("authenticate")
     @Produces({"application/json"})
-    public boolean authenticate(@HeaderParam(value = "phone") String phone, @HeaderParam(value = "password") String password) {
+    public boolean authenticate(@HeaderParam(value = "phone") String phone,
+            @HeaderParam(value = "password") String password) {
         try {
             getSubscriber(phone, password);
             return true;
@@ -132,20 +126,21 @@ public class SubscriberFacade {
 
     /**
      * Updates an existing {@link Subscriber} profile.
-     * 
+     * <p/>
      * @param phone
-     *          Header parameter containing the phone number identifying the 
+     * Header parameter containing the phone number identifying the
      *          {@link Subscriber}
      * @param password
-     *          Header parameter containing the password matching the phone
-     *          number of the {@link Subscriber}
-     * @param subscriber 
-     *          Updated {@link Subscriber} profiler
+     * Header parameter containing the password matching the phone
+     * number of the {@link Subscriber}
+     * @param subscriber * Updated {@link Subscriber} profiler
      */
     @PUT
     @Path("update")
     @Consumes({"application/json"})
-    public void update(@HeaderParam(value = "phone") String phone, @HeaderParam(value = "password") String password, Subscriber subscriber) {
+    public void update(@HeaderParam(value = "phone") String phone,
+            @HeaderParam(value = "password") String password,
+            Subscriber subscriber) {
 
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery cq = cb.createQuery();
@@ -155,7 +150,7 @@ public class SubscriberFacade {
         Predicate passwordMatch = cb.equal(subs.get("password"), password);
         Predicate condition = cb.and(phoneMatch, passwordMatch);
         cq.select(subs).where(condition);
-        
+
         List<Subscriber> matches = em.createQuery(cq).getResultList();
 
         if (matches.isEmpty()) {
@@ -182,23 +177,25 @@ public class SubscriberFacade {
 
     /**
      * Updates the category subscription of a given {@link Subscriber}.
-     * 
+     * <p/>
      * @param phone
-     *          Header parameter containing the phone number identifying the 
+     * Header parameter containing the phone number identifying the
      *          {@link Subscriber}
      * @param password
-     *          Header parameter containing the password matching the phone
-     *          number of the {@link Subscriber}
+     * Header parameter containing the password matching the phone
+     * number of the {@link Subscriber}
      * @param categories
-     *          List of subscribed categories
+     * List of subscribed categories
      */
     @POST
     @Path("subscribe")
     @Consumes({"application/json"})
-    public void subscribe(@HeaderParam(value = "phone") String phone, @HeaderParam(value = "password") String password, String categories) {
+    public void subscribe(@HeaderParam(value = "phone") String phone,
+            @HeaderParam(value = "password") String password, String categories) {
 
         // Decode JSON array
-        String allCats = categories.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\\"", "");
+        String allCats = categories.replaceAll("\\[", "").replaceAll("\\]", "").
+                replaceAll("\\\"", "");
         String[] cats = allCats.split(",");
 
 
@@ -206,7 +203,7 @@ public class SubscriberFacade {
             Subscriber s = getSubscriber(phone, password);
             s.setLastUpdate(Calendar.getInstance().getTime());
             s.getSubscriptions().clear();
-            
+
             for (String catId : cats) {
                 Section section = em.find(Section.class, Long.valueOf(catId));
                 s.getSubscriptions().add(section);
@@ -219,23 +216,25 @@ public class SubscriberFacade {
 
     /**
      * Updates the category subscription of a given {@link Subscriber}.
-     * 
+     * <p/>
      * @param phone
-     *          Header parameter containing the phone number identifying the 
+     * Header parameter containing the phone number identifying the
      *          {@link Subscriber}
      * @param password
-     *          Header parameter containing the password matching the phone
-     *          number of the {@link Subscriber}
+     * Header parameter containing the password matching the phone
+     * number of the {@link Subscriber}
      * @param items
-     *          List of subscribed categories
+     * List of subscribed categories
      */
     @POST
     @Path("readNews")
     @Consumes({"application/json"})
-    public void read(@HeaderParam(value = "phone") String phone, @HeaderParam(value = "password") String password, String items) {
+    public void read(@HeaderParam(value = "phone") String phone,
+            @HeaderParam(value = "password") String password, String items) {
 
         // Decode JSON array
-        String allItems = items.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\\"", "");
+        String allItems = items.replaceAll("\\[", "").replaceAll("\\]", "").
+                replaceAll("\\\"", "");
         String[] newsItems = allItems.split(",");
 
         System.out.println(allItems);
@@ -246,7 +245,8 @@ public class SubscriberFacade {
 
             for (String itemId : newsItems) {
                 if (!itemId.trim().isEmpty()) {
-                    NewsItem newsItem = em.find(NewsItem.class, Long.valueOf(itemId));
+                    NewsItem newsItem = em.find(NewsItem.class, Long.valueOf(
+                            itemId));
 
                     Read read = new Read();
                     read.setDate(now.getTime());
@@ -263,18 +263,19 @@ public class SubscriberFacade {
 
     /**
      * Gets the profile of a {@link Subscriber}.
-     * 
-     * @param phone
-     *          Phone number of the {@link Subscriber}
-     * @param password
-     *          Password matching the phone number
+     * <p/>
+     * @param phone    Phone number of the {@link Subscriber}
+     * @param password Password matching the phone number
      * @return {@link Subscriber} matching the phone number and password. If the
-     *          phone number and password does not match a 401 HTTP status code
-     *          is thrown
+     * phone number and password does not match a 401 HTTP status code
+     * is thrown
+     * @throws WebApplicationException If the phone and/or password is incorrect
      */
     @GET
     @Produces({"application/json"})
-    public Subscriber get(@HeaderParam("phone") String phone, @HeaderParam(value = "password") String password) {
+    public Subscriber get(@HeaderParam("phone") String phone,
+            @HeaderParam(value = "password") String password) {
+
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery cq = cb.createQuery();
         Root subs = cq.from(Subscriber.class);
@@ -293,18 +294,18 @@ public class SubscriberFacade {
     /**
      * Gets the {@link Section}s available for subscription by the given
      * {@link Subscriber}.
-     * 
+     * <p/>
      * @param phone
-     *          Phone number of the {@link Subscriber}
+     * Phone number of the {@link Subscriber}
      * @param password
-     *          Password of the {@link Subscriber}
+     * Password of the {@link Subscriber}
      * @param outlet
-     *          Unique identifier of the {@link Outlet}
+     * Unique identifier of the {@link Outlet}
      * @param key
-     *          Secret key of the {@link Outlet}
+     * Secret key of the {@link Outlet}
      * @return {@link List} of available sections for subscription. If the
-     *          phone number and password is incorrect, or the outlet and key
-     *          doesn't match a 401 HTTP status code is returned
+     * phone number and password is incorrect, or the outlet and key
+     * doesn't match a 401 HTTP status code is returned
      */
     @GET
     @Path("sections")
@@ -338,6 +339,14 @@ public class SubscriberFacade {
         return match.getSections();
     }
 
+    /**
+     * Get the news available for the authenticated user.
+     * <p/>
+     * @param phone    Phone number of the user
+     * @param password Password of the user
+     * @return {@link List} of {@link NewsItem}s available for the user
+     * @throws WebApplicationException If the user provided an invalid phone number or password
+     */
     @GET
     @Path("news")
     @Produces({"application/json"})
@@ -354,7 +363,8 @@ public class SubscriberFacade {
             CriteriaBuilder builder = em.getCriteriaBuilder();
             CriteriaQuery query = builder.createQuery();
             Root ni = query.from(NewsItem.class);
-            query.select(ni).where(builder.equal(ni.get("available"), true)).orderBy(builder.desc(ni.get("displayOrder")));
+            query.select(ni).where(builder.equal(ni.get("available"), true)).
+                    orderBy(builder.desc(ni.get("displayOrder")));
 
             List<NewsItem> matches = em.createQuery(query).getResultList();
             List<NewsItem> output = new ArrayList<NewsItem>();
@@ -362,16 +372,10 @@ public class SubscriberFacade {
                 // Don't store changes made to the news item before sending it out
                 em.detach(newsItem);
 
-                if (newsItem.getSection() != null && subscriber.getSubscriptions().contains(newsItem.getSection())) {
-                    newsItem.setStory(newsItem.getStory().replaceAll("&rsquo;", "'"));
-                    newsItem.setStory(newsItem.getStory().replaceAll("&lsquo;", "'"));
-                    newsItem.setStory(newsItem.getStory().replaceAll("&rdquo;", "\""));
-                    newsItem.setStory(newsItem.getStory().replaceAll("&ldquo;", "\""));
-                    newsItem.setStory(newsItem.getStory().replaceAll("&nbsp;", " "));
-                    newsItem.setStory(newsItem.getStory().replaceAll("&ndash;", "-"));
-                    newsItem.setStory(newsItem.getStory().replaceAll("&mdash;", "-"));
-                    newsItem.setStory(newsItem.getStory().replaceAll("\r\n", " "));
-                    newsItem.setStory(newsItem.getStory().replaceAll("\n", " "));
+                if (newsItem.getSection() != null
+                        && subscriber.getSubscriptions().contains(newsItem.
+                        getSection())) {
+                    newsItem.setStory(replaceHtmlEntities(newsItem.getStory()));
                     output.add(newsItem);
                 }
             }
@@ -383,7 +387,21 @@ public class SubscriberFacade {
         }
     }
 
-    private Subscriber getSubscriber(String phone, String password) throws SubscriberNotFound {
+    public String replaceHtmlEntities(String input) {
+        input = input.replaceAll("&rsquo;", "'");
+        input = input.replaceAll("&lsquo;", "'");
+        input = input.replaceAll("&rdquo;", "\"");
+        input = input.replaceAll("&ldquo;", "\"");
+        input = input.replaceAll("&nbsp;", " ");
+        input = input.replaceAll("&ndash;", "-");
+        input = input.replaceAll("&mdash;", "-");
+        input = input.replaceAll("\r\n", " ");
+        input = input.replaceAll("\n", " ");
+        return input;
+    }
+
+    private Subscriber getSubscriber(String phone, String password) throws
+            SubscriberNotFound {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery cq = cb.createQuery();
         Root subs = cq.from(Subscriber.class);

@@ -30,6 +30,7 @@ import dk.i2m.converge.core.plugin.ArchiveException;
 import dk.i2m.converge.core.plugin.NewswireDecoder;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
+import dk.i2m.converge.core.utils.FileExtensionFilter;
 import dk.i2m.converge.core.utils.StringUtils;
 import dk.i2m.converge.plugins.decoders.newsml12.binding.NIType;
 import dk.i2m.converge.plugins.decoders.newsml12.binding.NewsComponentType;

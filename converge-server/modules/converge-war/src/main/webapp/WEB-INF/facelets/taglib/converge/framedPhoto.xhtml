@@ -6,7 +6,7 @@
     <div class="bottomLeft"><div class="bottomRight"><div class="topLeft"><div class="topRight">
             <div class="date">
               <h:outputText value="#{date}">
-                <f:convertDateTime type="date" pattern="#{i18n.Generic_FORMAT_DATE}" timeZone="#{userSession.user.timeZone}" />
+                <f:convertDateTime type="date" pattern="#{msgs.FORMAT_DATE}" timeZone="#{userSession.user.timeZone}" />
               </h:outputText>
             </div>
             <div class="title">#{title}</div>

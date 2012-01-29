@@ -3,36 +3,6 @@
     <description>Mobile Server for the Converge News Suite</description>
     <display-name>Converge Mobile Server</display-name>
     <context-param>
-        <description>ID of the outlet</description>
-        <param-name>OUTLET_ID</param-name>
-        <param-value>1</param-value>
-    </context-param>
-    <context-param>
-        <description>Secret key of the outlet</description>
-        <param-name>OUTLET_KEY</param-name>
-        <param-value>abcd1234</param-value>
-    </context-param>
-    <context-param>
-        <description>Content Rendition Identifier for thumbs</description>
-        <param-name>RENDITION_THUMB</param-name>
-        <param-value>rnd:mobileThumb</param-value>
-    </context-param>
-        <context-param>
-        <description>Content Rendition Identifier for stories</description>
-        <param-name>RENDITION_STORY</param-name>
-        <param-value>rnd:mobile</param-value>
-    </context-param>
-    <context-param>
-        <description>Location where images can be accessed</description>
-        <param-name>IMG_LOCATION</param-name>
-        <param-value>/var/www/mimgs/</param-value>
-    </context-param>
-    <context-param>
-        <description>URL where images can be accessed</description>
-        <param-name>IMG_URL</param-name>
-        <param-value>http://converge2.nairobistar.com/mimgs/</param-value>
-    </context-param>
-    <context-param>
         <param-name>javax.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
     </context-param>

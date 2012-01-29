@@ -25,7 +25,7 @@
                     </h:column>
 
                     <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.ADD}" actionListener="#{newsItem.onAddConcept}" reRender="dtConcepts,mpNewConcept,txtNewConcept,sbNewConcept" oncomplete="if (#{!newsItem.conceptAdded}){ #{rich:component('mpNewConcept')}.show(); return false; }" />
-                    <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.article_SUBJECTS}" reRender="pgConceptSelector" oncomplete="#{rich:component('mpConceptSelector')}.show();" />
+                    <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.SUBJECTS}" reRender="pgConceptSelector" oncomplete="#{rich:component('mpConceptSelector')}.show();" />
                     <h:column>
                         <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.NewsItem_CONCEPTS_SUGGEST}" reRender="pgConceptSuggestion" actionListener="#{newsItem.onSuggestConcepts}" onclick="document.getElementById('frmNewsItem:btnSilentSave').click()" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpConceptSuggestion')}.show(); return false; }">
                             
@@ -185,7 +185,7 @@
 
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkAddNewConcept" styleClass="dialogButton" value="#{msgs.ADD}" actionListener="#{newsItem.onAddNewConcept}" reRender="dtConcepts,txtNewConcept,sbNewConcept" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpNewConcept')}.hide(); return false; }" />
-                            <h:commandLink id="lnkCloseNewConcept" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpNewConcept')}.hide(); return false;" />
+                            <h:commandLink id="lnkCloseNewConcept" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpNewConcept')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
                 </rich:modalPanel>

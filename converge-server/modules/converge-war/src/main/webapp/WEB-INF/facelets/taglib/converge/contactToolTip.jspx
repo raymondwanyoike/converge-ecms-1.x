@@ -42,14 +42,14 @@
 
                 <h:outputText value="&lt;br/&gt;#{msgs.contacts_UPDATED}:" escape="false" style="font-weight: bold;" />
                 <h:outputText value="#{value.updated.time}" >
-                    <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                    <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                 </h:outputText>
                 <h:outputText value="#{msgs.contacts_UPDATED_BY}:" escape="false" style="font-weight: bold;" />
                 <h:outputText value="#{value.updatedBy.fullName}" />
 
                 <h:outputText value="&lt;br/&gt;#{msgs.contacts_CREATED}:" escape="false" style="font-weight: bold;" />
                 <h:outputText value="#{value.created.time}" >
-                    <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                    <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                 </h:outputText>
                 <h:outputText value="#{msgs.contacts_CREATED_BY}:" escape="false" style="font-weight: bold;" />
                 <h:outputText value="#{value.createdBy.fullName}" />

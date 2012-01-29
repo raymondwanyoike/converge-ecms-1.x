@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 - 2011 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -164,6 +164,8 @@ public class Search {
     }
 
     public void onGenerateOverview(ActionEvent event) {
+        // Fetch 1000 results max
+        conductSearch(getKeyword(), 0, 1000);
         byte[] output = searchEngine.generateReport(this.results);
 
         String filename = JsfUtils.getResourceBundle(FacesContext.
@@ -378,6 +380,17 @@ public class Search {
     private UserAccount getUser() {
         return (UserAccount) JsfUtils.getValueOfValueExpression(
                 "#{userSession.user}");
+    }
+    
+    /**
+     * Event handler for removing an item from the search engine.
+     * 
+     * @param searchResult {@link SearchResult} to remove from the search engine
+     */
+    public void setRemoveItem(SearchResult searchResult) {
+        searchEngine.removeItem(searchResult.getId());
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
+                    "Search_REMOVE_CONFIRM", new Object[]{});
     }
 
     public class SearchPage {

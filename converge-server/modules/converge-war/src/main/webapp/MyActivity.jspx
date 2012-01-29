@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
 
-    <ui:composition template="/WEB-INF/facelets/templates//my_activity.xhtml">
+<<<<<<< HEAD
+    <ui:composition template="/WEB-INF/facelets/templates/my_activity.xhtml">
+=======
+    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/my_activity.xhtml">
+>>>>>>> parent of 53176a2... WebUI Changes 1
 
         <ui:define name="title">
             <h:outputText value="#{i18n.MyActivity_PAGE_TITLE}" />
@@ -14,10 +18,10 @@
                 <div class="moduleContent">
                     <h:panelGrid columns="2">
                         <h:outputText value="#{i18n.MyActivity_FILTER_FROM}" />
-                        <rich:calendar id="calFrom" value="#{myActivity.from}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{i18n.Generic_FORMAT_DATE}" />
+                        <rich:calendar id="calFrom" value="#{myActivity.from}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{msgs.FORMAT_DATE}" />
 
                         <h:outputText value="#{i18n.MyActivity_FILTER_TO}" />
-                        <rich:calendar id="calTo" value="#{myActivity.to}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{i18n.Generic_FORMAT_DATE}" />
+                        <rich:calendar id="calTo" value="#{myActivity.to}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{msgs.FORMAT_DATE}" />
 
                         <h:outputText value="&#160;" />
                         <a4j:commandButton actionListener="#{myActivity.onRefresh}" value="#{i18n.MyActivity_REFRESH}" ajaxSingle="true" reRender="frmOutput, frmFilterSummary" styleClass="button dynamicButton" />
@@ -119,7 +123,7 @@
                                 <rich:subTable value="#{item.placements}" var="placement">
                                     <rich:column>
                                         <h:outputText value="#{placement.edition.publicationDate.time}" title="#{i18n.MyActivity_USED_TIME_TOOLTIP}">
-                                            <f:convertDateTime pattern="#{i18n.FORMAT_SHORT_DATE_AND_TIME}" timeZone="#{common.systemTimeZone}" />
+                                            <f:convertDateTime pattern="#{msgs.FORMAT_SHORT_DATE_AND_TIME}" timeZone="#{common.systemTimeZone}" />
                                         </h:outputText>
                                     </rich:column>
                                     <rich:column>

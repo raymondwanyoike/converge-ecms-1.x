@@ -186,8 +186,7 @@ public abstract class JoomlaPlugin {
      * the the Joomla categories has been fetched ({@link JoomlaPlugin#fetchJoomlaCategories(dk.i2m.joomla.JoomlaConnection)})
      * before execution.
      *
-     * @param placement
-* News item to check
+     * @param placement News item to check
      * @return {@code true} if the section of the news item is
      * mapped to a valid category on the Joomla installation
      * otherwise {@code false}
@@ -289,7 +288,7 @@ public abstract class JoomlaPlugin {
                         getUrl(), umf.getCaption()});
             body.append(img);
         }
-        
+
         body.append(item.getStory().replaceAll("\\p{C}", ""));
         return body.toString();
     }
@@ -392,8 +391,7 @@ public abstract class JoomlaPlugin {
      * news item will add the number of hours specified in the property
      * to the expiration date of the edition.
      *
-     * @param placement
-* News item placement for which to generate an expiration date
+     * @param placement News item placement for which to generate an expiration date
      * @return Date and time when the news item should expire. {@code null}
      * is returned if the news item should not have an expiration date
      */
@@ -477,23 +475,9 @@ public abstract class JoomlaPlugin {
             Date publishDate = generatePublishDate(placement);
             Date expireDate = generateExpireDate(placement);
 
-            LOG.log(Level.INFO, "Original publish date for {0} set to {1}",
-                    new Object[]{newsItem.getId(), dateFormat.format(placement.
-                        getEdition().getPublicationDate().getTime())});
-            LOG.log(Level.INFO, "Publish date for {0} set to {1}",
-                    new Object[]{newsItem.getId(),
-                        dateFormat.format(publishDate.getTime())});
-            if (expireDate != null) {
-                LOG.log(Level.INFO, "Expire date for {0} set to {1}",
-                        new Object[]{newsItem.getId(),
-                            dateFormat.format(expireDate.getTime())});
-            } else {
-                LOG.log(Level.INFO, "Expire date for {0} set to {1}",
-                        new Object[]{newsItem.getId(), "null"});
-            }
+            LOG.log(Level.INFO, "Original publish date for #{0} set to {1}. Publish date on Joomla set to {2}. Expire date on Joomla set to {3}", new Object[]{newsItem.getId(), dateFormat.format(placement.getEdition().getPublicationDate().getTime()), dateFormat.format(publishDate.getTime()), expireDate != null ? dateFormat.format(expireDate.getTime()) : "null"});
 
-            
-            
+
             Integer foreignId = connection.newArticle(String.valueOf(newsItem.
                     getId()),
                     newsItem.getTitle(), generateIntro(newsItem, mediaFiles),

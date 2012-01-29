@@ -16,7 +16,6 @@
  */
 package dk.i2m.converge.core.logging;
 
-import dk.i2m.converge.core.security.UserAccount;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,10 +68,6 @@ public class LogEntry implements Serializable {
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date date;
 
-    @ManyToOne
-    @JoinColumn(name = "actor_id")
-    private UserAccount actor;
-
     @OneToMany(mappedBy = "logEntry", cascade = CascadeType.ALL)
     private List<LogSubject> subjects = new ArrayList<LogSubject>();
 
@@ -86,41 +81,25 @@ public class LogEntry implements Serializable {
     /**
      * Creates a new {@link LogEntry}.
      *
-     * @param severity    {@link Severity} of the {@link LogEntry}
+     * @param severity    {@link LogSeverity} of the {@link LogEntry}
      * @param description Description of the {@link LogEntry}
      */
     public LogEntry(LogSeverity severity, String description) {
-        this(severity, description, null, null, "");
+        this(severity, description, null, null);
     }
 
     /**
      * Creates a new {@link LogEntry}.
      *
-     * @param severity    {@link Severity} of the {@link LogEntry}
+     * @param severity    {@link LogSeverity} of the {@link LogEntry}
      * @param description Description of the {@link LogEntry}
      * @param entity      Entity relating to the {@link LogEntry}
      * @param entityId    Identifier of the entity
      */
     public LogEntry(LogSeverity severity, String description, String entity,
             String entityId) {
-        this(severity, description, null, entity, entityId);
-    }
-
-    /**
-     * Creates a new {@link LogEntry}.
-     *
-     * @param severity    {@link Severity} of the {@link LogEntry}
-     * @param description Description of the {@link LogEntry}
-     * @param actor       {@link UserAccount} who invoked the {@link LogEntry}
-     * @param entity      Entity relating to the {@link LogEntry}
-     * @param entityId    Identifier of the entity
-     */
-    public LogEntry(LogSeverity severity, String description, UserAccount actor,
-            String entity,
-            String entityId) {
         this.severity = severity;
         this.description = description;
-        this.actor = actor;
         if (entity != null) {
             addSubject(entity, entityId);
         }
@@ -196,24 +175,6 @@ public class LogEntry implements Serializable {
      */
     public void setSeverity(LogSeverity severity) {
         this.severity = severity;
-    }
-
-    /**
-     * Gets the user who invoked the entry.
-     *
-     * @return User who invoked the entry. If {@code null} is returned, the entry was created by Converge
-     */
-    public UserAccount getActor() {
-        return actor;
-    }
-
-    /**
-     * Sets the user who invoked the entry.
-     *
-     * @param actor User who invoked the entry. If {@code actor} is null, it is assumed that the entry was created by Converge
-     */
-    public void setActor(UserAccount actor) {
-        this.actor = actor;
     }
 
     /**

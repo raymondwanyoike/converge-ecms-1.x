@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2011 Interactive Media Management. All Rights Reserved.
+ *  Copyright (C) 2011 - 2012 Interactive Media Management. All Rights Reserved.
  * 
  *  NOTICE:  All information contained herein is, and remains the property of 
  *  INTERACTIVE MEDIA MANAGEMENT and its suppliers, if any.  The intellectual 
@@ -17,6 +17,8 @@ import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
+ * Persisted domain object representing a subscribable {@link Section} of an
+ * {@link Outlet}.
  *
  * @author Allan Lykke Christensen
  */
@@ -26,23 +28,38 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Section implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
     @Column(name = "external_id")
     private Long externalId;
+
     @Column(name = "title")
     private String title;
+
     @Column(name = "description")
     private String description;
+
     @Column(name = "display_order")
     private int displayOrder;
+
     @Column(name = "special")
     private boolean special;
-    @Column (name = "imgurl")
+
+    @Column(name = "imgurl")
     private String imgurl;
-    
+
+    @Column(name = "story_image_url")
+    @Lob
+    private String defaultStoryImageUrl;
+
+    @Column(name = "story_thumb_image_url")
+    @Lob
+    private String defaultStoryThumbImageUrl;
+
     public Long getId() {
         return id;
     }
@@ -98,7 +115,51 @@ public class Section implements Serializable {
     public void setImgurl(String imgurl) {
         this.imgurl = imgurl;
     }
-    
+
+    public String getDefaultStoryImageUrl() {
+        return defaultStoryImageUrl;
+    }
+
+    public void setDefaultStoryImageUrl(String defaultStoryImageUrl) {
+        this.defaultStoryImageUrl = defaultStoryImageUrl;
+    }
+
+    public String getDefaultStoryThumbImageUrl() {
+        return defaultStoryThumbImageUrl;
+    }
+
+    public void setDefaultStoryThumbImageUrl(String defaultStoryThumbImageUrl) {
+        this.defaultStoryThumbImageUrl = defaultStoryThumbImageUrl;
+    }
+
+    /**
+     * Determine if a default story image is set for this {@link Section}.
+     * <p/>
+     * @return {@code true} if a default story image is set, otherwise {@code false}
+     */
+    public boolean isDefaultStoryImageAvailable() {
+        if (this.defaultStoryImageUrl == null
+                || this.defaultStoryImageUrl.trim().isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Determine if a default story thumb image is set for this {@link Section}.
+     * <p/>
+     * @return {@code true} if a default story thumb image is set, otherwise {@code false}
+     */
+    public boolean isDefaultStoryThumbImageAvailable() {
+        if (this.defaultStoryThumbImageUrl == null
+                || this.defaultStoryThumbImageUrl.trim().isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -108,12 +169,12 @@ public class Section implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Section)) {
             return false;
         }
         Section other = (Section) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null
+                && !this.id.equals(other.id))) {
             return false;
         }
         return true;

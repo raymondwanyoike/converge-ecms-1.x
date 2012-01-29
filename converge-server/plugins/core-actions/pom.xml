@@ -48,6 +48,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>xuggle</groupId>
+            <artifactId>xuggle-xuggler</artifactId>
+            <version>3.4.1012.201001312056</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>org.jvnet.mock-javamail</groupId>
             <artifactId>mock-javamail</artifactId>
             <version>1.9</version>

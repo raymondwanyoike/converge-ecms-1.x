@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
 
-    <ui:composition template="/WEB-INF/facelets/templates//myprofile.xhtml">
+<<<<<<< HEAD
+    <ui:composition template="/WEB-INF/facelets/templates/myprofile.xhtml">
+=======
+    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/myprofile.xhtml">
+>>>>>>> parent of 53176a2... WebUI Changes 1
 
         <ui:define name="left">
 
@@ -75,7 +79,7 @@
             </a4j:outputPanel>
 
             <h:form id="frmProfileSettings">
-                <converge:moduleHeader moduleTitle="#{i18n.myprofile_Settings}"  />
+                <converge:moduleHeader moduleTitle="Settings"  />
                 <div class="moduleContent">
                     <h:panelGrid columns="2">
                         <h:outputText value="Localisation" styleClass="bold"/>
@@ -91,27 +95,27 @@
                         </h:selectOneMenu>
                         <h:outputText value="&#160;" />
                         <h:outputText value="&#160;" />
-                        <h:outputText value="#{i18n.menu_ADMINISTRATION_SEARCH_ENGINE}" styleClass="bold"/>
+                        <h:outputText value="Search Engine" styleClass="bold"/>
                         <h:outputText value="&#160;" />
 
-                        <h:outputText value="#{i18n.myprofile_ShowTags}"/>
+                        <h:outputText value="Show tags"/>
                         <h:selectBooleanCheckbox value="#{userSession.user.defaultSearchEngineTags}" />
 
-                        <h:outputText value="#{i18n.Search_SORT_BY}"/>
+                        <h:outputText value="Sort by"/>
                         <h:selectOneMenu value="#{userSession.user.defaultSearchResultsSortBy}">
-                            <f:selectItem  itemLabel="#{i18n.Search_SORT_BY_SCORE}" itemValue="score" />
-                            <f:selectItem  itemLabel="#{i18n.Search_SORT_BY_DATE}" itemValue="date" />
+                            <f:selectItem  itemLabel="Score" itemValue="score" />
+                            <f:selectItem  itemLabel="Date" itemValue="date" />
                         </h:selectOneMenu>
 
-                        <h:outputText value="#{i18n.myprofile_Sort_ascending}"/>
+                        <h:outputText value="Sort ascending"/>
                         <h:selectOneMenu id="somSearchSortOrder" value="#{userSession.user.defaultSearchResultsOrder}">
-                            <f:selectItem  itemLabel="#{i18n.Search_SORT_ORDER_ASCENDING}" itemValue="true" />
-                            <f:selectItem  itemLabel="#{i18n.Search_SORT_ORDER_DESCENDING}" itemValue="false" />
+                            <f:selectItem  itemLabel="Ascending" itemValue="true" />
+                            <f:selectItem  itemLabel="Descending" itemValue="false" />
                         </h:selectOneMenu>
 
                         <h:outputText value="&#160;" />
                         <h:outputText value="&#160;" />
-                        <h:outputText value="#{i18n.myprofile_Assignments}" styleClass="bold"/>
+                        <h:outputText value="Assignments" styleClass="bold"/>
                         <h:outputText value="&#160;" />
                         <h:outputText value="#{msgs.profile_DEFAULT_ASSIGNMENT_TYPE}" />
                         <h:selectOneMenu id="somDefaultAssignmentType" value="#{userSession.user.defaultAssignmentType}" style="width: 100%;" converter="#{converters.enumTypeConverter}">
@@ -143,7 +147,7 @@
                         <h:outputText value="&#160;" />
                         <h:outputText value="&#160;" />
                         <h:outputText value="&#160;" />
-                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.Generic_SAVE}" actionListener="#{userSession.onUpdateProfile}" reRender="frmPage" />
+                        <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.SAVE}" actionListener="#{userSession.onUpdateProfile}" reRender="frmPage" />
                     </h:panelGrid>
                 </div>
 
@@ -153,7 +157,7 @@
 
 
             <h:form id="frmPage">
-                <converge:moduleHeader moduleTitle="#{i18n.myprofile_Privileges}" />
+                <converge:moduleHeader moduleTitle="Privileges" />
                 <div class="moduleContent">
                     <rich:dataTable id="dtPrivileges" value="#{userSession.user.userRoles}" var="userRole" width="100%" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
                         <rich:column styleClass="columnIcon center">

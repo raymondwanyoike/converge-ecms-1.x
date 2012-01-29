@@ -3,8 +3,6 @@
   <persistence-unit name="cmsPU" transaction-type="JTA">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <jta-data-source>jdbc/convergeMobileSubscription</jta-data-source>
-    <class>dk.i2m.converge.mobile.server.domain.Outlet</class>
-    <class>dk.i2m.converge.mobile.server.domain.Section</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>

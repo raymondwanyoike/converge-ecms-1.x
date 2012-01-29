@@ -12,8 +12,12 @@
           xmlns:v="http://converge.i2m.dk"
           xmlns:converge="http://com.interactivemediamanagement.converge/tags">
 
-    <ui:composition template="/WEB-INF/facelets/templates//administration.xhtml">
-        <ui:define name="title">#{i18n.calendar_CATEGORIES}</ui:define>
+<<<<<<< HEAD
+    <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
+=======
+    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/administration.xhtml">
+>>>>>>> parent of 53176a2... WebUI Changes 1
+        <ui:define name="title">#{msgs.calendar_CATEGORIES}</ui:define>
 
         <ui:define name="body">
             <a4j:keepAlive beanName="administrator_CalendarCategories" />
@@ -21,14 +25,14 @@
                 <v:message />
             </a4j:outputPanel>
             <h:form id="frmCalendarCategories">
-                <converge:moduleHeader moduleTitle="#{i18n.calendar_CATEGORIES}" />
+                <converge:moduleHeader moduleTitle="#{msgs.calendar_CATEGORIES}" />
                 <div class="moduleContent">
 
                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                         <h:outputText value="" />
                         <a4j:commandButton id="btnNewCategory"
                                            styleClass="button mediumButton"
-                                           value="#{i18n.calendar_CATEGORY_NEW}"
+                                           value="#{msgs.calendar_CATEGORY_NEW}"
                                            actionListener="#{administrator_CalendarCategories.onNew}"
                                            reRender="frmEventCategoryDetails">
                             <rich:componentControl for="mpEventCategoryDetails"
@@ -61,14 +65,14 @@
                                 <rich:componentControl for="mpEventCategoryDetails"
                                                        operation="show"
                                                        event="oncomplete" />
-                                <h:graphicImage alt="#{i18n.calendar_CATEGORY}"
-                                                title="#{i18n.calendar_CATEGORY}"
+                                <h:graphicImage alt="#{msgs.calendar_CATEGORY}"
+                                                title="#{msgs.calendar_CATEGORY}"
                                                 value="#{res.EVENT_CATEGORY_ICON}" />
                             </a4j:commandLink>
                         </rich:column>
                         <rich:column sortBy="#{category.name}" sortOrder="ASCENDING">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.calendar_CATEGORY}" />
+                                <h:outputText value="#{msgs.calendar_CATEGORY}" />
                             </f:facet>
                             <a4j:commandLink reRender="frmEventCategoryDetails">
                                 <f:setPropertyActionListener value="#{category}"
@@ -81,7 +85,7 @@
                         </rich:column>
                         <rich:column sortBy="#{category.description}">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.calendar_CATEGORY_DESCRIPTION}" />
+                                <h:outputText value="#{msgs.calendar_CATEGORY_DESCRIPTION}" />
                             </f:facet>
                             <h:outputText value="#{category.description}" />
                         </rich:column>
@@ -93,7 +97,7 @@
                 <rich:modalPanel id="mpEventCategoryDetails" autosized="true" domElementAttachment="parent">
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{i18n.calendar_CATEGORY}"></h:outputText>
+                            <h:outputText value="#{msgs.calendar_CATEGORY}"></h:outputText>
                         </h:panelGroup>
                     </f:facet>
                     <f:facet name="controls">
@@ -115,12 +119,12 @@
                                        activeTabClass="tabActive"
                                        inactiveTabClass="tabInactive">
 
-                            <rich:tab label="#{i18n.calendar_CATEGORY}">
+                            <rich:tab label="#{msgs.calendar_CATEGORY}">
                                 <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
-                                    <h:outputText value="#{i18n.calendar_CATEGORY_NAME}" />
-                                    <h:inputText value="#{administrator_CalendarCategories.selectedCategory.name}" required="true" requiredMessage="#{i18n.calendar_CATEGORY_NAME_REQUIRED}" styleClass="text" />
+                                    <h:outputText value="#{msgs.calendar_CATEGORY_NAME}" />
+                                    <h:inputText value="#{administrator_CalendarCategories.selectedCategory.name}" required="true" requiredMessage="#{msgs.calendar_CATEGORY_NAME_REQUIRED}" styleClass="text" />
 
-                                    <h:outputText value="#{i18n.calendar_CATEGORY_DESCRIPTION}" />
+                                    <h:outputText value="#{msgs.calendar_CATEGORY_DESCRIPTION}" />
                                     <h:inputTextarea value="#{administrator_CalendarCategories.selectedCategory.description}" styleClass="text mediumTextArea"/>
                                 </h:panelGrid>
                             </rich:tab>
@@ -129,23 +133,23 @@
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveEventCategoryDetails"
                                              styleClass="dialogButton"
-                                             value="#{i18n.Generic_SAVE}"
+                                             value="#{msgs.SAVE}"
                                              actionListener="#{administrator_CalendarCategories.onSave}"
                                              reRender="frmCalendarCategories"
                                              oncomplete="if (#{converge:isAllValid()}) { Richfaces.hideModalPanel('mpEventCategoryDetails'); return false;}" />
 
                             <a4j:commandLink id="lnkApplyEventCategoryDetails"
                                              styleClass="dialogButton"
-                                             value="#{i18n.Generic_APPLY}"
+                                             value="#{msgs.APPLY}"
                                              reRender="frmCalendarCategories"
                                              actionListener="#{administrator_CalendarCategories.onSave}" />
 
                             <a4j:commandLink id="lnkDeleteEventCategoryDetails"
                                              rendered="#{administrator_CalendarCategories.editMode}"
-                                             onclick="if (confirm('#{i18n.calendar_CATEGORY_PROMPT_DELETE}') != true){ return false; };"
+                                             onclick="if (confirm('#{msgs.calendar_CATEGORY_PROMPT_DELETE}') != true){ return false; };"
                                              actionListener="#{administrator_CalendarCategories.onDelete}"
                                              styleClass="dialogButton"
-                                             value="#{i18n.Generic_DELETE}"
+                                             value="#{msgs.DELETE}"
                                              reRender="frmCalendarCategories">
                                 <rich:componentControl for="mpEventCategoryDetails"
                                                        operation="hide"
@@ -154,7 +158,7 @@
 
                             <h:commandLink id="lnkCancelEventCategoryDetails"
                                            styleClass="dialogButton"
-                                           value="#{i18n.Generic_CANCEL}"
+                                           value="#{msgs.CANCEL}"
                                            onclick="#{rich:component('mpEventCategoryDetails')}.hide(); return false;">
                             </h:commandLink>
                         </h:panelGroup>

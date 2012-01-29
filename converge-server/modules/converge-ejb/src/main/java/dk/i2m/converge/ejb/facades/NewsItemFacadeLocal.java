@@ -60,15 +60,7 @@ public interface NewsItemFacadeLocal {
      */
     NewsItem step(NewsItem newsItem, WorkflowState state, String comment) throws WorkflowStateTransitionException;
 
-    /**
-     * Checks-out a {@link NewsItem} from the database.
-     *
-     * @param id
-     *          Unique identifier of the {@link NewsItem}
-     * @return Checked-out {@link NewsItem} matching the given {@code id}
-     * @throws dk.i2m.dao.DataNotFoundException
-     *          If new {@link NewsItem} could be found with the given {@code id}
-     */
+    
     NewsItemHolder checkout(java.lang.Long id) throws dk.i2m.converge.ejb.services.DataNotFoundException;
 
     /**

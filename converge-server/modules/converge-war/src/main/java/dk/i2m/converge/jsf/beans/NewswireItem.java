@@ -30,7 +30,8 @@ import javax.faces.event.ActionEvent;
  */
 public class NewswireItem {
 
-    private static final Logger LOG = Logger.getLogger(NewswireItem.class.getName());
+    private static final Logger LOG = Logger.getLogger(NewswireItem.class.
+            getName());
 
     @EJB private NewswireServiceLocal newswireService;
 
@@ -83,7 +84,8 @@ public class NewswireItem {
     }
 
     private UserAccount getUser() {
-        return (UserAccount) JsfUtils.getValueOfValueExpression("#{userSession.user}");
+        return (UserAccount) JsfUtils.getValueOfValueExpression(
+                "#{userSession.user}");
     }
 
     /**
@@ -91,7 +93,7 @@ public class NewswireItem {
      * retrieved from {@link NewsItem#getSelectedNewsItem()} it is not loaded.
      *
      * @return {@code true} if a news item has been selected and loaded,
-     *         otherwise {@code false}
+     * otherwise {@code false}
      */
     public boolean isItemLoaded() {
         if (getSelectedItem() == null) {
@@ -106,15 +108,18 @@ public class NewswireItem {
      * can be imported to a {@link Catalogue}. It is only possible
      * to import {@link dk.i2m.converge.core.newswire.NewswireItem}s where
      * attachments have {@link Rendition}s set.
-     * 
+     * <p/>
      * @return {@code true} if the {@link NewswireItem} can be imported,
-     *         otherwise {@code false}
+     * otherwise {@code false}
      */
     public boolean isImportReady() {
         boolean ready = false;
-        for (NewswireItemAttachment attachment : getSelectedItem().getAttachments()) {
-            if (attachment.isRenditionSet()) {
-                ready = true;
+        if (getSelectedItem() != null) {
+            for (NewswireItemAttachment attachment : getSelectedItem().
+                    getAttachments()) {
+                if (attachment.isRenditionSet()) {
+                    ready = true;
+                }
             }
         }
         return ready;
@@ -123,16 +128,18 @@ public class NewswireItem {
     /**
      * Adds the attachments of a {@link NewswireItem} to the users
      * default catalogue.
-     * 
-     * @param event 
-     *          Event that invoked the handler
+     * <p/>
+     * @param event * Event that invoked the handler
      */
     public void onAddToCatalogue(ActionEvent event) {
         if (importCatalogue != null) {
-            MediaItem item = catalogueFacade.create(selectedItem, importCatalogue);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO , "i18n", "NewswireItem_IMPORT_SUCCESSFUL", importCatalogue.getName());
+            MediaItem item = catalogueFacade.create(selectedItem,
+                    importCatalogue);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
+                    "NewswireItem_IMPORT_SUCCESSFUL", importCatalogue.getName());
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "NewswireItem_IMPORT_FAILED", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    "i18n", "NewswireItem_IMPORT_FAILED", null);
         }
     }
 }

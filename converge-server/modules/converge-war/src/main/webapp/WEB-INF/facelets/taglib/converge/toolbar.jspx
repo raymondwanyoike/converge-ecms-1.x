@@ -99,16 +99,16 @@
                         <h:graphicImage value="/images/template/icons/my_photos.gif" title="#{msgs.PHOTOS}" />
                     </h:commandLink>
                     <h:commandLink action="LIBRARY_SUBJECTS" immediate="true">
-                        <h:graphicImage value="/images/template/icons/subject.png" title="#{i18n.article_SUBJECTS}" />
+                        <h:graphicImage value="/images/template/icons/subject.png" title="#{msgs.SUBJECTS}" />
                     </h:commandLink>
                     <h:commandLink action="LIBRARY_LOCATIONS" immediate="true">
-                        <h:graphicImage value="/images/template/icons/location.png" title="#{i18n.article_LOCATIONS}" />
+                        <h:graphicImage value="/images/template/icons/location.png" title="#{msgs.LOCATIONS}" />
                     </h:commandLink>
                     <h:commandLink action="LIBRARY_PERSONS" immediate="true">
-                        <h:graphicImage value="/images/template/icons/person.png" title="#{i18n.article_PERSONS}" />
+                        <h:graphicImage value="/images/template/icons/person.png" title="#{msgs.PERSONS}" />
                     </h:commandLink>
                     <h:commandLink action="LIBRARY_ORGANISATIONS" immediate="true">
-                        <h:graphicImage value="/images/template/icons/organisation.png" title="#{i18n.article_ORGANISATIONS}" />
+                        <h:graphicImage value="/images/template/icons/organisation.png" title="#{msgs.ORGANISATIONS}" />
                     </h:commandLink>
                 </c:if>
                 <c:if test="#{section == 'administration'}">

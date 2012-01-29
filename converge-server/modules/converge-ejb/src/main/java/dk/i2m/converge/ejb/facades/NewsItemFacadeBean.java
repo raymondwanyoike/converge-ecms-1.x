@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.core.logging.LogEntry;
 import dk.i2m.converge.core.content.*;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.logging.LogSeverity;
@@ -48,7 +47,8 @@ import javax.persistence.OptimisticLockException;
 @Stateless
 public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
-    private static final Logger LOG = Logger.getLogger(NewsItemFacadeBean.class.getName());
+    private static final Logger LOG = Logger.getLogger(NewsItemFacadeBean.class.
+            getName());
 
     @EJB private ConfigurationServiceLocal cfgService;
 
@@ -66,26 +66,29 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
     @EJB private PluginContextBeanLocal pluginContext;
 
+    @EJB private SystemFacadeLocal systemFacade;
+
     @Resource private SessionContext ctx;
 
     /**
      * Starts a new {@link NewsItem}.
      *
-     * @param newsItem
-     *          {@link NewsItem} to start.
+     * @param newsItem {@link NewsItem} to start.
      * @return Started {@link NewsItem}
-     * @throws WorkflowStateTransitionException
-     *          If the workflow could not be started for the <code>newsItem</code>
+     * @throws WorkflowStateTransitionException If the workflow could not be started for the
+     * <code>newsItem</code>
      */
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public NewsItem start(NewsItem newsItem) throws WorkflowStateTransitionException {
+    public NewsItem start(NewsItem newsItem) throws
+            WorkflowStateTransitionException {
         if (newsItem == null) {
             throw new WorkflowStateTransitionException("NewsItem not available");
         }
 
         if (newsItem.getId() != null) {
-            throw new DuplicateExecutionException("NewsItem #" + newsItem.getId() + " already started");
+            throw new DuplicateExecutionException("NewsItem #"
+                    + newsItem.getId() + " already started");
         }
 
         if (newsItem.getOutlet() == null) {
@@ -93,7 +96,8 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
 
 
-        WorkflowState startState = newsItem.getOutlet().getWorkflow().getStartState();
+        WorkflowState startState = newsItem.getOutlet().getWorkflow().
+                getStartState();
         boolean actorSet = false;
         UserRole requiredRole = startState.getActorRole();
         for (NewsItemActor actor : newsItem.getActors()) {
@@ -104,12 +108,14 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
 
         if (!actorSet) {
-            throw new MissingActorException("Actor with role " + requiredRole.getName() + " is missing", requiredRole);
+            throw new MissingActorException("Actor with role " + requiredRole.
+                    getName() + " is missing", requiredRole);
         }
 
         try {
             daoService.findById(NewsItem.class, newsItem.getId());
-            throw new DuplicateExecutionException("NewsItem #" + newsItem.getId() + " already exist");
+            throw new DuplicateExecutionException("NewsItem #"
+                    + newsItem.getId() + " already exist");
         } catch (DataNotFoundException ex) {
         }
 
@@ -118,7 +124,8 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         try {
             ua = userService.findById(uid);
         } catch (Exception ex) {
-            throw new WorkflowStateTransitionException("Could not resolve transition initator", ex);
+            throw new WorkflowStateTransitionException(
+                    "Could not resolve transition initator", ex);
         }
 
         try {
@@ -129,7 +136,8 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
             // Ensure that the outlet is set
 //            if (outlet != null) {
 //                WorkflowState startState = outlet.getWorkflow().getStartState();
-            WorkflowStateTransition transition = new WorkflowStateTransition(newsItem, now, startState, ua);
+            WorkflowStateTransition transition = new WorkflowStateTransition(
+                    newsItem, now, startState, ua);
             transition.setStoryVersion("");
             transition.setComment("");
             newsItem.getHistory().add(transition);
@@ -165,13 +173,16 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
             for (UserAccount userToNotify : usersToNotify) {
                 if (!userToNotify.equals(ua)) {
-                    String msgPattern = cfgService.getMessage("notification_MSG_STORY_ASSIGNED");
-                    SimpleDateFormat sdf = new SimpleDateFormat(cfgService.getMessage("FORMAT_SHORT_DATE_AND_TIME"));
+                    String msgPattern = cfgService.getMessage(
+                            "notification_MSG_STORY_ASSIGNED");
+                    SimpleDateFormat sdf = new SimpleDateFormat(cfgService.
+                            getMessage("FORMAT_SHORT_DATE_AND_TIME"));
                     sdf.setTimeZone(userToNotify.getTimeZone());
 
                     String date = sdf.format(newsItem.getDeadline().getTime());
 
-                    Object[] args = new Object[]{newsItem.getTitle(), date, ua.getFullName()};
+                    Object[] args = new Object[]{newsItem.getTitle(), date, ua.
+                        getFullName()};
                     String msg = MessageFormat.format(msgPattern, args);
 
                     notificationService.create(userToNotify, msg);
@@ -187,19 +198,15 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     /**
      * Promotes the {@link NewsItem} in the workflow.
      *
-     * @param newsItem
-     *          {@link NewsItem} to promote
-     * @param step
-     *          Unique identifier of the next step
-     * @param comment
-     *          Comment from the sender
+     * @param newsItem {@link NewsItem} to promote
+     * @param step     Unique identifier of the next step
+     * @param comment  Comment from the sender
      * @return Promoted {@link NewsItem}
-     * @throws WorkflowStateTransitionException
-     *          If the next step is not legal
+     * @throws WorkflowStateTransitionException If the next step is not legal
      */
     @Override
-    public NewsItem step(NewsItem newsItem, Long step, String comment) throws WorkflowStateTransitionException {
-        LOG.log(Level.INFO, "Promoting news item [{0}] to {1}", new Object[]{newsItem.getId(), step});
+    public NewsItem step(NewsItem newsItem, Long step, String comment) throws
+            WorkflowStateTransitionException {
 
         String uid = ctx.getCallerPrincipal().getName();
         UserAccount ua = null;
@@ -207,8 +214,12 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
             ua = userService.findById(uid);
             pluginContext.setCurrentUserAccount(ua);
         } catch (Exception ex) {
-            throw new WorkflowStateTransitionException("Could not resolve transition initator", ex);
+            throw new WorkflowStateTransitionException(
+                    "Could not resolve transition initator", ex);
         }
+
+        pluginContext.log(LogSeverity.INFO, "Promoting news item #{0} to {1}",
+                new Object[]{newsItem.getId(), step}, newsItem, newsItem.getId());
 
         Calendar now = Calendar.getInstance();
 
@@ -216,7 +227,8 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         try {
             transitionStep = daoService.findById(WorkflowStep.class, step);
         } catch (DataNotFoundException ex) {
-            throw new WorkflowStateTransitionException("Transition (WorkflowStep) #" + step + " does not exist", ex);
+            throw new WorkflowStateTransitionException("Transition (WorkflowStep) #"
+                    + step + " does not exist", ex);
         }
 
         WorkflowState nextState = transitionStep.getToState();
@@ -228,7 +240,8 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
             if (nextWorkflowStep.getToState().equals(nextState)) {
 
-                boolean isInRole = !Collections.disjoint(nextWorkflowStep.getValidFor(), ua.getUserRoles());
+                boolean isInRole = !Collections.disjoint(nextWorkflowStep.
+                        getValidFor(), ua.getUserRoles());
 
                 if (nextWorkflowStep.isValidForAll() || isInRole) {
                     legalStep = true;
@@ -238,10 +251,12 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
 
         if (!legalStep) {
-            throw new WorkflowStateTransitionException("Illegal transition from " + state.getId() + " to " + nextState.getId());
+            throw new WorkflowStateTransitionException("Illegal transition from "
+                    + state.getId() + " to " + nextState.getId());
         }
 
-        WorkflowStateTransition transition = new WorkflowStateTransition(newsItem, now, nextState, ua);
+        WorkflowStateTransition transition = new WorkflowStateTransition(
+                newsItem, now, nextState, ua);
         transition.setStoryVersion(newsItem.getStory());
         transition.setHeadlineVersion(newsItem.getTitle());
         transition.setBriefVersion(newsItem.getBrief());
@@ -260,7 +275,8 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
 
         // Actions
-        pluginContext.log(LogSeverity.INFO, "Executing workflow step actions", newsItem, newsItem.getId());
+        pluginContext.log(LogSeverity.INFO, "Executing workflow step actions",
+                newsItem, newsItem.getId());
         //LOG.log(Level.INFO, "Executing workflow step actions");
 
         for (WorkflowStepAction action : transitionStep.getActions()) {
@@ -269,7 +285,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
                 act.execute(pluginContext, newsItem, action, ua);
             } catch (WorkflowActionException ex) {
                 //LOG.log(Level.SEVERE, "Could not execute action {0}", action.getLabel());
-                pluginContext.log(LogSeverity.SEVERE, "Could not execute action {0}", new Object[]{action.getLabel()}, newsItem, newsItem.getId());
+                pluginContext.log(LogSeverity.SEVERE,
+                        "Could not execute action {0}", new Object[]{action.
+                            getLabel()}, newsItem, newsItem.getId());
             }
         }
 
@@ -278,15 +296,19 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
     /** {@inheritDoc} */
     @Override
-    public NewsItem step(NewsItem newsItem, WorkflowState state, String comment) throws WorkflowStateTransitionException {
-        LOG.log(Level.INFO, "Promoting NewsItem #{0} from {0} to {1}", new Object[]{newsItem.getId(), newsItem.getCurrentState().getName(), state.getName()});
+    public NewsItem step(NewsItem newsItem, WorkflowState state, String comment)
+            throws WorkflowStateTransitionException {
+        LOG.log(Level.INFO, "Promoting NewsItem #{0} from {0} to {1}",
+                new Object[]{newsItem.getId(), newsItem.getCurrentState().
+                    getName(), state.getName()});
 
         String uid = ctx.getCallerPrincipal().getName();
         UserAccount ua = null;
         try {
             ua = userService.findById(uid);
         } catch (Exception ex) {
-            throw new WorkflowStateTransitionException("Could not resolve transition initator", ex);
+            throw new WorkflowStateTransitionException(
+                    "Could not resolve transition initator", ex);
         }
 
         Calendar now = Calendar.getInstance();
@@ -295,10 +317,12 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         try {
             nextState = daoService.findById(WorkflowState.class, state.getId());
         } catch (DataNotFoundException ex) {
-            throw new WorkflowStateTransitionException("Invalid workflow state", ex);
+            throw new WorkflowStateTransitionException("Invalid workflow state",
+                    ex);
         }
 
-        WorkflowStateTransition transition = new WorkflowStateTransition(newsItem, now, nextState, ua);
+        WorkflowStateTransition transition = new WorkflowStateTransition(
+                newsItem, now, nextState, ua);
         transition.setStoryVersion(newsItem.getStory());
         transition.setHeadlineVersion(newsItem.getTitle());
         transition.setBriefVersion(newsItem.getBrief());
@@ -317,17 +341,19 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
     /**
      * Finds the current assignments of a given user.
-     * 
+     * <p/>
      * @param username
-     *          Username of the user
+* Username of the user
      * @return {@link List} of current assignments
      */
     @Override
     public List<CurrentAssignment> findCurrentAssignments(String username) {
         try {
             UserAccount ua = userFacade.findById(username);
-            Map params = QueryBuilder.with("user", ua).and("permission", WorkflowStatePermission.GROUP).parameters();
-            return daoService.findWithNamedQuery(NewsItem.VIEW_CURRENT_ASSIGNMENTS, params);
+            Map params = QueryBuilder.with("user", ua).and("permission",
+                    WorkflowStatePermission.GROUP).parameters();
+            return daoService.findWithNamedQuery(
+                    NewsItem.VIEW_CURRENT_ASSIGNMENTS, params);
         } catch (DataNotFoundException ex) {
             LOG.log(Level.WARNING, "Specified user {0} is unknown", username);
             return Collections.EMPTY_LIST;
@@ -336,21 +362,23 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
     /**
      * Gets items in the inbox for a particular user.
-     * 
+     * <p/>
      * @param username
-     *          Username of the {@link UserAccount}
+* Username of the {@link UserAccount}
      * @param start
-     *          First record to retrieve
+   * First record to retrieve
      * @param limit
-     *          Number of records to retrieve
-     * @return 
+   * Number of records to retrieve
+     * @return
      */
     @Override
     public List<InboxView> findInbox(String username, int start, int limit) {
         try {
             UserAccount ua = userFacade.findById(username);
-            Map params = QueryBuilder.with("user", ua).and("permission", WorkflowStatePermission.GROUP).parameters();
-            return daoService.findWithNamedQuery(NewsItem.VIEW_INBOX, params, start, limit);
+            Map params = QueryBuilder.with("user", ua).and("permission",
+                    WorkflowStatePermission.GROUP).parameters();
+            return daoService.findWithNamedQuery(NewsItem.VIEW_INBOX, params,
+                    start, limit);
         } catch (DataNotFoundException ex) {
             LOG.log(Level.SEVERE, null, ex);
             return Collections.EMPTY_LIST;
@@ -359,16 +387,17 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
     /**
      * Gets items in the inbox for a particular user.
-     * 
+     * <p/>
      * @param username
-     *          Username of the {@link UserAccount}
+* Username of the {@link UserAccount}
      * @return {@link List} of inbox items
      */
     @Override
     public List<InboxView> findInbox(String username) {
         try {
             UserAccount ua = userFacade.findById(username);
-            Map params = QueryBuilder.with("user", ua).and("permission", WorkflowStatePermission.GROUP).parameters();
+            Map params = QueryBuilder.with("user", ua).and("permission",
+                    WorkflowStatePermission.GROUP).parameters();
             return daoService.findWithNamedQuery(NewsItem.VIEW_INBOX, params);
         } catch (DataNotFoundException ex) {
             LOG.log(Level.SEVERE, null, ex);
@@ -391,7 +420,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
                 // Look at each story in the outlet
                 Map params = QueryBuilder.with("outlet", outlet).parameters();
-                List<NewsItem> itemsInOutlet = daoService.findWithNamedQuery(NewsItem.FIND_BY_OUTLET, params);
+                List<NewsItem> itemsInOutlet =
+                        daoService.findWithNamedQuery(NewsItem.FIND_BY_OUTLET,
+                        params);
 
                 for (NewsItem ni : itemsInOutlet) {
 
@@ -404,7 +435,8 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
                         // for a group attached to the story
                         switch (state.getPermission()) {
                             case GROUP:
-                                if (ua.getUserRoles().contains(state.getActorRole())) {
+                                if (ua.getUserRoles().contains(state.
+                                        getActorRole())) {
                                     items.add(ni);
                                 }
                                 break;
@@ -413,7 +445,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
                                 // Check all the actors for the news item
                                 for (NewsItemActor actor : ni.getActors()) {
                                     // If the actor has the role of the state, he is a current actor
-                                    if (actor.getRole().equals(state.getActorRole()) && actor.getUser().equals(ua)) {
+                                    if (actor.getRole().equals(state.
+                                            getActorRole()) && actor.getUser().
+                                            equals(ua)) {
                                         items.add(ni);
                                     }
                                 }
@@ -432,8 +466,10 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     public List<InboxView> findOutletBox(String username, Outlet outlet) {
         try {
             UserAccount ua = userFacade.findById(username);
-            Map params = QueryBuilder.with("outlet", outlet).and("user", ua).parameters();
-            return daoService.findWithNamedQuery(NewsItem.VIEW_OUTLET_BOX, params);
+            Map params = QueryBuilder.with("outlet", outlet).and("user", ua).
+                    parameters();
+            return daoService.findWithNamedQuery(NewsItem.VIEW_OUTLET_BOX,
+                    params);
         } catch (DataNotFoundException ex) {
             LOG.log(Level.WARNING, "Could not find user {0}", username);
             return Collections.EMPTY_LIST;
@@ -441,11 +477,14 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     }
 
     @Override
-    public List<InboxView> findOutletBox(String username, Outlet outlet, WorkflowState state) {
+    public List<InboxView> findOutletBox(String username, Outlet outlet,
+            WorkflowState state) {
         try {
             UserAccount ua = userFacade.findById(username);
-            Map params = QueryBuilder.with("outlet", outlet).and("state", state).and("user", ua).parameters();
-            return daoService.findWithNamedQuery(NewsItem.VIEW_OUTLET_BOX_STATE, params);
+            Map params = QueryBuilder.with("outlet", outlet).and("state", state).
+                    and("user", ua).parameters();
+            return daoService.findWithNamedQuery(NewsItem.VIEW_OUTLET_BOX_STATE,
+                    params);
         } catch (DataNotFoundException ex) {
             LOG.log(Level.WARNING, "Could not find user {0}", username);
             return Collections.EMPTY_LIST;
@@ -453,11 +492,14 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     }
 
     @Override
-    public List<InboxView> findOutletBox(String username, Outlet outlet, WorkflowState state, int start, int results) {
+    public List<InboxView> findOutletBox(String username, Outlet outlet,
+            WorkflowState state, int start, int results) {
         try {
             UserAccount ua = userFacade.findById(username);
-            Map params = QueryBuilder.with("outlet", outlet).and("state", state).and("user", ua).parameters();
-            return daoService.findWithNamedQuery(NewsItem.VIEW_OUTLET_BOX_STATE, params, start, results);
+            Map params = QueryBuilder.with("outlet", outlet).and("state", state).
+                    and("user", ua).parameters();
+            return daoService.findWithNamedQuery(NewsItem.VIEW_OUTLET_BOX_STATE,
+                    params, start, results);
         } catch (DataNotFoundException ex) {
             LOG.log(Level.WARNING, "Could not find user {0}", username);
             return Collections.EMPTY_LIST;
@@ -467,8 +509,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     /**
      * Permanently remove {@link NewsItem}s in the trash state by a given user.
      *
-     * @param username
-     *          Username of the {@link UserAccount}
+     * @param username Username of the {@link UserAccount}
      * @return Number of {@link NewsItem}s deleted
      */
     @Override
@@ -476,14 +517,13 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         int deleted = 0;
         try {
             UserAccount ua = userFacade.findById(username);
-            Map<String, Object> params = QueryBuilder.with("user", ua).parameters();
-
-            List<NewsItem> newsItems = daoService.findWithNamedQuery(NewsItem.FIND_TRASH, params);
+            Map<String, Object> params = QueryBuilder.with("user", ua).
+                    parameters();
+            List<NewsItem> newsItems = daoService.findWithNamedQuery(
+                    NewsItem.FIND_TRASH, params);
 
             for (NewsItem item : newsItems) {
-                LOG.log(Level.INFO, "Item in trash: {0} {1}", new Object[]{item.getId(), item.getTitle()});
                 if (isOriginalOwner(item, username)) {
-                    LOG.log(Level.INFO, "Deleting #{0}", new Object[]{item.getId()});
                     deleteNewsItem(item.getId(), false);
                     deleted++;
                 }
@@ -498,17 +538,15 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     /**
      * Determine if the given user is the original owner of the
      * given {@link NewsItem}.
-     * 
-     * @param item
-     *          {@link NewsItem} to check
-     * @param username
-     *          Username of the {@link UserAccount} to check
+     * <p/>
+     * @param item     {@link NewsItem} to check
+     * @param username Username of the {@link UserAccount} to check
      * @return {@code true} if {@code username} is the original owner of {@code item}
      */
     private boolean isOriginalOwner(NewsItem item, String username) {
         WorkflowState start = item.getOutlet().getWorkflow().getStartState();
         UserRole role = start.getActorRole();
-        UserAccount user = null;
+        UserAccount user;
         try {
             user = userService.findById(username);
         } catch (Exception ex) {
@@ -526,31 +564,41 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
     /** {@inheritDoc } */
     @Override
-    public List<NewsItem> findByStateAndOutlet(WorkflowState state, Outlet outlet) {
-        Map params = QueryBuilder.with("outlet", outlet).and("state", state).parameters();
-        return daoService.findWithNamedQuery(NewsItem.FIND_BY_OUTLET_AND_STATE, params);
+    public List<NewsItem> findByStateAndOutlet(WorkflowState state,
+            Outlet outlet) {
+        Map params = QueryBuilder.with("outlet", outlet).and("state", state).
+                parameters();
+        return daoService.findWithNamedQuery(NewsItem.FIND_BY_OUTLET_AND_STATE,
+                params);
     }
 
     /** {@inheritDoc } */
     @Override
     public List<NewsItem> findByStateAndOutlet(String stateName, Outlet outlet) {
-        Map params = QueryBuilder.with("outlet", outlet).and("stateName", stateName).parameters();
-        return daoService.findWithNamedQuery(NewsItem.FIND_BY_OUTLET_AND_STATE_NAME, params);
+        Map params = QueryBuilder.with("outlet", outlet).and("stateName",
+                stateName).parameters();
+        return daoService.findWithNamedQuery(
+                NewsItem.FIND_BY_OUTLET_AND_STATE_NAME, params);
     }
 
     /** {@inheritDoc } */
     @Override
-    public List<NewsItem> findByStateAndOutlet(WorkflowState state, Outlet outlet, int start, int results) {
-        Map params = QueryBuilder.with("outlet", outlet).and("state", state).parameters();
-        return daoService.findWithNamedQuery(NewsItem.FIND_BY_OUTLET_AND_STATE, params, start, results);
+    public List<NewsItem> findByStateAndOutlet(WorkflowState state,
+            Outlet outlet, int start, int results) {
+        Map params = QueryBuilder.with("outlet", outlet).and("state", state).
+                parameters();
+        return daoService.findWithNamedQuery(NewsItem.FIND_BY_OUTLET_AND_STATE,
+                params, start, results);
     }
 
     /** {@inheritDoc } */
     @Override
-    public boolean isNewsItemPublished(final Long newsItemId) throws DataNotFoundException {
+    public boolean isNewsItemPublished(final Long newsItemId) throws
+            DataNotFoundException {
         NewsItem newsItem = findNewsItemById(newsItemId);
 
-        if (newsItem.getCurrentState().equals(newsItem.getOutlet().getWorkflow().getEndState())) {
+        if (newsItem.getCurrentState().equals(newsItem.getOutlet().getWorkflow().
+                getEndState())) {
             return true;
         } else {
             return false;
@@ -560,8 +608,10 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     /** {@inheritDoc } */
     @Override
     public List<NewsItem> findAssignmentsByOutlet(Outlet selectedOutlet) {
-        Map<String, Object> params = QueryBuilder.with("outlet", selectedOutlet).parameters();
-        return daoService.findWithNamedQuery(NewsItem.FIND_ASSIGNMENTS_BY_OUTLET, params);
+        Map<String, Object> params = QueryBuilder.with("outlet", selectedOutlet).
+                parameters();
+        return daoService.findWithNamedQuery(NewsItem.FIND_ASSIGNMENTS_BY_OUTLET,
+                params);
     }
 
     /** {@inheritDoc } */
@@ -574,11 +624,13 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
             step(item, trashState, "");
             return true;
         } catch (DataNotFoundException ex) {
-            LOG.log(Level.WARNING, "Could not find news item to delete. {0}", ex.getMessage());
+            LOG.log(Level.WARNING, "Could not find news item to delete. {0}",
+                    ex.getMessage());
             LOG.log(Level.FINE, "", ex);
             return false;
         } catch (WorkflowStateTransitionException ex) {
-            LOG.log(Level.WARNING, "Could not delete news item. {0}", ex.getMessage());
+            LOG.log(Level.WARNING, "Could not delete news item. {0}", ex.
+                    getMessage());
             LOG.log(Level.FINE, "", ex);
             return false;
         }
@@ -594,10 +646,12 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
                 NewsItem item = daoService.findById(NewsItem.class, id);
                 daoService.delete(NewsItem.class, id);
                 // Schedule removal of news item from search engine
-                searchEngine.addToIndexQueue(QueueEntryType.NEWS_ITEM, id, QueueEntryOperation.REMOVE);
+                searchEngine.addToIndexQueue(QueueEntryType.NEWS_ITEM, id,
+                        QueueEntryOperation.REMOVE);
                 return true;
             } catch (DataNotFoundException ex) {
-                LOG.log(Level.WARNING, "Could not find news item to delete. {0}", ex.getMessage());
+                LOG.log(Level.WARNING, "Could not find news item to delete. {0}",
+                        ex.getMessage());
                 LOG.log(Level.FINE, "", ex);
                 return false;
             }
@@ -655,7 +709,8 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
             // NewsItem has been sent to selected users, check if the user
             // is among the selected users
             for (NewsItemActor actor : item.getActors()) {
-                if (actor.getUser().equals(user) && actor.getRole().equals(currentRole)) {
+                if (actor.getUser().equals(user) && actor.getRole().equals(
+                        currentRole)) {
                     return ContentItemPermission.USER;
                 }
             }
@@ -697,7 +752,8 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     }
 
     private List<NewsItem> findVersions(NewsItem newsItem) {
-        Map<String, Object> parameters = QueryBuilder.with("newsItem", newsItem).parameters();
+        Map<String, Object> parameters = QueryBuilder.with("newsItem", newsItem).
+                parameters();
         return daoService.findWithNamedQuery(NewsItem.FIND_VERSIONS, parameters);
     }
 
@@ -720,16 +776,18 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     public NewsItem findNewsItemById(Long id) throws DataNotFoundException {
         return daoService.findById(NewsItem.class, id);
     }
-    
+
     @Override
-    public NewsItemPlacement findNewsItemPlacementById(Long id) throws DataNotFoundException {
+    public NewsItemPlacement findNewsItemPlacementById(Long id) throws
+            DataNotFoundException {
         return daoService.findById(NewsItemPlacement.class, id);
     }
 
     /** {@inheritDoc } */
     @Override
     public boolean isCheckedOut(Long id) {
-        return !daoService.findWithNamedQuery(NewsItem.FIND_CHECKED_IN_NEWS_ITEM, QueryBuilder.with("id", id).parameters()).isEmpty();
+        return !daoService.findWithNamedQuery(NewsItem.FIND_CHECKED_IN_NEWS_ITEM,
+                QueryBuilder.with("id", id).parameters()).isEmpty();
     }
 
     /** {@inheritDoc } */
@@ -737,13 +795,19 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     public NewsItem checkin(NewsItem newsItem) throws LockingException {
 
         try {
-            UserAccount updaterUser = userService.findById(ctx.getCallerPrincipal().getName());
-            NewsItem orig = daoService.findById(NewsItem.class, newsItem.getId());
+            UserAccount updaterUser = userService.findById(ctx.
+                    getCallerPrincipal().getName());
+            NewsItem orig =
+                    daoService.findById(NewsItem.class, newsItem.getId());
 
             if (!orig.isLocked()) {
-                throw new LockingException("News Item #" + newsItem.getId() + " is not checked-out and can therefore not be checked-in");
-            } else if (orig.isLocked() && !orig.getCheckedOutBy().equals(updaterUser)) {
-                throw new LockingException("News Item #" + newsItem.getId() + " is already checked-out by " + orig.getCheckedOutBy());
+                throw new LockingException(
+                        "News Item #" + newsItem.getId()
+                        + " is not checked-out and can therefore not be checked-in");
+            } else if (orig.isLocked() && !orig.getCheckedOutBy().equals(
+                    updaterUser)) {
+                throw new LockingException("News Item #" + newsItem.getId()
+                        + " is already checked-out by " + orig.getCheckedOutBy());
             }
 
             String oldBriefing = orig.getAssignmentBriefing();
@@ -771,7 +835,8 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
                             usersToNotify.add(ua);
                         }
                     }
-                } else if (state.getPermission().equals(WorkflowStatePermission.USER)) {
+                } else if (state.getPermission().equals(
+                        WorkflowStatePermission.USER)) {
 
                     // Check all the actors for the news item
                     for (NewsItemActor actor : updated.getActors()) {
@@ -782,8 +847,10 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
                     }
                 }
 
-                String msg = cfgService.getMessage("notification_MSG_STORY_BRIEFING_UPDATED");
-                String notifyMsg = MessageFormat.format(msg, newsItem.getTitle(), updaterUser.getFullName());
+                String msg = cfgService.getMessage(
+                        "notification_MSG_STORY_BRIEFING_UPDATED");
+                String notifyMsg = MessageFormat.format(msg, newsItem.getTitle(),
+                        updaterUser.getFullName());
 
                 for (UserAccount ua : usersToNotify) {
                     notificationService.create(ua, notifyMsg);
@@ -804,7 +871,13 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
     }
 
-    /** {@inheritDoc } */
+    /**
+     * Checks-out a {@link NewsItem} from the database.
+     *
+     * @param id Unique identifier of the {@link NewsItem}
+     * @return Checked-out {@link NewsItem} in a {@link NewsItemHolder} matching the given {@code id}
+     * @throws DataNotFoundException If no {@link NewsItem} could be found with the given {@code id}
+     */
     @Override
     public NewsItemHolder checkout(Long id) throws DataNotFoundException {
         LOG.log(Level.INFO, "Checking out news item #{0}", id);
@@ -826,24 +899,33 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         NewsItem newsItem = daoService.findById(NewsItem.class, id);
         ContentItemPermission permission = getPermission(newsItem, user);
 
-        LOG.log(Level.INFO, "Permission of #{0} for {1} is {2}", new Object[]{id, user, permission.toString()});
+        LOG.log(Level.INFO, "Permission of #{0} for {1} is {2}", new Object[]{id,
+                    user, permission.toString()});
 
         if (newsItem.isLocked() && !newsItem.getCheckedOutBy().equals(user)) {
             // The item has been checked out and the check-out user is not the same as the one who has already checked it out
             //LOG.log(Level.INFO, "News Item #{0} is locked by {1}", new Object[]{id, newsItem.getCheckedOutBy()});
-            pluginContext.log(LogSeverity.INFO, "News Item #{0} is locked by {1}", new Object[]{id, newsItem.getCheckedOutBy()}, newsItem, id);
+            pluginContext.log(LogSeverity.INFO,
+                    "News Item #{0} is locked by {1}", new Object[]{id,
+                        newsItem.getCheckedOutBy().getFullName()}, newsItem, id);
             checkedOut = false;
             readOnly = true;
-        } else if (newsItem.isLocked() && newsItem.getCheckedOutBy().equals(user)) {
+        } else if (newsItem.isLocked()
+                && newsItem.getCheckedOutBy().equals(user)) {
             //LOG.log(Level.INFO, "News Item #{0} is already locked by {1}", new Object[]{id, newsItem.getCheckedOutBy()});
-            pluginContext.log(LogSeverity.INFO, "News Item #{0} is already locked by {1}", new Object[]{id, newsItem.getCheckedOutBy()}, newsItem, id);
+            pluginContext.log(LogSeverity.INFO,
+                    "News Item #{0} is already locked by {1}", new Object[]{id,
+                        newsItem.getCheckedOutBy().getFullName()}, newsItem, id);
             // The item has been checked out but the same user asking to check it out again
             checkedOut = true;
             readOnly = false;
         } else {
-            LOG.log(Level.INFO, "News Item #{0} is not locked", new Object[]{id});
-            if (permission == ContentItemPermission.USER || permission == ContentItemPermission.ROLE) {
-                pluginContext.log(LogSeverity.INFO, "Locking News Item #{0} for {1}", new Object[]{id, user}, newsItem, id);
+            //LOG.log(Level.INFO, "News Item #{0} is not locked", new Object[]{id});
+            if (permission == ContentItemPermission.USER || permission
+                    == ContentItemPermission.ROLE) {
+                pluginContext.log(LogSeverity.INFO,
+                        "Locking News Item #{0} for {1}", new Object[]{id, user.
+                            getFullName()}, newsItem, id);
                 //LOG.log(Level.INFO, "Locking News Item #{0} for {1}", new Object[]{id, user});
                 // Check-out user is the same as the current user or role of the content item
                 newsItem.setCheckedOut(Calendar.getInstance());
@@ -861,14 +943,16 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         List<NewsItem> versions = findVersions(newsItem);
 
         // Determine if pullback is available
-        if (newsItem.getLatestTransition().getUser().equals(user) && newsItem.getCurrentState().isPullbackEnabled()) {
+        if (newsItem.getLatestTransition().getUser().equals(user) && newsItem.
+                getCurrentState().isPullbackEnabled()) {
             pullbackAvailable = true;
         }
 
         // Determine which fields should be visible
         Map<String, Boolean> fieldVisibility = new HashMap<String, Boolean>();
 
-        List<NewsItemFieldVisible> visibleFields = newsItem.getCurrentState().getVisibleFields();
+        List<NewsItemFieldVisible> visibleFields = newsItem.getCurrentState().
+                getVisibleFields();
 
         for (NewsItemField field : NewsItemField.values()) {
 
@@ -884,13 +968,15 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
             }
         }
 
-        return new NewsItemHolder(newsItem, versions, permission, readOnly, checkedOut, pullbackAvailable, fieldVisibility);
+        return new NewsItemHolder(newsItem, versions, permission, readOnly,
+                checkedOut, pullbackAvailable, fieldVisibility);
     }
 
     /** {@inheritDoc } */
     @Override
     public boolean revokeLock(final Long id) {
-        int affected = daoService.executeQuery(NewsItem.REVOKE_LOCK, QueryBuilder.with("id", id));
+        int affected = daoService.executeQuery(NewsItem.REVOKE_LOCK,
+                QueryBuilder.with("id", id));
 
         if (affected > 0) {
             return true;
@@ -904,7 +990,8 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     public int revokeLocks(final String username) {
         try {
             UserAccount ua = userService.findById(username);
-            return daoService.executeQuery(NewsItem.REVOKE_LOCKS, QueryBuilder.with("user", ua));
+            return daoService.executeQuery(NewsItem.REVOKE_LOCKS, QueryBuilder.
+                    with("user", ua));
         } catch (UserNotFoundException ex) {
             LOG.log(Level.SEVERE, null, ex);
             return 0;
@@ -922,7 +1009,8 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
     /** {@inheritDoc } */
     @Override
-    public void pullback(Long id) throws LockingException, WorkflowStateTransitionException {
+    public void pullback(Long id) throws LockingException,
+            WorkflowStateTransitionException {
         LOG.log(Level.INFO, "Pulling back news item #{0}", new Object[]{id});
 
         try {
@@ -930,15 +1018,18 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
             NewsItem ni = nih.getNewsItem();
 
             if (ni.isLocked()) {
-                throw new LockingException("News item is locked and can't be pulled back");
+                throw new LockingException(
+                        "News item is locked and can't be pulled back");
             }
 
             if (!ni.getCurrentState().isPullbackEnabled()) {
-                throw new WorkflowStateTransitionException(ni.getCurrentState().getName() + " does not support pullback");
+                throw new WorkflowStateTransitionException(ni.getCurrentState().
+                        getName() + " does not support pullback");
             }
 
             if (ni.getHistory().size() < 2) {
-                throw new WorkflowStateTransitionException("Not enough history to pullback");
+                throw new WorkflowStateTransitionException(
+                        "Not enough history to pullback");
             }
 
             String uid = ctx.getCallerPrincipal().getName();
@@ -947,17 +1038,21 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
             try {
                 ua = userService.findById(uid);
             } catch (Exception ex) {
-                throw new WorkflowStateTransitionException("Could not resolve initator", ex);
+                throw new WorkflowStateTransitionException(
+                        "Could not resolve initator", ex);
             }
 
             Calendar now = Calendar.getInstance();
 
-            Collections.sort(ni.getHistory(), new BeanComparator("timestamp", false));
+            Collections.sort(ni.getHistory(), new BeanComparator("timestamp",
+                    false));
             WorkflowStateTransition oldTransition = ni.getHistory().get(1);
 
-            WorkflowState nextState = daoService.findById(WorkflowState.class, oldTransition.getState().getId());
+            WorkflowState nextState = daoService.findById(WorkflowState.class,
+                    oldTransition.getState().getId());
 
-            WorkflowStateTransition transition = new WorkflowStateTransition(ni, now, nextState, ua);
+            WorkflowStateTransition transition = new WorkflowStateTransition(ni,
+                    now, nextState, ua);
             transition.setStoryVersion(ni.getStory());
             transition.setHeadlineVersion(ni.getTitle());
             transition.setBriefVersion(ni.getBrief());
@@ -1007,10 +1102,12 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
     /** {@inheritDoc } */
     @Override
-    public NewsItem findNewsItemFromArchive(Long id) throws DataNotFoundException {
+    public NewsItem findNewsItemFromArchive(Long id) throws
+            DataNotFoundException {
         NewsItem ni = findNewsItemById(id);
 
-        if (ni.getCurrentState().equals(ni.getOutlet().getWorkflow().getEndState())) {
+        if (ni.getCurrentState().equals(
+                ni.getOutlet().getWorkflow().getEndState())) {
             return ni;
         } else {
             throw new DataNotFoundException();
@@ -1018,17 +1115,13 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     }
 
     @Override
-    public NewsItemPlacement addToNextEdition(NewsItem newsItem, Section section) throws DataNotFoundException {
-        LOG.log(Level.INFO, "Finding next edition");
+    public NewsItemPlacement addToNextEdition(NewsItem newsItem, Section section)
+            throws DataNotFoundException {
         Edition nextEdition = outletFacade.findNextEdition(newsItem.getOutlet());
 
         if (nextEdition.getId() == null) {
-            LOG.log(Level.INFO, "New edition found: ");
             nextEdition = outletFacade.createEdition(nextEdition);
-        } else {
-            LOG.log(Level.INFO, "Existing edition found");
         }
-        LOG.log(Level.INFO, nextEdition.getFriendlyName());
 
         NewsItemPlacement placement = new NewsItemPlacement();
         placement.setEdition(nextEdition);
@@ -1048,13 +1141,16 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         try {
             return daoService.update(placement);
         } catch (OptimisticLockException ex) {
-            LOG.log(Level.WARNING, "OptimsticLockException occured upon updating the NewsItemPlacement #{0}", new Object[]{placement.getId()});
+            LOG.log(Level.WARNING,
+                    "OptimsticLockException occured upon updating the NewsItemPlacement #{0}",
+                    new Object[]{placement.getId()});
             return placement;
         }
     }
 
     @Override
-    public NewsItemPlacement updatePlacement(Long placementId, Integer start, Integer position) {
+    public NewsItemPlacement updatePlacement(Long placementId, Integer start,
+            Integer position) {
         try {
             NewsItemPlacement nip;
             nip = daoService.findById(NewsItemPlacement.class, placementId);

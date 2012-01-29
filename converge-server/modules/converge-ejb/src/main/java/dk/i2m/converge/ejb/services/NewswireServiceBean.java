@@ -1,11 +1,18 @@
 /*
- * Copyright 2010 - 2011 Interactive Media Management
+ * Copyright 2010 - 2012 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later 
+ * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.ejb.services;
 
@@ -60,7 +67,7 @@ public class NewswireServiceBean implements NewswireServiceLocal {
             Logger.getLogger(NewswireServiceBean.class.getName());
 
     private ResourceBundle msgs = ResourceBundle.getBundle(
-            "dk.i2m.converge.i18n.Messages");
+            "dk.i2m.converge.i18n.ServiceMessages");
 
     @EJB private ConfigurationServiceLocal cfgService;
 
@@ -237,7 +244,7 @@ public class NewswireServiceBean implements NewswireServiceLocal {
         // Delete the newswire service
         daoService.delete(NewswireService.class, id);
     }
-    
+
 //    @Override
 //    public void downloadNewswireServicesSync() {
 //        SolrServer solrServer = getSolrServer();
@@ -254,7 +261,6 @@ public class NewswireServiceBean implements NewswireServiceLocal {
 //            }
 //        }
 //    }
-
     @Override
     public void purgeNewswires() {
         SolrServer solrServer = getSolrServer();
@@ -778,6 +784,14 @@ public class NewswireServiceBean implements NewswireServiceLocal {
         return daoService.findById(NewswireItem.class, id);
     }
 
+    /**
+     * Find a {@link List} of available {@link NewswireService}s for a given
+     * {@link UserAccount}.
+     * 
+     * @param id Unique identifier of the {@link UserAccount}
+     * @return {@link List} of available {@link NewswireService}s for the 
+     *         {@link UserAccount}
+     */
     @Override
     public List<NewswireService> findAvailableNewswireServices(Long id) {
         List<NewswireService> servicesAvailable =
@@ -807,177 +821,240 @@ public class NewswireServiceBean implements NewswireServiceLocal {
     @Override
     public void dispatchBaskets() {
         Long taskId = 0L;
-        taskId = systemFacade.createBackgroundTask(
-                "Dispatching newswire baskets by e-mail");
+        taskId = systemFacade.createBackgroundTask(msgs.getString(
+                "NewswireServiceBean_BASKET_DISPATCH_TASK"));
         SimpleDateFormat dateFormat = new SimpleDateFormat(msgs.getString(
-                "FORMAT_DATE_AND_TIME"));
+                "Generic_FORMAT_DATE_AND_TIME"));
         final String NL = System.getProperty("line.separator");
         final String SENDER = cfgService.getString(
                 ConfigurationKey.NEWSWIRE_BASKET_MAIL);
         final String HOME_URL = cfgService.getString(
                 ConfigurationKey.CONVERGE_HOME_URL);
         final String LBL_READ_MORE = msgs.getString(
-                "newswire_basket_mail_READ_MORE");
+                "NewswireServiceBean_BASKET_MAIL_READ_MORE");
         final String LBL_BASKET_SUMMARY = msgs.getString(
-                "newswire_basket_mail_BASKET_SUMMARY");
-        final String LBL_MATCHES =
-                msgs.getString("newswire_basket_mail_MATCHES");
+                "NewswireServiceBean_BASKET_MAIL_SUMMARY");
+        final String LBL_MATCHES = msgs.getString(
+                "NewswireServiceBean_BASKET_MAIL_MATCHES");
         final String LBL_SEARCH_TERMS = msgs.getString(
-                "newswire_basket_mail_SEARCH_TERMS");
-        final String LBL_TAGS = msgs.getString("newswire_basket_mail_TAGS");
+                "NewswireServiceBean_BASKET_MAIL_SEARCH_TERMS");
+        final String LBL_TAGS = msgs.getString(
+                "NewswireServiceBean_BASKET_MAIL_TAGS");
         final String LBL_SERVICES = msgs.getString(
-                "newswire_basket_mail_SERVICES");
+                "NewswireServiceBean_BASKET_MAIL_SERVICES");
         final String LBL_SERVICES_ALL = msgs.getString(
-                "newswire_basket_mail_SERVICES_ALL");
+                "NewswireServiceBean_BASKET_MAIL_SERVICES_ALL");
         final String LBL_BASKET_SUBJECT = msgs.getString(
-                "newswire_basket_mail_SUBJECT");
+                "NewswireServiceBean_BASKET_MAIL_SUBJECT");
 
         Calendar now = Calendar.getInstance();
         List<NewswireBasket> baskets =
                 daoService.findWithNamedQuery(
                 NewswireBasket.FIND_BY_EMAIL_DISPATCH);
-        LOG.log(Level.FINE, "Preparing dispatch of {0} baskets", baskets.size());
 
         for (NewswireBasket basket : baskets) {
-            Calendar lastDelivery = (Calendar) now.clone();
-            if (basket.getLastDelivery() == null) {
-                lastDelivery.add(Calendar.HOUR_OF_DAY, -24);
-                basket.setLastDelivery(now.getTime());
-            } else {
-                lastDelivery.setTime(basket.getLastDelivery());
-            }
-
-            Calendar next = (Calendar) now.clone();
-            next.set(Calendar.MINUTE, 0);
-            next.set(Calendar.SECOND, 0);
-            next.set(Calendar.MILLISECOND, 0);
-            next.add(Calendar.HOUR_OF_DAY, basket.getMailFrequency());
-            basket.setNextDelivery(next.getTime());
-
-            StringBuilder query = new StringBuilder();
-            query.append("date:[NOW-").append(basket.getMailFrequency()).append(
-                    "HOURS ").append(" TO NOW] && ").append(basket.getQuery());
-            SearchResults searchResults = search(query.toString(), 0, 1000,
-                    "score", false, new String[]{});
-
-            if (searchResults.getHits().size() > 0) {
-                dateFormat.setTimeZone(basket.getOwner().getTimeZone());
-
-                StringBuilder htmlContent = new StringBuilder();
-                StringBuilder plainContent = new StringBuilder();
-
-                htmlContent.append("<html><head><title>").append(
-                        basket.getTitle()).append("</title>").append(
-                        "</head><body>");
-
-                htmlContent.append("<h1>").append(basket.getTitle()).append(
-                        "</h1>");
-                plainContent.append(basket.getTitle().toUpperCase()).append(NL).
-                        append(NL);
-
-                for (SearchResult sr : searchResults.getHits()) {
-                    String link = compileMsg(sr.getLink(),
-                            new Object[]{HOME_URL}, basket.getOwner().
-                            getPreferredLocale());
-
-                    htmlContent.append(
-                            "<h2 style=\"margin-bottom: 0px; padding-top: 10px;\">").
-                            append(sr.getTitle()).append("</h2>");
-                    htmlContent.append("<p style=\"margin-top: 0px;\">");
-                    htmlContent.append(
-                            " <span style=\"font-size: 0.9em; color: #0E774A; font-weight: bold; text-transform: uppercase;\">").
-                            append(sr.getNote()).append("</span>");
-                    htmlContent.append(
-                            " <span style=\"font-size: 0.9em; color: #4272DB; text-transform:  uppercase;\">&#160;").
-                            append(dateFormat.format(sr.getLatestDate())).append(
-                            "</span>");
-                    htmlContent.append("</p>");
-                    htmlContent.append("<p style=\"margin-top: 0px;\">");
-                    if (sr.isPreview()) {
-                        htmlContent.append("<a href=\"").append(link).append(
-                                "\"><img src=\"").append(sr.getPreviewLink()).
-                                append(
-                                "\" style=\"border: 1px solid black; margin-right: 5px; margin-top: 5px;\" align=\"left\" alt=\"\" title=\"\" /></a>");
-                    }
-
-                    htmlContent.append(sr.getDescription()).append("</p>");
-                    htmlContent.append("<p><a href=\"").append(link).append(
-                            "\">").append(LBL_READ_MORE).append(
-                            "</a></p><div style=\"clear: both;\" />");
-
-                    plainContent.append(sr.getTitle().toUpperCase()).append(NL);
-                    plainContent.append(sr.getNote().toUpperCase()).append(" ").
-                            append(sr.getLatestDate()).append(NL);
-                    plainContent.append(dk.i2m.converge.core.utils.StringUtils.
-                            stripHtml(sr.getDescription()).trim()).append(NL).
-                            append(NL);
-                    plainContent.append(LBL_READ_MORE).append(" ").append(link).
-                            append(NL).append("===").append(NL);
-                }
-
-                htmlContent.append("<hr/><h3>").append(LBL_BASKET_SUMMARY).
-                        append("</h3>");
-                plainContent.append(LBL_BASKET_SUMMARY.toUpperCase()).append(NL);
-
-                htmlContent.append("<p>").append(LBL_MATCHES).append(searchResults.
-                        getNumberOfResults()).append("</p>");
-                plainContent.append(LBL_MATCHES).append(searchResults.
-                        getNumberOfResults()).append(NL);
-
-                htmlContent.append("<p>").append(LBL_SEARCH_TERMS).append(basket.
-                        getSearchTerm()).append("</p>");
-                plainContent.append(LBL_SEARCH_TERMS).append(searchResults.
-                        getNumberOfResults()).append(NL);
-
-                if (!basket.getTags().isEmpty()) {
-                    htmlContent.append("<p>").append(LBL_TAGS).append("<ul>");
-                    plainContent.append(LBL_TAGS).append(NL);
-                    for (ContentTag tag : basket.getTags()) {
-                        htmlContent.append("<li>").append(tag.getTag()).append(
-                                "</li>");
-                        plainContent.append("* ").append(tag.getTag()).append(NL);
-                    }
-                    htmlContent.append("</ul></p>");
-                    plainContent.append(NL);
-                }
-
-                htmlContent.append("<p>").append(LBL_SERVICES).append("<ul>");
-                plainContent.append(LBL_SERVICES).append(NL);
-
-                if (basket.getAppliesTo().isEmpty()) {
-                    htmlContent.append("<li>").append(LBL_SERVICES_ALL).append(
-                            "</li>");
-                    plainContent.append("* ").append(LBL_SERVICES_ALL);
-                } else {
-                    for (NewswireService service : basket.getAppliesTo()) {
-                        htmlContent.append("<li>").append(service.getSource()).
-                                append("</li>");
-                        plainContent.append("* ").append(service.getSource()).
-                                append(NL);
-                    }
-                }
-
-                htmlContent.append("</ul></p>");
-                plainContent.append(NL);
-
-                htmlContent.append("</body></html>");
-
-                // Generate subject
-                String subject = compileMsg(LBL_BASKET_SUBJECT,
-                        new Object[]{searchResults.getHits().size(), basket.
-                            getTitle()}, basket.getOwner().getPreferredLocale());
-
-                // Dispatch mail
-                notificationService.dispatchMail(basket.getOwner().getEmail(),
-                        SENDER, subject, htmlContent.toString(), plainContent.
-                        toString());
-            } else {
-                LOG.log(Level.FINEST, "No hits in basket [{0}] for [{1}]",
-                        new Object[]{basket.getTitle(), basket.getOwner().
-                            getFullName()});
-            }
+            dispatchBasket(basket);
         }
         systemFacade.removeBackgroundTask(taskId);
+    }
+
+    /**
+     * Dispatches a {@link NewswireBasket} via e-mail.
+     * 
+     * @param id Unique identifier of the {@link NewswireBasket}
+     * @return {@code true} if the basket has items that was e-mailed, otherwise {@code false}
+     */
+    @Override
+    public boolean dispatchBasket(Long id) {
+        try {
+            NewswireBasket b = daoService.findById(NewswireBasket.class, id);
+            return dispatchBasket(b);
+        } catch (DataNotFoundException ex) {
+            LOG.log(Level.WARNING, ex.getMessage());
+            return false;
+        }
+    }
+
+    private boolean dispatchBasket(NewswireBasket basket) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(msgs.getString(
+                "Generic_FORMAT_DATE_AND_TIME"));
+        final String NL = System.getProperty("line.separator");
+        final String SENDER = cfgService.getString(
+                ConfigurationKey.NEWSWIRE_BASKET_MAIL);
+        final String HOME_URL = cfgService.getString(
+                ConfigurationKey.CONVERGE_HOME_URL);
+        final String LBL_READ_MORE = msgs.getString(
+                "NewswireServiceBean_BASKET_MAIL_READ_MORE");
+        final String LBL_BASKET_SUMMARY = msgs.getString(
+                "NewswireServiceBean_BASKET_MAIL_SUMMARY");
+        final String LBL_MATCHES = msgs.getString(
+                "NewswireServiceBean_BASKET_MAIL_MATCHES");
+        final String LBL_SEARCH_TERMS = msgs.getString(
+                "NewswireServiceBean_BASKET_MAIL_SEARCH_TERMS");
+        final String LBL_TAGS = msgs.getString(
+                "NewswireServiceBean_BASKET_MAIL_TAGS");
+        final String LBL_SERVICES = msgs.getString(
+                "NewswireServiceBean_BASKET_MAIL_SERVICES");
+        final String LBL_SERVICES_ALL = msgs.getString(
+                "NewswireServiceBean_BASKET_MAIL_SERVICES_ALL");
+        final String LBL_BASKET_SUBJECT = msgs.getString(
+                "NewswireServiceBean_BASKET_MAIL_SUBJECT");
+
+        Calendar now = Calendar.getInstance();
+
+        Calendar lastDelivery = (Calendar) now.clone();
+        if (basket.getLastDelivery() == null) {
+            lastDelivery.add(Calendar.HOUR_OF_DAY, -24);
+            basket.setLastDelivery(now.getTime());
+        } else {
+            lastDelivery.setTime(basket.getLastDelivery());
+        }
+
+        Calendar next = (Calendar) now.clone();
+        next.set(Calendar.MINUTE, 0);
+        next.set(Calendar.SECOND, 0);
+        next.set(Calendar.MILLISECOND, 0);
+        next.add(Calendar.HOUR_OF_DAY, basket.getMailFrequency());
+        basket.setNextDelivery(next.getTime());
+
+        StringBuilder query = new StringBuilder();
+        query.append("date:[NOW-").
+                append(basket.getMailFrequency()).
+                append("HOURS ").
+                append(" TO NOW]");
+        
+        if (!basket.getQuery().trim().isEmpty()) {
+            query.append(" && ");
+            query.append(basket.getQuery());
+        }
+
+        SearchResults searchResults;
+        try {
+            searchResults = search(query.toString(), 0, 1000, "score", false,
+                    new String[]{});
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Problem dispatching basket #{0} with query {1}. {2}",
+                    new Object[]{basket.getId(), query.toString(), ex.getMessage()});
+            return false;
+        }
+
+        if (searchResults.getHits().size() > 0) {
+            dateFormat.setTimeZone(basket.getOwner().getTimeZone());
+
+            StringBuilder htmlContent = new StringBuilder();
+            StringBuilder plainContent = new StringBuilder();
+
+            htmlContent.append("<html><head><title>").
+                    append(basket.getTitle()).
+                    append("</title>").
+                    append("</head><body><h1>").
+                    append(basket.getTitle()).
+                    append("</h1>");
+
+            plainContent.append(basket.getTitle().toUpperCase()).
+                    append(NL).append(NL);
+
+            for (SearchResult sr : searchResults.getHits()) {
+                String link = HOME_URL + "/NewswireItem.xhtml?id=" + sr.getId();
+
+                htmlContent.append(
+                        "<h2 style=\"margin-bottom: 0px; padding-top: 10px;\">").
+                        append(sr.getTitle()).
+                        append("</h2>");
+                htmlContent.append("<p style=\"margin-top: 0px;\">");
+                htmlContent.append(
+                        " <span style=\"font-size: 0.9em; color: #0E774A; font-weight: bold; text-transform: uppercase;\">").
+                        append(sr.getNote()).
+                        append("</span>");
+                htmlContent.append(
+                        " <span style=\"font-size: 0.9em; color: #4272DB; text-transform:  uppercase;\">&#160;").
+                        append(dateFormat.format(sr.getLatestDate())).append(
+                        "</span>");
+                htmlContent.append("</p>");
+                htmlContent.append("<p style=\"margin-top: 0px;\">");
+                if (sr.isPreview()) {
+                    htmlContent.append("<a href=\"").append(link).append(
+                            "\"><img src=\"").append(sr.getPreviewLink()).
+                            append(
+                            "\" style=\"border: 1px solid black; margin-right: 5px; margin-top: 5px;\" align=\"left\" alt=\"\" title=\"\" /></a>");
+                }
+
+                htmlContent.append(sr.getDescription()).append("</p>");
+                htmlContent.append("<p><a href=\"").append(link).append(
+                        "\">").append(LBL_READ_MORE).append(
+                        "</a></p><div style=\"clear: both;\" />");
+
+                plainContent.append(sr.getTitle().toUpperCase()).append(NL);
+                plainContent.append(sr.getNote().toUpperCase()).append(" ").
+                        append(sr.getLatestDate()).append(NL);
+                plainContent.append(dk.i2m.converge.core.utils.StringUtils.
+                        stripHtml(sr.getDescription()).trim()).append(NL).
+                        append(NL);
+                plainContent.append(LBL_READ_MORE).append(" ").append(link).
+                        append(NL).append("===").append(NL);
+            }
+
+            htmlContent.append("<hr/><h3>").append(LBL_BASKET_SUMMARY).
+                    append("</h3>");
+            plainContent.append(LBL_BASKET_SUMMARY.toUpperCase()).append(NL);
+
+            htmlContent.append("<p>").append(LBL_MATCHES).append(searchResults.
+                    getNumberOfResults()).append("</p>");
+            plainContent.append(LBL_MATCHES).append(searchResults.
+                    getNumberOfResults()).append(NL);
+
+            htmlContent.append("<p>").append(LBL_SEARCH_TERMS).append(basket.
+                    getSearchTerm()).append("</p>");
+            plainContent.append(LBL_SEARCH_TERMS).append(searchResults.
+                    getNumberOfResults()).append(NL);
+
+            if (!basket.getTags().isEmpty()) {
+                htmlContent.append("<p>").append(LBL_TAGS).append("<ul>");
+                plainContent.append(LBL_TAGS).append(NL);
+                for (ContentTag tag : basket.getTags()) {
+                    htmlContent.append("<li>").append(tag.getTag()).append(
+                            "</li>");
+                    plainContent.append("* ").append(tag.getTag()).append(NL);
+                }
+                htmlContent.append("</ul></p>");
+                plainContent.append(NL);
+            }
+
+            htmlContent.append("<p>").append(LBL_SERVICES).append("<ul>");
+            plainContent.append(LBL_SERVICES).append(NL);
+
+            if (basket.getAppliesTo().isEmpty()) {
+                htmlContent.append("<li>").append(LBL_SERVICES_ALL).append(
+                        "</li>");
+                plainContent.append("* ").append(LBL_SERVICES_ALL);
+            } else {
+                for (NewswireService service : basket.getAppliesTo()) {
+                    htmlContent.append("<li>").append(service.getSource()).
+                            append("</li>");
+                    plainContent.append("* ").append(service.getSource()).
+                            append(NL);
+                }
+            }
+
+            htmlContent.append("</ul></p>");
+            plainContent.append(NL);
+
+            htmlContent.append("</body></html>");
+
+            // Generate subject
+            String subject = compileMsg(LBL_BASKET_SUBJECT,
+                    new Object[]{searchResults.getHits().size(),
+                        basket.getTitle()},
+                    basket.getOwner().getPreferredLocale());
+
+            // Dispatch mail
+            notificationService.dispatchMail(basket.getOwner().getEmail(),
+                    SENDER, subject, htmlContent.toString(), plainContent.
+                    toString());
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private String compileMsg(String pattern, Object[] arguments,

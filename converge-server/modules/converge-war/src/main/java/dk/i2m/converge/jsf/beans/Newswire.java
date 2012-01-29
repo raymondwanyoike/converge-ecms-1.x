@@ -44,6 +44,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
+import static dk.i2m.jsf.JsfUtils.*;
 
 /**
  * Request-scoped backing bean for the {@code Newswire.jspx} page.
@@ -177,6 +178,19 @@ public class Newswire {
             }
         }
         this.baskets = null;
+    }
+    
+    /**
+     * Dispatches the current basket as an e-mail.
+     * 
+     * @param event Event that invoked the handler
+     */
+    public void onDispatchBasket(ActionEvent event) {
+        if (newswireService.dispatchBasket(selectedBasket.getId())) {
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n", "Newswire_BASKET_DISPATCHED", null);
+        } else {
+            createMessage("frmPage", FacesMessage.SEVERITY_WARN, "i18n", "Newswire_BASKET_EMPTY_NOT_DISPATCHED", selectedBasket.getMailFrequency());
+        }
     }
 
     public void setDeleteTag(ContentTag tag) {

@@ -1,7 +1,11 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:v="http://converge.i2m.dk" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
 
-    <ui:composition template="/WEB-INF/facelets/templates//administration.xhtml">
+<<<<<<< HEAD
+    <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
+=======
+    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/administration.xhtml">
+>>>>>>> parent of 53176a2... WebUI Changes 1
         <ui:define name="title">#{msgs.language_LANGUAGES}</ui:define>
 
         <ui:define name="body">
@@ -90,12 +94,12 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveLanguageDetails" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Languages.onSave}" reRender="pgLanguageDetails,dtLanguages" oncomplete="if (#{converge:isAllValid()}) { Richfaces.hideModalPanel('mpLanguageDetails'); return false;}" />
-                            <a4j:commandLink id="lnkApplyLanguageDetails" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" reRender="pgLanguageDetails,dtLanguages" actionListener="#{administrator_Languages.onSave}" />
-                            <a4j:commandLink id="lnkDeleteLanguageDetails" rendered="#{administrator_Languages.editMode}" onclick="if (confirm('#{msgs.language_DELETE_PROMPT}') != true){ return false; };" actionListener="#{administrator_Languages.onDelete}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="frmLanguageDetails,dtLanguages">
+                            <a4j:commandLink id="lnkSaveLanguageDetails" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{administrator_Languages.onSave}" reRender="pgLanguageDetails,dtLanguages" oncomplete="if (#{converge:isAllValid()}) { Richfaces.hideModalPanel('mpLanguageDetails'); return false;}" />
+                            <a4j:commandLink id="lnkApplyLanguageDetails" styleClass="dialogButton" value="#{msgs.APPLY}" reRender="pgLanguageDetails,dtLanguages" actionListener="#{administrator_Languages.onSave}" />
+                            <a4j:commandLink id="lnkDeleteLanguageDetails" rendered="#{administrator_Languages.editMode}" onclick="if (confirm('#{msgs.language_DELETE_PROMPT}') != true){ return false; };" actionListener="#{administrator_Languages.onDelete}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="frmLanguageDetails,dtLanguages">
                                 <rich:componentControl for="mpLanguageDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
-                            <h:commandLink id="lnkCancelLanguageDetails" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpLanguageDetails')}.hide(); return false;" />
+                            <h:commandLink id="lnkCancelLanguageDetails" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpLanguageDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 

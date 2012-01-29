@@ -32,10 +32,11 @@ import org.eclipse.persistence.annotations.PrivateOwned;
 @Entity
 @Table(name = "newswire_service")
 @NamedQueries({
+    @NamedQuery(name = NewswireService.RESET_PROCESSING, query = "UPDATE NewswireService ns SET ns.processing = false"),
     @NamedQuery(name = NewswireService.COUNT_SUBSCRIBERS, query = "select count(ns.subscribers) from NewswireService ns where ns.id=:id"),
     @NamedQuery(name = NewswireService.DELETE_EXPIRED_ITEMS, query = "DELETE FROM NewswireItem ni WHERE ni.newswireService.id=:id AND ni.date <= :expirationDate"),
     @NamedQuery(name = NewswireService.COUNT_ITEMS, query = "select count(ns.items) from NewswireService ns where ns.id=:id"),
-    @NamedQuery(name = NewswireService.FIND_BY_STATUS, query = "select ns from NewswireService ns where ns.active=:active")})
+    @NamedQuery(name = NewswireService.FIND_BY_STATUS, query = "SELECT ns FROM NewswireService ns WHERE ns.active = :active ORDER BY ns.source ASC")})
 public class NewswireService implements Serializable {
 
     /**
@@ -43,6 +44,9 @@ public class NewswireService implements Serializable {
      */
     public static final String DELETE_EXPIRED_ITEMS = "NewswireService.deleteExpiredItems";
 
+    /** Query for resetting the processing status of all newswire services. */
+    public static final String RESET_PROCESSING = "NewswireService.resetProcessing";
+    
     public static final String COUNT_SUBSCRIBERS = "NewswireService.countSubscribers";
 
     public static final String COUNT_ITEMS = "NewswireService.countItems";

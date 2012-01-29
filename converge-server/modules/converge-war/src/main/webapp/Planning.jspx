@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root version="2.0" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:v="http://converge.i2m.dk" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
 
-    <ui:composition template="/WEB-INF/facelets/templates//planning.xhtml">
+<<<<<<< HEAD
+    <ui:composition template="/WEB-INF/facelets/templates/planning.xhtml">
+=======
+    <ui:composition template="/themes/#{initParam['templateName']}/facelets/templates/planning.xhtml">
+>>>>>>> parent of 53176a2... WebUI Changes 1
 
         <ui:define name="leftColumnBottom">
 
@@ -95,7 +99,7 @@
                                     <h:outputText value="#{section.end}" />
                                 </rich:column>
                                 <rich:column>
-                                    <a4j:commandButton styleClass="button mediumButton" value="#{i18n.planning_NEW_ASSIGNMENT}" ajaxSingle="true" rendered="#{edition.open}">
+                                    <a4j:commandButton styleClass="button mediumButton" value="#{msgs.planning_NEW_ASSIGNMENT}" ajaxSingle="true" rendered="#{edition.open}">
                                         <f:setPropertyActionListener target="#{planning.selectedEdition}" value="#{edition}" />
                                         <f:setPropertyActionListener target="#{planning.selectedEditionSection}" value="#{section}" />
                                         <a4j:support event="oncomplete" actionListener="#{planning.onNewEditionPlacement}" reRender="frmAssignmentDetails">
@@ -131,7 +135,7 @@
                                     </rich:column>
                                     <rich:column>
                                         <h:outputText value="#{item.deadline.time}">
-                                            <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                            <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                                         </h:outputText>
                                     </rich:column>
                                     <rich:column id="colPosition" sortBy="#{item.start}" sortOrder="ASCENDING">
@@ -173,10 +177,10 @@
                                     <h:selectBooleanCheckbox value="#{planning.selectedEdition.open}" />
 
                                     <h:outputText value="#{msgs.planning_EDITION_PUBLICATION_DATE}:" />
-                                    <rich:calendar popup="true" value="#{planning.selectedEdition.publicationDate.time}" datePattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}"/>
+                                    <rich:calendar popup="true" value="#{planning.selectedEdition.publicationDate.time}" datePattern="#{msgs.FORMAT_DATE_AND_TIME}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}"/>
 
                                     <h:outputText value="#{msgs.planning_EDITION_EXPIRATION_DATE}:" />
-                                    <rich:calendar popup="true" value="#{planning.selectedEdition.expirationDate.time}" firstWeekDay="1" datePattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}"/>
+                                    <rich:calendar popup="true" value="#{planning.selectedEdition.expirationDate.time}" firstWeekDay="1" datePattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}"/>
 
                                     <h:outputText value="#{msgs.planning_EDITION_VOLUME}:" />
                                     <rich:inputNumberSpinner value="#{planning.selectedEdition.volume}" styleClass="text" maxValue="9999" />
@@ -280,13 +284,13 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveEdition" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{planning.onSaveEdition}" reRender="frmPage">
+                            <a4j:commandLink id="lnkSaveEdition" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{planning.onSaveEdition}" reRender="frmPage">
                                 <rich:componentControl for="mpEditionDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
 
                             <a4j:commandLink id="lnkApplyEdition"
                                              styleClass="dialogButton"
-                                             value="#{i18n.Generic_APPLY}"
+                                             value="#{msgs.APPLY}"
                                              actionListener="#{planning.onSaveEdition}"
                                              reRender="pgEditionDetails, frmPage" />
 
@@ -295,7 +299,7 @@
                                              onclick="if (confirm('#{msgs.planning_EDITION_PROMPT_DELETE}') != true){ return false; };"
                                              actionListener="#{planning.onDeleteEdition}"
                                              styleClass="dialogButton"
-                                             value="#{i18n.Generic_DELETE}"
+                                             value="#{msgs.DELETE}"
                                              reRender="frmPage">
                                 <rich:componentControl for="mpEditionDetails"
                                                        operation="hide"
@@ -350,7 +354,7 @@
 
                             <a4j:commandLink id="lnkSaveEditionSection"
                                              styleClass="dialogButton"
-                                             value="#{i18n.Generic_SAVE}"
+                                             value="#{msgs.SAVE}"
                                              actionListener="#{planning.onSaveEditionSection}"
                                              reRender="pgEditionSections"
                                              limitToList="true">
@@ -361,7 +365,7 @@
 
                             <a4j:commandLink id="lnkApplyEditionSection"
                                              styleClass="dialogButton"
-                                             value="#{i18n.Generic_APPLY}"
+                                             value="#{msgs.APPLY}"
                                              actionListener="#{planning.onSaveEditionSection}"
                                              reRender="pgEditionSections, pgEditionSectionDetails"
                                              limitToList="true" />
@@ -371,7 +375,7 @@
                                              onclick="if (confirm('#{msgs.planning_EDITION_SECTION_PROMPT_DELETE}') != true){ return false; };"
                                              actionListener="#{planning.onDeleteEditionSection}"
                                              styleClass="dialogButton"
-                                             value="#{i18n.Generic_DELETE}"
+                                             value="#{msgs.DELETE}"
                                              reRender="pgEditionSections"
                                              limitToList="true">
                                 <rich:componentControl for="mpEditionSectionDetails"
@@ -382,7 +386,7 @@
 
                             <h:commandLink id="lnkCloseEditionSectionForm"
                                            styleClass="dialogButton"
-                                           value="#{i18n.Generic_CANCEL}"
+                                           value="#{msgs.CANCEL}"
                                            onclick="#{rich:component('mpEditionSectionDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
@@ -460,7 +464,7 @@
                             <a4j:commandLink id="lnkUseTemplate" styleClass="dialogButton" value="#{msgs.planning_EDITION_USE_TEMPLATE}" title="#{msgs.planning_EDITION_USE_TEMPLATE_TOOLTIP}" actionListener="#{planning.onUseEditionTemplate}" reRender="pgEditionSections">
                                 <rich:componentControl for="mpEditionTemplateDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
-                            <h:commandLink id="lnkCloseTemplates" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpEditionTemplateDetails')}.hide(); return false;" />
+                            <h:commandLink id="lnkCloseTemplates" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpEditionTemplateDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 

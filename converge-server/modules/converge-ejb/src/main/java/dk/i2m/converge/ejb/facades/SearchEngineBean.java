@@ -27,6 +27,7 @@ import dk.i2m.converge.core.search.IndexQueueEntry;
 import dk.i2m.converge.core.search.QueueEntryOperation;
 import dk.i2m.converge.core.search.QueueEntryType;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
+import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.utils.BeanComparator;
 import dk.i2m.converge.domain.search.IndexField;
 import dk.i2m.converge.domain.search.SearchFacet;
@@ -36,24 +37,22 @@ import dk.i2m.converge.ejb.services.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+import javax.annotation.Resource;
+import javax.ejb.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFHeader;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HeaderFooter;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Footer;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
@@ -66,6 +65,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.tika.Tika;
 
 /**
  * Stateless session bean implementing a search engine service.
@@ -78,6 +78,8 @@ public class SearchEngineBean implements SearchEngineLocal {
     private static final Logger LOG = Logger.getLogger(SearchEngineBean.class.
             getName());
 
+    /** Internationalisation of messages. */
+    //private ResourceBundle i18n = ResourceBundle.getBundle("dk.i2m.converge.i18n.ServiceMessages");
     @EJB private ConfigurationServiceLocal cfgService;
 
     @EJB private UserFacadeLocal userFacade;
@@ -89,6 +91,8 @@ public class SearchEngineBean implements SearchEngineLocal {
     @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @EJB private MetaDataServiceLocal metaDataService;
+
+    @Resource private SessionContext ctx;
 
     private DateFormat solrDateFormat = new SimpleDateFormat(
             "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -122,6 +126,22 @@ public class SearchEngineBean implements SearchEngineLocal {
     @Override
     public void removeFromQueue(Long id) {
         daoService.delete(IndexQueueEntry.class, id);
+    }
+
+    /**
+     * Remove an item from the search engine.
+     * <p/>
+     * @param id Unique identifier of the item to remove
+     */
+    @Override
+    public void removeItem(Long id) {
+        try {
+            getSolrServer().deleteById(String.valueOf(id));
+        } catch (SolrServerException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -316,6 +336,8 @@ public class SearchEngineBean implements SearchEngineLocal {
                     hit = generateMediaHit(qr, values);
                 }
 
+                generateTags(hit, qr, values);
+
                 if (hit != null) {
                     hit.setScore((Float) d.getFieldValue("score"));
                     searchResults.getHits().add(hit);
@@ -399,8 +421,6 @@ public class SearchEngineBean implements SearchEngineLocal {
                 }
             }
 
-
-
         } catch (SolrServerException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
@@ -413,52 +433,115 @@ public class SearchEngineBean implements SearchEngineLocal {
         return searchResults;
     }
 
+    /**
+     * Generates an overview reports of a set of {@link SearchResults}. The
+     * search results will be extracted (fetched) so that it is not just the
+     * partial set of {@link SearchResults} that will be included in the report.
+     * <p/>
+     * @param results {@link SearchResults} for which to generate the report
+     * @return Binary data representing the report
+     */
     @Override
     public byte[] generateReport(SearchResults results) {
+        ResourceBundle i18n;
+        try {
+            String uid = ctx.getCallerPrincipal().getName();
+            UserAccount user = userFacade.findById(uid);
+            Locale userLocale = user.getPreferredLocale();
+            i18n = ResourceBundle.getBundle(
+                    "dk.i2m.converge.i18n.ServiceMessages", userLocale);
+        } catch (DataNotFoundException ex) {
+            i18n = ResourceBundle.getBundle(
+                    "dk.i2m.converge.i18n.ServiceMessages");
+        }
 
-        SimpleDateFormat format = new SimpleDateFormat("d MMMM yyyy");
+        String lblSheetName = i18n.getString(
+                "SearchEngineBean_generateReport_SHEET_NAME");
+        String lblHeaderLeft = i18n.getString(
+                "SearchEngineBean_generateReport_HEADER_LEFT");
+        String lblHeaderRight = i18n.getString(
+                "SearchEngineBean_generateReport_HEADER_RIGHT");
+        String lblFooterLeft = i18n.getString(
+                "SearchEngineBean_generateReport_FOOTER_LEFT");
+        String lblFooterRight = i18n.getString(
+                "SearchEngineBean_generateReport_FOOTER_RIGHT");
+        String lblDateFormat = i18n.getString(
+                "SearchEngineBean_generateReport_DATE_FORMAT");
+        String lblRowHeaderId = i18n.getString(
+                "SearchEngineBean_generateReport_ROW_HEADER_ID");
+        String lblRowHeaderDate = i18n.getString(
+                "SearchEngineBean_generateReport_ROW_HEADER_DATE");
+        String lblRowHeaderTitle = i18n.getString(
+                "SearchEngineBean_generateReport_ROW_HEADER_TITLE");
+        String lblRowHeaderOutlet = i18n.getString(
+                "SearchEngineBean_generateReport_ROW_HEADER_OUTLET");
+        String lblRowHeaderSection = i18n.getString(
+                "SearchEngineBean_generateReport_ROW_HEADER_SECTION");
+
         HSSFWorkbook wb = new HSSFWorkbook();
 
-        String sheetName = WorkbookUtil.createSafeSheetName("Results");
+        String sheetName = WorkbookUtil.createSafeSheetName(lblSheetName);
         int overviewSheetRow = 0;
-
-        Font headerFont = wb.createFont();
-        headerFont.setFontHeightInPoints((short) 14);
-        headerFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
-
-        Font userFont = wb.createFont();
-        userFont.setFontHeightInPoints((short) 12);
-        userFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
 
         Font storyFont = wb.createFont();
         storyFont.setFontHeightInPoints((short) 12);
         storyFont.setBoldweight(Font.BOLDWEIGHT_NORMAL);
 
-//        CellStyle headerStyle = createHeaderStyle(wb, headerFont);
-//        CellStyle headerVerticalStyle = createHeaderVerticalStyle(wb, headerFont);
-//        CellStyle userStyle = createUserStyle(wb, userFont);
-//        CellStyle storyCenterStyle = createStoryCenterStyle(wb);
-//        CellStyle storyStyle = createStoryStyle(wb, storyFont);
-//        CellStyle percentStyle = createPercentStyle(wb, userFont);
+        // Create style with borders
+        CellStyle style = wb.createCellStyle();
+        style.setBorderBottom(CellStyle.BORDER_THIN);
+        style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderLeft(CellStyle.BORDER_THIN);
+        style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderRight(CellStyle.BORDER_THIN);
+        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderTop(CellStyle.BORDER_THIN);
+        style.setTopBorderColor(IndexedColors.BLACK.getIndex());
+
+        // Create style for date cells
+        CreationHelper createHelper = wb.getCreationHelper();
+        CellStyle dateStyle = wb.createCellStyle();
+        dateStyle.setDataFormat(createHelper.createDataFormat().getFormat(
+                lblDateFormat));
+        dateStyle.setBorderBottom(CellStyle.BORDER_THIN);
+        dateStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        dateStyle.setBorderLeft(CellStyle.BORDER_THIN);
+        dateStyle.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        dateStyle.setBorderRight(CellStyle.BORDER_THIN);
+        dateStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        dateStyle.setBorderTop(CellStyle.BORDER_THIN);
+        dateStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
 
         HSSFSheet overviewSheet = wb.createSheet(sheetName);
+
+        // Create sheet header
         HSSFHeader sheetHeader = overviewSheet.getHeader();
+        sheetHeader.setLeft(lblHeaderLeft);
+        sheetHeader.setRight(lblHeaderRight);
 
-        sheetHeader.setLeft("CONVERGE Story Report");
-        sheetHeader.setRight("");
+        // Create sheet footer
+        Footer footer = overviewSheet.getFooter();
+        String footerLeft = MessageFormat.format(lblFooterLeft,
+                new Object[]{HeaderFooter.page(), HeaderFooter.numPages()});
+        String footerRight = MessageFormat.format(lblFooterRight,
+                new Object[]{HeaderFooter.date(), HeaderFooter.time()});
+        footer.setLeft(footerLeft);
+        footer.setRight(footerRight);
 
+        // Freeze the header row
         overviewSheet.createFreezePane(0, 1, 0, 1);
 
         Row row = overviewSheet.createRow(0);
-        row.createCell(0).setCellValue("ID");
-        row.createCell(1).setCellValue("Date");
-        row.createCell(2).setCellValue("Title");
-        row.createCell(3).setCellValue("Outlet");
-        row.createCell(4).setCellValue("Section");
-
-        for (int i = 0; i <= 2; i++) {
-//                row.getCell(i).setCellStyle(headerStyle);
-        }
+        row.createCell(0).setCellValue(lblRowHeaderId);
+        row.getCell(0).setCellStyle(style);
+        row.createCell(1).setCellValue(lblRowHeaderDate);
+        row.getCell(1).setCellStyle(style);
+        row.createCell(2).setCellValue(lblRowHeaderTitle);
+        row.getCell(2).setCellStyle(style);
+        row.createCell(3).setCellValue(lblRowHeaderOutlet);
+        row.getCell(3).setCellStyle(style);
+        row.createCell(4).setCellValue(lblRowHeaderSection);
+        row.getCell(4).setCellStyle(style);
 
         overviewSheetRow++;
         for (SearchResult result : results.getHits()) {
@@ -469,22 +552,38 @@ public class SearchEngineBean implements SearchEngineLocal {
                 if (newsItem.getPlacements().isEmpty()) {
                     row = overviewSheet.createRow(overviewSheetRow);
                     row.createCell(0).setCellValue(result.getId());
+                    row.getCell(0).setCellStyle(style);
                     row.createCell(1).setCellValue(newsItem.getUpdated());
+                    row.getCell(1).setCellStyle(dateStyle);
                     row.createCell(2).setCellValue(newsItem.getTitle());
+                    row.getCell(2).setCellStyle(style);
                     row.createCell(3).setCellValue(
                             newsItem.getOutlet().getTitle());
+                    row.getCell(3).setCellStyle(style);
                     row.createCell(4).setCellValue("");
+                    row.getCell(4).setCellStyle(style);
                 } else {
                     for (NewsItemPlacement nip : newsItem.getPlacements()) {
-                        row = overviewSheet.createRow(overviewSheetRow);
-                        row.createCell(0).setCellValue(result.getId());
-                        row.createCell(1).setCellValue(nip.getEdition().
-                                getPublicationDate());
-                        row.createCell(2).setCellValue(newsItem.getTitle());
-                        row.createCell(3).setCellValue(
-                                nip.getOutlet().getTitle());
-                        row.createCell(4).setCellValue(nip.getSection().
-                                getFullName());
+                        try {
+                            row = overviewSheet.createRow(overviewSheetRow);
+                            row.createCell(0).setCellValue(result.getId());
+                            row.getCell(0).setCellStyle(style);
+                            row.createCell(1).setCellValue(nip.getEdition().
+                                    getPublicationDate());
+                            row.getCell(1).setCellStyle(dateStyle);
+                            row.createCell(2).setCellValue(newsItem.getTitle());
+                            row.getCell(2).setCellStyle(style);
+                            row.createCell(3).setCellValue(nip.getOutlet().
+                                    getTitle());
+                            row.getCell(3).setCellStyle(style);
+                            row.createCell(4).setCellValue(nip.getSection().
+                                    getFullName());
+                            row.getCell(4).setCellStyle(style);
+                        } catch (Exception ex) {
+                            LOG.log(Level.INFO,
+                                    "Failed to output line in report. {0}", ex.
+                                    getMessage());
+                        }
                     }
                 }
 
@@ -499,17 +598,8 @@ public class SearchEngineBean implements SearchEngineLocal {
         }
 
         wb.setRepeatingRowsAndColumns(0, 0, 0, 0, 0);
-        //wb.setPrintArea(0, 0, 8, 0, overviewSheetRow);
         overviewSheet.setFitToPage(true);
         overviewSheet.setAutobreaks(true);
-//        overviewSheet.getPrintSetup().setFitWidth((short)1);
-//        overviewSheet.getPrintSetup().setFitHeight((short)500);
-
-        Footer footer = overviewSheet.getFooter();
-        footer.setLeft("Page " + HeaderFooter.page() + " of " + HeaderFooter.
-                numPages());
-        footer.setRight("Generated on " + HeaderFooter.date() + " at "
-                + HeaderFooter.time());
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -519,6 +609,269 @@ public class SearchEngineBean implements SearchEngineLocal {
         }
 
         return baos.toByteArray();
+    }
+
+    /**
+     * Communicate to the Solr server that the search engine index should be
+     * updated.
+     * <p/>
+     * @throws SearchEngineIndexingException If an unexpected response was received from the Solr server
+     */
+    @Override
+    public void optimizeIndex() throws SearchEngineIndexingException {
+        try {
+            getSolrServer().optimize();
+        } catch (SolrServerException ex) {
+            throw new SearchEngineIndexingException(ex);
+        } catch (IOException ex) {
+            throw new SearchEngineIndexingException(ex);
+        }
+    }
+
+    /**
+     * Generates a {link SearchResult} for a media item.
+     *
+     * @param qr     QueryResponse from Solr
+     * @param values Fields available
+     * @return {@link SearchResult}
+     */
+    private SearchResult generateMediaHit(QueryResponse qr,
+            HashMap<String, Object> values) {
+        String id = (String) values.get(IndexField.ID.getName());
+
+        StringBuilder caption = new StringBuilder("");
+        StringBuilder title = new StringBuilder("");
+        StringBuilder note = new StringBuilder("");
+
+        Map<String, List<String>> highlighting = qr.getHighlighting().get(id);
+
+        boolean highlightingExist = highlighting != null;
+
+        if (highlightingExist && highlighting.get(IndexField.STORY.getName())
+                != null) {
+            for (String hl : highlighting.get(IndexField.STORY.getName())) {
+                caption.append(hl);
+            }
+        } else if (highlighting.get(IndexField.STORY.getName()) != null) {
+            caption.append(StringUtils.abbreviate((String) values.get(IndexField.STORY.
+                    getName()), 500));
+        } else {
+            caption.append(StringUtils.abbreviate((String) values.get(IndexField.CAPTION.
+                    getName()), 500));
+        }
+
+        if (highlightingExist && highlighting.get(IndexField.TITLE.getName())
+                != null) {
+            for (String hl : qr.getHighlighting().get(id).get(IndexField.TITLE.
+                    getName())) {
+                title.append(hl);
+            }
+        } else {
+            title.append((String) values.get(IndexField.TITLE.getName()));
+        }
+
+        String format = (String) values.get(IndexField.MEDIA_FORMAT.getName());
+
+        note.append((String) values.get(IndexField.TYPE.getName()));
+        note.append(" - ");
+        note.append(format);
+        note.append(" - ");
+        note.append((String) values.get(IndexField.REPOSITORY.getName()));
+
+        SearchResult hit = new SearchResult();
+        hit.setId(Long.valueOf(id));
+        hit.setTitle(title.toString());
+        hit.setDescription(caption.toString());
+        hit.setNote(note.toString());
+        hit.setLink("{0}/MediaItemArchive.xhtml?id=" + values.get(IndexField.ID.
+                getName()));
+        hit.setType((String) values.get(IndexField.TYPE.getName()));
+        hit.setFormat(format);
+
+        if (values.containsKey(IndexField.THUMB_URL.getName())) {
+            hit.setPreview(true);
+            hit.setPreviewLink((String) values.get(
+                    IndexField.THUMB_URL.getName()));
+            hit.setDirectLink((String) values.get(
+                    IndexField.DIRECT_URL.getName()));
+
+            try {
+                Tika tika = new Tika();
+                hit.setPreviewContentType(tika.detect(new URL(
+                        hit.getPreviewLink())));
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+            }
+
+        } else {
+            hit.setPreview(false);
+        }
+
+        if (values.containsKey(IndexField.DATE.getName())) {
+            if (values.get(IndexField.DATE.getName()) instanceof List) {
+                hit.setDates((List<Date>) values.get(IndexField.DATE.getName()));
+            } else {
+                hit.addDate((Date) values.get(IndexField.DATE.getName()));
+            }
+        }
+
+        return hit;
+    }
+
+    /**
+     * Generates a {link SearchResult} for a story.
+     *
+     * @param qr     QueryResponse from Solr
+     * @param values Fields available
+     * @return {@link SearchResult}
+     */
+    private SearchResult generateStoryHit(QueryResponse qr,
+            HashMap<String, Object> values) {
+        String id = (String) values.get(IndexField.ID.getName());
+
+        StringBuilder story = new StringBuilder();
+        StringBuilder title = new StringBuilder();
+        StringBuilder note = new StringBuilder();
+
+        Map<String, List<String>> highlighting = qr.getHighlighting().get(id);
+
+        boolean highlightingExist = highlighting != null;
+
+        if (highlightingExist && highlighting.get(IndexField.STORY.getName())
+                != null) {
+            for (String hl : highlighting.get(IndexField.STORY.getName())) {
+                story.append(hl);
+            }
+        } else {
+            story.append(StringUtils.abbreviate((String) values.get(IndexField.STORY.
+                    getName()), 500));
+        }
+
+        if (highlightingExist && highlighting.get(IndexField.TITLE.getName())
+                != null) {
+            for (String hl : qr.getHighlighting().get(id).get(IndexField.TITLE.
+                    getName())) {
+                title.append(hl);
+            }
+        } else {
+            title.append((String) values.get(IndexField.TITLE.getName()));
+        }
+
+        note.append((String) values.get(IndexField.TYPE.getName()));
+        note.append(" - Words: ");
+
+        if (values.containsKey(IndexField.WORD_COUNT.getName())) {
+            note.append(String.valueOf(values.get(
+                    IndexField.WORD_COUNT.getName())));
+        } else {
+            note.append("Unknown");
+        }
+
+
+        note.append("<br/>");
+
+        if (values.containsKey(IndexField.PLACEMENT.getName())) {
+            if (values.get(IndexField.PLACEMENT.getName()) instanceof String) {
+                note.append(values.get(IndexField.PLACEMENT.getName()));
+            } else if (values.get(IndexField.PLACEMENT.getName()) instanceof List) {
+                List<String> placements =
+                        (List<String>) values.get(IndexField.PLACEMENT.getName());
+                for (String placement : placements) {
+                    note.append(placement);
+                    note.append("<br/>");
+                }
+            } else {
+                LOG.warning("Unexpected value returned from search engine");
+            }
+        }
+
+        SearchResult hit = new SearchResult();
+        hit.setId(Long.valueOf(id));
+        hit.setTitle(title.toString());
+        hit.setDescription(story.toString());
+        hit.setNote(note.toString());
+        hit.setLink("{0}/NewsItemArchive.xhtml?id=" + id);
+        hit.setType((String) values.get(IndexField.TYPE.getName()));
+
+
+        return hit;
+    }
+
+    /**
+     * Gets the instance of the Apache Solr server used for indexing.
+     *
+     * @return Instance of the Apache Solr server
+     * @throws IllegalStateException If the search engine is not properly configured
+     */
+    private SolrServer getSolrServer() {
+        try {
+            String url =
+                    cfgService.getString(ConfigurationKey.SEARCH_ENGINE_URL);
+            Integer socketTimeout = cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_SOCKET_TIMEOUT);
+            Integer connectionTimeout = cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_CONNECTION_TIMEOUT);
+            Integer maxTotalConnectionsPerHost =
+                    cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_MAX_TOTAL_CONNECTIONS_PER_HOST);
+            Integer maxTotalConnections =
+                    cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_MAX_TOTAL_CONNECTIONS);
+            Integer maxRetries = cfgService.getInteger(
+                    ConfigurationKey.SEARCH_ENGINE_MAX_RETRIES);
+            Boolean followRedirects = cfgService.getBoolean(
+                    ConfigurationKey.SEARCH_ENGINE_FOLLOW_REDIRECTS);
+            Boolean allowCompression = cfgService.getBoolean(
+                    ConfigurationKey.SEARCH_ENGINE_ALLOW_COMPRESSION);
+
+            CommonsHttpSolrServer solrServer = new CommonsHttpSolrServer(url);
+            solrServer.setRequestWriter(new BinaryRequestWriter());
+            solrServer.setSoTimeout(socketTimeout);
+            solrServer.setConnectionTimeout(connectionTimeout);
+            solrServer.setDefaultMaxConnectionsPerHost(
+                    maxTotalConnectionsPerHost);
+            solrServer.setMaxTotalConnections(maxTotalConnections);
+            solrServer.setFollowRedirects(followRedirects);
+            solrServer.setAllowCompression(allowCompression);
+            solrServer.setMaxRetries(maxRetries);
+
+            return solrServer;
+        } catch (MalformedURLException ex) {
+            LOG.log(Level.SEVERE, "Invalid search engine configuration. {0}",
+                    ex.getMessage());
+            LOG.log(Level.FINE, "", ex);
+            throw new IllegalStateException(
+                    "Invalid search engine configuration", ex);
+        }
+    }
+
+    private void generateTags(SearchResult hit, QueryResponse qr,
+            HashMap<String, Object> values) {
+
+        if (values.containsKey(IndexField.DATE.getName())) {
+            if (values.get(IndexField.DATE.getName()) instanceof Date) {
+                hit.addDate((Date) values.get(IndexField.DATE.getName()));
+            } else if (values.get(IndexField.DATE.getName()) instanceof List) {
+                hit.setDates((List<Date>) values.get(IndexField.DATE.getName()));
+            } else {
+                LOG.warning("Unexpected value returned from search engine");
+            }
+        }
+
+        List<String> tags = new ArrayList<String>();
+        if (values.containsKey(IndexField.CONCEPT.getName())) {
+            if (values.get(IndexField.CONCEPT.getName()) instanceof String) {
+                Object tag = values.get(IndexField.CONCEPT.getName());
+                tags.add((String) tag);
+            } else if (values.get(IndexField.CONCEPT.getName()) instanceof List) {
+                tags =
+                        (List<String>) values.get(IndexField.CONCEPT.getName());
+            } else {
+                LOG.warning("Unexpected value returned from search engine");
+            }
+        }
+
+        hit.setTags(tags.toArray(new String[tags.size()]));
     }
 
     private void index(NewsItem ni, SolrServer solrServer) throws
@@ -618,7 +971,6 @@ public class SearchEngineBean implements SearchEngineLocal {
 
     public void index(MediaItem mi, SolrServer solrServer) throws
             SearchEngineIndexingException {
-        LOG.log(Level.FINE, "Adding MediaItem #{0} to index", mi.getId());
 
         if (mi.isOriginalAvailable()) {
 
@@ -715,236 +1067,6 @@ public class SearchEngineBean implements SearchEngineLocal {
                     "Ignoring MediaItem #{0}. Missing original {1} rendition",
                     new Object[]{mi.getId(), mi.getCatalogue().
                         getOriginalRendition().getName()});
-        }
-    }
-
-    @Override
-    public void optimizeIndex() throws SearchEngineIndexingException {
-        try {
-            getSolrServer().optimize();
-        } catch (SolrServerException ex) {
-            throw new SearchEngineIndexingException(ex);
-        } catch (IOException ex) {
-            throw new SearchEngineIndexingException(ex);
-        }
-    }
-
-    /**
-     * Generates a {link SearchResult} for a media item.
-     *
-     * @param qr
-     * QueryResponse from Solr
-     * @param values
-     * Fields available
-     * @return {@link SearchResult}
-     */
-    private SearchResult generateMediaHit(QueryResponse qr,
-            HashMap<String, Object> values) {
-        String id = (String) values.get(IndexField.ID.getName());
-
-        StringBuilder caption = new StringBuilder("");
-        StringBuilder title = new StringBuilder("");
-        StringBuilder note = new StringBuilder("");
-
-        Map<String, List<String>> highlighting = qr.getHighlighting().get(id);
-
-        boolean highlightingExist = highlighting != null;
-
-        if (highlightingExist && highlighting.get(IndexField.STORY.getName())
-                != null) {
-            for (String hl : highlighting.get(IndexField.STORY.getName())) {
-                caption.append(hl);
-            }
-        } else if (highlighting.get(IndexField.STORY.getName()) != null) {
-            caption.append(StringUtils.abbreviate((String) values.get(IndexField.STORY.
-                    getName()), 500));
-        } else {
-            caption.append(StringUtils.abbreviate((String) values.get(IndexField.CAPTION.
-                    getName()), 500));
-        }
-
-        if (highlightingExist && highlighting.get(IndexField.TITLE.getName())
-                != null) {
-            for (String hl : qr.getHighlighting().get(id).get(IndexField.TITLE.
-                    getName())) {
-                title.append(hl);
-            }
-        } else {
-            title.append((String) values.get(IndexField.TITLE.getName()));
-        }
-
-        String format = (String) values.get(IndexField.MEDIA_FORMAT.getName());
-
-        note.append((String) values.get(IndexField.TYPE.getName()));
-        note.append(" - ");
-        note.append(format);
-        note.append(" - ");
-        note.append((String) values.get(IndexField.REPOSITORY.getName()));
-
-        SearchResult hit = new SearchResult();
-        hit.setId(Long.valueOf(id));
-        hit.setTitle(title.toString());
-        hit.setDescription(caption.toString());
-        hit.setNote(note.toString());
-        hit.setLink("{0}/MediaItemArchive.xhtml?id=" + values.get(IndexField.ID.
-                getName()));
-        hit.setType((String) values.get(IndexField.TYPE.getName()));
-        hit.setFormat(format);
-
-        if (values.containsKey(IndexField.THUMB_URL.getName())) {
-            hit.setPreview(true);
-            hit.setPreviewLink((String) values.get(
-                    IndexField.THUMB_URL.getName()));
-            hit.setDirectLink((String) values.get(
-                    IndexField.DIRECT_URL.getName()));
-
-        } else {
-            hit.setPreview(false);
-        }
-
-        if (values.containsKey(IndexField.DATE.getName())) {
-            if (values.get(IndexField.DATE.getName()) instanceof List) {
-                hit.setDates((List<Date>) values.get(IndexField.DATE.getName()));
-            } else {
-                hit.addDate((Date) values.get(IndexField.DATE.getName()));
-            }
-        }
-
-        return hit;
-    }
-
-    /**
-     * Generates a {link SearchResult} for a story.
-     *
-     * @param qr     QueryResponse from Solr
-     * @param values Fields available
-     * @return {@link SearchResult}
-     */
-    private SearchResult generateStoryHit(QueryResponse qr,
-            HashMap<String, Object> values) {
-        String id = (String) values.get(IndexField.ID.getName());
-
-        StringBuilder story = new StringBuilder();
-        StringBuilder title = new StringBuilder();
-        StringBuilder note = new StringBuilder();
-
-        Map<String, List<String>> highlighting = qr.getHighlighting().get(id);
-
-        boolean highlightingExist = highlighting != null;
-
-        if (highlightingExist && highlighting.get(IndexField.STORY.getName())
-                != null) {
-            for (String hl : highlighting.get(IndexField.STORY.getName())) {
-                story.append(hl);
-            }
-        } else {
-            story.append(StringUtils.abbreviate((String) values.get(IndexField.STORY.
-                    getName()), 500));
-        }
-
-        if (highlightingExist && highlighting.get(IndexField.TITLE.getName())
-                != null) {
-            for (String hl : qr.getHighlighting().get(id).get(IndexField.TITLE.
-                    getName())) {
-                title.append(hl);
-            }
-        } else {
-            title.append((String) values.get(IndexField.TITLE.getName()));
-        }
-
-        note.append((String) values.get(IndexField.TYPE.getName()));
-        note.append(" - Words: ");
-
-        if (values.containsKey(IndexField.WORD_COUNT.getName())) {
-            note.append(String.valueOf(values.get(
-                    IndexField.WORD_COUNT.getName())));
-        } else {
-            note.append("Unknown");
-        }
-
-
-        note.append("<br/>");
-
-        if (values.containsKey(IndexField.PLACEMENT.getName())) {
-            if (values.get(IndexField.PLACEMENT.getName()) instanceof String) {
-                note.append(values.get(IndexField.PLACEMENT.getName()));
-            } else if (values.get(IndexField.PLACEMENT.getName()) instanceof List) {
-                List<String> placements =
-                        (List<String>) values.get(IndexField.PLACEMENT.getName());
-                for (String placement : placements) {
-                    note.append(placement);
-                    note.append("<br/>");
-                }
-            } else {
-                LOG.warning("Unexpected value returned from search engine");
-            }
-        }
-
-        SearchResult hit = new SearchResult();
-        hit.setId(Long.valueOf(id));
-        hit.setTitle(title.toString());
-        hit.setDescription(story.toString());
-        hit.setNote(note.toString());
-        hit.setLink("{0}/NewsItemArchive.xhtml?id=" + id);
-        hit.setType((String) values.get(IndexField.TYPE.getName()));
-
-        if (values.containsKey(IndexField.DATE.getName())) {
-            if (values.get(IndexField.DATE.getName()) instanceof Date) {
-                hit.addDate((Date) values.get(IndexField.DATE.getName()));
-            } else if (values.get(IndexField.DATE.getName()) instanceof List) {
-                hit.setDates((List<Date>) values.get(IndexField.DATE.getName()));
-            } else {
-                LOG.warning("Unexpected value returned from search engine");
-            }
-        }
-        return hit;
-    }
-
-    /**
-     * Gets the instance of the Apache Solr server used for indexing.
-     *
-     * @return Instance of the Apache Solr server
-     * @throws IllegalStateException If the search engine is not properly configured
-     */
-    private SolrServer getSolrServer() {
-        try {
-            String url =
-                    cfgService.getString(ConfigurationKey.SEARCH_ENGINE_URL);
-            Integer socketTimeout = cfgService.getInteger(
-                    ConfigurationKey.SEARCH_ENGINE_SOCKET_TIMEOUT);
-            Integer connectionTimeout = cfgService.getInteger(
-                    ConfigurationKey.SEARCH_ENGINE_CONNECTION_TIMEOUT);
-            Integer maxTotalConnectionsPerHost =
-                    cfgService.getInteger(
-                    ConfigurationKey.SEARCH_ENGINE_MAX_TOTAL_CONNECTIONS_PER_HOST);
-            Integer maxTotalConnections =
-                    cfgService.getInteger(
-                    ConfigurationKey.SEARCH_ENGINE_MAX_TOTAL_CONNECTIONS);
-            Integer maxRetries = cfgService.getInteger(
-                    ConfigurationKey.SEARCH_ENGINE_MAX_RETRIES);
-            Boolean followRedirects = cfgService.getBoolean(
-                    ConfigurationKey.SEARCH_ENGINE_FOLLOW_REDIRECTS);
-            Boolean allowCompression = cfgService.getBoolean(
-                    ConfigurationKey.SEARCH_ENGINE_ALLOW_COMPRESSION);
-
-            CommonsHttpSolrServer solrServer = new CommonsHttpSolrServer(url);
-            solrServer.setRequestWriter(new BinaryRequestWriter());
-            solrServer.setSoTimeout(socketTimeout);
-            solrServer.setConnectionTimeout(connectionTimeout);
-            solrServer.setDefaultMaxConnectionsPerHost(
-                    maxTotalConnectionsPerHost);
-            solrServer.setMaxTotalConnections(maxTotalConnections);
-            solrServer.setFollowRedirects(followRedirects);
-            solrServer.setAllowCompression(allowCompression);
-            solrServer.setMaxRetries(maxRetries);
-
-            return solrServer;
-        } catch (MalformedURLException ex) {
-            LOG.log(Level.SEVERE, "Invalid search engine configuration. {0}",
-                    ex.getMessage());
-            LOG.log(Level.FINE, "", ex);
-            throw new IllegalStateException(
-                    "Invalid search engine configuration", ex);
         }
     }
 }

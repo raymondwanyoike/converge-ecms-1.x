@@ -103,7 +103,7 @@
                     </rich:tabPanel>
 
                     <h:panelGroup styleClass="dialogueButtons">
-                        <h:commandLink id="lnkCloseCalendar" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpEventSelection')}.hide(); return false;" />
+                        <h:commandLink id="lnkCloseCalendar" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpEventSelection')}.hide(); return false;" />
                     </h:panelGroup>
                 </h:panelGrid>
 

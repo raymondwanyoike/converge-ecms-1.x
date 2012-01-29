@@ -24,8 +24,10 @@ import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.converge.core.content.AssignmentType;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.newswire.NewswireService;
+import dk.i2m.converge.core.utils.BeanComparator;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -660,6 +662,11 @@ public class UserAccount implements Serializable {
         this.newswireServices = newswireServices;
     }
 
+    /**
+     * Get a {@link List} of active {@link NewswireService} subscriptions.
+     * 
+     * @return {@link List} of active {@link NewswireService} subscriptions
+     */
     public List<NewswireService> getActiveNewswireServices() {
         List<NewswireService> active = new ArrayList<NewswireService>();
         for (NewswireService service : getNewswireServices()) {
@@ -667,6 +674,7 @@ public class UserAccount implements Serializable {
                 active.add(service);
             }
         }
+        Collections.sort(active, new BeanComparator("source"));
         return active;
     }
 

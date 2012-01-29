@@ -187,4 +187,6 @@ public interface NewswireServiceLocal {
     @javax.ejb.TransactionAttribute(value =
     javax.ejb.TransactionAttributeType.REQUIRES_NEW)
     public void startProcessingNewswireService(java.lang.Long id);
+
+    boolean dispatchBasket(java.lang.Long id);
 }

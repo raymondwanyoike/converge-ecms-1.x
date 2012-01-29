@@ -26,11 +26,8 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.xmlrpc.XmlRpcException;
-import org.apache.xmlrpc.client.TimingOutCallback;
+import org.apache.xmlrpc.client.*;
 import org.apache.xmlrpc.client.TimingOutCallback.TimeoutException;
-import org.apache.xmlrpc.client.XmlRpcClient;
-import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
-import org.apache.xmlrpc.client.XmlRpcLiteHttpTransportFactory;
 
 /**
  * Connection to a Joomla instances with the XML-RPC Plug-in installed.
@@ -340,6 +337,8 @@ public class JoomlaConnection {
     /**
      * Gets a list of available content categories.
      *
+     * @return List of categories found on the Joomla instance
+     * @throws JoomlaException If the categories could not be obtained due to a connection error
      */
     public Map<Integer, String> listCategories() throws JoomlaException {
         logger.log(Level.INFO, "Executing {0} at {1} ", new Object[]{XMLRPC_METHOD_LIST_CATEGORIES, url});
@@ -435,7 +434,7 @@ public class JoomlaConnection {
         config.setReplyTimeout(getReplyTimeout() * 1000);
 
         XmlRpcClient client = new XmlRpcClient();
-        client.setTransportFactory(new XmlRpcLiteHttpTransportFactory(client));
+        client.setTransportFactory(new XmlRpcCommonsTransportFactory(client));
         client.setConfig(config);
 
         return client;

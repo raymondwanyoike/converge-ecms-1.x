@@ -19,9 +19,11 @@ package dk.i2m.converge.core.content.catalogue;
 import dk.i2m.converge.core.content.Assignment;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.security.UserAccount;
+import dk.i2m.converge.core.utils.BeanComparator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import javax.persistence.*;
 
@@ -273,6 +275,9 @@ public class MediaItem implements Serializable {
                 missing.add(rendition);
             }
         }
+        
+        // Sort the renditions by the label
+        Collections.sort(missing, new BeanComparator("label"));
 
         return missing;
     }
@@ -285,6 +290,7 @@ public class MediaItem implements Serializable {
      *         {@link MediaItem}
      */
     public List<MediaItemRendition> getRenditions() {
+        Collections.sort(renditions, new BeanComparator("rendition.label"));
         return renditions;
     }
 

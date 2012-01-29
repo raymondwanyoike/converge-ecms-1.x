@@ -57,6 +57,8 @@ public class SearchResult {
 
     private float score = 0;
 
+    private String previewContentType = "";
+
     /**
      * Creates a new instance of {@link SearchResult}.
      */
@@ -66,29 +68,21 @@ public class SearchResult {
 
     /**
      * Creates a new instance of {@link SearchResult}.
-     * 
-     * @param id
-     *          Unique identifier of the content
-     * @param title
-     *          Title of the search result
-     * @param description
-     *          Description of the search result
-     * @param note
-     *          Note of the search result
-     * @param link
-     *          Link to the content
-     * @param type
-     *          Type of content
-     * @param repository
-     *          Media repository
-     * @param tags
-     *          Tags of the search result
-     * @param people
-     *          People of the search result
-     * @param previewLink
-     *          Preview link
+     * <p/>
+     * @param id          Unique identifier of the content
+     * @param title       Title of the search result
+     * @param description Description of the search result
+     * @param note        Note of the search result
+     * @param link        Link to the content
+     * @param type        Type of content
+     * @param repository  Media repository
+     * @param tags        Tags of the search result
+     * @param people      People of the search result
+     * @param previewLink Preview link
      */
-    public SearchResult(Long id, String title, String description, String note, String link, String type, String repository, String[] tags, String people, String previewLink, String directLink, String format) {
+    public SearchResult(Long id, String title, String description, String note,
+            String link, String type, String repository, String[] tags,
+            String people, String previewLink, String directLink, String format) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -229,7 +223,7 @@ public class SearchResult {
      * Sets a note for the search result.
      *
      * @param note
-     *          Note of the search result
+* Note of the search result
      */
     public void setNote(String note) {
         this.note = note;
@@ -249,7 +243,7 @@ public class SearchResult {
      * Sets the preview availability indicator.
      *
      * @param preview
-     *          {@code true} if there is an image preview, otherwise
+* {@code true} if there is an image preview, otherwise
      *          {@code false}
      */
     public void setPreview(boolean preview) {
@@ -268,8 +262,7 @@ public class SearchResult {
     /**
      * Sets the hyperlink to the preview.
      *
-     * @param previewLink
-     *          Hyperlink to the preview
+     * @param previewLink Hyperlink to the preview
      */
     public void setPreviewLink(String previewLink) {
         this.previewLink = previewLink;
@@ -289,9 +282,35 @@ public class SearchResult {
 
     public void setFormat(String format) {
         this.format = format;
+
+    }
+
+    public String getPreviewContentType() {
+        return previewContentType;
+    }
+
+    public void setPreviewContentType(String previewContentType) {
+        this.previewContentType = previewContentType;
+    }
+
+    public boolean isPreviewVideo() {
+        if (previewContentType.startsWith("video/")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isPreviewAudio() {
+        if (previewContentType.startsWith("audio/")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public boolean isVideo() {
+
         if ("Video".equalsIgnoreCase(this.format)) {
             return true;
         } else {

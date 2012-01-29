@@ -46,5 +46,11 @@ public enum SystemPrivilege {
     /** Super user access. */
     SUPER_USER,
     /** News reader access. */
-    NEWS_READER;
+    NEWS_READER,
+    /** Assign newswire items to users, i.e. copy stories from newswire to inbox. */
+    NEWSWIRE_ITEM_ASSIGN,
+    /** Remove newswire item from search engine. */
+    NEWSWIRE_ITEM_REMOVE,
+    /** Remove news item from search engine. */
+    SEARCH_ENGINE_RESULT_REMOVE
 }

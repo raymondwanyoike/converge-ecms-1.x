@@ -25,6 +25,7 @@ import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.logging.LogEntry;
 import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.logging.LogSubject;
+import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.plugin.Plugin;
 import dk.i2m.converge.core.plugin.PluginManager;
 import dk.i2m.converge.core.security.UserAccount;
@@ -77,7 +78,11 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     @Override
     public boolean sanityCheck() {
         removeAllBackgroundTasks();
-
+        int reset = removeAllNewswireProcessing();
+        LOG.log(Level.INFO,
+                "{0} newswire {0, choice, 0#services|1#service|2#services} reset",
+                reset);
+        
         int userCount = userService.findAll().size();
         LOG.log(Level.INFO,
                 "{0} user {0, choice, 0#accounts|1#account|2#accounts} in the system",
@@ -412,22 +417,19 @@ public class SystemFacadeBean implements SystemFacadeLocal {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void log(LogSeverity severity, UserAccount actor,
+    public void log(LogSeverity severity,
             String message, String origin, String originId) {
         LogEntry entry = new LogEntry(severity, message, origin, originId);
         entry.setDate(Calendar.getInstance().getTime());
-        entry.setActor(actor);
         daoService.create(entry);
     }
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void log(dk.i2m.converge.core.logging.LogSeverity severity,
-            dk.i2m.converge.core.security.UserAccount actor,
             java.lang.String message, java.util.List<LogSubject> subjects) {
         LogEntry entry = new LogEntry(severity, message);
         entry.setDate(Calendar.getInstance().getTime());
-        entry.setActor(actor);
         for (LogSubject subject : subjects) {
             entry.addSubject(subject);
         }
@@ -437,9 +439,8 @@ public class SystemFacadeBean implements SystemFacadeLocal {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void log(LogSeverity severity, UserAccount actor,
-            String message, Object origin, String originId) {
-        log(severity, actor, message, origin.getClass().getName(), originId);
+    public void log(LogSeverity severity, String message, Object origin, String originId) {
+        log(severity, message, origin.getClass().getName(), originId);
     }
 
     @Override
@@ -487,5 +488,9 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         for (LogEntry entry : entries) {
             daoService.delete(LogEntry.class, entry.getId());
         }
+    }
+
+    private int removeAllNewswireProcessing() {
+        return daoService.executeQuery(NewswireService.RESET_PROCESSING);
     }
 }

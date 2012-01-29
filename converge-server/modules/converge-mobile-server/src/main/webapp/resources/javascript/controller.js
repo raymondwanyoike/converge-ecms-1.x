@@ -30,7 +30,7 @@ var mobile_news;
 
 // Initialises jQuery scripts
 $(document).ready(function() {
-	// binds form submission and fields to the validation engine
+    // binds form submission and fields to the validation engine
     jQuery("#registrationForm").validationEngine();
     jQuery("#loginForm").validationEngine();
         
@@ -51,13 +51,12 @@ function populatePreferences(categories) {
         //Display only non-special categories for the user to choose from
         if (category.special=="false") {
             $('#prefCats').append('<input type="checkbox" name="cbCat" id="cbCat' + category.id + '" value="' + category.id + '" /><label for="cbCat' + category.id + '">' + category.title + '</label>');
-        }
-        else {
-            //TODO: Handle the special categories
+        } else {
+        //TODO: Handle the special categories
                              
         }
 
-	}
+    }
     // Check current preferences
     if (mobile_subscriber.subscriptions != undefined) {
         for (i=0; i< mobile_subscriber.subscriptions.length; i++) {
@@ -84,85 +83,101 @@ function refreshCategories() {
                     category_count++;
                 }
             }
-                     
-            $('#lstSubscriptions').append('<li><a href="#cat' + mobile_subscriber.subscriptions[i].id + '">' + mobile_subscriber.subscriptions[i].title + '</a><span class="ui-li-count">' + category_count + '</span></li>');
 
+            if (category_count != 0) {
+                $('#lstSubscriptions').append('<li><a href="#cat' + mobile_subscriber.subscriptions[i].id + '">' + mobile_subscriber.subscriptions[i].title + '</a><span class="ui-li-count">' + category_count + '</span></li>');
+            }
             // Removing existing category page if it exists
             $('#cat' + mobile_subscriber.subscriptions[i].id).remove();
 
-            $('body').append(
-                '<div data-role="page" id="cat' + mobile_subscriber.subscriptions[i].id + '" data-url="cat'+mobile_subscriber.subscriptions[i].id+'">' +
-                '    <div data-role="header" data-position="fixed" data-theme="a" >' +
-                '        <a href="#cats" data-icon="arrow-l" data-back="true" data-theme="a" >Back</a>' +
-                '        <h1>' + mobile_subscriber.subscriptions[i].title + '</h1>' +
-                '    </div>' +
-                '    <div data-role="content" data-theme="c">' +
-                '        <ul id="lstCat' + mobile_subscriber.subscriptions[i].id + '" data-role="listview" data-url="lstCat' + mobile_subscriber.subscriptions[i].id + '">' +
-                '        </ul>' +
-                '    </div>' +
-                '    <div data-role="footer" data-theme="a" data-position="fixed" id="newsCatAd'+news_item_category.id+'">' +
-                '       <div class="ads"> ' +
-                '           <iframe id=\'ac238136'+ news_item_category.id+'\' name=\'ac238136'+ news_item_category.id+'\' src=\'http://www.the-star.co.ke/ads/www/delivery/afr.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE\' frameborder=\'0\' scrolling=\'no\' width=\'234\' height=\'60\' allowtransparency=\'true\'><a href=\'http://www.the-star.co.ke/ads/www/delivery/ck.php?n=a311071e&amp;cb=INSERT_RANDOM_NUMBER_HERE\' target=\'_blank\'><img src=\'http://www.the-star.co.ke/ads/www/delivery/avw.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE&amp;n=a311071e\' border=\'0\' alt=\'\' /></a></iframe>' +
-                '       </div>' + 
-                '   </div>' +
+            if (category_count != 0) {
+                $('body').append(
+                    '<div data-role="page" id="cat' + mobile_subscriber.subscriptions[i].id + '" data-url="cat'+mobile_subscriber.subscriptions[i].id+'">' +
+                    '    <div data-role="header" data-position="fixed" data-theme="b" >' +
+                    '        <a href="#cats" data-icon="arrow-l" data-back="true" >Back</a>' +
+                    '        <h1>' + mobile_subscriber.subscriptions[i].title + '</h1>' +
+                    '    </div>' +
+                    '    <div data-role="content" data-theme="c">' +
+                    '        <ul id="lstCat' + mobile_subscriber.subscriptions[i].id + '" data-role="listview" data-url="lstCat' + mobile_subscriber.subscriptions[i].id + '">' +
+                    '        </ul>' +
+                    '    </div>' +
+                    '    <div data-role="footer" data-theme="a" data-position="fixed" id="newsCatAd'+news_item_category.id+'">' +
+                    '       <div class="ads"> ' +
+                    '           <iframe id=\'ac238136'+ news_item_category.id+'\' name=\'ac238136'+ news_item_category.id+'\' src=\'http://www.the-star.co.ke/ads/www/delivery/afr.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE\' frameborder=\'0\' scrolling=\'no\' width=\'234\' height=\'60\' allowtransparency=\'true\'><a href=\'http://www.the-star.co.ke/ads/www/delivery/ck.php?n=a311071e&amp;cb=INSERT_RANDOM_NUMBER_HERE\' target=\'_blank\'><img src=\'http://www.the-star.co.ke/ads/www/delivery/avw.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE&amp;n=a311071e\' border=\'0\' alt=\'\' /></a></iframe>' +
+                    '       </div>' + 
+                    '   </div>' +
 
-                '</div>');
+                    '</div>');
+
            
-            for (j=0; j<mobile_news.newsItem.length;j++) {
+                for (j=0; j<mobile_news.newsItem.length;j++) {
                 
-                var newsItem = mobile_news.newsItem[j];
-                if (newsItem.section.id == news_item_category.id) {
-                    var story = mobile_news.newsItem[j].story.replace(/(<([^>]+)>)/ig,"");
+                    var newsItem = mobile_news.newsItem[j];
+                    if (newsItem.section.id == news_item_category.id) {
+                        var story = mobile_news.newsItem[j].story.replace(/(<([^>]+)>)/ig,"");
                 
-                    // Story List
-                    $('#lstCat' + mobile_subscriber.subscriptions[i].id).append(
-                        '<li><a id="lnkNewsItem' + newsItem.id  + '" href="#newsItem' +mobile_news.newsItem[j].id  + '">' +
-                        '<img src="' + newsItem.thumbUrl + '" class="ui-li-thumb" />' +
-                        '<h3>' +mobile_news.newsItem[j].headline  + '</h3>' +
-                        '<p>' + story.trunc(150)  + '</p></a></li>');
+                        // Story List
+                        var thumbImg = "";
+                        if (newsItem.thumbUrl != undefined) {
+                            thumbImg = '<img src="' + newsItem.thumbUrl + '" class="ui-li-thumb" />';
+                        }
                     
-                    // Story Page
-                    $('body').append(
-                        '<div data-role="page" id="newsItem' + newsItem.id + '" data-url="newsItem'+newsItem.id+'">' +
-                        '    <div data-role="header" data-position="fixed" >' +
-                        '        <a href="#cat' + mobile_subscriber.subscriptions[i].id + '" data-icon="arrow-l" data-back="true" data-theme="a" >Back</a>' +
-                        '        <h1>' + newsItem.headline + '</h1>' +
-                        '    </div>' +
-                        '    <div data-role="content" data-theme="d">' +
-                        '       <p class="dateline">' + newsItem.dateline + ' - ' + news_item_category.title + '</p>' +
-                        '       <p><img src="' + newsItem.imgUrl + '" style="float: left; margin-right: 7px; margin-bottom: 7px;" />' + newsItem.story + '</p>' +
-                        '    </div>' +
-                        '    <div data-role="footer" data-theme="a" data-position="fixed" id="newsItemAd'+newsItem.id+'">' +
-                        '       <div class="ads"> ' +
-                        '           <iframe id=\'ac238136'+ newsItem.id+'\' name=\'ac238136'+ newsItem.id+'\' src=\'http://www.the-star.co.ke/ads/www/delivery/afr.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE\' frameborder=\'0\' scrolling=\'no\' width=\'234\' height=\'60\' allowtransparency=\'true\'><a href=\'http://www.the-star.co.ke/ads/www/delivery/ck.php?n=a311071e&amp;cb=INSERT_RANDOM_NUMBER_HERE\' target=\'_blank\'><img src=\'http://www.the-star.co.ke/ads/www/delivery/avw.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE&amp;n=a311071e\' border=\'0\' alt=\'\' /></a></iframe>' +
-                        '       </div>' +
-                        '   </div>' +
-                        '</div>');
+                        var storyImg = "";
+                        if (newsItem.imgUrl != undefined) {
+                            storyImg = '<p style="text-align:center;"><img src="' + newsItem.imgUrl + '" style="border: 1px solid black; margin-right: 7px; margin-bottom: 7px;" /></p>';
+                        }
+                    
+                    
+                        $('#lstCat' + mobile_subscriber.subscriptions[i].id).append(
+                            '<li><a id="lnkNewsItem' + newsItem.id  + '" href="#newsItem' +mobile_news.newsItem[j].id  + '">' +
+                            thumbImg +
+                            '<h3>' +mobile_news.newsItem[j].headline  + '</h3>' +
+                            '<p>' + story.trunc(150)  + '</p></a></li>');
+                    
+                        // Story Page
+                        $('body').append(
+                            '<div data-role="page" id="newsItem' + newsItem.id + '" data-url="newsItem'+newsItem.id+'">' +
+                            '    <div data-role="header" data-position="fixed" data-theme="b" >' +
+                            '        <a href="#cat' + mobile_subscriber.subscriptions[i].id + '" data-icon="arrow-l" data-back="true">Back</a>' +
+                            '        <h1>' + newsItem.headline + '</h1>' +
+                            '    </div>' +
+                            '    <div data-role="content" data-theme="d">' +
+                            '       <p class="dateline">' + newsItem.dateline + ' - ' + news_item_category.title + '</p>' +
+                            storyImg +
+                            '       <p>' + newsItem.story + '</p>' +
+                            '    </div>' +
+                            '    <div data-role="footer" data-theme="a" data-position="fixed" id="newsItemAd'+newsItem.id+'">' +
+                            '       <div class="ads"> ' +
+                            '           <iframe id=\'ac238136'+ newsItem.id+'\' name=\'ac238136'+ newsItem.id+'\' src=\'http://www.the-star.co.ke/ads/www/delivery/afr.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE\' frameborder=\'0\' scrolling=\'no\' width=\'234\' height=\'60\' allowtransparency=\'true\'><a href=\'http://www.the-star.co.ke/ads/www/delivery/ck.php?n=a311071e&amp;cb=INSERT_RANDOM_NUMBER_HERE\' target=\'_blank\'><img src=\'http://www.the-star.co.ke/ads/www/delivery/avw.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE&amp;n=a311071e\' border=\'0\' alt=\'\' /></a></iframe>' +
+                            '       </div>' +
+                            '   </div>' +
+                            '</div>');
            
                     
-                    $('#lnkNewsItem' + newsItem.id).click(function(event) {
-                        cnvms_read($('#phone').val(), $('#password').val(), newsItem.id);
-                    });
+                        $('#lnkNewsItem' + newsItem.id).click(function(event) {
+                            cnvms_read($('#phone').val(), $('#password').val(), newsItem.id);
+                        });
+                    }
                 }
             }
         }
-	   
-//	   $('#lstSubscriptions').append(
-//            '<li data-theme="e">' +
-//             '#lstSpecial'
-//           '<img src="images/maina.png" class="ui-li-thumb" />'
-//            '<h3>Maina\'s List</h3>' +
-//           '<p>Coming soon!</p></li>'
-//        );
+        
+        //	   $('#lstSubscriptions').append(
+        //            '<li data-theme="e">' +
+        //             '#lstSpecial'
+        //           '<img src="images/maina.png" class="ui-li-thumb" />'
+        //            '<h3>Maina\'s List</h3>' +
+        //           '<p>Coming soon!</p></li>'
+        //        );
             
-//        $('#lstSubscriptions').append(
-//            '<li data-theme="e">' +
-//            '<img src="images/caroline.png" class="ui-li-thumb" />' +
-//            '<h3>Caroline\'s Jobs</h3>' +
-//            '<p>Coming soon!</p></li>');
+        //        $('#lstSubscriptions').append(
+        //            '<li data-theme="e">' +
+        //            '<img src="images/caroline.png" class="ui-li-thumb" />' +
+        //            '<h3>Caroline\'s Jobs</h3>' +
+        //            '<p>Coming soon!</p></li>');
 
         
-       //  Re-render category pages
+        //  Re-render category pages
         for (i=0; i<category_ids.length; i++) {
             $('#cat' + mobile_subscriber.subscriptions[i].id).page();
         }
@@ -186,12 +201,12 @@ function fetchSubscriptions(phone, password) {
         cnvms_fetchnews(phone, password, function(newsData) {
             mobile_news = newsData
         }, 
-	   function() {
+        function() {
             alert('Could not fetch news')
         });
     },
     function() {
-	    alert("Invalid phone number or password");
+        alert("Invalid phone number or password");
     });
 }
 

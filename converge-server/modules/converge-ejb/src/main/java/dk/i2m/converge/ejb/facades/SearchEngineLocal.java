@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,10 +16,10 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.search.IndexQueueEntry;
 import dk.i2m.converge.core.search.QueueEntryOperation;
 import dk.i2m.converge.core.search.QueueEntryType;
+import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.domain.search.SearchResults;
 import java.util.Date;
 import java.util.List;
@@ -111,4 +111,6 @@ public interface SearchEngineLocal {
     void optimizeIndex() throws SearchEngineIndexingException;
 
     byte[] generateReport(dk.i2m.converge.domain.search.SearchResults results);
+
+    void removeItem(java.lang.Long id);
 }

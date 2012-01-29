@@ -263,14 +263,14 @@ public class PluginContextBean implements PluginContextBeanLocal {
             java.lang.Object origin,
             java.lang.Object originId) {
         String msg = MessageFormat.format(message, messageArguments);
-        systemFacade.log(severity, getCurrentUserAccount(), msg, origin, String.valueOf(originId));
+        systemFacade.log(severity, msg, origin, String.valueOf(originId));
     }
 
     @Override
     public void log(dk.i2m.converge.core.logging.LogSeverity severity,
             java.lang.String message, java.lang.Object origin,
             java.lang.Object originId) {
-        systemFacade.log(severity, getCurrentUserAccount(), message, origin, String.valueOf(
+        systemFacade.log(severity, message, origin, String.valueOf(
                 originId));
     }
 
@@ -278,7 +278,7 @@ public class PluginContextBean implements PluginContextBeanLocal {
     public void log(dk.i2m.converge.core.logging.LogSeverity severity,
             java.lang.String message, java.lang.Object[] messageArguments,
             List<LogSubject> subjects) {
-        systemFacade.log(severity, getCurrentUserAccount(), message, subjects);
+        systemFacade.log(severity, message, subjects);
     }
     
 }

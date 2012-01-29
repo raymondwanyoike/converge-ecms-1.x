@@ -242,6 +242,15 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         realFilename.append(rendition.getId()).append(".");
         realFilename.append(originalExtension);
 
+        // Check if there is already a rendition of this type
+        Long existingId;
+        try {
+            MediaItemRendition existing = item.findRendition(rendition);
+            existingId = existing.getId();
+        } catch (RenditionNotFoundException ex) {
+            existingId = 0L;
+        }
+        
         // Set-up the media item rendition
         MediaItemRendition mediaItemRendition = new MediaItemRendition();
         mediaItemRendition.setMediaItem(item);
@@ -266,7 +275,13 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
                 LOG.log(Level.SEVERE, "Could not execute CatalogueHook", ex);
             }
         }
-        return daoService.create(mediaItemRendition);
+        mediaItemRendition = daoService.create(mediaItemRendition);
+
+        // Delete previous media item rendition of the same rendition
+        if (existingId > 0 && mediaItemRendition.getId() != existingId) {
+            daoService.delete(MediaItemRendition.class, existingId);
+        }
+        return mediaItemRendition;
     }
 
     @Override
@@ -788,6 +803,9 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      */
     @Override
     public String archive(File file, Catalogue catalogue, String fileName) throws IOException {
+        if (!file.exists()) {
+            throw new IOException("Source file does not exist");
+        }
         Calendar now = Calendar.getInstance();
 
         StringBuilder cataloguePath = new StringBuilder();
@@ -808,7 +826,6 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         File mediaFile = new File(dir, fileName);
 
         // Move file to the new location
-        LOG.log(Level.INFO, "Archiving {0} at {1}", new Object[]{file.getAbsolutePath(), mediaFile.getAbsolutePath()});
         copyFile(file, mediaFile);
 
         return cataloguePath.toString();

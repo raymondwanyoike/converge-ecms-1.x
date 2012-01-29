@@ -16,16 +16,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -38,29 +29,39 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Subscriber implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
     @Column(name = "phone", unique = true)
     private String phone;
+
     @Column(name = "name")
     private String name;
+
     @Column(name = "password")
     private String password;
+
     @Column(name = "gender")
     private boolean gender;
+
     @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "dob")
     private Date dob;
-    @OneToMany
-    @JoinTable(name = "subscription", joinColumns =
-    @JoinColumn(name = "subscriber_id"), inverseJoinColumns =
-    @JoinColumn(name = "section_id"))
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "subscription",
+    joinColumns = @JoinColumn(name = "subscriber_id"),
+    inverseJoinColumns = @JoinColumn(name = "section_id"))
+    @OrderBy(value="displayOrder ASC")
     private List<Section> subscriptions = new ArrayList<Section>();
+
     @Column(name = "member_since")
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date subscriberSince;
+
     @Column(name = "last_update")
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date lastUpdate;
@@ -153,7 +154,8 @@ public class Subscriber implements Serializable {
             return false;
         }
         Subscriber other = (Subscriber) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null
+                && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -161,6 +163,7 @@ public class Subscriber implements Serializable {
 
     @Override
     public String toString() {
-        return "dk.i2m.converge.mobile.server.domain.Subscriber[ id=" + id + " ]";
+        return "dk.i2m.converge.mobile.server.domain.Subscriber[ id=" + id
+                + " ]";
     }
 }

@@ -4,7 +4,7 @@
         <rich:modalPanel id="mpConceptSelector" autosized="true" domElementAttachment="parent">
             <f:facet name="header">
                 <h:panelGroup>
-                    <h:outputText value="#{i18n.concepts_SELECT_META_DATA}" />
+                    <h:outputText value="#{msgs.concepts_SELECT_META_DATA}" />
                 </h:panelGroup>
             </f:facet>
             <f:facet name="controls">
@@ -17,7 +17,7 @@
             <h:panelGrid id="pgMetaDataSelect" style="width: 480px;">
 
                 <rich:tabPanel id="tpMetaDataSelect" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
-                    <rich:tab id="tabSubjects" label="#{i18n.concepts_SUBJECTS}">
+                    <rich:tab id="tabSubjects" label="#{msgs.concepts_SUBJECTS}">
 
                         <h:panelGrid id="pgSubjects" columnClasses="tabSheet" style="padding: 10px; width: 100%">
                             <h:panelGroup styleClass="scrollableContent" layout="block">
@@ -40,7 +40,7 @@
                 </rich:tabPanel>
 
                 <h:panelGroup styleClass="dialogueButtons">
-                    <h:commandLink id="lnkCloseConceptSelector" styleClass="dialogButton" value="#{i18n.Generic_CLOSE}" onclick="#{rich:component('mpConceptSelector')}.hide(); return false;" />
+                    <h:commandLink id="lnkCloseConceptSelector" styleClass="dialogButton" value="#{msgs.CLOSE}" onclick="#{rich:component('mpConceptSelector')}.hide(); return false;" />
                 </h:panelGroup>
             </h:panelGrid>
         </rich:modalPanel>

@@ -68,17 +68,17 @@
                         <h:outputText value="#{msgs.PHOTO_LISTING_DETAILS_TAKEN}:&#160;"  />
                         <h:outputText value="#{msgs.NOT_SET}" rendered="#{photo.photoTaken == null}"   />
                         <h:outputText value="#{photo.photoTaken.time}" rendered="#{photo.photoTaken != null}">
-                            <f:convertDateTime type="both" pattern="#{i18n.Generic_FORMAT_DATE}" timeZone="#{userSession.user.timeZone}" />
+                            <f:convertDateTime type="both" pattern="#{msgs.FORMAT_DATE}" timeZone="#{userSession.user.timeZone}" />
                         </h:outputText>
 
                         <h:outputText value="&#160;#{msgs.PHOTO_LISTING_DETAILS_UPDATED}:&#160;" />
                         <h:outputText value="#{photo.updated.time}">
-                            <f:convertDateTime type="both" pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                            <f:convertDateTime type="both" pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                         </h:outputText>
 
                         <h:outputText value="&#160;#{msgs.PHOTO_LISTING_DETAILS_CREATED}:&#160;" />
                         <h:outputText value="#{photo.created.time}">
-                            <f:convertDateTime type="both" pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                            <f:convertDateTime type="both" pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                         </h:outputText>
                     </h:column>
 

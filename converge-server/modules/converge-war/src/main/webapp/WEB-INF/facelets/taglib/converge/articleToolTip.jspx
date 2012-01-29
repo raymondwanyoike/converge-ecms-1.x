@@ -15,28 +15,28 @@
 
         <rich:toolTip style="width: 450px;" styleClass="tooltip">
             <h:panelGrid rowClasses="smallHeading, text">
-                <h:outputText value="#{i18n.article_BRIEF}" />
+                <h:outputText value="#{msgs.BRIEF}" />
                 <h:outputText value="#{article.brief}&#160;" />
 
-                <h:outputText value="#{i18n.article_SUBJECTS}" />
+                <h:outputText value="#{msgs.SUBJECTS}" />
                 <t:dataList value="#{article.subjects}" var="subject" rendered="#{not empty article.subjects}">
                     <h:outputText value="#{subject.fullTitle}&#160;" />
                 </t:dataList>
                 <h:outputText value="&#160;" rendered="#{empty article.subjects}" />
 
-                <h:outputText value="#{i18n.article_PERSONS}" />
+                <h:outputText value="#{msgs.PERSONS}" />
                 <t:dataList value="#{article.persons}" var="person" rendered="#{not empty article.persons}">
                     <h:outputText value="#{person.firstName} #{person.lastName}&#160;" />
                 </t:dataList>
                 <h:outputText value="&#160;" rendered="#{empty article.persons}" />
 
-                <h:outputText value="#{i18n.article_ORGANISATIONS}" />
+                <h:outputText value="#{msgs.ORGANISATIONS}" />
                 <t:dataList value="#{article.organisations}" var="organisation" rendered="#{not empty article.organisations}">
                     <h:outputText value="#{organisation.name}&#160;" />
                 </t:dataList>
                 <h:outputText value="&#160;" rendered="#{empty article.organisations}" />
 
-                <h:outputText value="#{i18n.article_LOCATIONS}" />
+                <h:outputText value="#{msgs.LOCATIONS}" />
                 <t:dataList value="#{article.locations}" var="location" rendered="#{not empty article.locations}">
                     <h:outputText value="#{location.name}&#160;" />
                 </t:dataList>
