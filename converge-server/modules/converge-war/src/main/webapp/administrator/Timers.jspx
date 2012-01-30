@@ -16,10 +16,10 @@
                                 <f:facet name="header">
                                     <a4j:status forceId="true" id="dtTimersStatus">
                                         <f:facet name="start">
-                                            <h:graphicImage value="#{res.AJAX_LOADING_ICON}" />
+                                            <h:graphicImage value="#{i18n.resource_ICON_AJAX_LOADING}" />
                                         </f:facet>
                                         <f:facet name="stop">
-                                            <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                                            <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                                         </f:facet>
                                     </a4j:status>
                                 </f:facet>

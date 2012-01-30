@@ -75,7 +75,7 @@
                     <rich:dataTable id="dtContributions" value="#{myActivity.userActivity.submitted}" var="item" styleClass="table" headerClass="tableHeader" rowClasses="odd, even" rows="20" rendered="#{!empty myActivity.userActivity.submitted}">
                         <rich:column styleClass="center columnIcon">
                             <f:facet name="header">
-                                <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                                <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                             </f:facet>
                             <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
                                 <h:graphicImage value="#{res.NEWS_ITEM_ICON}"  />

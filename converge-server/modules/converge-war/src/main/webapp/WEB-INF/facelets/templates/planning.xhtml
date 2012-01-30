@@ -32,17 +32,17 @@
                             <converge:moduleHeader moduleTitle="#{msgs.planning_ASSIGNMENT_MANAGE}" />
                             <div class="moduleContent">
                                 <h:panelGrid columns="2">
-                                    <h:graphicImage value="#{res.BULLET_ICON}" alt="#{msgs.planning_ASSIGNMENT_MANAGE_DIARY}" title="#{msgs.planning_ASSIGNMENT_MANAGE_DIARY}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{msgs.planning_ASSIGNMENT_MANAGE_DIARY}" title="#{msgs.planning_ASSIGNMENT_MANAGE_DIARY}" />
                                     <h:commandLink action="/planning/assignments">
                                         <h:outputText value="#{msgs.planning_ASSIGNMENT_MANAGE_DIARY}" />
                                     </h:commandLink>
 
-                                    <h:graphicImage value="#{res.BULLET_ICON}" alt="#{msgs.planning_ASSIGNMENT_MANAGE_EDITIONS}" title="#{msgs.planning_ASSIGNMENT_MANAGE_EDITIONS}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{msgs.planning_ASSIGNMENT_MANAGE_EDITIONS}" title="#{msgs.planning_ASSIGNMENT_MANAGE_EDITIONS}" />
                                     <h:commandLink action="/planning/editions">
                                         <h:outputText value="#{msgs.planning_ASSIGNMENT_MANAGE_EDITIONS}" />
                                     </h:commandLink>
 
-                                    <h:graphicImage value="#{res.BULLET_ICON}" alt="#{msgs.planning_ASSIGNMENT_MANAGE_PIPELINE}" title="#{msgs.planning_ASSIGNMENT_MANAGE_PIPELINE}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{msgs.planning_ASSIGNMENT_MANAGE_PIPELINE}" title="#{msgs.planning_ASSIGNMENT_MANAGE_PIPELINE}" />
                                     <h:commandLink action="/planning/pipeline">
                                         <h:outputText value="#{msgs.planning_ASSIGNMENT_MANAGE_PIPELINE}" />
                                     </h:commandLink>
@@ -56,7 +56,7 @@
                             <div class="moduleContent">
                                 <h:dataTable value="#{planning.outlets}" var="outlet">
                                     <h:column>
-                                        <h:graphicImage value="#{res.BULLET_ICON}" alt="#{outlet.title}" title="#{outlet.title}" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{outlet.title}" title="#{outlet.title}" />
                                     </h:column>
                                     <h:column>
                                         <a4j:commandLink reRender="frmPage, frmOutlets, lnkNewEdition" styleClass="#{planning.selectedOutlet.id == outlet.id ? 'bold' : ''}">

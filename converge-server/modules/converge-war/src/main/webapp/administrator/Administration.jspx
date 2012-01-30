@@ -30,9 +30,9 @@
                         <rich:dataTable value="#{administrator_Administration.availableMigration}" var="version" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
                             <rich:column styleClass="center columnIcon">
                                 <f:facet name="header">
-                                    <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                                 </f:facet>
-                                <h:graphicImage alt="Migrate" title="Migrate" value="#{res.PLUGIN_ICON}" />
+                                <h:graphicImage alt="Migrate" title="Migrate" value="#{i18n.resource_ICON_PLUGIN}" />
                             </rich:column>
 
                             <rich:column>

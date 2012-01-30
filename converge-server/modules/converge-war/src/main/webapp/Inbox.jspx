@@ -17,7 +17,7 @@
                     <rich:dataTable id="dtInbox" value="#{inbox.newsItems}" var="item" styleClass="table" headerClass="tableHeader" rowClasses="odd, even" rendered="#{inbox.showNewsItem}" rows="20">
                         <rich:column styleClass="center columnIcon">
                             <f:facet name="header">
-                                <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                                <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                             </f:facet>
                             <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
                                 <h:graphicImage value="#{res.NEWS_ITEM_ICON}" rendered="#{!item.locked}" title="#{item.status}" alt="#{item.status}"  />
@@ -99,10 +99,10 @@
                             <f:facet name="header">
                                 <a4j:status id="staMediaItems" forceId="true">
                                     <f:facet name="start">
-                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_AJAX_LOADING}" />
                                     </f:facet>
                                     <f:facet name="stop">
-                                        <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>

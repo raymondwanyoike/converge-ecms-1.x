@@ -17,18 +17,18 @@
                         <div class="moduleContent">
                             <h:panelGrid columns="2">
                                 <c:if test="#{inbox.privilegedToCreateNewAssignments}">
-                                    <h:graphicImage value="#{res.BULLET_ICON}" alt="#{msgs.inbox_NEW_ASSIGNMENT}" title="#{msgs.inbox_NEW_ASSIGNMENT}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{msgs.inbox_NEW_ASSIGNMENT}" title="#{msgs.inbox_NEW_ASSIGNMENT}" />
                                     <a4j:commandLink reRender="frmNewAssignment" actionListener="#{inbox.onNewAssignment}" oncomplete="#{rich:component('mpNewAssignment')}.show();#{rich:element('frmNewAssignment:txtStoryTitle')}.focus()">
                                         <h:outputText value="#{msgs.inbox_NEW_ASSIGNMENT}" />
                                     </a4j:commandLink>
                                 </c:if>
 
-                                <h:graphicImage value="#{res.BULLET_ICON}" alt="#{msgs.inbox_MY_ASSIGNMENTS}" title="#{msgs.inbox_MY_ASSIGNMENTS}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{msgs.inbox_MY_ASSIGNMENTS}" title="#{msgs.inbox_MY_ASSIGNMENTS}" />
                                 <a4j:commandLink reRender="frmInbox" actionListener="#{inbox.onShowMyAssignments}">
                                     <h:outputText value="#{msgs.inbox_MY_ASSIGNMENTS}" />
                                 </a4j:commandLink>
 
-                                <h:graphicImage value="#{res.BULLET_ICON}" alt="#{msgs.inbox_EMPTY_TRASH}" title="#{msgs.inbox_EMPTY_TRASH}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{msgs.inbox_EMPTY_TRASH}" title="#{msgs.inbox_EMPTY_TRASH}" />
                                 <a4j:commandLink reRender="frmInbox" actionListener="#{inbox.onEmptyTrash}" ajaxSingle="true">
                                     <h:outputText value="#{msgs.inbox_EMPTY_TRASH}" />
                                 </a4j:commandLink>

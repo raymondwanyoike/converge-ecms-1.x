@@ -13,9 +13,9 @@
                         <rich:dataTable id="dtProcesses" value="#{administrator_Processes.backgroundTasks}" var="task" styleClass="table" headerClass="tableHeader">
                             <rich:column styleClass="center columnIcon">
                                 <f:facet name="header">
-                                    <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                                 </f:facet>
-                                <h:graphicImage title="" alt="" value="#{res.AJAX_LOADING_ICON}" />
+                                <h:graphicImage title="" alt="" value="#{i18n.resource_ICON_AJAX_LOADING}" />
                             </rich:column>
                             <rich:column>
                                 <f:facet name="header">

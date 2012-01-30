@@ -7,12 +7,12 @@
             <converge:moduleHeader moduleTitle="#{msgs.OPTIONS}" />
             <div class="moduleContent">
                 <h:panelGrid columns="2">
-                    <h:graphicImage value="#{res.BULLET_ICON}" />
+                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
                     <h:outputLink value="#{facesContext.externalContext.request.contextPath}/Listings-StockMarkets.xhtml">
                         <h:outputText value="#{msgs.listing_STOCK_MARKETS}" />
                     </h:outputLink>
 
-                    <h:graphicImage value="#{res.BULLET_ICON}" />
+                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
                     <a4j:commandLink value="#{msgs.listing_FINANCIAL_MARKETS}" ajaxSingle="true" reRender="frmFinancialMarkets" onclick="#{rich:component('mpFinancialMarkets')}.show();" />
                 </h:panelGrid>
             </div>
@@ -31,7 +31,7 @@
                             <f:facet name="header">
                                 <a4j:status id="staMarketValues">
                                     <f:facet name="start">
-                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" title="#{msgs.UPDATING}" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_AJAX_LOADING}" title="#{msgs.UPDATING}" />
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>

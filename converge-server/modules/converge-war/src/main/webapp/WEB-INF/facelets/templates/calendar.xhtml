@@ -40,7 +40,7 @@
                         <div class="moduleContent">
                             <h:panelGrid columns="2">
 
-                                <h:graphicImage value="#{res.BULLET_ICON}" rendered="#{userSession.privileged['CALENDAR']}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_BULLET}" rendered="#{userSession.privileged['CALENDAR']}" />
 
                                 <a4j:commandLink id="lnkNewEvent" reRender="frmEventDetails" actionListener="#{calendar.onNewEvent}" rendered="#{userSession.privileged['CALENDAR']}">
                                     <h:outputText value="#{msgs.calendar_NEW_EVENT}" />
@@ -49,39 +49,39 @@
                                                            event="oncomplete" />
                                 </a4j:commandLink>
 
-                                <h:graphicImage value="#{res.BULLET_ICON}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
 
                                 <a4j:commandLink reRender="dtSchedule" actionListener="#{calendar.onRefreshSchedule}">
                                     <h:outputText value="#{msgs.calendar_REFRESH}" />
                                 </a4j:commandLink>
 
-                                <h:graphicImage value="#{res.BULLET_ICON}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
 
                                 <a4j:commandLink id="lnkSubscribe" onclick="#{rich:component('mpCalendarSubscribe')}.show(); return false;">
                                     <h:outputText value="#{msgs.calendar_VCAL_SUBSCRIBE}" />
                                 </a4j:commandLink>
 
-                                <h:graphicImage value="#{res.BULLET_ICON}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
                                 <a4j:commandLink id="lnkShowYear" reRender="frmPage" actionListener="#{calendar.onShowYear}">
                                     <h:outputText value="#{msgs.calendar_SHOW_YEAR}" />
                                 </a4j:commandLink>
 
-                                <h:graphicImage value="#{res.BULLET_ICON}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
                                 <a4j:commandLink id="lnkShowMonth" reRender="frmPage" actionListener="#{calendar.onShowMonth}">
                                     <h:outputText value="#{msgs.calendar_SHOW_MONTH}" />
                                 </a4j:commandLink>
 
-                                <h:graphicImage value="#{res.BULLET_ICON}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
                                 <a4j:commandLink id="lnkShowWeek" reRender="frmPage" actionListener="#{calendar.onShowWeek}">
                                     <h:outputText value="#{msgs.calendar_SHOW_WEEK}" />
                                 </a4j:commandLink>
 
-                                <h:graphicImage value="#{res.BULLET_ICON}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
                                 <a4j:commandLink id="lnkShowDay" reRender="frmPage" actionListener="#{calendar.onShowDay}">
                                     <h:outputText value="#{msgs.calendar_SHOW_DAY}" />
                                 </a4j:commandLink>
 
-                                <h:graphicImage value="#{res.BULLET_ICON}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
                                 <a4j:commandLink id="lnkShowUpcoming" reRender="frmPage" actionListener="#{calendar.onShowUpcoming}">
                                     <h:outputText value="#{msgs.calendar_SHOW_UPCOMING}" />
                                 </a4j:commandLink>

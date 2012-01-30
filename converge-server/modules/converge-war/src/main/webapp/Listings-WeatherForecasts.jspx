@@ -7,15 +7,15 @@
             <converge:moduleHeader moduleTitle="#{msgs.OPTIONS}" />
             <div class="moduleContent">
                 <h:panelGrid columns="2">
-                    <h:graphicImage value="#{res.BULLET_ICON}" />
+                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
                     <h:outputLink value="#{facesContext.externalContext.request.contextPath}/Listings-WeatherForecasts.xhtml">
                         <h:outputText value="#{msgs.listing_WEATHER_FORECASTS}" />
                     </h:outputLink>
 
-                    <h:graphicImage value="#{res.BULLET_ICON}" />
+                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
                     <a4j:commandLink value="#{msgs.listing_LOCATIONS}" ajaxSingle="true" reRender="frmLocations" onclick="#{rich:component('mpLocations')}.show();" />
 
-                    <h:graphicImage value="#{res.BULLET_ICON}" />
+                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
                     <a4j:commandLink value="#{msgs.listing_SITUATIONS}" ajaxSingle="true" reRender="frmSituations" onclick="#{rich:component('mpSituations')}.show();" />
                 </h:panelGrid>
             </div>
@@ -34,7 +34,7 @@
                             <f:facet name="header">
                                 <a4j:status id="staForecasts">
                                     <f:facet name="start">
-                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" title="#{msgs.UPDATING}" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_AJAX_LOADING}" title="#{msgs.UPDATING}" />
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>

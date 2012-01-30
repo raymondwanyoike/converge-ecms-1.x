@@ -7,12 +7,12 @@
             <converge:moduleHeader moduleTitle="#{msgs.OPTIONS}" />
             <div class="moduleContent">
                 <h:panelGrid columns="2">
-                    <h:graphicImage value="#{res.BULLET_ICON}" />
+                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
                     <h:outputLink value="#{facesContext.externalContext.request.contextPath}/Listings-ForexRates.xhtml">
                         <h:outputText value="#{msgs.listing_RATES}" />
                     </h:outputLink>
 
-                    <h:graphicImage value="#{res.BULLET_ICON}" />
+                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
                     <a4j:commandLink value="#{msgs.listing_CURRENCIES}" ajaxSingle="true" reRender="frmCurrencies" onclick="#{rich:component('mpCurrencies')}.show();" />
                 </h:panelGrid>
             </div>
@@ -32,7 +32,7 @@
                             <f:facet name="header">
                                 <a4j:status id="staForexRates">
                                     <f:facet name="start">
-                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" title="#{msgs.UPDATING}" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_AJAX_LOADING}" title="#{msgs.UPDATING}" />
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>

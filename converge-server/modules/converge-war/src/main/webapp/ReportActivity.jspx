@@ -35,10 +35,10 @@
                             <a4j:commandButton actionListener="#{reportActivity.onGenerateReport}" value="#{i18n.ReportActivity_GENERATE_REPORT}" reRender="frmOutput" styleClass="button mediumButton" />
                             <a4j:status>
                                 <f:facet name="start">
-                                    <h:graphicImage value="#{res.AJAX_LOADING_ICON}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_AJAX_LOADING}" />
                                 </f:facet>
                                 <f:facet name="stop">
-                                    <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                                 </f:facet>
                             </a4j:status>
                         </h:column>

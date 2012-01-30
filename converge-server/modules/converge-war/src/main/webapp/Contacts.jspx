@@ -29,7 +29,7 @@
                             <f:facet name="header">
                                 <a4j:status id="staProgress">
                                     <f:facet name="start">
-                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" title="#{msgs.UPDATING}" alt="#{msgs.UPDATING}" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_AJAX_LOADING}" title="#{msgs.UPDATING}" alt="#{msgs.UPDATING}" />
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>

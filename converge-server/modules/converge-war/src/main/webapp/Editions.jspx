@@ -14,7 +14,7 @@
                         </rich:calendar>
 
                         <h:panelGrid columns="2">
-                            <h:graphicImage value="#{res.BULLET_ICON}" alt="#{msgs.planning_EDITION_NEW_TOOLTIP}" title="#{msgs.planning_EDITION_NEW_TOOLTIP}" />
+                            <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{msgs.planning_EDITION_NEW_TOOLTIP}" title="#{msgs.planning_EDITION_NEW_TOOLTIP}" />
                             <a4j:commandLink id="lnkNewEdition" actionListener="#{planning.onNewEdition}" reRender="frmEditionDetails" ajaxSingle="true">
                                 <h:outputFormat value="#{msgs.planning_EDITION_NEW}">
                                     <f:param value="#{planning.selectedDate}" />

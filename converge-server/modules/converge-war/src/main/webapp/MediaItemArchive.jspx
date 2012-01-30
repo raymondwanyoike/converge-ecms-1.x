@@ -47,7 +47,7 @@
                 <rich:dataTable id="dtUsage" var="usage" value="#{mediaItemArchive.usage}" styleClass="table" headerClass="tableHeader" rowClasses="odd, even" rendered="#{mediaItemArchive.usage.rowCount &gt; 0}">
                     <rich:column styleClass="center columnIcon">
                         <f:facet name="header">
-                            <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
+                            <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                         </f:facet>
                         <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItemArchive.xhtml?id=#{usage.newsItemId}">
                             <h:graphicImage value="#{res.NEWS_ITEM_ICON}" />

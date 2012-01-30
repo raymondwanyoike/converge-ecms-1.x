@@ -93,7 +93,7 @@
                                 <converge:moduleHeader moduleTitle="#{msgs.concepts_MANAGE}" />
                                 <div class="moduleContent">
                                     <h:panelGrid columns="2">
-                                        <h:graphicImage value="#{res.BULLET_ICON}" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
                                         <a4j:commandLink reRender="frmConceptDetails" actionListener="#{concepts.onNewConcept}">
                                             <h:outputText value="#{msgs.concepts_NEW_CONCEPT}" />
                                             <rich:componentControl for="mpConceptDetails"
@@ -101,7 +101,7 @@
                                                                    event="oncomplete" />
                                         </a4j:commandLink>
 
-                                        <h:graphicImage value="#{res.BULLET_ICON}" rendered="#{userSession.privileged['MANAGE_CONCEPTS']}" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_BULLET}" rendered="#{userSession.privileged['MANAGE_CONCEPTS']}" />
                                         <a4j:commandLink reRender="frmImport" actionListener="#{concepts.onPreImport}" rendered="#{userSession.privileged['MANAGE_CONCEPTS']}">
                                             <h:outputText value="#{msgs.concepts_IMPORT_CONCEPTS}" />
                                             <rich:componentControl for="mpImport" operation="show" event="oncomplete" />
@@ -142,7 +142,7 @@
                             <div class="moduleContent">
                                 <h:dataTable value ="#{concepts.mostPopular}" var="concept">
                                     <h:column>
-                                        <h:graphicImage value="#{res.BULLET_ICON}"
+                                        <h:graphicImage value="#{i18n.resource_ICON_BULLET}"
                                                         alt="#{concept.name}"
                                                         title="#{concept.name}" />
                                     </h:column>

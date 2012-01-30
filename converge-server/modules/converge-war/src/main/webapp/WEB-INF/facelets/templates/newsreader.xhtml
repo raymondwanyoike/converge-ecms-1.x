@@ -24,7 +24,7 @@
                         <div class="moduleContent">
                             <h:dataTable value="#{newsReader.outlets}" var="outlet">
                                 <h:column>
-                                    <h:graphicImage value="#{res.BULLET_ICON}" alt="#{outlet.title}" title="#{outlet.title}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{outlet.title}" title="#{outlet.title}" />
                                 </h:column>
                                 <h:column>
                                     <a4j:commandLink reRender="frmPage, frmOutlets" styleClass="#{newsReader.selectedOutlet.id == outlet.id ? 'bold' : ''}">
@@ -52,7 +52,7 @@
                         <div class="moduleContent">
                             <h:dataTable value="#{newsReader.selectedEditions}" var="edition">
                                 <h:column>
-                                    <h:graphicImage value="#{res.BULLET_ICON}" alt="" title="" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="" title="" />
                                 </h:column>
                                 <h:column>
                                     <a4j:commandLink reRender="frmPage, frmEditionTime" styleClass="#{(newsReader.selectedEdition != null &amp;&amp; edition.id != null &amp;&amp; newsReader.selectedEdition.id == edition.id) ? 'bold' : ''}">
