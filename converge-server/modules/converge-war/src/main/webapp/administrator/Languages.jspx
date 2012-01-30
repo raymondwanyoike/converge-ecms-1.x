@@ -70,7 +70,7 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseLanguageDetails" value="#{res.DIALOGUE_CLOSE_ICON}" style="link" />
+                            <h:graphicImage id="imgCloseLanguageDetails" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
                             <rich:componentControl for="mpLanguageDetails" attachTo="imgCloseLanguageDetails" operation="hide" event="onclick"/>
                         </h:panelGroup>
                     </f:facet>

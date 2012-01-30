@@ -134,7 +134,7 @@
                     <f:facet name="controls">
                         <h:panelGroup>
                             <h:graphicImage id="imgCloseEventDetails"
-                                            value="#{res.DIALOGUE_CLOSE_ICON}"
+                                            value="#{i18n.resource_ICON_DIALOGUE_CLOSE}"
                                             style="link" />
                             <rich:componentControl for="mpEventDetails"
                                                    attachTo="imgCloseEventDetails"
@@ -237,7 +237,7 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseEventSubscribe" value="#{res.DIALOGUE_CLOSE_ICON}" style="link" />
+                            <h:graphicImage id="imgCloseEventSubscribe" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
                             <rich:componentControl for="mpCalendarSubscribe"
                                                    attachTo="imgCloseEventSubscribe"
                                                    operation="hide"
