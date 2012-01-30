@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import org.apache.tika.Tika;
 
 /**
  * {@link CatalogueHook} for transcoding a media file from one format to
@@ -47,13 +48,16 @@ public class TranscodeHook extends CatalogueHook {
 
     private Map<String, String> availableProperties = null;
 
-    private void validateProperties() {
-    }
+    private PluginContext pluginCtx;
 
+    private CatalogueHookInstance hookInstance;
+
+    /** Validate properties for the {@link CatalogueHook}. */
     enum Property {
 
         ORIGINAL_RENDITION,
         GENERATE_RENDITION,
+        GENERATE_RENDITION_FORMAT,
         GENERATE_RENDITION_USE_DEFAULT_DIMENSION,
         GENERATE_RENDITION_USE_ORIGINAL_DIMENSION,
         GENERATE_RENDITION_WIDTH,
@@ -61,32 +65,17 @@ public class TranscodeHook extends CatalogueHook {
         ENABLE_ON_UPDATE
     }
 
-    private boolean isPropertySet(Property p) {
-        return instanceProperties.containsKey(p.name());
-    }
-
-    private String getProperty(Property p) {
-        return instanceProperties.get(p.name());
-    }
-
-    private Boolean getPropertyAsBoolean(Property p) {
-        return Boolean.parseBoolean(getProperty(p));
-    }
-
-    private Long getPropertyAsLong(Property p) {
-        return Long.valueOf(getProperty(p));
-    }
-
-    private Integer getPropertyAsInteger(Property p) {
-        return Integer.valueOf(getProperty(p));
-    }
-
     @Override
     public void execute(PluginContext ctx, CatalogueEvent event,
             CatalogueHookInstance instance) throws CatalogueEventException {
+        this.pluginCtx = ctx;
+        this.hookInstance = instance;
         instanceProperties = instance.getPropertiesAsMap();
 
-        validateProperties();
+        // Validate the instance properties
+        if (!validateProperties()) {
+            return;
+        }
 
         boolean executeOnUpdate = false;
 
@@ -157,8 +146,7 @@ public class TranscodeHook extends CatalogueHook {
         // Transcode the video
         // Create temporary file to store the still
         String prefix = "xxx-" + uploadRendition.getMediaItem().getId();
-        // Add extension
-        String suffix = "" + generateRendition.getId() + "";
+        String suffix = "" + generateRendition.getId() + "." + getProperty(Property.GENERATE_RENDITION_FORMAT);
         File tempFile;
         try {
             tempFile = File.createTempFile(prefix, suffix);
@@ -166,10 +154,10 @@ public class TranscodeHook extends CatalogueHook {
             ctx.log(LogSeverity.SEVERE, "Could not create temporary file for storing the transcoded video. "
                     + ex.getMessage(), instance, instance.getId());
             return;
-
         }
+        
         TranscodeVideo video = new TranscodeVideo(uploadRendition.
-                getAbsoluteFilename(), tempFile.getName());
+                getAbsoluteFilename(), tempFile.getAbsoluteFile().toString());
         video.setHeight(height);
         video.setWidth(width);
 
@@ -182,15 +170,40 @@ public class TranscodeHook extends CatalogueHook {
         }
 
         try {
+            String contentType = "application/octet-stream";
             // Create the Media Item Rendition
-            // Update prefix
+
+            // Detect content type of generated file
+            try {
+                Tika tika = new Tika();
+                contentType = tika.detect(tempFile);
+            } catch (IOException ex) {
+                log(LogSeverity.WARNING, "LOG_COULD_NOT_DETECT_FILE_TYPE_FOR_X",
+                        new Object[]{ex.getMessage()});
+            }
+
             MediaItemRendition mir = ctx.createMediaItemRendition(tempFile,
                     event.getItem().getId(), generateRendition.getId(),
-                    tempFile.getName() + ".png", "image/png");
+                    tempFile.getName() + "." + getProperty(
+                    Property.GENERATE_RENDITION_FORMAT), contentType);
 
         } catch (IOException ex) {
             throw new CatalogueEventException(ex);
         }
+    }
+
+    private boolean validateProperties() {
+        if (!isPropertySet(Property.GENERATE_RENDITION_FORMAT)) {
+            log(LogSeverity.SEVERE,
+                    "LOG_GENERATE_RENDITION_FORMAT_NOT_SPECIFIED");
+            return false;
+        }
+
+        if (!isPropertySet(Property.ORIGINAL_RENDITION)) {
+            log(LogSeverity.SEVERE, "LOG_ORIGINAL_RENDITION_NOT_SPECIFIED");
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -243,5 +256,40 @@ public class TranscodeHook extends CatalogueHook {
     @Override
     public boolean isSupportBatch() {
         return true;
+    }
+
+    // -- Utility Methods -----
+    private void log(LogSeverity severity, String msg) {
+        log(severity, msg, new Object[]{});
+    }
+
+    private void log(LogSeverity severity, String msg, Object param) {
+        log(severity, msg, new Object[]{param});
+    }
+
+    private void log(LogSeverity severity, String msg, Object[] params) {
+        this.pluginCtx.log(severity, bundle.getString(msg), params,
+                this.hookInstance,
+                this.hookInstance.getId());
+    }
+
+    private boolean isPropertySet(Property p) {
+        return instanceProperties.containsKey(p.name());
+    }
+
+    private String getProperty(Property p) {
+        return instanceProperties.get(p.name());
+    }
+
+    private Boolean getPropertyAsBoolean(Property p) {
+        return Boolean.parseBoolean(getProperty(p));
+    }
+
+    private Long getPropertyAsLong(Property p) {
+        return Long.valueOf(getProperty(p));
+    }
+
+    private Integer getPropertyAsInteger(Property p) {
+        return Integer.valueOf(getProperty(p));
     }
 }
