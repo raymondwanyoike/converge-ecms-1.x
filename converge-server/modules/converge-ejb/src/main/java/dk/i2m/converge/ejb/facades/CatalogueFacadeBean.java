@@ -68,7 +68,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * Creates a new {@link Catalogue} in the database.
      *
      * @param catalogue
-* {@link Catalogue} to create
+     * {@link Catalogue} to create
      * @return {@link Catalogue} created with auto-generated properties set
      */
     @Override
@@ -80,7 +80,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * Updates an existing {@link Catalogue} in the database.
      *
      * @param catalogue
-* {@link Catalogue} to update
+     * {@link Catalogue} to update
      * @return Updated {@link Catalogue}
      */
     @Override
@@ -92,9 +92,9 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * Deletes an existing {@link Catalogue} from the database.
      *
      * @param id
-* Unique identifier of the {@link Catalogue}
+     * Unique identifier of the {@link Catalogue}
      * @throws DataNotFoundException
-* If the given {@link Catalogue} does not exist
+     * If the given {@link Catalogue} does not exist
      */
     @Override
     public void deleteCatalogueById(Long id) throws DataNotFoundException {
@@ -125,11 +125,11 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * Finds an existing {@link Catalogue} in the database.
      *
      * @param id
-* Unique identifier of the {@link Catalogue}
+     * Unique identifier of the {@link Catalogue}
      * @return {@link Catalogue} matching the given
      * <code>id</code>
      * @throws DataNotFoundException
-* If no {@link Catalogue} could be matched to the given
+     * If no {@link Catalogue} could be matched to the given
      * <code>id</code>
      */
     @Override
@@ -141,9 +141,9 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * Indexes enabled {@link Catalogue}s.
      *
      * @throws InvalidMediaRepositoryException
- * If the location of the {@link Catalogue} is not valid
+     * If the location of the {@link Catalogue} is not valid
      * @throws MediaRepositoryIndexingException
-* If the location of the {@link Catalogue} could not be
+     * If the location of the {@link Catalogue} could not be
      * indexed
      */
     @Override
@@ -187,7 +187,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * Finds a {@link Rendition} by its name.
      * <p/>
      * @param name
-* Name of the {@link Rendition}
+     * Name of the {@link Rendition}
      * @return {@link Rendition} matching the name
      * @throws DataNotFoundException * If the {@link Rendition} could not be found
      */
@@ -226,15 +226,15 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * {@link MediaItem}.
      * <p/>
      * @param file
-       * File representing the {@link MediaItemRendition}
+     * File representing the {@link MediaItemRendition}
      * @param item
-       * {@link MediaItem} to add the {@link MediaItemRendition}
+     * {@link MediaItem} to add the {@link MediaItemRendition}
      * @param rendition
-  * {@link Rendition} of the {@link MediaItemRendition}
+     * {@link Rendition} of the {@link MediaItemRendition}
      * @param filename
-   * Name of the file
+     * Name of the file
      * @param contentType
-* Content type of the file
+     * Content type of the file
      * @return Created {@link MediaItemRendition}
      * @throws IOException * If the {@link MediaItemRendition} could not be stored in the {@link Catalogue}
      */
@@ -255,10 +255,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         MediaItemRendition mediaItemRendition;
         try {
             mediaItemRendition = item.findRendition(rendition);
-            LOG.log(Level.INFO, "Using existing");
         } catch (RenditionNotFoundException ex) {
             mediaItemRendition = new MediaItemRendition();
-            LOG.log(Level.INFO, "creating new");
         }
 
         // Set-up the media item rendition
@@ -304,12 +302,9 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     /**
      * Executes a {@link CatalogueHookInstance} on a {@link MediaItem}.
      * <p/>
-     * @param mediaItemId
-   * Unique identifier of the {@link MediaItem}
-     * @param hookInstanceId
-* Unique identifier of the {@link CatalogueHookInstance}
-     * @throws DataNotFoundException * If the given {@code mediaItemId} or {@code hookInstanceId}
-     * was invalid
+     * @param mediaItemId    Unique identifier of the {@link MediaItem}
+     * @param hookInstanceId Unique identifier of the {@link CatalogueHookInstance}
+     * @throws DataNotFoundException If the given {@code mediaItemId} or {@code hookInstanceId} was invalid
      */
     @Override
     public void executeHook(Long mediaItemId, Long hookInstanceId) throws
@@ -447,7 +442,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * {@link MediaItem}.
      * <p/>
      * @param id
-* Unique identifier of the {@link MediaItemRendition}
+     * Unique identifier of the {@link MediaItemRendition}
      */
     @Override
     public void deleteMediaItemRenditionById(Long id) {
@@ -480,7 +475,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * engine.
      *
      * @param mediaItem
-* {@link MediaItem} to update
+     * {@link MediaItem} to update
      * @return Updated {@link MediaItem}
      */
     @Override
@@ -571,7 +566,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * <p/>
      * @param newswireItem * {@link NewswireItem} to base the {@link MediaItem}
      * @param catalogue
-   * {@link Catalogue} to add the {@link MediaItem}
+     * {@link Catalogue} to add the {@link MediaItem}
      * @return {@link MediaItem} created
      */
     @Override
@@ -638,7 +633,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * the {@link MediaItem} will also be removed from the search engine.
      *
      * @param id
-* Unique identifier of the {@link MediaItem}
+     * Unique identifier of the {@link MediaItem}
      */
     @Override
     public void deleteMediaItemById(Long id) {
@@ -709,7 +704,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * {@link dk.i2m.converge.core.content.NewsItem}.
      *
      * @param id
-* Unique identifier of the {@link MediaItem}
+     * Unique identifier of the {@link MediaItem}
      * @return {@code true} if the {@link MediaItem} is referenced, otherwise
      *         {@code false}
      */
@@ -737,7 +732,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * Gets a {@link List} of all placements for a given {@link MediaItem}.
      * <p/>
      * @param id
-* Unique identifier of the {@link MediaItem}
+     * Unique identifier of the {@link MediaItem}
      * @return {@link List} of placements for the given {@link MediaItem}
      * @throws DataNotFoundException * If the given {@link MediaItem} does not exist
      */
@@ -835,11 +830,11 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * @param file
      * File to archive
      * @param catalogue
-* Catalogue used for archiving the file
+     * Catalogue used for archiving the file
      * @param rendition
-* Rendition to store
+     * Rendition to store
      * @param rendition
-* {@link MediaItemRendition} to archive
+     * {@link MediaItemRendition} to archive
      * @return Path where the rendition was stored on the {@link Catalogue}
      * @throws IOException * If the file could not be archived
      */
@@ -884,9 +879,9 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * @param file
      * File to archive
      * @param catalogue
-* Catalogue used for archiving the file
+     * Catalogue used for archiving the file
      * @param fileName
- * File name of the file
+     * File name of the file
      * @return Path where the file was stored on the {@link Catalogue}
      * @throws IOException * If the file could not be archived
      */
@@ -929,9 +924,9 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * location to another.
      * <p/>
      * @param sourceFile
-* Source {@link File}
+     * Source {@link File}
      * @param destFile
-  * Destination {@link File}
+     * Destination {@link File}
      * @throws IOException * If the {@link File} could not be copied
      */
     private static void copyFile(File sourceFile, File destFile) throws
