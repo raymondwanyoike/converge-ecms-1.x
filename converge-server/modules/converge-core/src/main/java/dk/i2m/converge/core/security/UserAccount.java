@@ -16,41 +16,19 @@
  */
 package dk.i2m.converge.core.security;
 
-import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.Notification;
-import dk.i2m.converge.core.newswire.NewswireBasket;
-import dk.i2m.converge.core.workflow.Outlet;
-import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.converge.core.content.AssignmentType;
+import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
+import dk.i2m.converge.core.newswire.NewswireBasket;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.utils.BeanComparator;
+import dk.i2m.converge.core.workflow.Outlet;
+import dk.i2m.converge.core.workflow.Section;
+import java.awt.ComponentOrientation;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TimeZone;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import java.util.*;
+import javax.persistence.*;
 
 /**
  * {@link UserAccount} with access to the system and relation news items,
@@ -605,6 +583,22 @@ public class UserAccount implements Serializable {
     }
 
     /**
+     * Determine if the display should be rendered right-to-left for the
+     * user.
+     * 
+     * @return {@code true} if the display should be rendered right-to-left, 
+     *         otherwise {@code false}
+     */
+    public boolean isRightToLeft() {
+        Locale l = getPreferredLocale();
+        if (l == null){
+            return false;
+        }
+        
+        return !ComponentOrientation.getOrientation(l).isLeftToRight();
+    }
+    
+    /**
      * Gets the preferred language based on the preferred language string. If
      * the language string stored in the preferred language string cannot be
      * converted to a locale null will be returned.
@@ -613,7 +607,6 @@ public class UserAccount implements Serializable {
      *         <code>null</code> if preferred language is invalid.
      */
     public Locale getPreferredLocale() {
-
         // Valid lengths of the preferred language string
         final int fiveCharValidLength = 5;
         final int twoCharValidLength = 2;
