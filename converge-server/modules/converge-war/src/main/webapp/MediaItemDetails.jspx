@@ -421,12 +421,12 @@
 
                         <f:facet name="header">
                             <h:panelGroup>
-                                <h:outputText value="#{msgs.media_item_rendition_DETAILS}" />
+                                <h:outputText value="#{i18n.MediaItemDetails_MEDIA_ITEM_RENDITION_DETAILS}" />
                             </h:panelGroup>
                         </f:facet>
                         <f:facet name="controls">
                             <h:panelGroup>
-                                <h:graphicImage id="imgCloseRenditionDetails" value="#{res.DIALOGUE_CLOSE_ICON}" style="link" />
+                                <h:graphicImage id="imgCloseRenditionDetails" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
                                 <rich:componentControl for="mpRenditionDetails" attachTo="imgCloseRenditionDetails" operation="hide" event="onclick"/>
                             </h:panelGroup>
                         </f:facet>
@@ -435,24 +435,24 @@
 
                             <rich:tabPanel id="tpRenditionDetails" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
 
-                                <rich:tab id="tabRendition" label="#{msgs.media_item_RENDITION}">
+                                <rich:tab id="tabRendition" label="#{i18n.MediaItemDetails_RENDITION}">
                                     <h:panelGrid id="pgRendition" columnClasses="tabSheet" style="padding: 10px; width: 100%">
-                                        <h:outputText value="#{msgs.media_item_RENDITION}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.rendition.label}" styleClass="text mediumInput" disabled="true" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_FILENAME}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_FILENAME}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.filename}" styleClass="text mediumInput" disabled="true" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_URL}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_URL}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.absoluteFilename}" styleClass="text mediumInput" disabled="true" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_SIZE}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_SIZE}" />
                                         <h:inputText value="#{converge:displaySize(mediaItemDetails.selectedRendition.size)}" styleClass="text mediumInput" disabled="true" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_TYPE}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_TYPE}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.contentType}" styleClass="text mediumInput" disabled="true" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_REPLACE}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_REPLACE}" />
                                         <rich:fileUpload fileUploadListener="#{mediaItemDetails.renditionUploadListener}"
                                                          id="fuRendition"
                                                          immediateUpload="true"
@@ -460,7 +460,7 @@
                                                          allowFlash="false" listHeight="60" listWidth="450" ajaxSingle="true">
                                             <a4j:support event="onuploadcomplete" ajaxSingle="true" reRender="pgRenditionDetails,dtRenditions,preview" actionListener="#{mediaItemDetails.onSaveRendition}" />
                                             <f:facet name="label">
-                                                <h:outputText value="#{msgs.media_item_rendition_UPLOAD_INDICATOR}" />
+                                                <h:outputText value="#{i18n.MediaItemDetails_RENDITION_UPLOAD_INDICATOR}" />
                                             </f:facet>
                                         </rich:fileUpload>
                                     </h:panelGrid>
