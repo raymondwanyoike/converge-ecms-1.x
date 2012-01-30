@@ -212,14 +212,6 @@ public class PluginContextBean implements PluginContextBeanLocal {
         try {
             MediaItem mediaItem = catalogueFacade.findMediaItemById(mediaItemId);
             Rendition rendition = catalogueFacade.findRenditionById(renditionId);
-
-            try {
-                // Delete existing rendition
-                MediaItemRendition mir = mediaItem.findRendition(rendition);
-                catalogueFacade.deleteMediaItemRenditionById(mir.getId());
-            } catch (RenditionNotFoundException rex) {
-            }
-
             return catalogueFacade.create(file, mediaItem, rendition, filename,
                     contentType);
         } catch (DataNotFoundException ex) {

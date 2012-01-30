@@ -47,10 +47,10 @@
                 <h:panelGroup layout="block" id="preview" styleClass="mediaItemPreview">
                     <h:graphicImage url="#{i18n.resource_IMAGE_EMPTY_FRAME}" rendered="#{!mediaItemDetails.selectedMediaItem.renditionsAttached}" />
 
-                    <h:graphicImage url="#{mediaItemDetails.selectedMediaItem.preview.absoluteFilename}" rendered="#{mediaItemDetails.selectedMediaItem.previewAvailable &amp;&amp; !mediaItemDetails.selectedMediaItem.preview.video &amp;&amp; !mediaItemDetails.selectedMediaItem.preview.audio}" />
+                    <h:graphicImage url="#{mediaItemDetails.selectedMediaItem.preview.absoluteFilename}?#{common.localTime.time}" rendered="#{mediaItemDetails.selectedMediaItem.previewAvailable &amp;&amp; !mediaItemDetails.selectedMediaItem.preview.video &amp;&amp; !mediaItemDetails.selectedMediaItem.preview.audio}" />
 
                     <h:panelGroup rendered="#{mediaItemDetails.selectedMediaItem.renditionsAttached &amp;&amp; (mediaItemDetails.selectedMediaItem.preview.video || mediaItemDetails.selectedMediaItem.preview.audio)}">
-                        <converge:mediaPlayer id="#{mediaItemDetails.selectedMediaItem.id}" value="#{mediaItemDetails.selectedMediaItem.preview.absoluteFilename}" width="200" height="200" controlbar="none" />
+                        <converge:mediaPlayer id="#{mediaItemDetails.selectedMediaItem.id}" value="#{mediaItemDetails.selectedMediaItem.preview.absoluteFilename}?#{common.localTime.time}" width="200" height="200" controlbar="none" />
                     </h:panelGroup>
                 </h:panelGroup>
 
@@ -458,7 +458,7 @@
                                                          immediateUpload="true"
                                                          addControlLabel="Select"
                                                          allowFlash="false" listHeight="60" listWidth="450" ajaxSingle="true">
-                                            <a4j:support event="onuploadcomplete" ajaxSingle="true" reRender="pgRenditionDetails" />
+                                            <a4j:support event="onuploadcomplete" ajaxSingle="true" reRender="pgRenditionDetails,dtRenditions,preview" actionListener="#{mediaItemDetails.onSaveRendition}" />
                                             <f:facet name="label">
                                                 <h:outputText value="#{msgs.media_item_rendition_UPLOAD_INDICATOR}" />
                                             </f:facet>

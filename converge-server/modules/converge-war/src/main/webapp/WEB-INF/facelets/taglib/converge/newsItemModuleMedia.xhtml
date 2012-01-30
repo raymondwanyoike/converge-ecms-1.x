@@ -184,16 +184,16 @@
 
                                 <h:panelGrid id="pgMedia" columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:outputLink value="#{newsItem.userSubmission.original.absoluteFilename}" rendered="#{newsItem.userSubmission.renditionsAttached &amp;&amp; newsItem.userSubmission.previewAvailable}" target="_blank">
-                                        <h:graphicImage url="#{newsItem.userSubmission.preview.absoluteFilename}" />
+                                        <h:graphicImage id="pgMediaPreview" url="#{newsItem.userSubmission.preview.absoluteFilename}?#{common.localTime.time}"  />
                                     </h:outputLink>
 
                                     <h:outputLink value="#{newsItem.userSubmission.original.absoluteFilename}" rendered="#{newsItem.userSubmission.renditionsAttached &amp;&amp; !newsItem.userSubmission.previewAvailable}" target="_blank">
                                         <h:graphicImage url="/images/unknown-media-item.png" />
                                     </h:outputLink>
 
-                                    <rich:fileUpload listWidth="0" id="fuMediaItemFile"
+                                    <rich:fileUpload id="fuMediaItemFile"
                                                      allowFlash="false"
-                                                     listHeight="0"
+                                                     listHeight="60" listWidth="450"
                                                      maxFilesQuantity="1"
                                                      immediateUpload="true"
                                                      autoclear="true"
@@ -201,7 +201,7 @@
                                                      ajaxSingle="true"
                                                      addControlLabel="#{msgs.news_item_MEDIA_ITEM_UPLOAD}"
                                                      rendered="#{newsItem.selectedCatalogue != null}">
-                                        <a4j:support event="onuploadcomplete" reRender="pgMediaItemUpload"/>
+                                        <a4j:support event="onuploadcomplete" reRender="pgMediaItemUpload,pgMediaPreview" limitToList="true" />
                                         <f:facet name="label">
                                             <h:outputText value="#{msgs.media_item_rendition_UPLOAD_INDICATOR}" />
                                         </f:facet>

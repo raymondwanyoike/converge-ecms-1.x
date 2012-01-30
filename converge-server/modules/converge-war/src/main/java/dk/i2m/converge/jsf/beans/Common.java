@@ -78,6 +78,15 @@ public class Common {
     
     private ResourceBundle i18n = JsfUtils.getResourceBundle(FacesContext.getCurrentInstance(), "i18n");
 
+    /**
+     * Get the local time on the server.
+     * 
+     * @return Local time on the server
+     */
+    public Date getLocalTime() {
+        return java.util.Calendar.getInstance().getTime();
+    }
+    
     public TimeZone getSystemTimeZone() {
         try {
             String timeZone = systemFacade.getProperty(ConfigurationKey.TIME_ZONE);

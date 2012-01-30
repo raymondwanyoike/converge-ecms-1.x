@@ -45,7 +45,8 @@ import org.apache.commons.io.FilenameUtils;
 @Stateless
 public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
-    private static final Logger LOG = Logger.getLogger(CatalogueFacadeBean.class.getName());
+    private static final Logger LOG =
+            Logger.getLogger(CatalogueFacadeBean.class.getName());
 
     @EJB private DaoServiceLocal daoService;
 
@@ -67,7 +68,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * Creates a new {@link Catalogue} in the database.
      *
      * @param catalogue
-     *          {@link Catalogue} to create
+* {@link Catalogue} to create
      * @return {@link Catalogue} created with auto-generated properties set
      */
     @Override
@@ -79,8 +80,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * Updates an existing {@link Catalogue} in the database.
      *
      * @param catalogue
-     *          {@link Catalogue} to update
-     * @return Updated {@link Catalogue} 
+* {@link Catalogue} to update
+     * @return Updated {@link Catalogue}
      */
     @Override
     public Catalogue update(Catalogue catalogue) {
@@ -91,9 +92,9 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * Deletes an existing {@link Catalogue} from the database.
      *
      * @param id
-     *          Unique identifier of the {@link Catalogue}
+* Unique identifier of the {@link Catalogue}
      * @throws DataNotFoundException
-     *          If the given {@link Catalogue} does not exist
+* If the given {@link Catalogue} does not exist
      */
     @Override
     public void deleteCatalogueById(Long id) throws DataNotFoundException {
@@ -124,11 +125,12 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * Finds an existing {@link Catalogue} in the database.
      *
      * @param id
-     *          Unique identifier of the {@link Catalogue}
-     * @return {@link Catalogue} matching the given <code>id</code>
+* Unique identifier of the {@link Catalogue}
+     * @return {@link Catalogue} matching the given
+     * <code>id</code>
      * @throws DataNotFoundException
-     *          If no {@link Catalogue} could be matched to the given
-     *          <code>id</code>
+* If no {@link Catalogue} could be matched to the given
+     * <code>id</code>
      */
     @Override
     public Catalogue findCatalogueById(Long id) throws DataNotFoundException {
@@ -139,21 +141,25 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * Indexes enabled {@link Catalogue}s.
      *
      * @throws InvalidMediaRepositoryException
-     *          If the location of the {@link Catalogue} is not valid
+ * If the location of the {@link Catalogue} is not valid
      * @throws MediaRepositoryIndexingException
-     *          If the location of the {@link Catalogue} could not be
-     *          indexed
+* If the location of the {@link Catalogue} could not be
+     * indexed
      */
     @Override
-    public void indexCatalogues() throws InvalidMediaRepositoryException, MediaRepositoryIndexingException {
-        Map<String, Object> parameters = QueryBuilder.with("status", MediaItemStatus.APPROVED).parameters();
-        List<MediaItem> items = daoService.findWithNamedQuery(MediaItem.FIND_BY_STATUS, parameters);
+    public void indexCatalogues() throws InvalidMediaRepositoryException,
+            MediaRepositoryIndexingException {
+        Map<String, Object> parameters = QueryBuilder.with("status",
+                MediaItemStatus.APPROVED).parameters();
+        List<MediaItem> items = daoService.findWithNamedQuery(
+                MediaItem.FIND_BY_STATUS, parameters);
 
         for (MediaItem item : items) {
             //try {
             //byte[] file = FileUtils.getBytes(new URL(item.getAbsoluteFilename()));
             //generateThumbnail(file, item);
-            searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, item.getId(), QueueEntryOperation.UPDATE);
+            searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, item.getId(),
+                    QueueEntryOperation.UPDATE);
             //} catch (IOException ex) {
             //    logger.log(Level.SEVERE, ex.getMessage());
             //    logger.log(Level.FINE, "", ex);
@@ -179,18 +185,20 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     /**
      * Finds a {@link Rendition} by its name.
-     * 
+     * <p/>
      * @param name
-     *          Name of the {@link Rendition}
+* Name of the {@link Rendition}
      * @return {@link Rendition} matching the name
-     * @throws DataNotFoundException 
-     *          If the {@link Rendition} could not be found
+     * @throws DataNotFoundException * If the {@link Rendition} could not be found
      */
     @Override
-    public Rendition findRenditionByName(String name) throws DataNotFoundException {
-        Map<String, Object> params = QueryBuilder.with("name", name).parameters();
+    public Rendition findRenditionByName(String name) throws
+            DataNotFoundException {
+        Map<String, Object> params =
+                QueryBuilder.with("name", name).parameters();
 
-        List<Rendition> results = daoService.findWithNamedQuery(Rendition.FIND_BY_NAME, params, 1);
+        List<Rendition> results = daoService.findWithNamedQuery(
+                Rendition.FIND_BY_NAME, params, 1);
         if (results.isEmpty()) {
             throw new DataNotFoundException();
         }
@@ -216,23 +224,24 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     /**
      * Creates a new {@link MediaItemRendition} based on a {@link File} and
      * {@link MediaItem}.
-     * 
+     * <p/>
      * @param file
-     *          File representing the {@link MediaItemRendition}
+       * File representing the {@link MediaItemRendition}
      * @param item
-     *          {@link MediaItem} to add the {@link MediaItemRendition}
+       * {@link MediaItem} to add the {@link MediaItemRendition}
      * @param rendition
-     *          {@link Rendition} of the {@link MediaItemRendition}
+  * {@link Rendition} of the {@link MediaItemRendition}
      * @param filename
-     *          Name of the file
+   * Name of the file
      * @param contentType
-     *          Content type of the file
+* Content type of the file
      * @return Created {@link MediaItemRendition}
-     * @throws IOException 
-     *          If the {@link MediaItemRendition} could not be stored in the {@link Catalogue}
+     * @throws IOException * If the {@link MediaItemRendition} could not be stored in the {@link Catalogue}
      */
     @Override
-    public MediaItemRendition create(File file, MediaItem item, Rendition rendition, String filename, String contentType) throws IOException {
+    public MediaItemRendition create(File file, MediaItem item,
+            Rendition rendition, String filename, String contentType) throws
+            IOException {
         Catalogue catalogue = item.getCatalogue();
 
         // Remove path from filename if file was uploaded from Windows
@@ -243,16 +252,17 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         realFilename.append(originalExtension);
 
         // Check if there is already a rendition of this type
-        Long existingId;
+        MediaItemRendition mediaItemRendition;
         try {
-            MediaItemRendition existing = item.findRendition(rendition);
-            existingId = existing.getId();
+            mediaItemRendition = item.findRendition(rendition);
+            LOG.log(Level.INFO, "Using existing");
         } catch (RenditionNotFoundException ex) {
-            existingId = 0L;
+            mediaItemRendition = new MediaItemRendition();
+            LOG.log(Level.INFO, "creating new");
         }
-        
+
         // Set-up the media item rendition
-        MediaItemRendition mediaItemRendition = new MediaItemRendition();
+        //MediaItemRendition mediaItemRendition = new MediaItemRendition();
         mediaItemRendition.setMediaItem(item);
         mediaItemRendition.setFilename(realFilename.toString());
         mediaItemRendition.setSize(file.length());
@@ -269,18 +279,20 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         for (CatalogueHookInstance hookInstance : catalogue.getHooks()) {
             try {
                 CatalogueHook hook = hookInstance.getHook();
-                CatalogueEvent event = new CatalogueEvent(CatalogueEvent.Event.UploadRendition, mediaItemRendition.getMediaItem(), mediaItemRendition);
+                CatalogueEvent event = new CatalogueEvent(
+                        CatalogueEvent.Event.UploadRendition,
+                        mediaItemRendition.getMediaItem(), mediaItemRendition);
                 hook.execute(pluginContext, event, hookInstance);
             } catch (CatalogueEventException ex) {
                 LOG.log(Level.SEVERE, "Could not execute CatalogueHook", ex);
             }
         }
-        mediaItemRendition = daoService.create(mediaItemRendition);
-
-        // Delete previous media item rendition of the same rendition
-        if (existingId > 0 && mediaItemRendition.getId() != existingId) {
-            daoService.delete(MediaItemRendition.class, existingId);
+        if (mediaItemRendition.getId() == null) {
+            mediaItemRendition = daoService.create(mediaItemRendition);
+        } else {
+            mediaItemRendition = daoService.update(mediaItemRendition);
         }
+
         return mediaItemRendition;
     }
 
@@ -291,24 +303,29 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     /**
      * Executes a {@link CatalogueHookInstance} on a {@link MediaItem}.
-     * 
+     * <p/>
      * @param mediaItemId
-     *          Unique identifier of the {@link MediaItem}
+   * Unique identifier of the {@link MediaItem}
      * @param hookInstanceId
-     *          Unique identifier of the {@link CatalogueHookInstance}
-     * @throws DataNotFoundException 
-     *          If the given {@code mediaItemId} or {@code hookInstanceId}  
-     *          was invalid
+* Unique identifier of the {@link CatalogueHookInstance}
+     * @throws DataNotFoundException * If the given {@code mediaItemId} or {@code hookInstanceId}
+     * was invalid
      */
     @Override
-    public void executeHook(Long mediaItemId, Long hookInstanceId) throws DataNotFoundException {
+    public void executeHook(Long mediaItemId, Long hookInstanceId) throws
+            DataNotFoundException {
         MediaItem mediaItem = findMediaItemById(mediaItemId);
-        CatalogueHookInstance hookInstance = daoService.findById(CatalogueHookInstance.class, hookInstanceId);
+        CatalogueHookInstance hookInstance =
+                daoService.findById(CatalogueHookInstance.class, hookInstanceId);
 
-        LOG.log(Level.INFO, "Executing hook {0} for Media Item #{1}", new Object[]{hookInstance.getLabel(), mediaItem.getId()});
-        Long innerTaskId = systemFacade.createBackgroundTask("Executing " + hookInstance.getLabel() + " for Media Item #" + mediaItem.getId());
+        LOG.log(Level.INFO, "Executing hook {0} for Media Item #{1}",
+                new Object[]{hookInstance.getLabel(), mediaItem.getId()});
+        Long innerTaskId = systemFacade.createBackgroundTask("Executing "
+                + hookInstance.getLabel() + " for Media Item #" + mediaItem.
+                getId());
         for (MediaItemRendition mir : mediaItem.getRenditions()) {
-            CatalogueEvent event = new CatalogueEvent(CatalogueEvent.Event.UpdateRendition, mediaItem, mir);
+            CatalogueEvent event = new CatalogueEvent(
+                    CatalogueEvent.Event.UpdateRendition, mediaItem, mir);
             try {
                 CatalogueHook hook = hookInstance.getHook();
                 hook.execute(pluginContext, event, hookInstance);
@@ -321,7 +338,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     }
 
     @Override
-    public void executeBatchHook(CatalogueHookInstance hookInstance, Long catalogueId) throws DataNotFoundException {
+    public void executeBatchHook(CatalogueHookInstance hookInstance,
+            Long catalogueId) throws DataNotFoundException {
         LOG.log(Level.INFO, "Executing Batch Hook");
         CatalogueHook hook;
         try {
@@ -332,21 +350,29 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         }
 
         if (!hook.isSupportBatch()) {
-            LOG.log(Level.INFO, "{0} doesn''t support batch execution", hook.getName());
+            LOG.log(Level.INFO, "{0} doesn''t support batch execution", hook.
+                    getName());
             return;
         }
 
-        Long taskId = systemFacade.createBackgroundTask("Batch hook " + hookInstance.getLabel() + " (" + hook.getName() + ")");
+        Long taskId = systemFacade.createBackgroundTask("Batch hook "
+                + hookInstance.getLabel() + " (" + hook.getName() + ")");
 
         Catalogue catalogue = findCatalogueById(catalogueId);
-        Map<String, Object> params = QueryBuilder.with("catalogue", catalogue).parameters();
-        List<MediaItem> mediaItems = daoService.findWithNamedQuery(MediaItem.FIND_BY_CATALOGUE, params);
+        Map<String, Object> params = QueryBuilder.with("catalogue", catalogue).
+                parameters();
+        List<MediaItem> mediaItems = daoService.findWithNamedQuery(
+                MediaItem.FIND_BY_CATALOGUE, params);
 
         for (MediaItem item : mediaItems) {
-            LOG.log(Level.INFO, "Executing Batch Hook for Media Item #" + item.getId());
-            Long innerTaskId = systemFacade.createBackgroundTask("Executing " + hookInstance.getLabel() + " for Media Item #" + item.getId());
+            LOG.log(Level.INFO, "Executing Batch Hook for Media Item #" + item.
+                    getId());
+            Long innerTaskId = systemFacade.createBackgroundTask("Executing "
+                    + hookInstance.getLabel() + " for Media Item #"
+                    + item.getId());
             for (MediaItemRendition mir : item.getRenditions()) {
-                CatalogueEvent event = new CatalogueEvent(CatalogueEvent.Event.UpdateRendition, item, mir);
+                CatalogueEvent event = new CatalogueEvent(
+                        CatalogueEvent.Event.UpdateRendition, item, mir);
                 try {
                     hook.execute(pluginContext, event, hookInstance);
                 } catch (CatalogueEventException ex) {
@@ -361,13 +387,16 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     }
 
     @Override
-    public MediaItemRendition update(File file, String filename, String contentType, MediaItemRendition mediaItemRendition) throws IOException {
+    public MediaItemRendition update(File file, String filename,
+            String contentType, MediaItemRendition mediaItemRendition) throws
+            IOException {
         Catalogue catalogue = mediaItemRendition.getMediaItem().getCatalogue();
 
         // Remove path from filename if file was uploaded from Windows
         String originalExtension = FilenameUtils.getExtension(filename);
         StringBuilder realFilename = new StringBuilder();
-        realFilename.append(mediaItemRendition.getRendition().getId()).append(".");
+        realFilename.append(mediaItemRendition.getRendition().getId()).append(
+                ".");
         realFilename.append(originalExtension);
 
         mediaItemRendition.setFilename(realFilename.toString());
@@ -383,7 +412,9 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         for (CatalogueHookInstance hookInstance : catalogue.getHooks()) {
             try {
                 CatalogueHook hook = hookInstance.getHook();
-                CatalogueEvent event = new CatalogueEvent(CatalogueEvent.Event.UpdateRendition, mediaItemRendition.getMediaItem(), mediaItemRendition);
+                CatalogueEvent event = new CatalogueEvent(
+                        CatalogueEvent.Event.UpdateRendition,
+                        mediaItemRendition.getMediaItem(), mediaItemRendition);
                 hook.execute(pluginContext, event, hookInstance);
             } catch (CatalogueEventException ex) {
                 LOG.log(Level.SEVERE, "Could not execute CatalogueHook", ex);
@@ -394,7 +425,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     private void fillWithMetadata(MediaItemRendition mediaItemRendition) {
         // Discover meta data and format info
-        Map<String, String> metaData = metaDataService.extract(mediaItemRendition.getFileLocation());
+        Map<String, String> metaData =
+                metaDataService.extract(mediaItemRendition.getFileLocation());
 
         for (String key : metaData.keySet()) {
             if (key.equalsIgnoreCase("width")) {
@@ -404,7 +436,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
             } else if (key.equalsIgnoreCase("colourSpace")) {
                 mediaItemRendition.setColourSpace(metaData.get(key));
             } else if (key.equalsIgnoreCase("Resolution")) {
-                mediaItemRendition.setResolution(Integer.valueOf(metaData.get(key)));
+                mediaItemRendition.setResolution(Integer.valueOf(metaData.get(
+                        key)));
             }
         }
     }
@@ -412,9 +445,9 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     /**
      * Deletes an existing {@link MediaItemRendition} from a
      * {@link MediaItem}.
-     * 
+     * <p/>
      * @param id
-     *          Unique identifier of the {@link MediaItemRendition}
+* Unique identifier of the {@link MediaItemRendition}
      */
     @Override
     public void deleteMediaItemRenditionById(Long id) {
@@ -429,10 +462,13 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
         if (mediaItem.getId() == null) {
             mediaItem = daoService.create(mediaItem);
-            if (mediaItem.getStatus() == null || !mediaItem.getStatus().equals(MediaItemStatus.APPROVED)) {
-                searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, mediaItem.getId(), QueueEntryOperation.REMOVE);
+            if (mediaItem.getStatus() == null || !mediaItem.getStatus().equals(
+                    MediaItemStatus.APPROVED)) {
+                searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM,
+                        mediaItem.getId(), QueueEntryOperation.REMOVE);
             } else {
-                searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, mediaItem.getId(), QueueEntryOperation.UPDATE);
+                searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM,
+                        mediaItem.getId(), QueueEntryOperation.UPDATE);
             }
         }
         return mediaItem;
@@ -444,7 +480,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * engine.
      *
      * @param mediaItem
-     *          {@link MediaItem} to update
+* {@link MediaItem} to update
      * @return Updated {@link MediaItem}
      */
     @Override
@@ -452,10 +488,13 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         mediaItem.setUpdated(Calendar.getInstance());
         mediaItem = daoService.update(mediaItem);
 
-        if (mediaItem.getStatus() == null || !mediaItem.getStatus().equals(MediaItemStatus.APPROVED)) {
-            searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, mediaItem.getId(), QueueEntryOperation.REMOVE);
+        if (mediaItem.getStatus() == null || !mediaItem.getStatus().equals(
+                MediaItemStatus.APPROVED)) {
+            searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, mediaItem.
+                    getId(), QueueEntryOperation.REMOVE);
         } else {
-            searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, mediaItem.getId(), QueueEntryOperation.UPDATE);
+            searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, mediaItem.
+                    getId(), QueueEntryOperation.UPDATE);
         }
 
         // TODO: Set-up as workflow
@@ -470,33 +509,54 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
             Notification notification;
             switch (mediaItem.getStatus()) {
                 case APPROVED:
-                    notification = new Notification("<b>" + mediaItem.getTitle() + "</b> was approved", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), mediaItem.getOwner(), user);
+                    notification = new Notification("<b>" + mediaItem.getTitle()
+                            + "</b> was approved", "MediaItemDetails.xhtml?id="
+                            + mediaItem.getId(), mediaItem.getOwner(), user);
                     notificationService.create(notification);
                     if (!mediaItem.getOwner().equals(user)) {
-                        notification = new Notification("Approved <b>" + mediaItem.getTitle() + "</b>", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), user, user);
+                        notification = new Notification("Approved <b>"
+                                + mediaItem.getTitle() + "</b>", "MediaItemDetails.xhtml?id="
+                                + mediaItem.getId(), user, user);
                         notificationService.create(notification);
                     }
                     break;
                 case REJECTED:
-                    notification = new Notification("<b>" + mediaItem.getTitle() + "</b> was rejected", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), mediaItem.getOwner(), user);
+                    notification = new Notification("<b>" + mediaItem.getTitle()
+                            + "</b> was rejected", "MediaItemDetails.xhtml?id="
+                            + mediaItem.getId(), mediaItem.getOwner(), user);
                     notificationService.create(notification);
-                    notification = new Notification("Rejected <b>" + mediaItem.getTitle() + "</b>", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), user, user);
+                    notification = new Notification("Rejected <b>" + mediaItem.
+                            getTitle() + "</b>", "MediaItemDetails.xhtml?id="
+                            + mediaItem.getId(), user, user);
                     notificationService.create(notification);
                     break;
                 case SUBMITTED:
-                    for (UserAccount editor : mediaItem.getCatalogue().getEditorRole().getUserAccounts()) {
-                        notification = new Notification("<b>" + mediaItem.getTitle() + "</b> was submitted for approval", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), editor, mediaItem.getOwner());
+                    for (UserAccount editor : mediaItem.getCatalogue().
+                            getEditorRole().getUserAccounts()) {
+                        notification = new Notification("<b>" + mediaItem.
+                                getTitle() + "</b> was submitted for approval", "MediaItemDetails.xhtml?id="
+                                + mediaItem.getId(), editor,
+                                mediaItem.getOwner());
                         notificationService.create(notification);
                     }
-                    notification = new Notification("Submitted <b>" + mediaItem.getTitle() + "</b> for approval", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), user, user);
+                    notification = new Notification("Submitted <b>" + mediaItem.
+                            getTitle() + "</b> for approval", "MediaItemDetails.xhtml?id="
+                            + mediaItem.getId(), user, user);
                     notificationService.create(notification);
                     break;
                 case SELF_UPLOAD:
-                    for (UserAccount editor : mediaItem.getCatalogue().getEditorRole().getUserAccounts()) {
-                        notification = new Notification("<b>" + mediaItem.getTitle() + "</b> was self-uploaded for approval", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), editor, mediaItem.getOwner());
+                    for (UserAccount editor : mediaItem.getCatalogue().
+                            getEditorRole().getUserAccounts()) {
+                        notification = new Notification("<b>" + mediaItem.
+                                getTitle()
+                                + "</b> was self-uploaded for approval", "MediaItemDetails.xhtml?id="
+                                + mediaItem.getId(), editor,
+                                mediaItem.getOwner());
                         notificationService.create(notification);
                     }
-                    notification = new Notification("Submitted <b>" + mediaItem.getTitle() + "</b> for approval", "MediaItemDetails.xhtml?id=" + mediaItem.getId(), user, user);
+                    notification = new Notification("Submitted <b>" + mediaItem.
+                            getTitle() + "</b> for approval", "MediaItemDetails.xhtml?id="
+                            + mediaItem.getId(), user, user);
                     notificationService.create(notification);
                     break;
             }
@@ -508,11 +568,10 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     /**
      * Creates a {@link MediaItem} based on a {@link NewswireItem}.
-     * 
-     * @param newswireItem 
-     *          {@link NewswireItem} to base the {@link MediaItem}
+     * <p/>
+     * @param newswireItem * {@link NewswireItem} to base the {@link MediaItem}
      * @param catalogue
-     *          {@link Catalogue} to add the {@link MediaItem}
+   * {@link Catalogue} to add the {@link MediaItem}
      * @return {@link MediaItem} created
      */
     @Override
@@ -531,11 +590,13 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         item.setUpdated(now);
 
         StringBuilder description = new StringBuilder();
-        if (org.apache.commons.lang.StringUtils.isNotBlank(newswireItem.getSummary())) {
+        if (org.apache.commons.lang.StringUtils.isNotBlank(newswireItem.
+                getSummary())) {
             description.append(newswireItem.getSummary());
         }
-        
-        if (org.apache.commons.lang.StringUtils.isNotBlank(newswireItem.getContent())) {
+
+        if (org.apache.commons.lang.StringUtils.isNotBlank(newswireItem.
+                getContent())) {
             description.append(StringUtils.stripHtml(newswireItem.getContent()));
         }
 
@@ -545,7 +606,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         item.setCatalogue(catalogue);
         item.setStatus(MediaItemStatus.APPROVED);
         item = create(item);
-        
+
         // TODO: Import tags
 
         for (NewswireItemAttachment attachment : newswireItem.getAttachments()) {
@@ -553,12 +614,15 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
                 try {
                     MediaItemRendition mir = new MediaItemRendition();
                     mir.setContentType(attachment.getContentType());
-                    File mediaFile = new File(attachment.getCatalogueFileLocation());
-                    mir.setPath(archive(mediaFile, catalogue, attachment.getFilename()));
+                    File mediaFile = new File(attachment.
+                            getCatalogueFileLocation());
+                    mir.setPath(archive(mediaFile, catalogue, attachment.
+                            getFilename()));
                     mir.setFilename(attachment.getFilename());
                     mir.setRendition(attachment.getRendition());
                     mir.setMediaItem(item);
-                    mir = update(mediaFile, attachment.getFilename(), attachment.getContentType(), mir);
+                    mir = update(mediaFile, attachment.getFilename(),
+                            attachment.getContentType(), mir);
                     item.getRenditions().add(mir);
                 } catch (IOException ex) {
                     LOG.log(Level.SEVERE, null, ex);
@@ -574,11 +638,12 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * the {@link MediaItem} will also be removed from the search engine.
      *
      * @param id
-     *          Unique identifier of the {@link MediaItem}
+* Unique identifier of the {@link MediaItem}
      */
     @Override
     public void deleteMediaItemById(Long id) {
-        searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, id, QueueEntryOperation.REMOVE);
+        searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, id,
+                QueueEntryOperation.REMOVE);
         daoService.delete(MediaItem.class, id);
     }
 
@@ -589,26 +654,33 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     @Override
     public List<MediaItem> findMediaItemsByStatus(MediaItemStatus status) {
-        Map<String, Object> params = QueryBuilder.with("status", status).parameters();
+        Map<String, Object> params = QueryBuilder.with("status", status).
+                parameters();
         return daoService.findWithNamedQuery(MediaItem.FIND_BY_STATUS, params);
     }
 
     @Override
     public List<MediaItem> findMediaItemsByOwner(UserAccount owner) {
-        Map<String, Object> params = QueryBuilder.with("owner", owner).parameters();
+        Map<String, Object> params = QueryBuilder.with("owner", owner).
+                parameters();
         return daoService.findWithNamedQuery(MediaItem.FIND_BY_OWNER, params);
     }
 
     @Override
-    public List<MediaItem> findCurrentMediaItems(UserAccount user, Long mediaRepositoryId) {
+    public List<MediaItem> findCurrentMediaItems(UserAccount user,
+            Long mediaRepositoryId) {
         try {
-            Catalogue mr = daoService.findById(Catalogue.class, mediaRepositoryId);
-            Map<String, Object> params = QueryBuilder.with("user", user).and("mediaRepository", mr).parameters();
+            Catalogue mr = daoService.findById(Catalogue.class,
+                    mediaRepositoryId);
+            Map<String, Object> params = QueryBuilder.with("user", user).and(
+                    "mediaRepository", mr).parameters();
 
             List<MediaItem> items = new ArrayList<MediaItem>();
 
-            items.addAll(daoService.findWithNamedQuery(MediaItem.FIND_CURRENT_AS_OWNER, params));
-            items.addAll(daoService.findWithNamedQuery(MediaItem.FIND_CURRENT_AS_EDITOR, params));
+            items.addAll(daoService.findWithNamedQuery(
+                    MediaItem.FIND_CURRENT_AS_OWNER, params));
+            items.addAll(daoService.findWithNamedQuery(
+                    MediaItem.FIND_CURRENT_AS_EDITOR, params));
 
             Set set = new HashSet(items);
             return new ArrayList(set);
@@ -618,11 +690,15 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     }
 
     @Override
-    public List<MediaItem> findCurrentMediaItems(UserAccount user, MediaItemStatus status, Long mediaRepositoryId) {
+    public List<MediaItem> findCurrentMediaItems(UserAccount user,
+            MediaItemStatus status, Long mediaRepositoryId) {
         try {
-            Catalogue mr = daoService.findById(Catalogue.class, mediaRepositoryId);
-            Map<String, Object> params = QueryBuilder.with("user", user).and("status", status).and("mediaRepository", mr).parameters();
-            return daoService.findWithNamedQuery(MediaItem.FIND_BY_OWNER_AND_STATUS, params, 200);
+            Catalogue mr = daoService.findById(Catalogue.class,
+                    mediaRepositoryId);
+            Map<String, Object> params = QueryBuilder.with("user", user).and(
+                    "status", status).and("mediaRepository", mr).parameters();
+            return daoService.findWithNamedQuery(
+                    MediaItem.FIND_BY_OWNER_AND_STATUS, params, 200);
         } catch (DataNotFoundException ex) {
             return Collections.EMPTY_LIST;
         }
@@ -633,7 +709,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * {@link dk.i2m.converge.core.content.NewsItem}.
      *
      * @param id
-     *          Unique identifier of the {@link MediaItem}
+* Unique identifier of the {@link MediaItem}
      * @return {@code true} if the {@link MediaItem} is referenced, otherwise
      *         {@code false}
      */
@@ -641,8 +717,11 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     public boolean isMediaItemUsed(Long id) {
         try {
             MediaItem mediaItem = daoService.findById(MediaItem.class, id);
-            Map<String, Object> params = QueryBuilder.with("mediaItem", mediaItem).parameters();
-            List results = daoService.findWithNamedQuery(NewsItemMediaAttachment.FIND_BY_MEDIA_ITEM, params);
+            Map<String, Object> params = QueryBuilder.with("mediaItem",
+                    mediaItem).parameters();
+            List results =
+                    daoService.findWithNamedQuery(
+                    NewsItemMediaAttachment.FIND_BY_MEDIA_ITEM, params);
 
             if (results.isEmpty()) {
                 return false;
@@ -656,30 +735,36 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     /**
      * Gets a {@link List} of all placements for a given {@link MediaItem}.
-     * 
+     * <p/>
      * @param id
-     *          Unique identifier of the {@link MediaItem}
+* Unique identifier of the {@link MediaItem}
      * @return {@link List} of placements for the given {@link MediaItem}
-     * @throws DataNotFoundException 
-     *          If the given {@link MediaItem} does not exist
+     * @throws DataNotFoundException * If the given {@link MediaItem} does not exist
      */
     @Override
-    public List<MediaItemUsage> getMediaItemUsage(Long id) throws DataNotFoundException {
+    public List<MediaItemUsage> getMediaItemUsage(Long id) throws
+            DataNotFoundException {
         MediaItem mediaItem = daoService.findById(MediaItem.class, id);
-        Map<String, Object> params = QueryBuilder.with("mediaItem", mediaItem).parameters();
-        List<NewsItemMediaAttachment> results = daoService.findWithNamedQuery(NewsItemMediaAttachment.FIND_BY_MEDIA_ITEM, params);
+        Map<String, Object> params = QueryBuilder.with("mediaItem", mediaItem).
+                parameters();
+        List<NewsItemMediaAttachment> results =
+                daoService.findWithNamedQuery(
+                NewsItemMediaAttachment.FIND_BY_MEDIA_ITEM, params);
         List<MediaItemUsage> output = new ArrayList<MediaItemUsage>();
 
         for (NewsItemMediaAttachment attachment : results) {
 
             if (!attachment.getNewsItem().getPlacements().isEmpty()) {
-                for (NewsItemPlacement placement : attachment.getNewsItem().getPlacements()) {
+                for (NewsItemPlacement placement : attachment.getNewsItem().
+                        getPlacements()) {
                     MediaItemUsage usage = new MediaItemUsage();
                     usage.setNewsItemId(attachment.getNewsItem().getId());
                     usage.setTitle(attachment.getNewsItem().getTitle());
                     usage.setCaption(attachment.getCaption());
-                    usage.setDate(placement.getEdition().getPublicationDate().getTime());
-                    usage.setOutlet(placement.getEdition().getOutlet().getTitle());
+                    usage.setDate(placement.getEdition().getPublicationDate().
+                            getTime());
+                    usage.setOutlet(
+                            placement.getEdition().getOutlet().getTitle());
                     usage.setSection(placement.getSection().getFullName());
                     usage.setStart(placement.getStart());
                     usage.setPosition(placement.getPosition());
@@ -746,26 +831,30 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     /**
      * Archives a {@link MediaItemRendition} in a {@link Catalogue}.
-     * 
+     * <p/>
      * @param file
-     *          File to archive
+     * File to archive
      * @param catalogue
-     *          Catalogue used for archiving the file
+* Catalogue used for archiving the file
      * @param rendition
-     *          Rendition to store
+* Rendition to store
      * @param rendition
-     *          {@link MediaItemRendition} to archive
+* {@link MediaItemRendition} to archive
      * @return Path where the rendition was stored on the {@link Catalogue}
-     * @throws IOException 
-     *          If the file could not be archived
+     * @throws IOException * If the file could not be archived
      */
-    public String archive(File file, Catalogue catalogue, MediaItemRendition rendition) throws IOException {
+    public String archive(File file, Catalogue catalogue,
+            MediaItemRendition rendition) throws IOException {
         Calendar now = Calendar.getInstance();
 
         StringBuilder cataloguePath = new StringBuilder();
-        cataloguePath.append(now.get(Calendar.YEAR)).append(File.separator).append(now.get(Calendar.MONTH) + 1).append(File.separator).append(now.get(Calendar.DAY_OF_MONTH)).append(File.separator).append(rendition.getMediaItem().getId());
+        cataloguePath.append(now.get(Calendar.YEAR)).append(File.separator).
+                append(now.get(Calendar.MONTH) + 1).append(File.separator).
+                append(now.get(Calendar.DAY_OF_MONTH)).append(File.separator).
+                append(rendition.getMediaItem().getId());
 
-        StringBuilder catalogueLocation = new StringBuilder(catalogue.getLocation());
+        StringBuilder catalogueLocation = new StringBuilder(catalogue.
+                getLocation());
         catalogueLocation.append(File.separator).append(cataloguePath.toString());
 
         // Get the repository location
@@ -780,7 +869,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         File mediaFile = new File(dir, rendition.getFilename());
 
         // Move file to the new location
-        LOG.log(Level.FINE, "Archiving {0} at {1}", new Object[]{file.getAbsolutePath(), mediaFile.getAbsolutePath()});
+        LOG.log(Level.FINE, "Archiving {0} at {1}", new Object[]{file.
+                    getAbsolutePath(), mediaFile.getAbsolutePath()});
         copyFile(file, mediaFile);
 
         rendition.setPath(cataloguePath.toString());
@@ -790,28 +880,31 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     /**
      * Archives a {@link File} in a {@link Catalogue}.
-     * 
+     * <p/>
      * @param file
-     *          File to archive
+     * File to archive
      * @param catalogue
-     *          Catalogue used for archiving the file
+* Catalogue used for archiving the file
      * @param fileName
-     *          File name of the file
+ * File name of the file
      * @return Path where the file was stored on the {@link Catalogue}
-     * @throws IOException 
-     *          If the file could not be archived
+     * @throws IOException * If the file could not be archived
      */
     @Override
-    public String archive(File file, Catalogue catalogue, String fileName) throws IOException {
+    public String archive(File file, Catalogue catalogue, String fileName)
+            throws IOException {
         if (!file.exists()) {
             throw new IOException("Source file does not exist");
         }
         Calendar now = Calendar.getInstance();
 
         StringBuilder cataloguePath = new StringBuilder();
-        cataloguePath.append(now.get(Calendar.YEAR)).append(File.separator).append(now.get(Calendar.MONTH) + 1).append(File.separator).append(now.get(Calendar.DAY_OF_MONTH));
+        cataloguePath.append(now.get(Calendar.YEAR)).append(File.separator).
+                append(now.get(Calendar.MONTH) + 1).append(File.separator).
+                append(now.get(Calendar.DAY_OF_MONTH));
 
-        StringBuilder catalogueLocation = new StringBuilder(catalogue.getLocation());
+        StringBuilder catalogueLocation = new StringBuilder(catalogue.
+                getLocation());
         catalogueLocation.append(File.separator).append(cataloguePath.toString());
 
         // Get the repository location
@@ -834,15 +927,15 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     /**
      * Utility method for copying a file from one
      * location to another.
-     * 
+     * <p/>
      * @param sourceFile
-     *          Source {@link File}
+* Source {@link File}
      * @param destFile
-     *          Destination {@link File}
-     * @throws IOException 
-     *          If the {@link File} could not be copied
+  * Destination {@link File}
+     * @throws IOException * If the {@link File} could not be copied
      */
-    private static void copyFile(File sourceFile, File destFile) throws IOException {
+    private static void copyFile(File sourceFile, File destFile) throws
+            IOException {
         if (!destFile.exists()) {
             destFile.createNewFile();
         }
@@ -864,12 +957,14 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     }
 
     @Override
-    public CatalogueHookInstance createCatalogueAction(CatalogueHookInstance action) {
+    public CatalogueHookInstance createCatalogueAction(
+            CatalogueHookInstance action) {
         return daoService.create(action);
     }
 
     @Override
-    public CatalogueHookInstance updateCatalogueAction(CatalogueHookInstance action) {
+    public CatalogueHookInstance updateCatalogueAction(
+            CatalogueHookInstance action) {
         return daoService.update(action);
     }
 }
