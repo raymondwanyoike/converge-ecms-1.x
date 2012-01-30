@@ -198,6 +198,7 @@ public class NewsItem {
             }
             this.newConcept = "";
             conceptAdded = true;
+            onAutoSave(event);
         } catch (DataNotFoundException ex) {
             this.conceptType = "";
             this.newConceptName = this.newConcept;
@@ -227,6 +228,7 @@ public class NewsItem {
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                         false, c.getFullTitle() + " has been added to "
                         + selectedNewsItem.getTitle(), null);
+                onAutoSave(event);
             }
             this.newConcept = "";
         }
@@ -655,8 +657,7 @@ public class NewsItem {
     /**
      * Handler for validating the selected {@link WorkflowStep}.
      *
-     * @param event
-* Event that invoked the handler
+     * @param event Event that invoked the handler
      */
     public void onValidateWorkflowStep(ActionEvent event) {
         this.validWorkflowStep = true;
@@ -974,8 +975,7 @@ public class NewsItem {
     /**
      * Event handler for starting the search.
      *
-     * @param event
-* Event that invoked the handler
+     * @param event Event that invoked the handler
      */
     public void onSearch(ActionEvent event) {
         if (!getKeyword().trim().isEmpty()) {
@@ -1483,6 +1483,7 @@ public class NewsItem {
         Set<Concept> uniqueConcepts = new HashSet<Concept>(allConcepts);
         allConcepts = new ArrayList<Concept>(uniqueConcepts);
         getSelectedNewsItem().setConcepts(allConcepts);
+        onAutoSave(event);
     }
 
     public Map<String, Concept> getSuggestedConcepts() {
