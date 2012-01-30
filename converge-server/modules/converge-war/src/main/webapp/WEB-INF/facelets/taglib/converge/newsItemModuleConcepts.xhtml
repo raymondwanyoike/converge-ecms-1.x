@@ -2,21 +2,20 @@
 
     <c:if test="#{newsItem.fieldVisible['METADATA']}">
 
-        <converge:moduleHeader moduleTitle="#{msgs.newsitem_META_DATA}" id="moduleMetaData">
+        <converge:moduleHeader moduleTitle="#{i18n.NewsItem_CONCEPTS_TITLE}" id="moduleMetaData">
             <ui:define name="module_options">
             </ui:define>
         </converge:moduleHeader>
 
         <div class="moduleContent">
-
             <a4j:region>
                 <h:panelGrid columns="4" rendered="#{value.currentActor &amp;&amp; !value.readOnly}">
                     <h:column>
                         <h:inputText id="txtNewConcept" value="#{newsItem.newConcept}" styleClass="text mediumInput" />
-                        <rich:suggestionbox id="sbNewConcept" for="txtNewConcept" var="result" suggestionAction="#{newsItem.onConceptSuggestion}" ajaxSingle="true" fetchValue="#{result.name}" minChars="2" nothingLabel="No match">
+                        <rich:suggestionbox id="sbNewConcept" for="txtNewConcept" var="result" suggestionAction="#{newsItem.onConceptSuggestion}" ajaxSingle="true" fetchValue="#{result.name}" minChars="2" nothingLabel="#{i18n.NewsItem_CONCEPTS_NO_MATCH}">
                             <h:column>
-                                <c:set var="key" value="#{result.type}_ICON" />
-                                <h:graphicImage value="#{res[key]}" />
+                                <c:set var="key" value="resource_ICON_#{result.type}" />
+                                <h:graphicImage value="#{i18n[key]}" />
                             </h:column>
                             <h:column>
                                 <h:outputText value="#{result.name}" />
@@ -24,12 +23,11 @@
                         </rich:suggestionbox>
                     </h:column>
 
-                    <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.ADD}" actionListener="#{newsItem.onAddConcept}" reRender="dtConcepts,mpNewConcept,txtNewConcept,sbNewConcept" oncomplete="if (#{!newsItem.conceptAdded}){ #{rich:component('mpNewConcept')}.show(); return false; }" />
-                    <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.SUBJECTS}" reRender="pgConceptSelector" oncomplete="#{rich:component('mpConceptSelector')}.show();" />
+                    <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.Generic_ADD}" actionListener="#{newsItem.onAddConcept}" reRender="dtConcepts,mpNewConcept,txtNewConcept,sbNewConcept" oncomplete="if (#{!newsItem.conceptAdded}){ #{rich:component('mpNewConcept')}.show(); return false; }" />
+                    <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.NewsItem_CONCEPTS_SUBJECTS}" reRender="pgConceptSelector" oncomplete="#{rich:component('mpConceptSelector')}.show();" />
                     <h:column>
-                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.NewsItem_CONCEPTS_SUGGEST}" reRender="pgConceptSuggestion" actionListener="#{newsItem.onSuggestConcepts}" onclick="document.getElementById('frmNewsItem:btnSilentSave').click()" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpConceptSuggestion')}.show(); return false; }">
-                            
-                        </a4j:commandButton>
+
+                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.NewsItem_CONCEPTS_SUGGEST}" reRender="pgConceptSuggestion" actionListener="#{newsItem.onSuggestConcepts}" onclick="document.getElementById('frmNewsItem:btnSilentSave').click()" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpConceptSuggestion')}.show(); return false; }" />
                         <a4j:status>
                             <f:facet name="start">
                                 <h:graphicImage value="#{res.AJAX_LOADING_ICON}" />
@@ -38,6 +36,7 @@
                                 <h:graphicImage value="#{res.EMPTY_ICON}" width="16" height="16" />
                             </f:facet>
                         </a4j:status>
+
                     </h:column>
                 </h:panelGrid>
 
@@ -45,12 +44,12 @@
                     <h:panelGrid columns="3">
                         <a4j:commandLink reRender="dtConcepts">
                             <f:setPropertyActionListener target="#{newsItem.removeConcept}" value="#{concept}" />
-                            <h:graphicImage url="#{res.REMOVE_ICON}" />
+                            <h:graphicImage url="#{i18n.resource_ICON_REMOVE}" />
                         </a4j:commandLink>
                         <h:column>
-                            <c:set var="keyIcon" value="#{concept.type}_ICON" />
-                            <c:set var="keyName" value="#{concept.type}_NAME" />
-                            <h:graphicImage value="#{res[keyIcon]}" title="#{msgs[keyName]}" />
+                            <c:set var="keyIcon" value="resource_ICON_#{concept.type}" />
+                            <c:set var="keyName" value="Generic_#{concept.type}_NAME" />
+                            <h:graphicImage value="#{i18n[keyIcon]}" title="#{i18n[keyName]}" />
                         </h:column>
                         <h:column>
                             <h:outputText value="#{concept.fullTitle}" id="conceptTitle" />
@@ -119,7 +118,7 @@
                         </f:facet>
                         <f:facet name="controls">
                             <h:panelGroup>
-                                <h:graphicImage id="imgCloseConceptSuggestion" value="#{res.DIALOGUE_CLOSE_ICON}" styleClass="link" />
+                                <h:graphicImage id="imgCloseConceptSuggestion" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" styleClass="link" />
                                 <rich:componentControl for="mpConceptSuggestion" attachTo="imgCloseConceptSuggestion" operation="hide" event="onclick"/>
                             </h:panelGroup>
                         </f:facet>
@@ -168,10 +167,10 @@
                                 <h:panelGrid id="pgDetails" columnClasses="tabSheet" style="padding: 10px; width: 100%">
                                     <h:outputText value="#{msgs.concepts_CONCEPT_TYPE}" />
                                     <h:selectOneRadio value="#{newsItem.conceptType}">
-                                        <f:selectItem itemLabel="#{msgs['dk.i2m.converge.core.metadata.Organisation_NAME']}" itemValue="ORGANISATION" />
-                                        <f:selectItem itemLabel="#{msgs['dk.i2m.converge.core.metadata.Person_NAME']}" itemValue="PERSON" />
-                                        <f:selectItem itemLabel="#{msgs['dk.i2m.converge.core.metadata.GeoArea_NAME']}" itemValue="LOCATION" />
-                                        <f:selectItem itemLabel="#{msgs['dk.i2m.converge.core.metadata.PointOfInterest_NAME']}" itemValue="POI" />
+                                        <f:selectItem itemLabel="#{i18n['Generic_dk.i2m.converge.core.metadata.Organisation_NAME']}" itemValue="ORGANISATION" />
+                                        <f:selectItem itemLabel="#{i18n['Generic_dk.i2m.converge.core.metadata.Person_NAME']}" itemValue="PERSON" />
+                                        <f:selectItem itemLabel="#{i18n['Generic_dk.i2m.converge.core.metadata.GeoArea_NAME']}" itemValue="LOCATION" />
+                                        <f:selectItem itemLabel="#{i18n['Generic_dk.i2m.converge.core.metadata.PointOfInterest_NAME']}" itemValue="POI" />
                                     </h:selectOneRadio>
 
                                     <h:outputText value="#{msgs.concepts_CONCEPT}" />
@@ -189,9 +188,9 @@
                         </h:panelGroup>
                     </h:panelGrid>
                 </rich:modalPanel>
-
             </a4j:region>
         </div>
-        <div style="clear: both; padding-bottom: 12px;"></div>
+
+        <converge:moduleSpacer />
     </c:if>
 </ui:composition>
