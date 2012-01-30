@@ -43,51 +43,48 @@ import org.richfaces.event.UploadEvent;
 
 /**
  * Backing bean for {@code /MediaItemDetails.jspx}.
- *
+ * <p/>
  * @author Allan Lykke Christensen
  */
 public class MediaItemDetails {
 
     private static final Logger LOG = Logger.getLogger(MediaItemDetails.class.getName());
-
-    @EJB private CatalogueFacadeLocal catalogueFacade;
-
-    @EJB private MetaDataFacadeLocal metaDataFacade;
-
-    @EJB private MetaDataServiceLocal metaDataService;
-
-    @EJB private UserFacadeLocal userFacade;
-
+    @EJB
+    private CatalogueFacadeLocal catalogueFacade;
+    @EJB
+    private MetaDataFacadeLocal metaDataFacade;
+    @EJB
+    private MetaDataServiceLocal metaDataService;
+    @EJB
+    private UserFacadeLocal userFacade;
     private MediaItem selectedMediaItem;
-
     private Long id;
-
     private MediaItemRendition selectedRendition = new MediaItemRendition();
-
     private DataModel discovered = new ListDataModel(new ArrayList());
-
     private DataModel usage;
-
     private boolean conceptAdded = false;
-
     private String newConcept = "";
-
-    /** Dev Note: Could not use a Concept object for direct entry as it is abstract. */
+    /**
+     * Dev Note: Could not use a Concept object for direct entry as it is
+     * abstract.
+     */
     private String newConceptName = "";
-
-    /** Dev Note: Could not use a Concept object for direct entry as it is abstract. */
+    /**
+     * Dev Note: Could not use a Concept object for direct entry as it is
+     * abstract.
+     */
     private String newConceptDescription = "";
-
-    /** Dev Note: Could not use a Concept object for direct entry as it is abstract. */
+    /**
+     * Dev Note: Could not use a Concept object for direct entry as it is
+     * abstract.
+     */
     private String conceptType = "";
-
-    /** Editors of the MediaItem catalogue. */
+    /**
+     * Editors of the MediaItem catalogue.
+     */
     private List<UserAccount> editors = new ArrayList<UserAccount>();
-
     private Map<String, Rendition> renditions;
-
     private DataModel availableRenditions;
-
     private Rendition uploadRendition;
 
     /**
@@ -100,7 +97,7 @@ public class MediaItemDetails {
      * Event handler for suggesting concepts based on inputted string. Note that
      * {@link dk.i2m.converge.core.metadata.Subject}s are not returned as they
      * are selected through the subject selection dialog.
-     *
+     * <p/>
      * @param suggestion String for which to base the suggestions
      * @return {@link List} of suggested {@link Concept}s based on
      *         {@code suggestion}
@@ -108,8 +105,8 @@ public class MediaItemDetails {
     public List<Concept> onConceptSuggestion(Object suggestion) {
         String conceptName = (String) suggestion;
         List<Concept> suggestedConcepts;
-        suggestedConcepts = metaDataFacade.findConceptsByName(conceptName, 
-                Person.class, GeoArea.class, PointOfInterest.class, 
+        suggestedConcepts = metaDataFacade.findConceptsByName(conceptName,
+                Person.class, GeoArea.class, PointOfInterest.class,
                 Organisation.class);
 
         return suggestedConcepts;
@@ -118,7 +115,7 @@ public class MediaItemDetails {
     /**
      * Event handler for deleting the selected {@link MediaItem}. The handler
      * will not allow for the item to be deleted if it is referenced.
-     * 
+     * <p/>
      * @return {@code /inbox} if the {@link MediaItem} was deleted, otherwise
      *         {@code null}
      */
@@ -197,11 +194,10 @@ public class MediaItemDetails {
     }
 
     /**
-     * Determine if the current user is authorised to
-     * view and work with the selected {@link MediaItem}.
-     * 
-     * @return {@code true} if the user is authorised,
-     *         otherwise {@code false}
+     * Determine if the current user is authorised to view and work with the
+     * selected {@link MediaItem}.
+     * <p/>
+     * @return {@code true} if the user is authorised, otherwise {@code false}
      */
     public boolean isAuthorized() {
         if (selectedMediaItem == null) {
@@ -214,9 +210,9 @@ public class MediaItemDetails {
     /**
      * Determine if the current user is an editor of the {@link Catalogue} of
      * the {@link MediaItem}.
-     * 
+     * <p/>
      * @return {@code true} if the user is an editor of the {@link Catalogue} of
-     *         the {@link MediaItem}, otherwise {@code false}
+     * the {@link MediaItem}, otherwise {@code false}
      */
     public boolean isEditor() {
         UserRole editorRole = selectedMediaItem.getCatalogue().getEditorRole();
@@ -269,9 +265,8 @@ public class MediaItemDetails {
 
     /**
      * Listener for uploading a new rendition.
-     * 
-     * @param event
-     *          Event that invoked the listener
+     * <p/>
+     * @param event Event that invoked the listener
      */
     public void renditionUploadListener(UploadEvent event) {
         if (event == null) {
@@ -293,7 +288,6 @@ public class MediaItemDetails {
         } else {
             LOG.severe("RichFaces is not set-up to use tempFiles for storing file uploads");
         }
-        this.availableRenditions = null;
     }
 
     public void onNewRendition(ActionEvent event) {
@@ -313,6 +307,9 @@ public class MediaItemDetails {
     public void onSaveRendition(ActionEvent event) {
         catalogueFacade.update(selectedRendition);
         this.availableRenditions = null;
+        Long theId = this.selectedMediaItem.getId();
+        this.selectedMediaItem = null;
+        setId(theId);
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "media_item_rendition_UPDATED");
     }
 
@@ -326,9 +323,8 @@ public class MediaItemDetails {
     /**
      * Initialises the bean by retrieving the {@link MediaItem} and related data
      * from the database.
-     * 
-     * @param id 
-     *          Unique identifier of the {@link MediaItem} to open
+     * <p/>
+     * @param id Unique identifier of the {@link MediaItem} to open
      */
     public void setId(Long id) {
         this.id = id;
@@ -389,9 +385,8 @@ public class MediaItemDetails {
 
     /**
      * Executes a {@link CatalogueHookInstance} on the selected {@link MediaItem}.
-     * 
-     * @param instance 
-     *          {@link CatalogueHookInstance} to execute
+     * <p/>
+     * @param instance {@link CatalogueHookInstance} to execute
      */
     public void setExecuteHook(CatalogueHookInstance instance) {
         try {
@@ -449,7 +444,6 @@ public class MediaItemDetails {
     public class AvailableMediaItemRendition {
 
         private MediaItemRendition mediaItemRendition;
-
         private Rendition rendition;
 
         public AvailableMediaItemRendition(Rendition rendition, MediaItemRendition mediaItemRendition) {
@@ -477,7 +471,6 @@ public class MediaItemDetails {
     public class DiscoveredProperty {
 
         private String property = "";
-
         private String value = "";
 
         public DiscoveredProperty() {
