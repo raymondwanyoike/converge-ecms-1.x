@@ -3,27 +3,27 @@
 
     <ui:composition template="/WEB-INF/facelets/templates/login.xhtml">
         <ui:define name="title">
-            <h:outputText value="#{msgs.LOGIN_PAGE_TITLE}" />
+            <h:outputText value="#{i18n.LogIn_PAGE_TITLE}" />
         </ui:define>
         <ui:define name="body">
             <form method="POST" action="j_security_check">
                 <h:panelGrid columns="2" columnClasses="right, left">
-                    <h:outputText value="#{msgs.USERNAME}:" />
+                    <h:outputText value="#{i18n.LogIn_USERNAME}:" />
                     <h:column>
-                        <input id="loginUsername" name="j_username" type="text" class="text" style="width: 200px;" title="#{msgs.USERNAME_TOOLTIP}" />
+                        <input id="loginUsername" name="j_username" type="text" class="text" style="width: 200px;" title="#{i18n.LogIn_USERNAME_TOOLTIP}" />
                     </h:column>
-                    <h:outputText value="#{msgs.PASSWORD}:" />
+                    <h:outputText value="#{i18n.LogIn_PASSWORD}:" />
                     <h:column>
-                        <input id="loginPassword" name="j_password" type="password" class="text" style="width: 200px;" title="#{msgs.PASSWORD_TOOLTIP}" />
+                        <input id="loginPassword" name="j_password" type="password" class="text" style="width: 200px;" title="#{i18n.LogIn_PASSWORD_TOOLTIP}" />
                     </h:column>
                 </h:panelGrid>
 
                 <h:panelGrid columns="2" columnClasses="loginErrorColumn, loginButtonColumn" styleClass="loginStatusTable">
                     <h:column>
-                        <h:outputText styleClass="errorMessage" value="#{param['err'] == 1 ? msgs.LOGIN_ERROR : ''}" />
-                        <h:outputText styleClass="infoMessage" value="#{param['err'] == 2 ? msgs.LOGGED_OFF : ''}" />
+                        <h:outputText styleClass="errorMessage" value="#{param['err'] == 1 ? i18n.LogIn_ERROR : ''}" />
+                        <h:outputText styleClass="infoMessage" value="#{param['err'] == 2 ? i18n.LogIn_OFF : ''}" />
                     </h:column>
-                    <input type="submit" class="button smallButton" value="#{msgs.LOGIN_BUTTON}" title="#{msgs.LOGIN_BUTTON_TOOLTIP}" />
+                    <input type="submit" class="button smallButton" value="#{i18n.LogIn_BUTTON}" title="#{i18n.LogIn_BUTTON_TOOLTIP}" />
                 </h:panelGrid>
             </form>
             <script type="text/javascript">
