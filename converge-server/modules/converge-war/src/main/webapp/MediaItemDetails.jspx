@@ -466,87 +466,87 @@
                                     </h:panelGrid>
                                 </rich:tab>
 
-                                <rich:tab id="tabImage" label="#{msgs.media_item_rendition_IMAGE}">
+                                <rich:tab id="tabImage" label="#{i18n.MediaItemDetails_RENDITION_IMAGE}">
                                     <h:panelGrid id="pgImage" columnClasses="tabSheet" style="padding: 10px; width: 100%">
-                                        <h:outputText value="#{msgs.media_item_rendition_COLOUR_SPACE}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_COLOUR_SPACE}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.colourSpace}" styleClass="text mediumInput" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_WIDTH}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_WIDTH}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.width}" styleClass="text smallInput">
                                             <f:convertNumber integerOnly="true" groupingUsed="false" />
                                         </h:inputText>
 
-                                        <h:outputText value="#{msgs.media_item_rendition_HEIGHT}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_HEIGHT}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.height}" styleClass="text smallInput">
                                             <f:convertNumber integerOnly="true" groupingUsed="false" />
                                         </h:inputText>
 
-                                        <h:outputText value="#{msgs.media_item_rendition_RESOLUTION}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_RESOLUTION}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.resolution}" styleClass="text smallInput">
                                             <f:convertNumber integerOnly="true" groupingUsed="false" />
                                         </h:inputText>
                                     </h:panelGrid>
                                 </rich:tab>
 
-                                <rich:tab id="tabAudio" label="#{msgs.media_item_rendition_AUDIO}">
+                                <rich:tab id="tabAudio" label="#{i18n.MediaItemDetails_RENDITION_AUDIO}">
                                     <h:panelGrid id="pgAudio" columnClasses="tabSheet" style="padding: 10px; width: 100%">
-                                        <h:outputText value="#{msgs.media_item_rendition_AUDIO_BITRATE}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_AUDIO_BITRATE}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.audioBitrate}" styleClass="text smallInput">
                                             <f:convertNumber integerOnly="true" groupingUsed="false" />
                                         </h:inputText>
 
-                                        <h:outputText value="#{msgs.media_item_rendition_AUDIO_CHANNELS}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_AUDIO_CHANNELS}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.audioChannels}" styleClass="text mediumInput" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_AUDIO_CODEC}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_AUDIO_CODEC}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.audioCodec}" styleClass="text mediumInput" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_AUDIO_SAMPLE_RATE}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_AUDIO_SAMPLE_RATE}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.audioSampleRate}" styleClass="text smallInput">
                                             <f:convertNumber integerOnly="true" groupingUsed="false" />
                                         </h:inputText>
 
-                                        <h:outputText value="#{msgs.media_item_rendition_AUDIO_SAMPLE_SIZE}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_AUDIO_SAMPLE_SIZE}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.audioSampleSize}" styleClass="text smallInput">
                                             <f:convertNumber integerOnly="true" groupingUsed="false" />
                                         </h:inputText>
 
-                                        <h:outputText value="#{msgs.media_item_rendition_AUDIO_VARIABLE_BITRATE}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_AUDIO_VARIABLE_BITRATE}" />
                                         <h:selectBooleanCheckbox value="#{mediaItemDetails.selectedRendition.audioVariableBitrate}" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_DURATION}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_DURATION}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.duration}" styleClass="text smallInput">
                                             <f:convertNumber integerOnly="true" groupingUsed="false" />
                                         </h:inputText>
                                     </h:panelGrid>
                                 </rich:tab>
 
-                                <rich:tab id="tabVideo" label="#{msgs.media_item_rendition_VIDEO}">
+                                <rich:tab id="tabVideo" label="#{i18n.MediaItemDetails_RENDITION_VIDEO}">
                                     <h:panelGrid id="pgVideo" columnClasses="tabSheet" style="padding: 10px; width: 100%">
-                                        <h:outputText value="#{msgs.media_item_rendition_VIDEO_CODEC}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_VIDEO_CODEC}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.videoCodec}" styleClass="text mediumInput" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_VIDEO_AVERAGE_BIT_RATE}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_VIDEO_AVERAGE_BIT_RATE}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.videoAverageBitRate}" styleClass="text smallInput">
                                             <f:convertNumber integerOnly="true" groupingUsed="false" />
                                         </h:inputText>
 
-                                        <h:outputText value="#{msgs.media_item_rendition_VIDEO_VARIABLE_BIT_RATE}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_VIDEO_VARIABLE_BIT_RATE}" />
                                         <h:selectBooleanCheckbox value="#{mediaItemDetails.selectedRendition.videoVariableBitRate}" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_VIDEO_FRAME_RATE}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_VIDEO_FRAME_RATE}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.videoFrameRate}" styleClass="text mediumInput" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_VIDEO_SCAN_TECHNIQUE}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_VIDEO_SCAN_TECHNIQUE}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.videoScanTechnique}" styleClass="text mediumInput" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_VIDEO_ASPECT_RATIO}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_VIDEO_ASPECT_RATIO}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.videoAspectRatio}" styleClass="text mediumInput" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_VIDEO_SAMPLING_METHOD}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_VIDEO_SAMPLING_METHOD}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.videoSamplingMethod}" styleClass="text mediumInput" />
 
-                                        <h:outputText value="#{msgs.media_item_rendition_DURATION}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_VIDEO_DURATION}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.duration}" styleClass="text smallInput">
                                             <f:convertNumber integerOnly="true" groupingUsed="false" />
                                         </h:inputText>
@@ -557,7 +557,7 @@
 
                             <h:panelGroup styleClass="dialogueButtons">
 
-                                <a4j:commandLink id="lnkDeleteRendition" styleClass="dialogButton #{mediaItemDetails.selectedRendition.originalRendition ? 'disabledDialogButton' : ''}" disabled="#{mediaItemDetails.selectedRendition.originalRendition}"  value="#{msgs.DELETE}" actionListener="#{mediaItemDetails.onDeleteRendition}" reRender="dtRenditions, preview" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpRenditionDetails')}.hide(); return false; }" onclick="if (confirm('#{msgs.media_item_CONFIRM_DELETE_RENDITION}') != true){ return false; };" />
+                                <a4j:commandLink id="lnkDeleteRendition" styleClass="dialogButton #{mediaItemDetails.selectedRendition.originalRendition ? 'disabledDialogButton' : ''}" disabled="#{mediaItemDetails.selectedRendition.originalRendition}"  value="#{i18n.Generic_DELETE}" actionListener="#{mediaItemDetails.onDeleteRendition}" reRender="dtRenditions, preview" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpRenditionDetails')}.hide(); return false; }" onclick="if (confirm('#{i18n.MediaItemDetails_RENDITION_CONFIRM_DELETE_RENDITION}') != true){ return false; };" />
                                 <a4j:commandLink id="lnkSaveRendition" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{mediaItemDetails.onSaveRendition}" reRender="dtRenditions, preview" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpRenditionDetails')}.hide(); return false; }" />
                                 <h:commandLink id="lnkCloseRendition" styleClass="dialogButton" value="#{i18n.Generic_CLOSE}" onclick="#{rich:component('mpRenditionDetails')}.hide(); return false;" />
                             </h:panelGroup>
@@ -570,7 +570,7 @@
 
                         <f:facet name="header">
                             <h:panelGroup>
-                                <h:outputText value="#{msgs.media_item_rendition_DETAILS}" />
+                                <h:outputText value="#{i18n.MediaItemDetails_RENDITION_DETAILS}" />
                             </h:panelGroup>
                         </f:facet>
                         <f:facet name="controls">
@@ -583,7 +583,7 @@
                         <h:panelGrid id="pgNewRendition" style="width: 480px;">
                             <rich:tabPanel id="tpNewRendition" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
 
-                                <rich:tab id="tabNewRendition" label="#{msgs.media_item_rendition_UPLOAD}">
+                                <rich:tab id="tabNewRendition" label="#{i18n.MediaItemDetails_RENDITION_UPLOAD}">
                                     <h:panelGrid id="pgRenditionUpload" columnClasses="tabSheet" style="padding: 10px; width: 100%">
                                         <rich:fileUpload fileUploadListener="#{mediaItemDetails.newRenditionUploadListener}"
                                                          id="fuNewRendition"
@@ -591,7 +591,7 @@
                                                          addControlLabel="Select"
                                                          allowFlash="false" listHeight="60" listWidth="450" ajaxSingle="true">
                                             <f:facet name="label">
-                                                <h:outputText value="#{msgs.media_item_rendition_UPLOAD_INDICATOR}" />
+                                                <h:outputText value="#{i18n.MediaItemDetails_RENDITION_UPLOAD_INDICATOR}" />
                                             </f:facet>
                                             <a4j:support event="onuploadcomplete" oncomplete="#{rich:component('mpNewRendition')}.hide();" actionListener="#{mediaItemDetails.onSaveNewRendition}" ajaxSingle="true" reRender="dtRenditions, preview, dtConcepts" />
                                         </rich:fileUpload>

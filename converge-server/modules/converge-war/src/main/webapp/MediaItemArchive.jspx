@@ -147,5 +147,4 @@
             </div>
         </ui:define>
     </ui:composition>
-
 </jsp:root>
