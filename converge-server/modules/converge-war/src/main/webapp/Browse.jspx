@@ -10,10 +10,10 @@
             </a4j:outputPanel>
 
             <h:form id="frmPage">
-                <converge:moduleHeader moduleTitle="Browse"  />
+                <converge:moduleHeader moduleTitle="#{i18n.Search_BROWSE}"  />
                 <div class="moduleContent">
                     <h:panelGrid style="width: 100%" columnClasses="left, right" columns="2">
-                        <h:outputFormat value="#{msgs.search_X_RESULTS_FOUND}" styleClass="searchSummary">
+                        <h:outputFormat value="#{i18n.Browse_SEARCH_X_RESULTS_FOUND}" styleClass="searchSummary">
                             <f:param value="#{browse.results.numberOfResults}" />
                             <f:param value="#{browse.results.searchTimeInSeconds}" />
                             <f:param value="#{browse.results.numberOfPages}" />
@@ -60,7 +60,7 @@
                         </rich:column>
                     </rich:dataTable>
                     <converge:moduleSpacer />
-                    <h2>Results</h2>
+                    <h2>#{i18n.Browse_NEWSWIRE_RESULTS}</h2>
                     <ui:repeat value="#{browse.searchResults}" var="item">
                         <h2 style="padding-bottom: 0px;">
                             <h:outputLink value="#{item.link}" target="_blank">
@@ -75,18 +75,18 @@
 
                         <h:outputText value="#{item.description}" escape="false" /><br/>
                         <span class="searchResultDescription"><h:outputText value="#{item.note}" escape="false" /></span>
-                        <span class="searchResultDate">#{msgs.DATE}:&#160;
+                        <span class="searchResultDate">#{i18n.Generic_DATE}:&#160;
                             <h:outputText value="#{item.earliestDate}" rendered="#{item.earliestDate != null}">
-                                <f:convertDateTime pattern="#{msgs.FORMAT_DATE}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE}" timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
-                            <h:outputText value="#{msgs.UNKNOWN}" rendered="#{item.earliestDate == null}" />
+                            <h:outputText value="#{i18n.Browse_Unknown}" rendered="#{item.earliestDate == null}" />
                         </span>
                     </p>
                     <converge:moduleSpacer />
                 </ui:repeat>
 
                 <h:panelGroup styleClass="searchPages" layout="block">
-                    <h:outputText value="#{msgs.search_PAGES}" />
+                    <h:outputText value="#{i18n.Browse_SEARCH_PAGES}" />
                     <ui:repeat value="#{browse.pages}" var="page">
                         <a4j:commandLink styleClass="#{((browse.results.currentPage+1) == page.page) ? 'searchPageSelected' : 'searchPage'}" actionListener="#{browse.onChangePage}" reRender="frmPage" onclick="jQuery( 'html, body' ).animate( { scrollTop: 0 }, 'slow' );">
                             <f:param name="changePage" value="#{page.page}" />
