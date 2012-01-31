@@ -6,7 +6,7 @@
         <ui:define name="left">
 
             <h:form id="frmProfilePhoto">
-                <converge:moduleHeader moduleTitle="#{msgs.profile_PHOTO}" />
+                <converge:moduleHeader moduleTitle="#{i18n.MyProfile_PHOTO}" />
                 <div class="moduleContent">
                     <h:panelGrid columns="2">
                         <h:graphicImage id="imgProfilePhoto" styleClass="profilePhoto"
@@ -35,35 +35,35 @@
 
             <converge:moduleSpacer />
 
-            <converge:moduleHeader moduleTitle="#{msgs.profile_DETAILS}"  />
+            <converge:moduleHeader moduleTitle="#{i18n.MyProfile_DETAILS}"  />
             <div class="moduleContent">
                 <h:panelGrid>
-                    <h:outputText value="#{msgs.profile_USERNAME}" styleClass="bold" />
+                    <h:outputText value="#{i18n.MyProfile_USERNAME}" styleClass="bold" />
                     <h:outputText value="#{userSession.user.username}" />
-                    <h:outputText value="#{msgs.profile_GIVEN_NAME}" styleClass="bold" />
+                    <h:outputText value="#{i18n.MyProfile_GIVEN_NAME}" styleClass="bold" />
                     <h:outputText value="#{userSession.user.givenName}" rendered="#{userSession.user.givenName != ''}" />
-                    <h:outputText value="#{msgs.NOT_SET}" rendered="#{userSession.user.givenName == ''}" />
-                    <h:outputText value="#{msgs.profile_SURNAME}" styleClass="bold" />
+                    <h:outputText value="#{i18n.MyProfile_NOT_SET}" rendered="#{userSession.user.givenName == ''}" />
+                    <h:outputText value="#{i18n.MyProfile_SURNAME}" styleClass="bold" />
                     <h:outputText value="#{userSession.user.surname}" rendered="#{userSession.user.surname != ''}"   />
-                    <h:outputText value="#{msgs.NOT_SET}" rendered="#{userSession.user.surname == ''}" />
-                    <h:outputText value="#{msgs.profile_FULL_NAME}" styleClass="bold" />
+                    <h:outputText value="#{i18n.MyProfile_NOT_SET}" rendered="#{userSession.user.surname == ''}" />
+                    <h:outputText value="#{i18n.MyProfile_FULL_NAME}" styleClass="bold" />
                     <h:outputText value="#{userSession.user.fullName}" rendered="#{userSession.user.fullName != ''}"  />
-                    <h:outputText value="#{msgs.NOT_SET}" rendered="#{userSession.user.fullName == ''}" />
-                    <h:outputText value="#{msgs.profile_JOB_TITLE}" styleClass="bold" />
+                    <h:outputText value="#{i18n.MyProfile_NOT_SET}" rendered="#{userSession.user.fullName == ''}" />
+                    <h:outputText value="#{i18n.MyProfile_JOB_TITLE}" styleClass="bold" />
                     <h:outputText value="#{userSession.user.jobTitle}" rendered="#{userSession.user.jobTitle != ''}" />
-                    <h:outputText value="#{msgs.NOT_SET}" rendered="#{userSession.user.jobTitle == ''}" />
-                    <h:outputText value="#{msgs.profile_ORGANISATION}" styleClass="bold" />
+                    <h:outputText value="#{i18n.MyProfile_NOT_SET}" rendered="#{userSession.user.jobTitle == ''}" />
+                    <h:outputText value="#{i18n.MyProfile_ORGANISATION}" styleClass="bold" />
                     <h:outputText value="#{userSession.user.organisation}" rendered="#{userSession.user.organisation != ''}" />
-                    <h:outputText value="#{msgs.NOT_SET}" rendered="#{userSession.user.organisation == ''}" />
-                    <h:outputText value="#{msgs.profile_EMAIL}" styleClass="bold" />
+                    <h:outputText value="#{i18n.MyProfile_NOT_SET}" rendered="#{userSession.user.organisation == ''}" />
+                    <h:outputText value="#{i18n.MyProfile_EMAIL}" styleClass="bold" />
                     <h:outputText value="#{userSession.user.email}" rendered="#{userSession.user.email != ''}" />
-                    <h:outputText value="#{msgs.NOT_SET}" rendered="#{userSession.user.email == ''}" />
-                    <h:outputText value="#{msgs.profile_PHONE}" styleClass="bold" />
+                    <h:outputText value="#{i18n.MyProfile_NOT_SET}" rendered="#{userSession.user.email == ''}" />
+                    <h:outputText value="#{i18n.MyProfile_PHONE}" styleClass="bold" />
                     <h:outputText value="#{userSession.user.phone}" rendered="#{userSession.user.phone != ''}" />
-                    <h:outputText value="#{msgs.NOT_SET}" rendered="#{userSession.user.phone == ''}" />
-                    <h:outputText value="#{msgs.profile_MOBILE}" styleClass="bold" />
+                    <h:outputText value="#{i18n.MyProfile_NOT_SET}" rendered="#{userSession.user.phone == ''}" />
+                    <h:outputText value="#{i18n.MyProfile_MOBILE}" styleClass="bold" />
                     <h:outputText value="#{userSession.user.mobile}" rendered="#{userSession.user.mobile != ''}" />
-                    <h:outputText value="#{msgs.NOT_SET}" rendered="#{userSession.user.mobile == ''}" />
+                    <h:outputText value="#{i18n.MyProfile_NOT_SET}" rendered="#{userSession.user.mobile == ''}" />
                 </h:panelGrid>
             </div>
 
@@ -75,67 +75,67 @@
             </a4j:outputPanel>
 
             <h:form id="frmProfileSettings">
-                <converge:moduleHeader moduleTitle="Settings"  />
+                <converge:moduleHeader moduleTitle="#{i18n.myprofile_Settings}"  />
                 <div class="moduleContent">
                     <h:panelGrid columns="2">
                         <h:outputText value="Localisation" styleClass="bold"/>
                         <h:outputText value="&#160;" />
-                        <h:outputText value="#{msgs.profile_TIME_ZONE}"/>
+                        <h:outputText value="#{i18n.MyProfile_TIME_ZONE}"/>
                         <h:selectOneMenu value="#{userSession.user.timeZoneAsString}" style="width: 100%;">
                             <f:selectItems value="#{common.timeZones}" />
                         </h:selectOneMenu>
 
-                        <h:outputText value="#{msgs.profile_LANGUAGE}" />
+                        <h:outputText value="#{i18n.MyProfile_LANGUAGE}" />
                         <h:selectOneMenu  value="#{userSession.user.preferredLanguage}" style="width: 100%;">
                             <f:selectItems value="#{common.availableLanguages}" />
                         </h:selectOneMenu>
                         <h:outputText value="&#160;" />
                         <h:outputText value="&#160;" />
-                        <h:outputText value="Search Engine" styleClass="bold"/>
+                        <h:outputText value="#{i18n.menu_ADMINISTRATION_SEARCH_ENGINE}" styleClass="bold"/>
                         <h:outputText value="&#160;" />
 
-                        <h:outputText value="Show tags"/>
+                        <h:outputText value="#{i18n.myprofile_ShowTags}"/>
                         <h:selectBooleanCheckbox value="#{userSession.user.defaultSearchEngineTags}" />
 
-                        <h:outputText value="Sort by"/>
+                        <h:outputText value="#{i18n.Search_SORT_BY}"/>
                         <h:selectOneMenu value="#{userSession.user.defaultSearchResultsSortBy}">
-                            <f:selectItem  itemLabel="Score" itemValue="score" />
-                            <f:selectItem  itemLabel="Date" itemValue="date" />
+                            <f:selectItem  itemLabel="#{i18n.Search_SORT_BY_SCORE}" itemValue="score" />
+                            <f:selectItem  itemLabel="#{i18n.Search_SORT_BY_DATE}" itemValue="date" />
                         </h:selectOneMenu>
 
-                        <h:outputText value="Sort ascending"/>
+                        <h:outputText value="#{i18n.myprofile_Sort_ascending}"/>
                         <h:selectOneMenu id="somSearchSortOrder" value="#{userSession.user.defaultSearchResultsOrder}">
-                            <f:selectItem  itemLabel="Ascending" itemValue="true" />
-                            <f:selectItem  itemLabel="Descending" itemValue="false" />
+                            <f:selectItem  itemLabel="#{i18n.Search_SORT_ORDER_ASCENDING}" itemValue="true" />
+                            <f:selectItem  itemLabel="#{i18n.Search_SORT_ORDER_DESCENDING}" itemValue="false" />
                         </h:selectOneMenu>
 
                         <h:outputText value="&#160;" />
                         <h:outputText value="&#160;" />
-                        <h:outputText value="Assignments" styleClass="bold"/>
+                        <h:outputText value="#{i18n.myprofile_Assignments}" styleClass="bold"/>
                         <h:outputText value="&#160;" />
-                        <h:outputText value="#{msgs.profile_DEFAULT_ASSIGNMENT_TYPE}" />
+                        <h:outputText value="#{i18n.MyProfile_DEFAULT_ASSIGNMENT_TYPE}" />
                         <h:selectOneMenu id="somDefaultAssignmentType" value="#{userSession.user.defaultAssignmentType}" style="width: 100%;" converter="#{converters.enumTypeConverter}">
                             <f:selectItem itemLabel="" />
                             <f:selectItems value="#{common.assignmentTypes}" />
                         </h:selectOneMenu>
 
-                        <h:outputText value="#{msgs.profile_DEFAULT_ADD_TO_NEXT_EDITION}" />
+                        <h:outputText value="#{i18n.MyProfile_DEFAULT_ADD_TO_NEXT_EDITION}" />
                         <h:selectBooleanCheckbox value="#{userSession.user.defaultAddNextEdition}" />
 
-                        <h:outputText value="#{msgs.profile_OUTLET}" />
+                        <h:outputText value="#{i18n.MyProfile_OUTLET}" />
                         <h:selectOneMenu value="#{userSession.user.defaultOutlet}" style="width: 100%;" converter="#{converters.outletConverter}">
                             <f:selectItem itemLabel="" />
                             <f:selectItems value="#{userSession.myNewsItemsOutlets}" />
                             <a4j:support event="onchange" reRender="somDefaultSection" />
                         </h:selectOneMenu>
 
-                        <h:outputText value="#{msgs.profile_SECTION}" />
+                        <h:outputText value="#{i18n.MyProfile_SECTION}" />
                         <h:selectOneMenu id="somDefaultSection" value="#{userSession.user.defaultSection}" style="width: 100%;" converter="#{converters.sectionConverter}">
                             <f:selectItem itemLabel="" />
                             <f:selectItems value="#{userSession.myNewsItemsOutletSections}" />
                         </h:selectOneMenu>
 
-                        <h:outputText value="#{msgs.profile_DEFAULT_CATALGUE}" />
+                        <h:outputText value="#{i18n.MyProfile_DEFAULT_CATALGUE}" />
                         <h:selectOneMenu value="#{userSession.user.defaultMediaRepository}" style="width: 100%;" converter="#{converters.mediaRepositoryConverter}">
                             <f:selectItem itemLabel="" />
                             <f:selectItems value="#{common.writableMediaRepositories}" />
@@ -143,7 +143,7 @@
                         <h:outputText value="&#160;" />
                         <h:outputText value="&#160;" />
                         <h:outputText value="&#160;" />
-                        <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.SAVE}" actionListener="#{userSession.onUpdateProfile}" reRender="frmPage" />
+                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.Generic_SAVE}" actionListener="#{userSession.onUpdateProfile}" reRender="frmPage" />
                     </h:panelGrid>
                 </div>
 
@@ -153,7 +153,7 @@
 
 
             <h:form id="frmPage">
-                <converge:moduleHeader moduleTitle="Privileges" />
+                <converge:moduleHeader moduleTitle="#{i18n.myprofile_Privileges}" />
                 <div class="moduleContent">
                     <rich:dataTable id="dtPrivileges" value="#{userSession.user.userRoles}" var="userRole" width="100%" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
                         <rich:column styleClass="columnIcon center">
