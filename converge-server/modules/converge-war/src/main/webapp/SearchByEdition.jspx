@@ -11,19 +11,19 @@
 
             <h:form id="frmQuery">
                 <a4j:status onstart="Richfaces.showModalPanel('mpLoading')" onstop="Richfaces.hideModalPanel('mpLoading')" />
-                <converge:moduleHeader moduleTitle="#{msgs.search_BROWSE_BY_EDITION}"  />
+                <converge:moduleHeader moduleTitle="#{i18n.Search_BROWSE_BY_EDITION}"  />
                 <div class="moduleContent">
                     <h:panelGroup>
-                        <h:outputText value="#{msgs.search_BROWSE_BY_EDITION_OUTLET}" style="margin-right: 5px;" />
+                        <h:outputText value="#{i18n.Search_BROWSE_BY_EDITION_OUTLET}" style="margin-right: 5px;" />
                         <h:selectOneMenu value="#{searchByEdition.selectedOutlet}"  style="margin-right: 5px;" converter="#{converters.outletConverter}">
                             <f:selectItems value="#{common.outlets}" />
                         </h:selectOneMenu>
 
-                        <h:outputText value="#{msgs.search_BROWSE_BY_EDITION_DATE}"  style="margin-right: 5px;" />
-                        <rich:calendar id="calDate" value="#{searchByEdition.selectedDate}"  style="margin-right: 5px;" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{msgs.FORMAT_DATE}">
+                        <h:outputText value="#{i18n.Search_BROWSE_BY_EDITION_DATE}"  style="margin-right: 5px;" />
+                        <rich:calendar id="calDate" value="#{searchByEdition.selectedDate}"  style="margin-right: 5px;" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{i18n.Generic_FORMAT_DATE}">
                         </rich:calendar>
 
-                        <a4j:commandButton type="submit" styleClass="button dynamicButton" value="#{msgs.search_SHOW}" actionListener="#{searchByEdition.onSearch}" reRender="frmPage,frmQuery" />
+                        <a4j:commandButton type="submit" styleClass="button dynamicButton" value="#{i18n.Search_SHOW}" actionListener="#{searchByEdition.onSearch}" reRender="frmPage,frmQuery" />
                     </h:panelGroup>
                 </div>
             </h:form>
@@ -36,7 +36,7 @@
                         <div style="clear: both; padding-bottom: 12px;"></div>
 
                         <h2><h:outputText value="#{edition.publicationDate}" >
-                                <f:convertDateTime pattern="#{msgs.FORMAT_TIME}" timeZone="#{common.systemTimeZone}" />
+                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_TIME}" timeZone="#{common.systemTimeZone}" />
                             </h:outputText></h2>
 
                         <rich:dataTable id="dtEditionAssignments" value="#{edition.assignments}" var="assignment" styleClass="table" headerClass="tableHeader" rowClasses="odd, even" sortPriority="#{converge:createList('colPosition,colPriority')}">
@@ -51,7 +51,7 @@
                                 <h:graphicImage value="#{res.NEWS_ITEM_ICON}" title="#{assignment.status}" alt="#{assignment.status}" rendered="#{!assignment.endState}" />
                                 <rich:toolTip styleClass="lockTooltip" rendered="#{assignment.locked}">
 
-                                    <h:outputFormat value="#{msgs.newsitem_LOCKED_TOOLTIP}" escape="false">
+                                    <h:outputFormat value="#{i18n.Search_LOCKED_TOOLTIP}" escape="false">
                                         <f:param value="#{assignment.checkedOutBy}" />
                                         <f:param value="#{assignment.checkedOut}" />
                                     </h:outputFormat>
@@ -60,22 +60,22 @@
 
                             <rich:column sortBy="#{assignment.id}" styleClass="right columnId" headerClass="columnId">
                                 <f:facet name="header">
-                                    <h:outputText value="#{msgs.ID}" title="#{msgs.ARTICLE_ID_TOOLTIP}" />
+                                    <h:outputText value="#{i18n.Generic_ID}" title="#{i18n.Search_ARTICLE_ID_TOOLTIP}" />
                                 </f:facet>
                                 <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItemArchive.xhtml" target="_blank" rendered="#{assignment.endState}">
                                     <f:param value="#{assignment.id}" name="id" />
                                     <h:outputText value="#{assignment.id}">
-                                        <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                                        <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
                                     </h:outputText>
                                 </h:outputLink>
                                 <h:outputText value="#{assignment.id}" rendered="#{!assignment.endState}">
-                                    <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                                    <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
                                 </h:outputText>
                             </rich:column>
 
                             <rich:column sortBy="#{assignment.title}" styleClass="left">
                                 <f:facet name="header">
-                                    <h:outputText value="#{msgs.newsitem_HEADLINE}" />
+                                    <h:outputText value="#{i18n.Search_NEWSITEM_HEADLINE}" />
                                 </f:facet>
                                 <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItemArchive.xhtml" target="_blank" rendered="#{assignment.endState}">
                                     <f:param value="#{assignment.id}" name="id" />
@@ -86,14 +86,14 @@
 
                             <rich:column sortBy="#{assignment.section}" styleClass="left columnMediumNumber">
                                 <f:facet name="header">
-                                    <h:outputText value="#{msgs.newsitem_SECTION}" />
+                                    <h:outputText value="#{i18n.Search_NEWSITEM_SECTION}" />
                                 </f:facet>
                                 <h:outputText value="#{assignment.section}" />
                             </rich:column>
 
                             <rich:column sortBy="#{assignment.wordCount}" styleClass="columnSmallNumber">
                                 <f:facet name="header">
-                                    <h:outputText value="#{msgs.newsitem_WORD_COUNT}" />
+                                    <h:outputText value="#{i18n.Search_NEWSITEM_WORD_COUNT}" />
                                 </f:facet>
                                 <h:outputText value="#{assignment.wordCount} (#{assignment.targetWordCount})" rendered="#{assignment.targetWordCount != 0}" />
                                 <h:outputText value="#{assignment.wordCount}" rendered="#{assignment.targetWordCount == 0}" />
@@ -101,14 +101,14 @@
 
                             <rich:column id="colPosition" sortBy="#{assignment.start}" sortOrder="ASCENDING" styleClass="columnSmallNumber">
                                 <f:facet name="header">
-                                    <h:outputText value="#{msgs.newsitem_START}" />
+                                    <h:outputText value="#{i18n.Search_NEWSITEM_START}" />
                                 </f:facet>
                                 <h:outputText value="#{assignment.start}" />
                             </rich:column>
 
                             <rich:column id="colPriority" sortBy="#{assignment.position}" sortOrder="ASCENDING" styleClass="columnSmallNumber">
                                 <f:facet name="header">
-                                    <h:outputText value="#{msgs.newsitem_POSITION}" />
+                                    <h:outputText value="#{i18n.Search_NEWSITEM_POSITION}" />
                                 </f:facet>
                                 <h:outputText value="#{assignment.position}" />
                             </rich:column>
