@@ -14,10 +14,10 @@
                 <div class="moduleContent">
                     <h:panelGrid columns="2">
                         <h:outputText value="#{i18n.MyActivity_FILTER_FROM}" />
-                        <rich:calendar id="calFrom" value="#{myActivity.from}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{msgs.FORMAT_DATE}" />
+                        <rich:calendar id="calFrom" value="#{myActivity.from}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{i18n.Generic_FORMAT_DATE}" />
 
                         <h:outputText value="#{i18n.MyActivity_FILTER_TO}" />
-                        <rich:calendar id="calTo" value="#{myActivity.to}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{msgs.FORMAT_DATE}" />
+                        <rich:calendar id="calTo" value="#{myActivity.to}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{i18n.Generic_FORMAT_DATE}" />
 
                         <h:outputText value="&#160;" />
                         <a4j:commandButton actionListener="#{myActivity.onRefresh}" value="#{i18n.MyActivity_REFRESH}" ajaxSingle="true" reRender="frmOutput, frmFilterSummary" styleClass="button dynamicButton" />
@@ -88,7 +88,7 @@
                             </f:facet>
                             <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
                                 <h:outputText value="#{item.id}">
-                                    <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                                    <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
                                 </h:outputText>
                             </h:outputLink>
                         </rich:column>
@@ -119,7 +119,7 @@
                                 <rich:subTable value="#{item.placements}" var="placement">
                                     <rich:column>
                                         <h:outputText value="#{placement.edition.publicationDate.time}" title="#{i18n.MyActivity_USED_TIME_TOOLTIP}">
-                                            <f:convertDateTime pattern="#{msgs.FORMAT_SHORT_DATE_AND_TIME}" timeZone="#{common.systemTimeZone}" />
+                                            <f:convertDateTime pattern="#{i18n.FORMAT_SHORT_DATE_AND_TIME}" timeZone="#{common.systemTimeZone}" />
                                         </h:outputText>
                                     </rich:column>
                                     <rich:column>
