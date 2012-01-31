@@ -20,7 +20,7 @@
                     <ui:insert name="leftColumnTop" />
 
                     <h:form id="frmOutlets">
-                        <converge:moduleHeader moduleTitle="#{msgs.OUTLETS}" />
+                        <converge:moduleHeader moduleTitle="#{i18n.Inbox_OUTLETS}" />
                         <div class="moduleContent">
                             <h:dataTable value="#{newsReader.outlets}" var="outlet">
                                 <h:column>
@@ -59,7 +59,7 @@
                                         <f:setPropertyActionListener value="#{edition}" target="#{newsReader.selectedEdition}" />
                                         
                                         <h:outputText value="#{edition.publicationDate.time}" >
-                                            <f:convertDateTime pattern="#{msgs.FORMAT_TIME}" timeZone="#{common.systemTimeZone}" />
+                                            <f:convertDateTime pattern="#{i18n.Generic_FORMAT_TIME}" timeZone="#{common.systemTimeZone}" />
                                         </h:outputText> #{!edition.open ? ' - Closed' :''}
                                     </a4j:commandLink>
                                 </h:column>
