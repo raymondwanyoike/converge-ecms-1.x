@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
     <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
-        <ui:define name="title">#{msgs.administrator_plugins_PAGE_TITLE}</ui:define>
+        <ui:define name="title">#{i18n.administrator_plugins_PAGE_TITLE}</ui:define>
         <ui:define name="body">
 
             <a4j:keepAlive beanName="administrator_Configuration" />
@@ -9,7 +9,7 @@
 
             <a4j:region id="regMainContent">
                 <h:form id="frmPlugins">
-                    <converge:moduleHeader moduleTitle="#{msgs.PLUGINS}" />
+                    <converge:moduleHeader moduleTitle="#{i18n.PLUGINS}" />
                     <div class="moduleContent">
                         <rich:dataTable id="dtPlugins" value="#{administrator_Configuration.plugins}" var="plugin" styleClass="table" headerClass="tableHeader">
 
@@ -24,36 +24,36 @@
                                         </f:facet>
                                     </a4j:status>
                                 </f:facet>
-                                <h:graphicImage title="#{msgs.PLUGIN}" alt="#{msgs.PLUGIN}" value="#{res.PLUGIN_ICON}" />
+                                <h:graphicImage title="#{i18n.PLUGIN}" alt="#{i18n.PLUGIN}" value="#{res.PLUGIN_ICON}" />
                             </rich:column>
 
                             <rich:column sortBy="#{plugin.name}" sortOrder="ASCENDING">
                                 <f:facet name="header">
-                                    <h:outputText value="#{msgs.plugin_NAME}" title="#{msgs.plugin_NAME_TOOLTIP}"/>
+                                    <h:outputText value="#{i18n.Plugin_NAME}" title="#{i18n.Plugin_NAME_TOOLTIP}"/>
                                 </f:facet>
                                 <h:outputText value="#{plugin.name}" escape="false" />
                             </rich:column>
 
                             <rich:column sortBy="#{plugin.description}">
                                 <f:facet name="header">
-                                    <h:outputText value="#{msgs.plugin_DESCRIPTION}" title="#{msgs.plugin_DESCRIPTION_TOOLTIP}" />
+                                    <h:outputText value="#{i18n.Plugin_DESCRIPTION}" title="#{i18n.Plugin_DESCRIPTION_TOOLTIP}" />
                                 </f:facet>
                                 <h:outputText value="#{plugin.description}" escape="false" />
                             </rich:column>
 
                             <rich:column sortBy="#{plugin.vendor}">
                                 <f:facet name="header">
-                                    <h:outputText value="#{msgs.plugin_VENDOR}" title="#{msgs.plugin_VENDOR_TOOLTIP}" />
+                                    <h:outputText value="#{i18n.Plugin_VENDOR}" title="#{i18n.Plugin_VENDOR_TOOLTIP}" />
                                 </f:facet>
                                 <h:outputText value="#{plugin.vendor}" escape="false" />
                             </rich:column>
 
                             <rich:column sortBy="#{plugin.date}">
                                 <f:facet name="header">
-                                    <h:outputText value="#{msgs.plugin_RELEASE_DATE}" title="#{msgs.plugin_RELEASE_DATE_TOOLTIP}" />
+                                    <h:outputText value="#{i18n.Plugin_RELEASE_DATE}" title="#{i18n.Plugin_RELEASE_DATE_TOOLTIP}" />
                                 </f:facet>
                                 <h:outputText value="#{plugin.date}">
-                                    <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                    <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                                 </h:outputText>
                             </rich:column>
                             
