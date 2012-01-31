@@ -3,7 +3,7 @@
     <ui:composition template="/WEB-INF/facelets/templates/default.xhtml">
 
         <ui:define name="title">
-            <h:outputText value="#{msgs.INBOX}" />
+            <h:outputText value="#{i18n.Inbox_PAGE_TITLE}" />
         </ui:define>
 
         <ui:define name="pageBody">
@@ -19,25 +19,25 @@
                                 <c:if test="#{inbox.privilegedToCreateNewAssignments}">
                                     <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{msgs.inbox_NEW_ASSIGNMENT}" title="#{msgs.inbox_NEW_ASSIGNMENT}" />
                                     <a4j:commandLink reRender="frmNewAssignment" actionListener="#{inbox.onNewAssignment}" oncomplete="#{rich:component('mpNewAssignment')}.show();#{rich:element('frmNewAssignment:txtStoryTitle')}.focus()">
-                                        <h:outputText value="#{msgs.inbox_NEW_ASSIGNMENT}" />
+                                        <h:outputText value="#{i18n.Inbox_NEW_ASSIGNMENT}" />
                                     </a4j:commandLink>
                                 </c:if>
 
                                 <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{msgs.inbox_MY_ASSIGNMENTS}" title="#{msgs.inbox_MY_ASSIGNMENTS}" />
                                 <a4j:commandLink reRender="frmInbox" actionListener="#{inbox.onShowMyAssignments}">
-                                    <h:outputText value="#{msgs.inbox_MY_ASSIGNMENTS}" />
+                                    <h:outputText value="#{i18n.Inbox_MY_ASSIGNMENTS}" />
                                 </a4j:commandLink>
 
                                 <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{msgs.inbox_EMPTY_TRASH}" title="#{msgs.inbox_EMPTY_TRASH}" />
                                 <a4j:commandLink reRender="frmInbox" actionListener="#{inbox.onEmptyTrash}" ajaxSingle="true">
-                                    <h:outputText value="#{msgs.inbox_EMPTY_TRASH}" />
+                                    <h:outputText value="#{i18n.Inbox_EMPTY_TRASH}" />
                                 </a4j:commandLink>
                             </h:panelGrid>
                         </div>
 
                         <converge:moduleSpacer />
 
-                        <converge:moduleHeader moduleTitle="#{msgs.OUTLETS}" />
+                        <converge:moduleHeader moduleTitle="#{i18n.Inbox_OUTLETS}" />
                         <div class="moduleContent">
 
                             <rich:tree reRender="frmInbox" ajaxSubmitSelection="true"  switchType="client" value="#{inbox.outletsNode}" var="item" nodeFace="#{item.type}" nodeSelectListener="#{inbox.onOutletFolderSelect}">
