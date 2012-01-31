@@ -7,23 +7,23 @@
             <c:if test="#{newsItem.authorized}">
                 <converge:newsItemModuleOptions value="#{newsItem}" />
 
-                <converge:moduleHeader moduleTitle="#{msgs.newsitem_PROPERTIES}" />
+                <converge:moduleHeader moduleTitle="#{i18n.NewsItem_PROPERTIES}" />
                 <div>
                     <h:panelGrid id="pgProperties" style="margin-left: 2%; margin-right: 2%; width: 98%" rowClasses="left" columns="2">
-                        <h:outputText value="#{msgs.newsitem_WORKFLOW_OUTLET}"  />
+                        <h:outputText value="#{i18n.NewsItem_WORKFLOW_OUTLET}"  />
                         <h:outputText value="#{newsItem.selectedNewsItem.outlet.title}" />
 
-                        <h:outputText value="#{msgs.newsitem_LANGUAGE}"/>
+                        <h:outputText value="#{i18n.NewsItem_LANGUAGE}"/>
                         <h:selectOneMenu id="somLanguage" value="#{newsItem.selectedNewsItem.language}" disabled="#{!newsItem.currentActor || newsItem.readOnly}" style="width: 100%" converter="#{converters.languageConverter}">
                             <f:selectItems value="#{common.languages}" />
                         </h:selectOneMenu>
 
-                        <h:outputText value="#{msgs.newsitem_TARGET_WORDS}"/>
+                        <h:outputText value="#{i18n.NewsItem_TARGET_WORDS}"/>
                         <rich:inputNumberSpinner id="insTargetWords" value="#{newsItem.selectedNewsItem.targetWordCount}" minValue="0" maxValue="100000" step="50" />                        
 
-                        <h:outputText value="#{msgs.newsitem_SUBMITTED}"/>
+                        <h:outputText value="#{i18n.NewsItem_SUBMITTED}"/>
                         <h:outputText value="#{newsItem.selectedNewsItem.submittedDate}" rendered="#{newsItem.selectedNewsItem.submitted}">
-                            <f:convertDateTime timeZone="#{common.systemTimeZone}" pattern="#{msgs.FORMAT_SHORT_DATE_AND_TIME}" />
+                            <f:convertDateTime timeZone="#{common.systemTimeZone}" pattern="#{i18n.FORMAT_SHORT_DATE_AND_TIME}" />
                         </h:outputText>
                         <h:outputText value="#{msgs.newsitem_SUBMITTED_NOT_SET}" rendered="#{!newsItem.selectedNewsItem.submitted}" />
                     </h:panelGrid>
@@ -46,9 +46,9 @@
 
             <c:if test="#{!newsItem.authorized}">
                 <h:panelGrid>
-                    <h:outputText value="#{msgs.newsitem_UNAUTHORISED}" />
+                    <h:outputText value="#{i18n.NewsItem_UNAUTHORISED}" />
                     <h:commandLink action="/inbox" immediate="true">
-                        <h:outputText value="#{msgs.newsitem_GO_TO_INBOX}" />
+                        <h:outputText value="#{i18n.NewsItem_GO_TO_INBOX}" />
                     </h:commandLink>
                 </h:panelGrid>
             </c:if>
@@ -73,7 +73,7 @@
                     <rich:modalPanel id="mpPlacement" autosized="true" domElementAttachment="parent" >
                         <f:facet name="header">
                             <h:panelGroup>
-                                <h:outputText value="#{msgs.PLACEMENT}" />
+                                <h:outputText value="#{i18n.NewsItem_PLACEMENT}" />
                             </h:panelGroup>
                         </f:facet>
                         <f:facet name="controls">
@@ -86,10 +86,10 @@
 
                             <rich:tabPanel id="tpPlacement" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
 
-                                <rich:tab label="#{msgs.PLACEMENT}">
+                                <rich:tab label="#{i18n.NewsItem_PLACEMENT}">
 
                                     <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
-                                        <h:outputText value="#{msgs.OUTLET}" />
+                                        <h:outputText value="#{i18n.NewsItem_WORKFLOW_OUTLET}" />
                                         <h:selectOneMenu id="somOutlets" value="#{newsItem.selectedNewsItemPlacement.outlet}" converter="#{converters.outletConverter}"
                                                          valueChangeListener="#{newsItem.onChangePlacementOutlet}">
                                             <f:selectItem itemLabel="" />
@@ -97,17 +97,17 @@
                                             <a4j:support event="onchange" reRender="somEditions, somEditionSection" ajaxSingle="true" />
                                         </h:selectOneMenu>
 
-                                        <h:outputText value="#{msgs.newsitem_SECTION}" />
+                                        <h:outputText value="#{i18n.NewsItem_SECTION}" />
                                         <h:selectOneMenu id="somEditionSection" value="#{newsItem.selectedNewsItemPlacement.section}" converter="#{converters.sectionConverter}" required="true" requiredMessage="You must specify the section of placement">
                                             <f:selectItem itemLabel="" />
                                             <f:selectItems value="#{newsItem.sections}" />
                                             <a4j:support event="onchange" reRender="somEditions" />
                                         </h:selectOneMenu>
 
-                                        <h:outputText value="#{msgs.newsitem_EDITION}" />
+                                        <h:outputText value="#{i18n.NewsItem_EDITION}" />
 
                                         <h:column>
-                                            <rich:calendar id="calEditionDate" value="#{newsItem.editionDate}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{msgs.FORMAT_DATE}">
+                                            <rich:calendar id="calEditionDate" value="#{newsItem.editionDate}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{i18n.Generic_FORMAT_DATE}">
                                                 <a4j:support event="onchanged" reRender="somEditions" />
                                             </rich:calendar>
                                             <h:selectOneMenu id="somEditions" value="#{newsItem.editionCandidate}" converter="#{converters.editionCandidateConverter}">
@@ -123,10 +123,10 @@
                                             </h:panelGrid>
                                         </h:column>
 
-                                        <h:outputText value="#{msgs.newsitem_START}" />
+                                        <h:outputText value="#{i18n.NewsItem_START}" />
                                         <rich:inputNumberSpinner value="#{newsItem.selectedNewsItemPlacement.start}" required="true" requiredMessage="You must specify the start/page of the story" />
 
-                                        <h:outputText value="#{msgs.newsitem_POSITION}" />
+                                        <h:outputText value="#{i18n.NewsItem_POSITION}" />
                                         <rich:inputNumberSpinner value="#{newsItem.selectedNewsItemPlacement.position}" required="true" requiredMessage="You must specify the position of the story" />
 
                                     </h:panelGrid>
@@ -135,10 +135,10 @@
                             </rich:tabPanel>
 
                             <h:panelGroup styleClass="dialogueButtons">
-                                <a4j:commandLink id="lnkSavePlacement" styleClass="dialogButton" value="#{msgs.OUTLET_PLACEMENT_SAVE}" actionListener="#{newsItem.onAddPlacement}" reRender="dtPlacements" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpPlacement')}.hide(); return false; }" rendered="#{newsItem.selectedNewsItemPlacement.id == null}" />
-                                <a4j:commandLink id="lnkUpdatePlacement" styleClass="dialogButton" value="#{msgs.UPDATE}" actionListener="#{newsItem.onUpdatePlacement}" reRender="dtPlacements" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpPlacement')}.hide(); return false; }" rendered="#{newsItem.selectedNewsItemPlacement.id != null}" />
-                                <a4j:commandLink id="lnkRemovePlacement" styleClass="dialogButton" value="#{msgs.REMOVE_FROM_PLACEMENT}" actionListener="#{newsItem.onRemovePlacement}" reRender="dtPlacements" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpPlacement')}.hide(); return false; }" rendered="#{newsItem.selectedNewsItemPlacement.id != null}" />
-                                <h:commandLink id="lnkCancelPlacement" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpPlacement')}.hide(); return false;" />
+                                <a4j:commandLink id="lnkSavePlacement" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{newsItem.onAddPlacement}" reRender="dtPlacements" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpPlacement')}.hide(); return false; }" rendered="#{newsItem.selectedNewsItemPlacement.id == null}" />
+                                <a4j:commandLink id="lnkUpdatePlacement" styleClass="dialogButton" value="#{i18n.Generic_UPDATE}" actionListener="#{newsItem.onUpdatePlacement}" reRender="dtPlacements" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpPlacement')}.hide(); return false; }" rendered="#{newsItem.selectedNewsItemPlacement.id != null}" />
+                                <a4j:commandLink id="lnkRemovePlacement" styleClass="dialogButton" value="#{i18n.NewsItem_REMOVE_FROM_PLACEMENT}" actionListener="#{newsItem.onRemovePlacement}" reRender="dtPlacements" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpPlacement')}.hide(); return false; }" rendered="#{newsItem.selectedNewsItemPlacement.id != null}" />
+                                <h:commandLink id="lnkCancelPlacement" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpPlacement')}.hide(); return false;" />
                             </h:panelGroup>
                         </h:panelGrid>
 
