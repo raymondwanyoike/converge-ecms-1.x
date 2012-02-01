@@ -75,10 +75,10 @@
             </a4j:outputPanel>
 
             <h:form id="frmProfileSettings">
-                <converge:moduleHeader moduleTitle="#{i18n.myprofile_Settings}"  />
+                <converge:moduleHeader moduleTitle="#{i18n.MyProfile_SETTINGS}"  />
                 <div class="moduleContent">
                     <h:panelGrid columns="2">
-                        <h:outputText value="Localisation" styleClass="bold"/>
+                        <h:outputText value="#{i18n.MyProfile_LOCALISATION}" styleClass="bold"/>
                         <h:outputText value="&#160;" />
                         <h:outputText value="#{i18n.MyProfile_TIME_ZONE}"/>
                         <h:selectOneMenu value="#{userSession.user.timeZoneAsString}" style="width: 100%;">
@@ -91,19 +91,19 @@
                         </h:selectOneMenu>
                         <h:outputText value="&#160;" />
                         <h:outputText value="&#160;" />
-                        <h:outputText value="#{i18n.menu_ADMINISTRATION_SEARCH_ENGINE}" styleClass="bold"/>
+                        <h:outputText value="#{i18n.MyProfile_SEARCH_ENGINE}" styleClass="bold"/>
                         <h:outputText value="&#160;" />
 
-                        <h:outputText value="#{i18n.myprofile_ShowTags}"/>
+                        <h:outputText value="#{i18n.MyProfile_SHOW_TAGS}"/>
                         <h:selectBooleanCheckbox value="#{userSession.user.defaultSearchEngineTags}" />
 
-                        <h:outputText value="#{i18n.Search_SORT_BY}"/>
+                        <h:outputText value="#{i18n.MyProfile_SEARCH_ENGINE_SORT_BY}"/>
                         <h:selectOneMenu value="#{userSession.user.defaultSearchResultsSortBy}">
                             <f:selectItem  itemLabel="#{i18n.Search_SORT_BY_SCORE}" itemValue="score" />
                             <f:selectItem  itemLabel="#{i18n.Search_SORT_BY_DATE}" itemValue="date" />
                         </h:selectOneMenu>
 
-                        <h:outputText value="#{i18n.myprofile_Sort_ascending}"/>
+                        <h:outputText value="#{i18n.MyProfile_SORT_ASCENDING}"/>
                         <h:selectOneMenu id="somSearchSortOrder" value="#{userSession.user.defaultSearchResultsOrder}">
                             <f:selectItem  itemLabel="#{i18n.Search_SORT_ORDER_ASCENDING}" itemValue="true" />
                             <f:selectItem  itemLabel="#{i18n.Search_SORT_ORDER_DESCENDING}" itemValue="false" />
@@ -111,7 +111,7 @@
 
                         <h:outputText value="&#160;" />
                         <h:outputText value="&#160;" />
-                        <h:outputText value="#{i18n.myprofile_Assignments}" styleClass="bold"/>
+                        <h:outputText value="#{i18n.MyProfile_ASSIGNMENTS}" styleClass="bold"/>
                         <h:outputText value="&#160;" />
                         <h:outputText value="#{i18n.MyProfile_DEFAULT_ASSIGNMENT_TYPE}" />
                         <h:selectOneMenu id="somDefaultAssignmentType" value="#{userSession.user.defaultAssignmentType}" style="width: 100%;" converter="#{converters.enumTypeConverter}">
@@ -153,21 +153,21 @@
 
 
             <h:form id="frmPage">
-                <converge:moduleHeader moduleTitle="#{i18n.myprofile_Privileges}" />
+                <converge:moduleHeader moduleTitle="#{i18n.MyProfile_PRIVILEGES}" />
                 <div class="moduleContent">
                     <rich:dataTable id="dtPrivileges" value="#{userSession.user.userRoles}" var="userRole" width="100%" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
                         <rich:column styleClass="columnIcon center">
-                            <h:graphicImage value="#{res.USER_ROLE_ICON}" />
+                            <h:graphicImage value="#{i18n.resource_ICON_USER_ROLE}" />
                         </rich:column>
                         <rich:column>
                             <f:facet name="header">
-                                <h:outputText value="Role" />
+                                <h:outputText value="#{i18n.MyProfile_PRIVILEGES_ROLE}" />
                             </f:facet>
                             <h:outputText value="#{userRole.name}" />
                         </rich:column>
                         <rich:column>
                             <f:facet name="header">
-                                <h:outputText value="Outlet" />
+                                <h:outputText value="#{i18n.MyProfile_PRIVILEGES_OUTLET}" />
                             </f:facet>
                             <rich:dataList value="#{userRole.outlets}" var="outlet">
                                 <h:outputText value="#{outlet.title}" />&#160;

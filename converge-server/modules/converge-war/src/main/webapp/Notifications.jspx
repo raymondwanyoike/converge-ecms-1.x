@@ -34,7 +34,7 @@
                                 <h:outputText value="#{i18n.Generic_TIME}" />
                             </f:facet>
                             <h:outputText value="#{notification.added.time}">
-                                <f:convertDateTime pattern="#{i18n.FORMAT_SHORT_DATE_AND_TIME}"
+                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_SHORT_DATE_AND_TIME}"
                                                    timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
                         </rich:column>

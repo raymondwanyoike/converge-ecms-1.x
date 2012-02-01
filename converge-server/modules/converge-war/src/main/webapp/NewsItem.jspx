@@ -23,7 +23,7 @@
 
                         <h:outputText value="#{i18n.NewsItem_SUBMITTED}"/>
                         <h:outputText value="#{newsItem.selectedNewsItem.submittedDate}" rendered="#{newsItem.selectedNewsItem.submitted}">
-                            <f:convertDateTime timeZone="#{common.systemTimeZone}" pattern="#{i18n.FORMAT_SHORT_DATE_AND_TIME}" />
+                            <f:convertDateTime timeZone="#{common.systemTimeZone}" pattern="#{i18n.Generic_FORMAT_SHORT_DATE_AND_TIME}" />
                         </h:outputText>
                         <h:outputText value="#{msgs.newsitem_SUBMITTED_NOT_SET}" rendered="#{!newsItem.selectedNewsItem.submitted}" />
                     </h:panelGrid>

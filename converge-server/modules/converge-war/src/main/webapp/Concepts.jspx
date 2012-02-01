@@ -13,8 +13,8 @@
             </h:form>
 
             <h:form id="frmConceptDisplay"  rendered="#{concepts.showConcept}">
-                <c:set var="key" value="#{concepts.selectedConcept.type}_NAME" />
-                <converge:moduleHeader moduleTitle="#{concepts.selectedConcept.name} (#{msgs[key]})" />
+                <c:set var="key" value="Generic_#{concepts.selectedConcept.type}_NAME" />
+                <converge:moduleHeader moduleTitle="#{concepts.selectedConcept.name} (#{i18n[key]})" />
                 <div class="moduleContent">
                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                         <h:column>
@@ -258,9 +258,9 @@
                     </h:panelGrid>
 
                     <h:panelGrid rendered="#{concepts.updatingConcept}" styleClass="propertySheet">
-                        <h:outputText value="#{i18n.Concepts_NAME}:" />
+                        <h:outputText value="#{i18n.Concepts_NAME}" />
                         <h:inputText value="#{concepts.selectedConcept.name}" styleClass="text" style="width: 98%" />
-                        <h:outputText value="#{i18n.concepts_DEFINITION}:" />
+                        <h:outputText value="#{i18n.Concepts_DEFINITION}" />
                         <rich:editor id="edDefinition"
                                      value="#{concepts.selectedConcept.definition}"
                                      theme="advanced"

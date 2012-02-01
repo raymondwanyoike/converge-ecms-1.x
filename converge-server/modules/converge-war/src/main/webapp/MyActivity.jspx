@@ -119,7 +119,7 @@
                                 <rich:subTable value="#{item.placements}" var="placement">
                                     <rich:column>
                                         <h:outputText value="#{placement.edition.publicationDate.time}" title="#{i18n.MyActivity_USED_TIME_TOOLTIP}">
-                                            <f:convertDateTime pattern="#{i18n.FORMAT_SHORT_DATE_AND_TIME}" timeZone="#{common.systemTimeZone}" />
+                                            <f:convertDateTime pattern="#{i18n.Generic_FORMAT_SHORT_DATE_AND_TIME}" timeZone="#{common.systemTimeZone}" />
                                         </h:outputText>
                                     </rich:column>
                                     <rich:column>

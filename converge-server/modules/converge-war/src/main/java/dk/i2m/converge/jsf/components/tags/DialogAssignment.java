@@ -214,6 +214,7 @@ public class DialogAssignment {
             }
         } else {
             try {
+                // TODO: OptimisticLockException seems to occur when updating
                 assignment = newsItemFacade.checkin(assignment);
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "planning_ASSIGNMENT_UPDATED");
             } catch (LockingException ex) {

@@ -10,23 +10,23 @@
             </a4j:outputPanel>
 
             <h:form id="frmPage" rendered="#{userSession.privileged['OUTLET_PLANNING']}">
-                <converge:moduleHeader moduleTitle="#{i18n.PipeLine_PIPELINE}" />
+                <converge:moduleHeader moduleTitle="#{i18n.Pipeline_PIPELINE}" />
                 <div class="moduleContent">
 
                     <h:panelGrid columns="2" columnClasses="right" style="width: 100%">
                         <h:column>
-                            <h:outputText value="#{i18n.PipeLine_SHOW_NEWS_ITEMS_IN}&#160;" />
+                            <h:outputText value="#{i18n.Pipeline_SHOW_NEWS_ITEMS_IN}&#160;" />
 
                             <h:selectOneMenu id="somOutlets" value="#{planning.selectedOutlet}" converter="#{converters.outletConverter}">
-                                <f:selectItem itemLabel="#{i18n.PipeLine_SELECT_OUTLET}" />
+                                <f:selectItem itemLabel="#{i18n.Pipeline_SELECT_OUTLET}" />
                                 <f:selectItems value="#{common.outlets}" />
                                 <a4j:support event="onchange" reRender="somDepartments, somStates" />
                             </h:selectOneMenu>
 
-                            <h:outputText value="&#160;#{i18n.PipeLine_WITH_STATUS}&#160;" />
+                            <h:outputText value="&#160;#{i18n.Pipeline_WITH_STATUS}&#160;" />
 
                             <h:selectOneMenu id="somStates" value="#{planning.selectedState}" converter="#{converters.workflowStateConverter}">
-                                <f:selectItem itemLabel="#{i18n.PipeLine_SELECT_STATE}" />
+                                <f:selectItem itemLabel="#{i18n.Pipeline_SELECT_STATE}" />
                                 <f:selectItems value="#{planning.outletWorkflowStates}" />
                             </h:selectOneMenu>
                             &#160;
@@ -72,7 +72,7 @@
 
                         <rich:column styleClass="left" sortBy="#{ni.currentActor}">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.PipeLine_ACTOR}" />
+                                <h:outputText value="#{i18n.Pipeline_ACTOR}" />
                             </f:facet>
                             <h:outputText value="#{ni.currentActor}" />
                             <converge:actorsToolTip value="#{ni.actors}" />
@@ -80,7 +80,7 @@
 
                         <rich:column>
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.PipeLine_EVENT}" />
+                                <h:outputText value="#{i18n.Pipeline_EVENT}" />
                             </f:facet>
 
                             <h:outputText value="#{ni.event.summary}" />
@@ -89,7 +89,7 @@
 
                         <rich:column sortBy="#{ni.wordCount}">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.PipeLine_WORD_COUNT}" />
+                                <h:outputText value="#{i18n.Pipeline_WORD_COUNT}" />
                             </f:facet>
                             <h:outputText value="#{ni.wordCount}" rendered="#{ni.targetWordCount &lt;= 0}" />
                             <h:outputText value="#{ni.wordCount} (#{ni.targetWordCount})" rendered="#{ni.targetWordCount &gt; 0}" />
@@ -97,14 +97,14 @@
 
                         <rich:column sortBy="#{ni.currentState.name}">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.PipeLine_STATUS}" />
+                                <h:outputText value="#{i18n.Pipeline_STATUS}" />
                             </f:facet>
                             <h:outputText value="#{ni.currentState.name}" />
                         </rich:column>
 
                         <rich:column sortBy="#{ni.deadline}">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.PipeLine_NEWSITEM_DEADLINE}" />
+                                <h:outputText value="#{i18n.Pipeline_NEWSITEM_DEADLINE}" />
                             </f:facet>
                             <h:outputText value="#{ni.deadline.time}">
                                 <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
@@ -118,8 +118,8 @@
                                 <a4j:support event="oncomplete" reRender="frmAssignmentDetails" actionListener="#{planning.onShowBriefing}">
                                     <rich:componentControl event="oncomplete" for="mpAssignmentDetails" operation="show"  />
                                 </a4j:support>
-                                <h:graphicImage value="#{res.BRIEFING_EXIST_ICON}" alt="#{i18n.PipeLine_BRIEFING_EXIST}" title="#{i18n.PipeLine_BRIEFING_EXIST}" rendered="#{ni.assignmentBriefing != ''}" />
-                                <h:graphicImage value="#{res.BRIEFING_NOT_EXIST_ICON}" alt="#{i18n.PipeLine_BRIEFING_NOT_EXIST}" title="#{i18n.PipeLine_BRIEFING_NOT_EXIST}" rendered="#{ni.assignmentBriefing == ''}" />
+                                <h:graphicImage value="#{res.BRIEFING_EXIST_ICON}" alt="#{i18n.Pipeline_BRIEFING_EXIST}" title="#{i18n.Pipeline_BRIEFING_EXIST}" rendered="#{ni.assignmentBriefing != ''}" />
+                                <h:graphicImage value="#{res.BRIEFING_NOT_EXIST_ICON}" alt="#{i18n.Pipeline_BRIEFING_NOT_EXIST}" title="#{i18n.Pipeline_BRIEFING_NOT_EXIST}" rendered="#{ni.assignmentBriefing == ''}" />
                             </a4j:commandLink>
                         </rich:column>
 
@@ -136,7 +136,7 @@
 
                         <rich:column styleClass="center columnIcon">
                             <f:facet name="header"></f:facet>
-                            <a4j:commandLink onclick="if (confirm('#{i18n.PipeLine_PROMPT_DELETE}') != true){ return false; };">
+                            <a4j:commandLink onclick="if (confirm('#{i18n.Pipeline_PROMPT_DELETE}') != true){ return false; };">
                                 <f:setPropertyActionListener value="#{ni}" target="#{planning.selectedAssignment}" />
                                 <a4j:support event="oncomplete" actionListener="#{planning.onDeleteAssignment}" reRender="frmPage" />
                                 <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
