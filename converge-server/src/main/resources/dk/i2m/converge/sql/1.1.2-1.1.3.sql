@@ -3,8 +3,7 @@ CREATE TABLE `log_entry` (
     `description` TEXT DEFAULT '',
     `severity` VARCHAR(255) DEFAULT '',
     `log_date` datetime DEFAULT null,
-    PRIMARY KEY (`id`),
-    KEY `FK_log_entry_actor` (`actor_id`)
+    PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `log_subject` (
