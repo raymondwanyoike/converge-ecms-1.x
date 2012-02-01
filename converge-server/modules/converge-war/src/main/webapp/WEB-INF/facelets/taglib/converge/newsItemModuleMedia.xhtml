@@ -22,7 +22,7 @@
                             </rich:inplaceInput>
                         </h:panelGroup>
                         <h:panelGroup layout="block" style="float: right; width: 20px; padding: 4px; margin:4px;">
-                            <a4j:commandLink onclick="if (confirm('#{i18n.NewsItem_CONFIRM_REMOVE_ATTACHMENT}') != true){ return false; };" ajaxSingle="true" reRender="dtMediaFiles">
+                            <a4j:commandLink onclick="if (confirm('#{i18n.NewsItem_MEDIA_ATTACHMENT_REMOVE_CONFIRM}') != true){ return false; };" ajaxSingle="true" reRender="dtMediaFiles">
                                 <f:setPropertyActionListener target="#{newsItem.deleteMediaItem}" value="#{attachment}" />
                                 <h:graphicImage url="#{i18n.resource_ICON_REMOVE}"  />
                             </a4j:commandLink>
@@ -54,6 +54,7 @@
                         jwplayer("container#{attachment.id}").setup({
                             flashplayer: "#{facesContext.externalContext.request.contextPath}/scripts/jwplayer/player.swf", 
                             file: "#{attachment.mediaItem.original.absoluteFilename}", 
+                            image: "#{attachment.mediaItem.preview.absoluteFilename}",
                             plugins: {},
                             width: 250,
                             volume: 100
@@ -126,25 +127,25 @@
                         <rich:tab label="#{i18n.NewsItem_MEDIA_ITEM_SEARCH}">
                             <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                 <h:panelGroup>
-                                    <h:inputText id="txtSearchKeyword" styleClass="text" value="#{value.keyword}" title="" style="width: 350px;" />
-                                    <a4j:commandButton type="submit" styleClass="button dynamicButton" style="margin-left: 10px;" value="#{i18n.NewsItem_MEDIA_ITEM_SEARCH_BUTTON_LABEL}" actionListener="#{value.onSearch}" reRender="pgResults" />
+                                    <h:inputText id="txtSearchKeyword" styleClass="text" value="#{newsItem.keyword}" title="" style="width: 350px;" />
+                                    <a4j:commandButton type="submit" styleClass="button dynamicButton" style="margin-left: 10px;" value="#{i18n.NewsItem_MEDIA_ITEM_SEARCH_BUTTON_LABEL}" actionListener="#{newsItem.onSearch}" reRender="pgResults" />
                                 </h:panelGroup>
 
                                 <h:panelGroup id="pgResults" layout="block" styleClass="scrollableContent">
-                                    <h:outputFormat value="#{i18n.NewsItem_MEDIA_ITEM_SEARCH_X_RESULTS_FOUND}" rendered="#{value.searchResults.rowCount &gt; -1}">
+                                    <h:outputFormat value="#{i18n.NewsItem_MEDIA_ITEM_SEARCH_X_RESULTS_FOUND}" rendered="#{newsItem.searchResults.rowCount &gt; -1}">
                                         <f:param value="#{newsItem.lastSearch.numberOfResults}" />
                                         <f:param value="#{newsItem.lastSearch.searchTimeInSeconds}" />
                                         <f:param value="#{newsItem.lastSearch.numberOfPages}" />
                                     </h:outputFormat>
 
-                                    <rich:dataTable id="searchResults" rows="50" value="#{value.searchResults}" var="item">
+                                    <rich:dataTable id="searchResults" rows="50" value="#{newsItem.searchResults}" var="item">
 
                                         <rich:column>
                                             <h:panelGrid>
                                                 <h:outputText value="#{item.title}" escape="false" styleClass="bold" />
                                                 <h:column>
-                                                    <h:graphicImage url="#{item.previewLink}" rendered="#{item.preview &amp;&amp; !item.video &amp;&amp; !item.audio}" styleClass="searchResultThumb" />
-                                                    <h:panelGroup rendered="#{item.video || item.audio}" styleClass="searchResultThumb">
+                                                    <h:graphicImage url="#{item.previewLink}" rendered="#{item.preview &amp;&amp; !item.previewVideo &amp;&amp; !item.previewAudio}" styleClass="searchResultThumb" />
+                                                    <h:panelGroup rendered="#{item.previewVideo || item.previewAudio}" styleClass="searchResultThumb">
                                                         <converge:mediaPlayer id="searchResult#{item.id}" value="#{item.directLink}" height="150" width="150" controlbar="none" />
                                                     </h:panelGroup>
 
