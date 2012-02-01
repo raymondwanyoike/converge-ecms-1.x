@@ -12,32 +12,32 @@
           xmlns:converge="http://com.interactivemediamanagement.converge/tags">
 
     <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
-        <ui:define name="title">#{msgs.ADMINISTRATION}</ui:define>
+        <ui:define name="title">#{i18n.ADMINISTRATION_Title}</ui:define>
         <ui:define name="body">
 
-            <converge:moduleHeader moduleTitle="#{msgs.app_SYSTEM_INFORMATION}" />
+            <converge:moduleHeader moduleTitle="#{i18n.System_TITLE}" />
             <div class="moduleContent">
 
                 <h:panelGrid columns="2" columnClasses="left, left">
-                    <h:outputText value="#{msgs.app_OPERATING_SYSTEM}" />
+                    <h:outputText value="#{i18n.System_OPERATING_SYSTEM}" />
                     <h:outputText value="#{administrator_Administration.operatingSystem}" />
-                    <h:outputText value="#{msgs.app_JAVA_VERSION}" />
+                    <h:outputText value="#{i18n.System_JAVA_VERSION}" />
                     <h:outputText value="#{administrator_Administration.javaVersion}" />
-                    <h:outputText value="#{msgs.app_START_TIME}" />
+                    <h:outputText value="#{i18n.System_START_TIME}" />
                     <h:outputText value="#{administrator_Administration.startTime}">
-                        <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{common.systemTimeZone}" />
+                        <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{common.systemTimeZone}" />
                     </h:outputText>
                 </h:panelGrid>
             </div>
             <converge:moduleSpacer />
-            <converge:moduleHeader moduleTitle="#{msgs.app_MEMORY_INFORMATION}" />
+            <converge:moduleHeader moduleTitle="#{i18n.System_MEMORY_INFORMATION}" />
             <div class="moduleContent">
                 <h:panelGrid columns="2" columnClasses="left, right">
-                    <h:outputText value="#{msgs.app_SYSTEM_INFORMATION_MAX_MEMORY}" />
+                    <h:outputText value="#{i18n.System_INFORMATION_MAX_MEMORY}" />
                     <h:outputText value="#{administrator_Administration.maxMemory}">
                         <f:convertNumber />
                     </h:outputText>
-                    <h:outputText value="#{msgs.app_SYSTEM_INFORMATION_USED_MEMORY}" />
+                    <h:outputText value="#{i18n.System_INFORMATION_USED_MEMORY}" />
                     <h:outputText value="#{administrator_Administration.usedMemory}">
                         <f:convertNumber />
                     </h:outputText>

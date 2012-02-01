@@ -32,7 +32,7 @@
                             <f:facet name="header">
                                 <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                             </f:facet>
-                            <h:graphicImage title="#{msgs.PROPERTY}" alt="#{msgs.PROPERTY}" value="#{res.PROPERTY_ICON}" />
+                            <h:graphicImage title="#{i18n.OpenCalais_PROPERTY}" alt="#{i18n.OpenCalais_PROPERTY}" value="#{res.PROPERTY_ICON}" />
                         </rich:column>
                         <rich:column>
                             <f:facet name="header">
@@ -170,7 +170,7 @@
 
                                         <rich:column sortBy="#{concept.fullTitle}" filterBy="#{concept.name}" filterEvent="onkeyup" >
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.concepts_CONCEPT}" />
+                                                <h:outputText value="#{i18n.Concepts_CONCEPT}" />
                                             </f:facet>
                                             <a4j:commandLink id="lnkSelectMetaDataSubject" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{administrator_OpenCalais.conceptId}" value="#{concept.id}" />
@@ -211,7 +211,7 @@
 
                                         <rich:column sortBy="#{concept.name}" filterBy="#{concept.name}" filterEvent="onkeyup" >
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.concepts_CONCEPT}" />
+                                                <h:outputText value="#{i18n.Concepts_CONCEPT}" />
                                             </f:facet>
                                             <a4j:commandLink id="lnkSelectMetaDataPerson" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{administrator_OpenCalais.conceptId}" value="#{concept.id}" />
@@ -255,7 +255,7 @@
 
                                         <rich:column sortBy="#{concept.name}" filterBy="#{concept.name}" filterEvent="onkeyup" >
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.concepts_CONCEPT}" />
+                                                <h:outputText value="#{i18n.Concepts_CONCEPT}" />
                                             </f:facet>
                                             <a4j:commandLink id="lnkSelectMetaDataOrganisation" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{administrator_OpenCalais.conceptId}" value="#{concept.id}" />
@@ -273,7 +273,7 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabLocations" label="#{msgs.concepts_LOCATIONS}">
+                            <rich:tab id="tabLocations" label="#{i18n.Concepts_LOCATIONS}">
 
                                 <h:panelGrid id="pgLocations" columnClasses="tabSheet" style="padding: 10px; width: 100%">
 
@@ -298,7 +298,7 @@
 
                                         <rich:column sortBy="#{concept.name}" filterBy="#{concept.name}" filterEvent="onkeyup" >
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.concepts_CONCEPT}" />
+                                                <h:outputText value="#{i18n.Concepts_CONCEPT}" />
                                             </f:facet>
                                             <a4j:commandLink id="lnkSelectMetaDataLocation" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{administrator_OpenCalais.conceptId}" value="#{concept.id}" />
@@ -324,7 +324,7 @@
                         <h:panelGroup styleClass="dialogueButtons">
                             <h:commandLink id="lnkCancelConceptDetails"
                                            styleClass="dialogButton"
-                                           value="#{msgs.CLOSE}"
+                                           value="#{i18n.Generic_CLOSE}"
                                            onclick="#{rich:component('mpConceptSelector')}.hide(); return false;">
                             </h:commandLink>
                         </h:panelGroup>

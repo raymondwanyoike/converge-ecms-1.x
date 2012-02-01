@@ -126,8 +126,7 @@
                                 </div>
                                 <div style="clear: both; padding: 9px;" />
 
-                                <a4j:repeat value="#{search.searchResults}" var="item">
-
+                                <ui:repeat value="#{search.searchResults}" var="item">
                                     <h2 style="padding-bottom: 0px;">
                                         <h:outputLink value="#{item.link}" target="_blank">
                                             <h:outputText value="#{item.title}" escape="false" />

@@ -2,7 +2,8 @@
 <jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags" xmlns:v="http://converge.i2m.dk">
 
     <ui:composition template="/WEB-INF/facelets/templates/blank.xhtml">
-        <ui:define name="title">#{msgs.CONTACTS}</ui:define>
+
+        <ui:define name="title">#{i18n.Contacts_PAGE_TITLE}</ui:define>
 
         <ui:define name="body">
             <a4j:keepAlive beanName="contacts" />
@@ -12,12 +13,12 @@
 
             <h:form id="frmPage">
                 <a4j:queue requestDelay="1000" ignoreDupResponses="true" />
-                <converge:moduleHeader moduleTitle="#{msgs.CONTACTS}" />
+                <converge:moduleHeader moduleTitle="#{i18n.Contacts_PAGE_TITLE}" />
                 <div class="moduleContent">
                     <h:panelGrid columns="1" columnClasses="right" style="width: 100%">
                         <h:column>
-                            <a4j:commandButton id="btnRefresh" styleClass="button dynamicButton" value="#{msgs.REFRESH}" actionListener="#{contacts.onRefresh}" reRender="dtContacts" ajaxSingle="true" />
-                            <a4j:commandButton id="btnNew" styleClass="button dynamicButton" style="margin-left: 5px;" value="#{msgs.contacts_NEW_CONTACT}" actionListener="#{contacts.onNew}" reRender="frmContactDetails" ajaxSingle="true">
+                            <a4j:commandButton id="btnRefresh" styleClass="button dynamicButton" value="#{i18n.Generic_REFRESH}" actionListener="#{contacts.onRefresh}" reRender="dtContacts" ajaxSingle="true" />
+                            <a4j:commandButton id="btnNew" styleClass="button dynamicButton" style="margin-left: 5px;" value="#{i18n.Contacts_NEW_CONTACT}" actionListener="#{contacts.onNew}" reRender="frmContactDetails" ajaxSingle="true">
                                 <rich:componentControl for="mpContactDetails" operation="show" event="oncomplete" />
                             </a4j:commandButton>
                         </h:column>
@@ -29,7 +30,7 @@
                             <f:facet name="header">
                                 <a4j:status id="staProgress">
                                     <f:facet name="start">
-                                        <h:graphicImage value="#{i18n.resource_ICON_AJAX_LOADING}" title="#{msgs.UPDATING}" alt="#{msgs.UPDATING}" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_AJAX_LOADING}" title="#{i18n.Generic_UPDATING}" alt="#{i18n.Generic_UPDATING}" />
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>
@@ -38,11 +39,11 @@
 
                         <rich:column styleClass="left" sortBy="#{contact.updated.time}">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.contacts_UPDATED}" />
+                                <h:outputText value="#{i18n.Contacts_UPDATED}" />
                             </f:facet>
 
                             <h:outputText value="#{contact.updated.time}">
-                                <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
                             <converge:contactToolTip value="#{contact}" />
 
@@ -50,7 +51,7 @@
 
                         <rich:column styleClass="left" sortBy="#{contact.firstName}" filterBy="#{contact.firstName}" filterEvent="onkeyup" >
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.contacts_FIRST_NAME}" />
+                                <h:outputText value="#{i18n.Contacts_FIRST_NAME}" />
                             </f:facet>
                             <h:outputText value="#{contact.firstName}" />
                             <converge:contactToolTip value="#{contact}" />
@@ -58,7 +59,7 @@
 
                         <rich:column styleClass="left" sortBy="#{contact.lastName}" filterBy="#{contact.lastName}" filterEvent="onkeyup">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.contacts_LAST_NAME}" />
+                                <h:outputText value="#{i18n.Contacts_LAST_NAME}" />
                             </f:facet>
                             <h:outputText value="#{contact.lastName}" />
                             <converge:contactToolTip value="#{contact}" />
@@ -66,7 +67,7 @@
 
                         <rich:column styleClass="left" sortBy="#{contact.organisation}" filterBy="#{contact.organisation}" filterEvent="onkeyup">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.contacts_ORGANISATION}" />
+                                <h:outputText value="#{i18n.Contacts_ORGANISATION}" />
                             </f:facet>
                             <h:outputText value="#{contact.organisation}" />
                             <converge:contactToolTip value="#{contact}" />
@@ -74,7 +75,7 @@
 
                         <rich:column styleClass="left" sortBy="#{contact.jobTitle}" filterBy="#{contact.jobTitle}" filterEvent="onkeyup">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.contacts_JOB_TITLE}" />
+                                <h:outputText value="#{i18n.Contacts_JOB_TITLE}" />
                             </f:facet>
                             <h:outputText value="#{contact.jobTitle}" />
                             <converge:contactToolTip value="#{contact}" />
@@ -82,17 +83,17 @@
 
                         <rich:column styleClass="left" sortBy="#{contact.primaryPhone}"  filterBy="#{contact.primaryPhone}" filterEvent="onkeyup">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.contacts_PHONE}" />
+                                <h:outputText value="#{i18n.Contacts_PHONE}" />
                             </f:facet>
                             <h:outputText value="#{contact.primaryPhone.number}" />
                             <converge:contactToolTip value="#{contact}" />
                         </rich:column>
 
                         <rich:column styleClass="columnIcon center" rendered="#{userSession.privileged['CONTACTS_MANAGE']}">
-                            <a4j:commandLink onclick="if (confirm('#{msgs.contacts_PROMPT_DELETE}') != true){ return false; };">
+                            <a4j:commandLink onclick="if (confirm('#{i18n.Contacts_PROMPT_DELETE}') != true){ return false; };">
                                 <f:setPropertyActionListener value="#{contact}" target="#{contacts.selectedContact}" />
                                 <a4j:support event="oncomplete" actionListener="#{contacts.onDelete}" reRender="frmPage" limitToList="true" />
-                                <h:graphicImage alt="#{msgs.DELETE}" title="#{msgs.DELETE}" value="#{res.DELETE_ICON}"/>
+                                <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{res.DELETE_ICON}"/>
                             </a4j:commandLink>
                         </rich:column>
 
@@ -100,7 +101,7 @@
                             <a4j:commandLink id="lnkEditContact" reRender="frmContactDetails">
                                 <f:setPropertyActionListener value="#{contact}" target="#{contacts.selectedContact}" />
                                 <rich:componentControl for="mpContactDetails" operation="show" event="oncomplete" />
-                                <h:graphicImage alt="#{msgs.UPDATE}" title="#{msgs.UPDATE}" value="#{res.UPDATE_ICON}"/>
+                                <h:graphicImage alt="#{i18n.Generic_UPDATE}" title="#{i18n.Generic_UPDATE}" value="#{res.UPDATE_ICON}"/>
                             </a4j:commandLink>
                         </rich:column>
 
@@ -113,7 +114,7 @@
                 <rich:modalPanel id="mpContactDetails" autosized="true" domElementAttachment="parent">
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{msgs.CONTACTS}"></h:outputText>
+                            <h:outputText value="#{i18n.Contacts_PAGE_TITLE}"></h:outputText>
                         </h:panelGroup>
                     </f:facet>
                     <f:facet name="controls">
@@ -127,9 +128,9 @@
 
                         <rich:tabPanel id="tpContactDetails" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
 
-                            <rich:tab label="#{msgs.contacts_CONTACT}">
+                            <rich:tab label="#{i18n.Contacts_CONTACT}">
                                 <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
-                                    <h:outputText value="#{msgs.contacts_TITLE}" />
+                                    <h:outputText value="#{i18n.Contacts_TITLE}" />
                                     <h:selectOneRadio value="#{contacts.selectedContact.title}">
                                         <f:selectItem itemLabel="Mr" itemValue="Mr." />
                                         <f:selectItem itemLabel="Ms" itemValue="Ms." />
@@ -139,29 +140,29 @@
                                         <f:selectItem itemLabel="Hon" itemValue="Hon." />
                                     </h:selectOneRadio>
 
-                                    <h:outputText value="#{msgs.contacts_FIRST_NAME}" />
+                                    <h:outputText value="#{i18n.Contacts_FIRST_NAME}" />
                                     <h:inputText value="#{contacts.selectedContact.firstName}" styleClass="text mediumInput" />
 
-                                    <h:outputText value="#{msgs.contacts_LAST_NAME}" />
+                                    <h:outputText value="#{i18n.Contacts_LAST_NAME}" />
                                     <h:inputText value="#{contacts.selectedContact.lastName}" styleClass="text mediumInput" />
 
-                                    <h:outputText value="#{msgs.contacts_JOB_TITLE}" />
+                                    <h:outputText value="#{i18n.Contacts_JOB_TITLE}" />
                                     <h:inputText value="#{contacts.selectedContact.jobTitle}" styleClass="text mediumInput" />
 
-                                    <h:outputText value="#{msgs.contacts_ORGANISATION}" />
+                                    <h:outputText value="#{i18n.Contacts_ORGANISATION}" />
                                     <h:inputText value="#{contacts.selectedContact.organisation}" styleClass="text mediumInput" />
 
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab label="#{msgs.contacts_PHONES}" disabled="#{contacts.selectedContact.id == null}">
+                            <rich:tab label="#{i18n.Contacts_PHONES}" disabled="#{contacts.selectedContact.id == null}">
                                 <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
                                     <h:panelGrid columns="5" style="width: 100%;">
-                                        <h:outputText value="#{msgs.contacts_LABEL}" />
+                                        <h:outputText value="#{i18n.Contacts_LABEL}" />
                                         <h:inputText id="txtPhoneLabel" value="#{contacts.selectedContactPhone.label}" styleClass="text" />
-                                        <h:outputText value="#{msgs.contacts_PHONE}" />
+                                        <h:outputText value="#{i18n.Contacts_PHONE}" />
                                         <h:inputText id="txtPhoneNumber" value="#{contacts.selectedContactPhone.number}" styleClass="text" />
-                                        <a4j:commandButton id="btnAddPhone" styleClass="button dynamicButton" value="#{msgs.SAVE}" reRender="dtContactPhones, txtPhoneLabel, txtPhoneNumber" actionListener="#{contacts.onSavePhone}" />
+                                        <a4j:commandButton id="btnAddPhone" styleClass="button dynamicButton" value="#{i18n.Generic_SAVE}" reRender="dtContactPhones, txtPhoneLabel, txtPhoneNumber" actionListener="#{contacts.onSavePhone}" />
                                     </h:panelGrid>
 
                                     <rich:dataTable id="dtContactPhones" value="#{contacts.selectedContact.phones}" var="phone">
@@ -178,7 +179,7 @@
                                             <a4j:commandLink ajaxSingle="true">
                                                 <f:setPropertyActionListener value="#{phone}" target="#{contacts.moveContactPhone}" />
                                                 <a4j:support event="oncomplete" actionListener="#{contacts.onMoveContactPhoneUp}" reRender="dtContactPhones" ajaxSingle="true" />
-                                                <h:graphicImage alt="#{msgs.MOVE_UP}" title="#{msgs.MOVE_UP}" value="#{res.MOVE_UP_ICON}"/>
+                                                <h:graphicImage alt="#{i18n.Contacts_MOVE_UP}" title="#{i18n.Contacts_MOVE_UP}" value="#{res.MOVE_UP_ICON}"/>
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -186,15 +187,15 @@
                                             <a4j:commandLink ajaxSingle="true">
                                                 <f:setPropertyActionListener value="#{phone}" target="#{contacts.moveContactPhone}" />
                                                 <a4j:support event="oncomplete" actionListener="#{contacts.onMoveContactPhoneDown}" reRender="dtContactPhones" ajaxSingle="true" />
-                                                <h:graphicImage alt="#{msgs.MOVE_DOWN}" title="#{msgs.MOVE_DOWN}" value="#{res.MOVE_DOWN_ICON}"/>
+                                                <h:graphicImage alt="#{i18n.Contacts_MOVE_DOWN}" title="#{i18n.Contacts_MOVE_DOWN}" value="#{res.MOVE_DOWN_ICON}"/>
                                             </a4j:commandLink>
                                         </rich:column>
 
                                         <rich:column styleClass="columnIcon center" rendered="#{userSession.privileged['CONTACTS_MANAGE']}">
-                                            <a4j:commandLink onclick="if (confirm('#{msgs.contacts_PROMPT_DELETE_PHONE}') != true){ return false; };">
+                                            <a4j:commandLink onclick="if (confirm('#{i18n.Contacts_PROMPT_DELETE_PHONE}') != true){ return false; };">
                                                 <f:setPropertyActionListener value="#{phone}" target="#{contacts.selectedContactPhone}" />
                                                 <a4j:support event="oncomplete" actionListener="#{contacts.onDeleteContactPhone}" reRender="dtContactPhones" />
-                                                <h:graphicImage alt="#{msgs.DELETE}" title="#{msgs.DELETE}" value="#{res.DELETE_ICON}"/>
+                                                <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{res.DELETE_ICON}"/>
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -203,16 +204,16 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab label="#{msgs.contacts_EMAILS}" disabled="#{contacts.selectedContact.id == null}">
+                            <rich:tab label="#{i18n.Contacts_EMAILS}" disabled="#{contacts.selectedContact.id == null}">
                                 <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
                                     <h:panelGrid columns="5" style="width: 100%;">
-                                        <h:outputText value="#{msgs.contacts_LABEL}" />
+                                        <h:outputText value="#{i18n.Contacts_LABEL}" />
                                         <h:inputText id="txtEmailLabel" value="#{contacts.selectedContactEmail.label}" styleClass="text" />
-                                        <h:outputText value="#{msgs.contacts_EMAIL}" />
+                                        <h:outputText value="#{i18n.Contacts_EMAIL}" />
                                         <h:inputText id="txtEmailEmail" value="#{contacts.selectedContactEmail.email}" styleClass="text" />
                                         <a4j:commandButton id="btnAddEmail"
                                                            styleClass="button dynamicButton"
-                                                           value="#{msgs.SAVE}"
+                                                           value="#{i18n.Generic_SAVE}"
                                                            reRender="dtContactEmails, txtEmailLabel, txtEmailEmail"
                                                            actionListener="#{contacts.onSaveEmail}" />
                                     </h:panelGrid>
@@ -226,10 +227,10 @@
                                         </rich:column>
 
                                         <rich:column styleClass="columnIcon center" rendered="#{userSession.privileged['CONTACTS_MANAGE']}">
-                                            <a4j:commandLink onclick="if (confirm('#{msgs.contacts_PROMPT_DELETE_EMAIL}') != true){ return false; };">
+                                            <a4j:commandLink onclick="if (confirm('#{i18n.Contacts_PROMPT_DELETE_EMAIL}') != true){ return false; };">
                                                 <f:setPropertyActionListener value="#{email}" target="#{contacts.selectedContactEmail}" />
                                                 <a4j:support event="oncomplete" actionListener="#{contacts.onDeleteContactEmail}" reRender="dtContactEmails" />
-                                                <h:graphicImage alt="#{msgs.DELETE}" title="#{msgs.DELETE}" value="#{res.DELETE_ICON}"/>
+                                                <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{res.DELETE_ICON}"/>
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -238,10 +239,10 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab label="#{msgs.contacts_ADDRESSES}" disabled="#{contacts.selectedContact.id == null}">
+                            <rich:tab label="#{i18n.Contacts_ADDRESSES}" disabled="#{contacts.selectedContact.id == null}">
                                 <h:panelGrid id="pgAddressTab" columnClasses="tabSheet" style="padding: 10px; width: 100%">
 
-                                    <h:outputText value="#{msgs.contacts_LABEL}" />
+                                    <h:outputText value="#{i18n.Contacts_LABEL}" />
                                     <h:inputText value="#{contacts.selectedContactAddress.label}" styleClass="text" />
 
                                     <h:outputText value="Address Line 1" />
@@ -261,7 +262,7 @@
 
                                     <a4j:commandButton id="btnAddAddress"
                                                        styleClass="button dynamicButton"
-                                                       value="#{msgs.SAVE}"
+                                                       value="#{i18n.Generic_SAVE}"
                                                        reRender="dtContactAddresses"
                                                        actionListener="#{contacts.onSaveAddress}" />
 
@@ -279,10 +280,10 @@
                                         </rich:column>
 
                                         <rich:column styleClass="columnIcon center" rendered="#{userSession.privileged['CONTACTS_MANAGE']}">
-                                            <a4j:commandLink onclick="if (confirm('#{msgs.contacts_PROMPT_DELETE_ADDRESS}') != true){ return false; };">
+                                            <a4j:commandLink onclick="if (confirm('#{i18n.Contacts_PROMPT_DELETE_ADDRESS}') != true){ return false; };">
                                                 <f:setPropertyActionListener value="#{address}" target="#{contacts.selectedContactAddress}" />
                                                 <a4j:support event="oncomplete" actionListener="#{contacts.onDeleteContactAddress}" reRender="dtContactAddresses, pgAddressTab" />
-                                                <h:graphicImage alt="#{msgs.DELETE}" title="#{msgs.DELETE}" value="#{res.DELETE_ICON}"/>
+                                                <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{res.DELETE_ICON}"/>
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -292,7 +293,7 @@
                             </rich:tab>
 
 
-                            <rich:tab label="#{msgs.contacts_NOTES}">
+                                            <rich:tab label="#{i18n.Contacts_NOTES}">
                                 <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
                                     <h:inputTextarea value="#{contacts.selectedContact.note}" styleClass="text mediumTextArea"/>
                                 </h:panelGrid>
@@ -303,20 +304,20 @@
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveContactDetails"
                                              styleClass="dialogButton"
-                                             value="#{msgs.SAVE}"
+                                             value="#{i18n.Generic_SAVE}"
                                              actionListener="#{contacts.onSave}"
                                              reRender="dtContacts"
                                              oncomplete="if (#{converge:isAllValid()}) { Richfaces.hideModalPanel('mpContactDetails'); return false;}" />
 
                             <a4j:commandLink id="lnkApplyContactDetails"
                                              styleClass="dialogButton"
-                                             value="#{msgs.APPLY}"
+                                             value="#{i18n.Generic_APPLY}"
                                              reRender="dtContacts,pgContactDetails"
                                              actionListener="#{contacts.onSave}" />
 
                             <h:commandLink id="lnkCancelContactDetails"
                                            styleClass="dialogButton"
-                                           value="#{msgs.CANCEL}"
+                                           value="#{i18n.Generic_CANCEL}"
                                            onclick="#{rich:component('mpContactDetails')}.hide(); return false;">
                             </h:commandLink>
                         </h:panelGroup>

@@ -3,13 +3,13 @@
 
     <ui:composition template="/WEB-INF/facelets/templates/unauthorised.xhtml">
         <ui:define name="title">
-            <h:outputText value="#{msgs.UNAUTHORISED}" />
+            <h:outputText value="#{i18n.Unauthorised_UNAUTHORISED}" />
         </ui:define>
 
         <ui:define name="pageBody">
             <div style="clear: both; padding-bottom: 12px;"></div>
             <p align="center">
-                <h:outputText value="#{msgs.UNAUTHORISED_DETAIL}" />
+                <h:outputText value="#{i18n.Unauthorised_UNAUTHORISED_DETAIL}" />
             </p>
         </ui:define>
             

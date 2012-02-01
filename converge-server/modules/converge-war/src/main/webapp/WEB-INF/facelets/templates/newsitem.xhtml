@@ -3,7 +3,7 @@
     <ui:composition template="/WEB-INF/facelets/templates/default.xhtml">
 
         <ui:define name="title">
-            <h:outputText value="#{msgs.newsitem_PAGE_TITLE}" />
+            <h:outputText value="#{i18n.NewsItem_PAGE_TITLE}" />
         </ui:define>
 
         <ui:define name="pageBody">
@@ -38,7 +38,7 @@
 
                 function confirmNavigation() {
                     if (formChanged) {
-                        return confirm('#{msgs.newsitem_CLOSE_WITHOUT_SAVING}');
+                        return confirm('#{i18n.NewsItem_CLOSE_WITHOUT_SAVING}');
                     } else {
                         return true;
                     }

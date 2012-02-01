@@ -338,7 +338,7 @@
             <id>xuggleRepository</id>
             <name>Xuggle Repository</name>
             <url>http://xuggle.googlecode.com/svn/trunk/repo/share/java</url>
-        </repository>
+        </repository>        
     </repositories>
     <properties />
 

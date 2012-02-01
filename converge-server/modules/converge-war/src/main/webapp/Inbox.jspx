@@ -27,44 +27,44 @@
 
                         <rich:column sortBy="#{item.id}" sortOrder="DESCENDING" styleClass="right columnId">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.ID}" title="#{msgs.ARTICLE_ID_TOOLTIP}" />
+                                <h:outputText value="#{i18n.Generic_ID}" title="#{i18n.Inbox_ARTICLE_ID_TOOLTIP}" />
                             </f:facet>
                             <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
                                 <h:outputText value="#{item.id}">
-                                    <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                                    <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
                                 </h:outputText>
                             </h:outputLink>
                         </rich:column>
 
                         <rich:column sortBy="#{item.title}" styleClass="left">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.TITLE}" title="#{msgs.ARTICLE_TITLE_TOOLTIP}" />
+                                <h:outputText value="#{i18n.Generic_TITLE}" title="#{i18n.Inbox_ARTICLE_TITLE_TOOLTIP}" />
                             </f:facet>
                             <h:panelGrid>
                                 <h:outputText value="#{item.slugline}" title="" rendered="#{item.slugline != null || item.slugline != ''}" />
                                 <h:outputText value="#{item.title}" title="" />
-                                <h:outputText value="#{msgs.ARTICLE_WORD_COUNT}: #{item.wordCount}" rendered="#{item.targetWordCount &lt;= 0}" styleClass="small" />
-                                <h:outputText value="#{msgs.ARTICLE_WORD_COUNT}: #{item.wordCount} (#{item.targetWordCount})" rendered="#{item.targetWordCount &gt; 0}" styleClass="small" />
+                                <h:outputText value="#{i18n.Inbox_ARTICLE_WORD_COUNT}: #{item.wordCount}" rendered="#{item.targetWordCount &lt;= 0}" styleClass="small" />
+                                <h:outputText value="#{i18n.Inbox_ARTICLE_WORD_COUNT}: #{item.wordCount} (#{item.targetWordCount})" rendered="#{item.targetWordCount &gt; 0}" styleClass="small" />
                             </h:panelGrid>
                         </rich:column>
 
                         <rich:column sortBy="#{item.actor}" styleClass="left">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.newsitem_CURRENT_ACTOR}" title="#{msgs.newsitem_CURRENT_ACTOR_TOOLTIP}" />
+                                <h:outputText value="#{i18n.Inbox_NEWSITEM_CURRENT_ACTOR}" title="#{i18n.Inbox_NEWSITEM_CURRENT_ACTOR_TOOLTIP}" />
                             </f:facet>
                             <h:outputText value="#{item.actor}" title="" />
                         </rich:column>
 
                         <rich:column styleClass="left" sortBy="#{item.status}">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.STATUS}" title="#{msgs.ARTICLE_STATUS_TOOLTIP}" />
+                                <h:outputText value="#{i18n.Inbox_STATUS}" title="#{i18n.Inbox_ARTICLE_STATUS_TOOLTIP}" />
                             </f:facet>
                             <h:outputText value="#{item.status}" />
                         </rich:column>
 
                         <rich:column styleClass="left" sortBy="#{item.outlet}">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.OUTLET}" title="#{msgs.ARTICLE_PUBLICATION_TOOLTIP}" />
+                                <h:outputText value="#{i18n.Inbox_OUTLET}" title="#{i18n.Inbox_ARTICLE_PUBLICATION_TOOLTIP}" />
                             </f:facet>
                             <h:panelGrid>
                                 <h:outputText value="#{item.outlet}" />
@@ -73,19 +73,19 @@
 
                         <rich:column styleClass="columnDateTime" sortBy="#{item.deadline}">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.inbox_DEADLINE}" title="#{msgs.inbox_DEADLINE_TOOLTIP}" />
+                                <h:outputText value="#{i18n.Inbox_DEADLINE}" title="#{i18n.Inbox_DEADLINE_TOOLTIP}" />
                             </f:facet>
                             <h:outputText value="#{item.deadline}">
-                                <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
                         </rich:column>
 
                         <rich:column sortBy="#{item.updated}" styleClass="columnDateTime">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.UPDATED}" title="#{msgs.ARTICLE_UPDATED_TOOLTIP}" />
+                                <h:outputText value="#{i18n.Inbox_UPDATED}" title="#{i18n.Inbox_ARTICLE_UPDATED_TOOLTIP}" />
                             </f:facet>
                             <h:outputText value="#{item.updated}">
-                                <f:convertDateTime type="both" pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime type="both" pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
                         </rich:column>
 
@@ -118,18 +118,18 @@
 
                         <rich:column sortBy="#{item.id}" sortOrder="DESCENDING" styleClass="right columnId">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.ID}"  />
+                                <h:outputText value="#{i18n.Generic_ID}"  />
                             </f:facet>
                             <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{item.id}">
                                 <h:outputText value="#{item.id}">
-                                    <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                                    <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
                                 </h:outputText>
                             </h:outputLink>
                         </rich:column>
 
                         <rich:column sortBy="#{item.title}" styleClass="left">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.TITLE}" title="#{msgs.ARTICLE_TITLE_TOOLTIP}" />
+                                <h:outputText value="#{i18n.Generic_TITLE}" title="#{i18n.Inbox_ARTICLE_TITLE_TOOLTIP}" />
                             </f:facet>
                             <h:panelGrid>
                                 <h:panelGrid>
@@ -141,7 +141,7 @@
 
                         <rich:column sortBy="#{item.owner}" styleClass="left">
                             <f:facet name="header">
-                                <h:outputText value="Submitter" />
+                                <h:outputText value="#{i18n.Inbox_SUBMITTER}" />
                             </f:facet>
                             <h:panelGrid>
                                 <h:outputText value="#{item.owner.fullName}" title="" />
@@ -150,7 +150,7 @@
 
                         <rich:column sortBy="#{item.status}">
                             <f:facet name="header">
-                                <h:outputText value="Status" />
+                                <h:outputText value="#{i18n.Inbox_STATUS}" />
                             </f:facet>
                             <h:outputText value="#{item.status}" rendered="#{!inbox.catalogueEditor}" />
                             <h:panelGroup layout="block" rendered="#{inbox.catalogueEditor}">
@@ -167,10 +167,10 @@
 
                         <rich:column sortBy="#{item.updated.time}" styleClass="columnDateTime">
                             <f:facet name="header">
-                                <h:outputText value="#{msgs.UPDATED}" />
+                                <h:outputText value="#{i18n.Inbox_UPDATED}" />
                             </f:facet>
                             <h:outputText value="#{item.updated.time}">
-                                <f:convertDateTime type="both" pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime type="both" pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
                         </rich:column>
 
@@ -185,7 +185,7 @@
                 <rich:modalPanel id="mpNewAssignment" autosized="true" domElementAttachment="parent" >
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{msgs.inbox_NEW_ASSIGNMENT}" />
+                            <h:outputText value="#{i18n.Inbox_NEW_ASSIGNMENT}" />
                         </h:panelGroup>
                     </f:facet>
                     <f:facet name="controls">
@@ -200,33 +200,33 @@
                         <rich:tabPanel id="tpNewAssignment" switchType="ajax" immediate="true" activeTabClass="tabActive" inactiveTabClass="tabInactive"
                                        selectedTab="#{inbox.newAssignmentType}">
 
-                            <rich:tab id="tabStory" label="Story">
+                            <rich:tab id="tabStory" label="#{i18n.Inbox_TAB_STORY_LABEL}">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
-                                    <h:outputText value="#{msgs.assignment_ASSIGNMENT_TITLE}" />
-                                    <h:inputText id="txtStoryTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" required="true" requiredMessage="#{msgs.inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
+                                    <h:outputText value="#{i18n.Inbox_ASSIGNMENT_TITLE}" />
+                                    <h:inputText id="txtStoryTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" required="true" requiredMessage="#{i18n.Inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
 
-                                    <h:outputText value="#{msgs.assignment_ASSIGNMENT_DEADLINE}" />
-                                    <rich:calendar popup="true" required="true" requiredMessage="#{msgs.inbox_NEWS_ITEM_DEADLINE_REQUIRED}" value="#{inbox.newAssignment.assignment.deadline.time}" datePattern="#{msgs.FORMAT_DATE_AND_TIME}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}"/>
+                                    <h:outputText value="#{i18n.Inbox_ASSIGNMENT_DEADLINE}" />
+                                    <rich:calendar popup="true" required="true" requiredMessage="#{i18n.Inbox_NEWS_ITEM_DEADLINE_REQUIRED}" value="#{inbox.newAssignment.assignment.deadline.time}" datePattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}"/>
 
-                                    <h:outputText value="#{msgs.assignment_ASSIGNMENT_OUTLET}" />
+                                    <h:outputText value="#{i18n.Inbox_ASSIGNMENT_OUTLET}" />
                                     <h:selectOneMenu id="somOutlet" styleClass="text mediumInput" value="#{inbox.newAssignment.newsItem.outlet}" converter="#{converters.outletConverter}">
                                         <f:selectItem itemLabel="" />
                                         <f:selectItems value="#{inbox.privilegedOutlets}" />
                                     </h:selectOneMenu>
 
-                                    <h:outputText value="#{msgs.assignment_ADD_TO_NEXT_EDITION}" />
+                                    <h:outputText value="#{i18n.Inbox_ADD_TO_NEXT_EDITION}" />
                                     <h:selectBooleanCheckbox value="#{inbox.newAssignment.nextEdition}" />
                                 </h:panelGrid>
 
                             </rich:tab>
-                            <rich:tab id="tabMedia" label="Media">
+                            <rich:tab id="tabMedia" label="#{i18n.Inbox_TAB_MEDIA_LABEL}">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
-                                    <h:outputText value="#{msgs.assignment_ASSIGNMENT_TITLE}" />
-                                    <h:inputText id="txtMediaTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" required="true" requiredMessage="#{msgs.inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
+                                    <h:outputText value="#{i18n.Inbox_ASSIGNMENT_TITLE}" />
+                                    <h:inputText id="txtMediaTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" required="true" requiredMessage="#{i18n.Inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
 
-                                    <h:outputText value="#{msgs.assignment_ASSIGNMENT_MEDIA_REPOSITORY}" />
+                                    <h:outputText value="#{i18n.Inbox_ASSIGNMENT_MEDIA_REPOSITORY}" />
                                     <h:selectOneMenu id="somMediaRepository" styleClass="text mediumInput" value="#{inbox.newAssignment.mediaItem.catalogue}" converter="#{converters.mediaRepositoryConverter}">
                                         <f:selectItem itemLabel="" />
                                         <f:selectItems value="#{common.writableMediaRepositories}" />
@@ -242,12 +242,12 @@
                         <a4j:commandLink id="lnkSaveAssignment"
                                          eventsQueue="qAssignment"
                                          styleClass="dialogButton"
-                                         value="#{msgs.assignment_CREATE}"
+                                         value="#{i18n.Inbox_ASSIGNMENT_CREATE}"
                                          actionListener="#{inbox.onAddAssignment}"
                                          reRender="frmInbox"
                                          oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpNewAssignment')}.hide(); window.location='#{facesContext.externalContext.request.contextPath}/#{inbox.createdItemLink}'; return false; }" />
 
-                        <h:commandLink id="lnkCancelAssignment" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpNewAssignment')}.hide(); return false;" />
+                        <h:commandLink id="lnkCancelAssignment" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpNewAssignment')}.hide(); return false;" />
                     </h:panelGroup>
 
                 </rich:modalPanel>
@@ -258,38 +258,38 @@
                 <rich:modalPanel id="mpDuplicateAssignment" autosized="true" domElementAttachment="parent" >
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{msgs.inbox_DUPLICATE}" />
+                            <h:outputText value="#{i18n.Inbox_DUPLICATE}" />
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid style="width: 480px;">
 
                         <rich:tabPanel id="tpDuplicateAssignment" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
 
-                            <rich:tab label="#{msgs.inbox_DUPLICATE}">
+                            <rich:tab label="#{i18n.Inbox_DUPLICATE}">
                                 <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
                                     <h:column>
-                                        <h:outputText value="#{msgs.inbox_NEWS_ITEM_TITLE}:" />
+                                        <h:outputText value="#{i18n.Inbox_NEWS_ITEM_TITLE}:" />
                                         <converge:message for="txtNewsItemTitle" />
                                     </h:column>
-                                    <h:inputText id="txtNewsItemTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" required="true" requiredMessage="#{msgs.inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
+                                        <h:inputText id="txtNewsItemTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" required="true" requiredMessage="#{i18n.Inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
 
-                                    <h:outputText value="#{msgs.inbox_NEWS_ITEM_DEADLINE}:" />
+                                        <h:outputText value="#{i18n.Inbox_NEWS_ITEM_DEADLINE}:" />
                                     <rich:calendar popup="true"
                                                    required="true"
-                                                   requiredMessage="#{msgs.inbox_NEWS_ITEM_DEADLINE_REQUIRED}"
+                                                   requiredMessage="#{i18n.Inbox_NEWS_ITEM_DEADLINE_REQUIRED}"
                                                    value="#{inbox.newAssignment.assignment.deadline.time}"
-                                                   datePattern="#{msgs.FORMAT_DATE_AND_TIME}"
+                                                   datePattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}"
                                                    firstWeekDay="1" timeZone="#{userSession.user.timeZone}"/>
 
 
                                     <h:column>
-                                        <h:outputText value="#{msgs.inbox_NEWS_ITEM_OUTLET}:" />
+                                        <h:outputText value="#{i18n.Inbox_NEWS_ITEM_OUTLET}:" />
                                         <converge:message for="selOutlet" />
                                     </h:column>
                                     <h:selectOneMenu id="selOutlet"
                                                      styleClass="text mediumInput"
                                                      value="#{inbox.newAssignment.newsItem.outlet}"
-                                                     required="true" requiredMessage="#{msgs.inbox_NEWS_ITEM_OUTLET_REQUIRED}"
+                                                     required="true" requiredMessage="#{i18n.Inbox_NEWS_ITEM_OUTLET_REQUIRED}"
                                                      converter="#{converters.outletConverter}">
                                         <f:selectItem itemLabel="" />
                                         <f:selectItems value="#{inbox.privilegedOutlets}" />
@@ -304,14 +304,14 @@
 
                         <a4j:commandLink id="lnkCreateAssignment"
                                          styleClass="dialogButton"
-                                         value="#{msgs.inbox_CREATE_NEWS_ITEM_BUTTON_LABEL}"
+                                         value="#{i18n.Inbox_CREATE_NEWS_ITEM_BUTTON_LABEL}"
                                          actionListener="#{inbox.onAddAssignment}"
                                          reRender="frmInbox"
                                          oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpDuplicateAssignment')}.hide(); return false; }" />
 
                         <h:commandLink id="lnkCancelAssignment"
                                        styleClass="dialogButton"
-                                       value="#{msgs.CANCEL}"
+                                       value="#{i18n.Generic_CANCEL}"
                                        onclick="#{rich:component('mpDuplicateAssignment')}.hide(); return false;" />
                     </h:panelGroup>
 
@@ -320,5 +320,4 @@
         </ui:define>
 
     </ui:composition>
-
 </jsp:root>

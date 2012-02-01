@@ -25,10 +25,10 @@
                         <h:selectBooleanCheckbox value="#{reportActivity.userRoleSubmitter}" title="#{i18n.ReportActivity_USER_ROLE_SUBMITTER_TOOLTIP}" />
 
                         <h:outputText value="#{i18n.ReportActivity_START_DATE}" />
-                        <rich:calendar id="calStartDate" value="#{reportActivity.startDate}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{msgs.FORMAT_DATE}" />
+                        <rich:calendar id="calStartDate" value="#{reportActivity.startDate}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{i18n.Generic_FORMAT_DATE}" />
 
                         <h:outputText value="#{i18n.ReportActivity_END_DATE}" />
-                        <rich:calendar id="calEndDate" value="#{reportActivity.endDate}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{msgs.FORMAT_DATE}" />
+                        <rich:calendar id="calEndDate" value="#{reportActivity.endDate}" popup="true" timeZone="#{common.systemTimeZone}" datePattern="#{i18n.Generic_FORMAT_DATE}" />
 
                         <h:outputText value="" />
                         <h:column>

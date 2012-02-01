@@ -6,7 +6,7 @@
         <ui:define name="leftColumnBottom">
 
             <h:form id="frmEditionDate" rendered="#{userSession.privileged['OUTLET_PLANNING']}">
-                <converge:moduleHeader moduleTitle="#{msgs.planning_EDITION_DATE}" />
+                <converge:moduleHeader moduleTitle="#{i18n.Planning_EDITION_DATE}" />
                 <div class="moduleContent">
                     <rich:calendar id="calEditionDate" value="#{planning.selectedDate.time}" popup="false" firstWeekDay="1" style="width: 100%" timeZone="#{userSession.user.timeZone}">
                         <a4j:support event="onchanged" actionListener="#{planning.onSelectDate}" reRender="frmPage" />
@@ -31,7 +31,7 @@
                     <div class="moduleContent">
 
                         <h:panelGrid columns="1" columnClasses="right" style="width: 100%">
-                            <a4j:commandButton id="btnNewEdition" styleClass="button mediumButton" value="#{msgs.planning_EDITION_NEW}" title="#{msgs.planning_EDITION_NEW_TOOLTIP}" actionListener="#{planning.onNewEdition}" reRender="frmEditionDetails" ajaxSingle="true">
+                            <a4j:commandButton id="btnNewEdition" styleClass="button mediumButton" value="#{i18n.Planning_EDITION_NEW}" title="#{i18n.Planning_EDITION_NEW_TOOLTIP}" actionListener="#{planning.onNewEdition}" reRender="frmEditionDetails" ajaxSingle="true">
                                 <rich:componentControl for="mpEditionDetails" operation="show" event="oncomplete" />
                             </a4j:commandButton>
                         </h:panelGrid>
@@ -52,31 +52,31 @@
                                         <f:setPropertyActionListener value="#{edition}" target="#{planning.selectedEdition}" />
                                         <rich:componentControl for="mpEditionDetails" operation="show" event="oncomplete" />
 
-                                        <h:outputFormat value="#{msgs.planning_EDITION_HEADER}">
+                                        <h:outputFormat value="#{i18n.Planning_EDITION_HEADER}">
                                             <f:param value="#{edition.volume}" />
                                             <f:param value="#{edition.number}" />
                                             <f:param value="#{edition.open ? 1 : 0}" />
                                         </h:outputFormat>
 
-                                        <h:outputText value="#{msgs.planning_PUBLISH_AT} " />
+                                        <h:outputText value="#{i18n.Planning_PUBLISH_AT} " />
                                         <h:outputText value="#{edition.publicationDate.time}" >
-                                            <f:convertDateTime pattern="#{msgs.FORMAT_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                            <f:convertDateTime pattern="#{i18n.Generic_FORMAT_TIME}" timeZone="#{userSession.user.timeZone}" />
                                         </h:outputText>
 
-                                        <h:outputText value="#{msgs.planning_EXPIRE_AT} " />
+                                        <h:outputText value="#{i18n.Planning_EXPIRE_AT} " />
                                         <h:outputText value="#{edition.expirationDate.time}" >
-                                            <f:convertDateTime pattern="#{msgs.FORMAT_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                            <f:convertDateTime pattern="#{i18n.Generic_FORMAT_TIME}" timeZone="#{userSession.user.timeZone}" />
                                         </h:outputText>
                                     </a4j:commandLink>
                                 </f:facet>
 
                                 <rich:column>
-                                    <h:graphicImage value="/images/icons/section.gif" alt="#{msgs.EDITION_TEMPLATE_SECTION}" title="#{msgs.EDITION_TEMPLATE_SECTION}" rendered="#{!section.advertisement}" />
-                                    <h:graphicImage value="/images/icons/section_advertisement.png" alt="#{msgs.EDITION_TEMPLATE_SECTION_ADVERTISEMENT}" title="#{msgs.EDITION_TEMPLATE_SECTION_ADVERTISEMENT}" rendered="#{section.advertisement}" />
+                                    <h:graphicImage value="/images/icons/section.gif" alt="#{i18n.Planning_EDITION_TEMPLATE_SECTION}" title="#{i18n.Planning_EDITION_TEMPLATE_SECTION}" rendered="#{!section.advertisement}" />
+                                    <h:graphicImage value="/images/icons/section_advertisement.png" alt="#{i18n.Planning_EDITION_TEMPLATE_SECTION_ADVERTISEMENT}" title="#{i18n.Planning_EDITION_TEMPLATE_SECTION_ADVERTISEMENT}" rendered="#{section.advertisement}" />
                                 </rich:column>
                                 <rich:column sortBy="#{section.name}" colspan="3">
                                     <f:facet name="header">
-                                        <h:outputText value="#{msgs.planning_SECTION_NAME}" />
+                                        <h:outputText value="#{i18n.Planning_SECTION_NAME}" />
                                     </f:facet>
                                     <h:outputText value="#{section.name}"
                                                   title="#{section.description}"
@@ -84,18 +84,18 @@
                                 </rich:column>
                                 <rich:column id="colStart" sortBy="#{section.start}"  sortOrder="ASCENDING">
                                     <f:facet name="header">
-                                        <h:outputText value="#{msgs.planning_EDITION_SECTION_START}" title="#{msgs.planning_EDITION_SECTION_START_TOOLTIP}" />
+                                        <h:outputText value="#{i18n.Planning_EDITION_SECTION_START}" title="#{i18n.Planning_EDITION_SECTION_START_TOOLTIP}" />
                                     </f:facet>
                                     <h:outputText value="#{section.start}" />
                                 </rich:column>
                                 <rich:column id="colEnd" sortBy="#{section.end}"  sortOrder="ASCENDING">
                                     <f:facet name="header">
-                                        <h:outputText value="#{msgs.planning_EDITION_SECTION_END}" title="#{msgs.planning_EDITION_SECTION_END_TOOLTIP}" />
+                                        <h:outputText value="#{i18n.Planning_EDITION_SECTION_END}" title="#{i18n.Planning_EDITION_SECTION_END_TOOLTIP}" />
                                     </f:facet>
                                     <h:outputText value="#{section.end}" />
                                 </rich:column>
                                 <rich:column>
-                                    <a4j:commandButton styleClass="button mediumButton" value="#{msgs.planning_NEW_ASSIGNMENT}" ajaxSingle="true" rendered="#{edition.open}">
+                                    <a4j:commandButton styleClass="button mediumButton" value="#{i18n.planning_NEW_ASSIGNMENT}" ajaxSingle="true" rendered="#{edition.open}">
                                         <f:setPropertyActionListener target="#{planning.selectedEdition}" value="#{edition}" />
                                         <f:setPropertyActionListener target="#{planning.selectedEditionSection}" value="#{section}" />
                                         <a4j:support event="oncomplete" actionListener="#{planning.onNewEditionPlacement}" reRender="frmAssignmentDetails">
@@ -111,27 +111,27 @@
                                                rowClasses="odd, even"
                                                sortPriority="#{converge:createList('colPosition,colPriority')}">
                                     <rich:column>
-                                        <h:graphicImage value="#{res.NEWS_ITEM_ICON}" alt="#{msgs.planning_NEWS_ITEM}" title="#{msgs.planning_NEWS_ITEM}" />
+                                        <h:graphicImage value="#{res.NEWS_ITEM_ICON}" alt="#{i18n.Planning_NEWS_ITEM}" title="#{i18n.Planning_NEWS_ITEM}" />
                                     </rich:column>
 
                                     <rich:column>
                                         <h:outputText value="#{item.title}" /><br />
-                                        <h:outputText value="#{msgs.newsitem_ACTORS}:&#160;" style="font-style: italic; font-weight: bold; font-size: 9px;" />
+                                        <h:outputText value="#{i18n.PipeLine_ACTOR_ACTORS}:&#160;" style="font-style: italic; font-weight: bold; font-size: 9px;" />
                                         <h:outputText value="#{item.currentActor}" style="font-style: italic; font-size: 9px;" /><br/>
-                                        <h:outputText value="#{msgs.planning_EDITOR}:&#160;" style="font-style: italic; font-weight: bold; font-size: 9px;" />
+                                        <h:outputText value="#{i18n.Planning_EDITOR}:&#160;" style="font-style: italic; font-weight: bold; font-size: 9px;" />
                                         <h:outputText value="#{item.department.name}" style="font-style: italic; font-size: 9px;" /><br/>
-                                        <h:outputText value="#{msgs.WORD_COUNT}:&#160;" style="font-style: italic; font-weight: bold; font-size: 9px;" />
+                                        <h:outputText value="#{i18n.PipeLine_WORD_COUNT}:&#160;" style="font-style: italic; font-weight: bold; font-size: 9px;" />
                                         <h:outputText value="#{item.wordCount}" style="font-style: italic; font-size: 9px;" /><br/>
-                                        <h:outputText value="#{msgs.newsitem_TARGET_WORD_COUNT}:&#160;" style="font-style: italic; font-weight: bold; font-size: 9px;" />
+                                        <h:outputText value="#{i18n.PipeLine_WORD_COUNT}:&#160;" style="font-style: italic; font-weight: bold; font-size: 9px;" />
                                         <h:outputText value="#{item.targetWordCount}" style="font-style: italic; font-size: 9px;" rendered="#{item.targetWordCount != 0}" />
-                                        <h:outputText value="#{msgs.NOT_SET}" style="font-style: italic; font-size: 9px;" rendered="#{item.targetWordCount == 0}" />
+                                        <h:outputText value="#{i18n.Planning_NOT_SET}" style="font-style: italic; font-size: 9px;" rendered="#{item.targetWordCount == 0}" />
                                     </rich:column>
                                     <rich:column>
                                         <h:outputText value="#{item.currentState.name}" />
                                     </rich:column>
                                     <rich:column>
                                         <h:outputText value="#{item.deadline.time}">
-                                            <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                            <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                                         </h:outputText>
                                     </rich:column>
                                     <rich:column id="colPosition" sortBy="#{item.start}" sortOrder="ASCENDING">
@@ -141,7 +141,7 @@
                                         <h:outputText value="#{item.position}" />
                                     </rich:column>
                                     <rich:column>
-                                        <a4j:commandButton rendered="#{false}" styleClass="button mediumButton" value="#{msgs.planning_DETAILS}" reRender="frmAssignmentDetails" ajaxSingle="true">
+                                        <a4j:commandButton rendered="#{false}" styleClass="button mediumButton" value="#{i18n.Planning_DETAILS}" reRender="frmAssignmentDetails" ajaxSingle="true">
                                             <f:setPropertyActionListener target="#{planning.selectedAssignment}" value="#{item}" />
                                             <rich:componentControl for="mpAssignmentDetails" operation="show" event="oncomplete" />
                                         </a4j:commandButton>
@@ -157,44 +157,44 @@
                 <rich:modalPanel id="mpEditionDetails" autosized="true" domElementAttachment="parent" rendered="#{planning.selectedEdition != null}">
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{msgs.planning_EDITION_DETAILS}" />
+                            <h:outputText value="#{i18n.Planning_EDITION_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgEditionDetails" style="width: 480px;">
 
                         <rich:tabPanel switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
 
-                            <rich:tab id="tabEdition" label="#{msgs.planning_EDITION}">
+                            <rich:tab id="tabEdition" label="#{i18n.Planning_EDITION}">
                                 <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
-                                    <h:outputText value="#{msgs.planning_EDITION_OUTLET}:" />
+                                    <h:outputText value="#{i18n.Planning_EDITION_OUTLET}:" />
                                     <h:inputText styleClass="text mediumInput" value="#{planning.selectedEdition.outlet.title}" disabled="true" />
 
-                                    <h:outputText value="#{msgs.planning_EDITION_OPEN}:" />
+                                    <h:outputText value="#{i18n.Planning_EDITION_OPEN}:" />
                                     <h:selectBooleanCheckbox value="#{planning.selectedEdition.open}" />
 
-                                    <h:outputText value="#{msgs.planning_EDITION_PUBLICATION_DATE}:" />
-                                    <rich:calendar popup="true" value="#{planning.selectedEdition.publicationDate.time}" datePattern="#{msgs.FORMAT_DATE_AND_TIME}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}"/>
+                                    <h:outputText value="#{i18n.Planning_EDITION_PUBLICATION_DATE}:" />
+                                    <rich:calendar popup="true" value="#{planning.selectedEdition.publicationDate.time}" datePattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}"/>
 
-                                    <h:outputText value="#{msgs.planning_EDITION_EXPIRATION_DATE}:" />
-                                    <rich:calendar popup="true" value="#{planning.selectedEdition.expirationDate.time}" firstWeekDay="1" datePattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}"/>
+                                    <h:outputText value="#{i18n.Planning_EDITION_EXPIRATION_DATE}:" />
+                                    <rich:calendar popup="true" value="#{planning.selectedEdition.expirationDate.time}" firstWeekDay="1" datePattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}"/>
 
-                                    <h:outputText value="#{msgs.planning_EDITION_VOLUME}:" />
+                                    <h:outputText value="#{i18n.Planning_EDITION_VOLUME}:" />
                                     <rich:inputNumberSpinner value="#{planning.selectedEdition.volume}" styleClass="text" maxValue="9999" />
 
-                                    <h:outputText value="#{msgs.planning_EDITION_NUMBER}:" />
+                                    <h:outputText value="#{i18n.Planning_EDITION_NUMBER}:" />
                                     <rich:inputNumberSpinner value="#{planning.selectedEdition.number}" styleClass="text" maxValue="9999" />
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabEditionSections" label="#{msgs.planning_EDITION_SECTIONS}">
+                            <rich:tab id="tabEditionSections" label="#{i18n.Planning_EDITION_SECTIONS}">
                                 <h:panelGrid id="pgEditionSections" columnClasses="tabSheet" style="padding: 10px; width: 100%">
                                     <h:panelGrid columns="1" columnClasses="right" style="width: 100%">
                                         <h:column>
                                             <a4j:commandButton id="btnShowTemplate"
                                                                styleClass="button smallButton"
                                                                style="margin-right: 2px;"
-                                                               value="#{msgs.planning_TEMPLATES}"
-                                                               title="#{msgs.planning_TEMPLATES_TOOLTIP}"
+                                                               value="#{i18n.Planning_TEMPLATES}"
+                                                               title="#{i18n.Planning_TEMPLATES_TOOLTIP}"
                                                                reRender="frmEditionTemplateDetails"
                                                                limitToList="true">
                                                 <rich:componentControl for="mpEditionTemplateDetails"
@@ -204,8 +204,8 @@
 
                                             <a4j:commandButton id="btnNewSection"
                                                                styleClass="button smallButton"
-                                                               value="#{msgs.planning_EDITION_SECTION_NEW}"
-                                                               title="#{msgs.planning_EDITION_SECTION_NEW_TOOLTIP}"
+                                                               value="#{i18n.Planning_EDITION_SECTION_NEW}"
+                                                               title="#{i18n.Planning_EDITION_SECTION_NEW_TOOLTIP}"
                                                                actionListener="#{planning.onNewEditionSection}"
                                                                reRender="frmEditionSectionDetails"
                                                                limitToList="true">
@@ -234,19 +234,19 @@
                                                 <f:setPropertyActionListener value="#{section}"
                                                                              target="#{planning.selectedEditionSection}" />
                                                 <h:graphicImage value="/images/icons/section.gif"
-                                                                alt="#{msgs.EDITION_TEMPLATE_SECTION}"
-                                                                title="#{msgs.EDITION_TEMPLATE_SECTION}"
+                                                                alt="#{i18n.Planning_EDITION_TEMPLATE_SECTION}"
+                                                                title="#{i18n.Planning_EDITION_TEMPLATE_SECTION}"
                                                                 rendered="#{!section.advertisement}" />
                                                 <h:graphicImage value="/images/icons/section_advertisement.png"
-                                                                alt="#{msgs.EDITION_TEMPLATE_SECTION_ADVERTISEMENT}"
-                                                                title="#{msgs.EDITION_TEMPLATE_SECTION_ADVERTISEMENT}"
+                                                                alt="#{i18n.Planning_EDITION_TEMPLATE_SECTION_ADVERTISEMENT}"
+                                                                title="#{i18n.Planning_EDITION_TEMPLATE_SECTION_ADVERTISEMENT}"
                                                                 rendered="#{section.advertisement}" />
                                             </a4j:commandLink>
                                         </rich:column>
                                         <rich:column sortBy="#{section.name}">
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.planning_EDITION_SECTION_NAME}"
-                                                              title="#{msgs.planning_EDITION_SECTION_NAME_TOOLTIP}" />
+                                                <h:outputText value="#{i18n.Planning_EDITION_SECTION_NAME}"
+                                                              title="#{i18n.Planning_EDITION_SECTION_NAME_TOOLTIP}" />
                                             </f:facet>
                                             <a4j:commandLink reRender="frmEditionSectionDetails"
                                                              limitToList="true">
@@ -262,15 +262,15 @@
                                         </rich:column>
                                         <rich:column id="colStart" sortBy="#{section.start}"  sortOrder="ASCENDING">
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.planning_EDITION_SECTION_START}"
-                                                              title="#{msgs.planning_EDITION_SECTION_START_TOOLTIP}" />
+                                                <h:outputText value="#{i18n.Planning_EDITION_SECTION_START}"
+                                                              title="#{i18n.Planning_EDITION_SECTION_START_TOOLTIP}" />
                                             </f:facet>
                                             <h:outputText value="#{section.start}" />
                                         </rich:column>
                                         <rich:column id="colEnd" sortBy="#{section.end}"  sortOrder="ASCENDING">
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.planning_EDITION_SECTION_END}"
-                                                              title="#{msgs.planning_EDITION_SECTION_END_TOOLTIP}" />
+                                                <h:outputText value="#{i18n.Planning_EDITION_SECTION_END}"
+                                                              title="#{i18n.Planning_EDITION_SECTION_END_TOOLTIP}" />
                                             </f:facet>
                                             <h:outputText value="#{section.end}" />
                                         </rich:column>
@@ -280,22 +280,22 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveEdition" styleClass="dialogButton" value="#{msgs.SAVE}" actionListener="#{planning.onSaveEdition}" reRender="frmPage">
+                            <a4j:commandLink id="lnkSaveEdition" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{planning.onSaveEdition}" reRender="frmPage">
                                 <rich:componentControl for="mpEditionDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
 
                             <a4j:commandLink id="lnkApplyEdition"
                                              styleClass="dialogButton"
-                                             value="#{msgs.APPLY}"
+                                             value="#{i18n.Generic_APPLY}"
                                              actionListener="#{planning.onSaveEdition}"
                                              reRender="pgEditionDetails, frmPage" />
 
                             <a4j:commandLink id="lnkDeleteEdition"
                                              rendered="#{planning.editionEditMode}"
-                                             onclick="if (confirm('#{msgs.planning_EDITION_PROMPT_DELETE}') != true){ return false; };"
+                                             onclick="if (confirm('#{i18n.Planning_EDITION_PROMPT_DELETE}') != true){ return false; };"
                                              actionListener="#{planning.onDeleteEdition}"
                                              styleClass="dialogButton"
-                                             value="#{msgs.DELETE}"
+                                             value="#{i18n.Generic_DELETE}"
                                              reRender="frmPage">
                                 <rich:componentControl for="mpEditionDetails"
                                                        operation="hide"
@@ -305,7 +305,7 @@
 
                             <h:commandLink id="lnkCloseOutletForm"
                                            styleClass="dialogButton"
-                                           value="#{msgs.CLOSE}"
+                                           value="#{i18n.Generic_CLOSE}"
                                            onclick="#{rich:component('mpEditionDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
@@ -317,30 +317,30 @@
                 <rich:modalPanel id="mpEditionSectionDetails" autosized="true" domElementAttachment="parent" rendered="#{planning.selectedEditionSection != null}">
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{msgs.planning_EDITION_SECTION_DETAILS}" />
+                            <h:outputText value="#{i18n.Planning_EDITION_SECTION_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgEditionSectionDetails" style="width: 480px;">
 
                         <rich:tabPanel switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
 
-                            <rich:tab id="tabEditionSection" label="#{msgs.planning_EDITION_SECTION}">
+                            <rich:tab id="tabEditionSection" label="#{i18n.Planning_EDITION_SECTION}">
                                 <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
-                                    <h:outputText value="#{msgs.planning_EDITION_SECTION_NAME}:" />
+                                    <h:outputText value="#{i18n.Planning_EDITION_SECTION_NAME}:" />
                                     <h:inputText id="txtEditionSectionName" value="#{planning.selectedEditionSection.name}"
                                                  styleClass="text mediumInput"
-                                                 title="#{msgs.planning_EDITION_SECTION_NAME_TOOLTIP}" />
+                                                 title="#{i18n.Planning_EDITION_SECTION_NAME_TOOLTIP}" />
 
-                                    <h:outputText value="#{msgs.planning_EDITION_SECTION_DESCRIPTION}:" />
+                                    <h:outputText value="#{i18n.Planning_EDITION_SECTION_DESCRIPTION}:" />
                                     <h:inputTextarea id="txtEditionSectionDescription"
                                                      value="#{planning.selectedEditionSection.description}"
                                                      styleClass="text mediumInput"
-                                                     title="#{msgs.planning_EDITION_SECTION_DETAILS_TOOLTIP}" />
+                                                     title="#{i18n.Planning_EDITION_SECTION_DETAILS_TOOLTIP}" />
 
-                                    <h:outputText value="#{msgs.planning_EDITION_SECTION_START}:" />
+                                    <h:outputText value="#{i18n.Planning_EDITION_SECTION_START}:" />
                                     <rich:inputNumberSpinner value="#{planning.selectedEditionSection.start}" styleClass="text" />
 
-                                    <h:outputText value="#{msgs.planning_EDITION_SECTION_END}:" />
+                                    <h:outputText value="#{i18n.Planning_EDITION_SECTION_END}:" />
                                     <rich:inputNumberSpinner value="#{planning.selectedEditionSection.end}" styleClass="text" />
                                 </h:panelGrid>
                             </rich:tab>
@@ -350,7 +350,7 @@
 
                             <a4j:commandLink id="lnkSaveEditionSection"
                                              styleClass="dialogButton"
-                                             value="#{msgs.SAVE}"
+                                             value="#{i18n.Generic_SAVE}"
                                              actionListener="#{planning.onSaveEditionSection}"
                                              reRender="pgEditionSections"
                                              limitToList="true">
@@ -361,17 +361,17 @@
 
                             <a4j:commandLink id="lnkApplyEditionSection"
                                              styleClass="dialogButton"
-                                             value="#{msgs.APPLY}"
+                                             value="#{i18n.Generic_APPLY}"
                                              actionListener="#{planning.onSaveEditionSection}"
                                              reRender="pgEditionSections, pgEditionSectionDetails"
                                              limitToList="true" />
 
                             <a4j:commandLink id="lnkDeleteEditionSection"
                                              rendered="#{planning.editionSectionEditMode}"
-                                             onclick="if (confirm('#{msgs.planning_EDITION_SECTION_PROMPT_DELETE}') != true){ return false; };"
+                                             onclick="if (confirm('#{i18n.Planning_EDITION_SECTION_PROMPT_DELETE}') != true){ return false; };"
                                              actionListener="#{planning.onDeleteEditionSection}"
                                              styleClass="dialogButton"
-                                             value="#{msgs.DELETE}"
+                                             value="#{i18n.Generic_DELETE}"
                                              reRender="pgEditionSections"
                                              limitToList="true">
                                 <rich:componentControl for="mpEditionSectionDetails"
@@ -382,7 +382,7 @@
 
                             <h:commandLink id="lnkCloseEditionSectionForm"
                                            styleClass="dialogButton"
-                                           value="#{msgs.CANCEL}"
+                                           value="#{i18n.Generic_CANCEL}"
                                            onclick="#{rich:component('mpEditionSectionDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
@@ -394,14 +394,14 @@
                 <rich:modalPanel id="mpEditionTemplateDetails" autosized="true" domElementAttachment="parent" rendered="#{planning.selectedEdition != null}">
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{msgs.planning_EDITION_TEMPLATES}" />
+                            <h:outputText value="#{i18n.Planning_EDITION_TEMPLATES}" />
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgEditionTemplateDetails" style="width: 480px;">
 
                         <rich:tabPanel switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
 
-                            <rich:tab id="tabEditionTemplate" label="#{msgs.planning_EDITION_TEMPLATES}">
+                            <rich:tab id="tabEditionTemplate" label="#{i18n.Planning_EDITION_TEMPLATES}">
                                 <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
                                     <h:selectOneMenu id="selTemplates" value="#{planning.selectedEditionTemplate}" styleClass="text mediumInput" converter="#{converters.editionTemplateConverter}">
                                         <f:selectItem itemLabel="" />
@@ -420,33 +420,33 @@
                                         <rich:column>
                                             <f:facet name="header">&#160;</f:facet>
                                             <h:graphicImage value="/images/icons/section.gif"
-                                                            alt="#{msgs.EDITION_TEMPLATE_SECTION}"
-                                                            title="#{msgs.EDITION_TEMPLATE_SECTION}"
+                                                            alt="#{i18n.Planning_EDITION_TEMPLATE_SECTION}"
+                                                            title="#{i18n.Planning_EDITION_TEMPLATE_SECTION}"
                                                             rendered="#{!section.advertisement}" />
                                             <h:graphicImage value="/images/icons/section_advertisement.png"
-                                                            alt="#{msgs.EDITION_TEMPLATE_SECTION_ADVERTISEMENT}"
-                                                            title="#{msgs.EDITION_TEMPLATE_SECTION_ADVERTISEMENT}"
+                                                            alt="#{i18n.Planning_EDITION_TEMPLATE_SECTION_ADVERTISEMENT}"
+                                                            title="#{i18n.Planning_EDITION_TEMPLATE_SECTION_ADVERTISEMENT}"
                                                             rendered="#{section.advertisement}" />
                                         </rich:column>
                                         <rich:column sortBy="#{section.name}">
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.planning_EDITION_SECTION_NAME}"
-                                                              title="#{msgs.planning_EDITION_SECTION_NAME_TOOLTIP}" />
+                                                <h:outputText value="#{i18n.Planning_EDITION_SECTION_NAME}"
+                                                              title="#{i18n.Planning_EDITION_SECTION_NAME_TOOLTIP}" />
                                             </f:facet>
                                             <h:outputText value="#{section.name}"
                                                           title="#{section.description}" />
                                         </rich:column>
                                         <rich:column id="colStart" sortBy="#{section.start}" sortOrder="ASCENDING">
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.planning_EDITION_SECTION_START}"
-                                                              title="#{msgs.planning_EDITION_SECTION_START_TOOLTIP}" />
+                                                <h:outputText value="#{i18n.Planning_EDITION_SECTION_START}"
+                                                              title="#{i18n.Planning_EDITION_SECTION_START_TOOLTIP}" />
                                             </f:facet>
                                             <h:outputText value="#{section.start}" />
                                         </rich:column>
                                         <rich:column id="colEnd" sortBy="#{section.end}"  sortOrder="ASCENDING">
                                             <f:facet name="header">
-                                                <h:outputText value="#{msgs.planning_EDITION_SECTION_END}"
-                                                              title="#{msgs.planning_EDITION_SECTION_END_TOOLTIP}" />
+                                                <h:outputText value="#{i18n.Planning_EDITION_SECTION_END}"
+                                                              title="#{i18n.Planning_EDITION_SECTION_END_TOOLTIP}" />
                                             </f:facet>
                                             <h:outputText value="#{section.end}" />
                                         </rich:column>
@@ -457,10 +457,10 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkUseTemplate" styleClass="dialogButton" value="#{msgs.planning_EDITION_USE_TEMPLATE}" title="#{msgs.planning_EDITION_USE_TEMPLATE_TOOLTIP}" actionListener="#{planning.onUseEditionTemplate}" reRender="pgEditionSections">
+                            <a4j:commandLink id="lnkUseTemplate" styleClass="dialogButton" value="#{i18n.Planning_EDITION_USE_TEMPLATE}" title="#{i18n.Planning_EDITION_USE_TEMPLATE_TOOLTIP}" actionListener="#{planning.onUseEditionTemplate}" reRender="pgEditionSections">
                                 <rich:componentControl for="mpEditionTemplateDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
-                            <h:commandLink id="lnkCloseTemplates" styleClass="dialogButton" value="#{msgs.CANCEL}" onclick="#{rich:component('mpEditionTemplateDetails')}.hide(); return false;" />
+                            <h:commandLink id="lnkCloseTemplates" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpEditionTemplateDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
 

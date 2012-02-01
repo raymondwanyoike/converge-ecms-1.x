@@ -9,7 +9,7 @@
       xmlns:converge="http://com.interactivemediamanagement.converge/tags">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <title><ui:insert name="title" />&#160;-&#160;#{msgs.APPLICATION_TITLE}</title>
+        <title><ui:insert name="title" />&#160;-&#160;#{i18n.Generic_APPLICATION_TITLE}</title>
         <link rel="shortcut icon" href="#{facesContext.externalContext.request.contextPath}/favicon.ico" />
         <link rel="stylesheet" href="#{facesContext.externalContext.request.contextPath}/css/template.css" type="text/css" />
         <script type="text/javascript" src="#{facesContext.externalContext.request.contextPath}/scripts/windowutils.js"></script>
@@ -48,7 +48,7 @@
             <div id="subheader_spacer">
                 <div class="subheader_tabs" onclick="window.location.href = '#{facesContext.externalContext.request.contextPath}/logout.jsp';" style="z-index: 2;">
                     <div class="left"></div>
-                    <div class="middle">#{msgs.SIGN_OUT}</div>
+                    <div class="middle">#{i18n.Unauthorised_SIGN_OUT}</div>
                     <div class="right"></div>
                 </div>
             </div>
