@@ -85,7 +85,7 @@
 
                                 <rich:column sortBy="#{assignment.id}" styleClass="right columnId #{rowStyle}" headerClass="columnId">
                                     <f:facet name="header">
-                                        <h:outputText value="#{i18n.Generic_ID}" title="#{i18n.Editions_ARTICLE_ID_TOOLTIP}" />
+                                        <h:outputText value="#{i18n.Editions_NEWS_ITEM_ID}" title="#{i18n.Editions_ARTICLE_ID_TOOLTIP}" />
                                     </f:facet>
                                     <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml">
                                         <f:param value="#{assignment.id}" name="id" />

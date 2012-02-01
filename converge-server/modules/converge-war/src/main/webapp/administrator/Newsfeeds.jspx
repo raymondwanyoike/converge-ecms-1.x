@@ -45,7 +45,7 @@
 
                         <rich:column id="colId" styleClass="right columnId" sortBy="#{newsfeed.id}">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.Generic_ID}" />
+                                <h:outputText value="#{i18n.administrator_Newsfeeds_NEWSWIRE_ID}" />
                             </f:facet>
                             <a4j:commandLink reRender="frmNewsfeedDetails">
                                 <rich:componentControl event="oncomplete" operation="show" for="mpNewsfeedDetails" />

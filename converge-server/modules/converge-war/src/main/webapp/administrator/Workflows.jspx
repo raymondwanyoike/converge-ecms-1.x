@@ -34,7 +34,7 @@
 
                         <rich:column sortBy="#{workflow.id}" styleClass="right columnId">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.Generic_ID}" title="#{i18n.Workflows_ID_TOOLTIP}" />
+                                <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_ID}" title="#{i18n.Workflows_ID_TOOLTIP}" />
                             </f:facet>
                             <a4j:commandLink reRender="mpWorkflowDetails" ajaxSingle="true" oncomplete="#{rich:component('mpWorkflowDetails')}.show()">
                                 <f:setPropertyActionListener target="#{administrator_Workflows.selectedTab}" value="tabWorkflow" />

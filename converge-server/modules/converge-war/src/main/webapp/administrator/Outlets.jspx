@@ -40,7 +40,7 @@
 
                         <rich:column styleClass="right columnId" sortBy="#{outlet.id}">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.Generic_ID}" title="#{i18n.Outlets_ID_TOOLTIP}" />
+                                <h:outputText value="#{i18n.administrator_Outlets_OUTLET_ID}" title="#{i18n.Outlets_ID_TOOLTIP}" />
                             </f:facet>
                             <a4j:commandLink reRender="frmOutletDetails" ajaxSingle="true">
                                 <f:setPropertyActionListener value="#{outlet}" target="#{administrator_Outlets.selectedOutlet}" />
@@ -192,7 +192,7 @@
 
                                         <rich:column styleClass="left" sortBy="#{section.id}">
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Generic_ID}" />
+                                                <h:outputText value="#{i18n.administrator_Outlets_SECTION_ID}" />
                                             </f:facet>
                                             <h:outputText value="#{section.id}" />
                                         </rich:column>

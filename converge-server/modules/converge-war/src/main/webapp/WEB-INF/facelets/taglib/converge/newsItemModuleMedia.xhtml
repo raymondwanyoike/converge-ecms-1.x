@@ -2,7 +2,7 @@
 
     <c:if test="#{newsItem.fieldVisible['MEDIA']}">
 
-        <converge:moduleHeader moduleTitle="#{msgs.newsitem_MEDIA_FILES}" />
+        <converge:moduleHeader moduleTitle="#{i18n.NewsItem_MEDIA_FILES}" />
         <div class="moduleContent">
 
             <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%" rendered="#{newsItem.currentActor &amp;&amp; !newsItem.readOnly}">
@@ -11,7 +11,7 @@
                                    oncomplete="#{rich:component('mpMediaFileUpload')}.show();#{rich:element('frmNewsItem:txtSearchKeyword')}.focus()" />
             </h:panelGrid>
 
-            <rich:dataGrid id="dtMediaFiles" value="#{value.selectedNewsItem.mediaAttachments}" var="attachment" columns="#{newsItem.numberOfMediaAttachmentsColumns}" columnClasses="colMediaAttachment"> 
+            <rich:dataGrid id="dtMediaFiles" value="#{newsItem.selectedNewsItem.mediaAttachments}" var="attachment" columns="#{newsItem.numberOfMediaAttachmentsColumns}" columnClasses="colMediaAttachment"> 
                 <h:panelGrid style="width:100%;">
                     <h:panelGroup layout="block">
                         <h:panelGroup layout="block" style="float: left; font-size: smaller; padding: 4px; margin:4px; font-weight: bold; background: #dddddd; text-align: center; width: 15px; border: 1px solid #ccc;">
@@ -22,9 +22,9 @@
                             </rich:inplaceInput>
                         </h:panelGroup>
                         <h:panelGroup layout="block" style="float: right; width: 20px; padding: 4px; margin:4px;">
-                            <a4j:commandLink onclick="if (confirm('#{msgs.newsitem_CONFIRM_REMOVE_ATTACHMENT}') != true){ return false; };" ajaxSingle="true" reRender="dtMediaFiles">
+                            <a4j:commandLink onclick="if (confirm('#{i18n.NewsItem_CONFIRM_REMOVE_ATTACHMENT}') != true){ return false; };" ajaxSingle="true" reRender="dtMediaFiles">
                                 <f:setPropertyActionListener target="#{newsItem.deleteMediaItem}" value="#{attachment}" />
-                                <h:graphicImage url="#{res.REMOVE_ICON}"  />
+                                <h:graphicImage url="#{i18n.resource_ICON_REMOVE}"  />
                             </a4j:commandLink>
                         </h:panelGroup>
                     </h:panelGroup>
@@ -94,7 +94,7 @@
                         <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_ID}" />
                         <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{attachment.mediaItem.id}">
                             <h:outputText value="#{attachment.mediaItem.id}">
-                                <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                                <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
                             </h:outputText>
                         </h:outputLink>
                         
@@ -123,15 +123,15 @@
                 <h:panelGrid style="width: 480px;">
                     <rich:tabPanel id="tpMediaFileUpload" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
 
-                        <rich:tab label="#{msgs.SEARCH}">
+                        <rich:tab label="#{i18n.NewsItem_MEDIA_ITEM_SEARCH}">
                             <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                 <h:panelGroup>
                                     <h:inputText id="txtSearchKeyword" styleClass="text" value="#{value.keyword}" title="" style="width: 350px;" />
-                                    <a4j:commandButton type="submit" styleClass="button dynamicButton" style="margin-left: 10px;" value="#{msgs.search_SEARCH}" actionListener="#{value.onSearch}" reRender="pgResults" />
+                                    <a4j:commandButton type="submit" styleClass="button dynamicButton" style="margin-left: 10px;" value="#{i18n.NewsItem_MEDIA_ITEM_SEARCH_BUTTON_LABEL}" actionListener="#{value.onSearch}" reRender="pgResults" />
                                 </h:panelGroup>
 
                                 <h:panelGroup id="pgResults" layout="block" styleClass="scrollableContent">
-                                    <h:outputFormat value="#{msgs.search_X_RESULTS_FOUND}" rendered="#{value.searchResults.rowCount &gt; -1}">
+                                    <h:outputFormat value="#{i18n.NewsItem_MEDIA_ITEM_SEARCH_X_RESULTS_FOUND}" rendered="#{value.searchResults.rowCount &gt; -1}">
                                         <f:param value="#{newsItem.lastSearch.numberOfResults}" />
                                         <f:param value="#{newsItem.lastSearch.searchTimeInSeconds}" />
                                         <f:param value="#{newsItem.lastSearch.numberOfPages}" />
@@ -150,18 +150,18 @@
 
                                                     <h:outputText value="#{item.description}" escape="false" /><br/>
                                                     <span class="searchResultDescription">#{item.note}</span><br/>
-                                                    <span class="searchResultDate">#{msgs.DATE}:&#160;
+                                                    <span class="searchResultDate">#{i18n.NewsItem_MEDIA_ITEM_SEARCH_RESULT_DATE}:&#160;
                                                         <h:outputText value="#{item.earliestDate}" rendered="#{item.earliestDate != null}">
-                                                            <f:convertDateTime pattern="#{msgs.FORMAT_DATE}" timeZone="#{userSession.user.timeZone}" />
+                                                            <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE}" timeZone="#{userSession.user.timeZone}" />
                                                         </h:outputText>
-                                                        <h:outputText value="#{msgs.UNKNOWN}" rendered="#{item.earliestDate == null}" />
+                                                        <h:outputText value="#{i18n.NewsItem_MEDIA_ITEM_SEARCH_RESULT_DATE_UNKNOWN}" rendered="#{item.earliestDate == null}" />
                                                     </span>
                                                 </h:column>
                                             </h:panelGrid>
                                         </rich:column>
 
                                         <rich:column>
-                                            <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.SELECT}" reRender="pgMediaItemSelected" ajaxSingle="true">
+                                            <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.NewsItem_MEDIA_ITEM_SEARCH_RESULT_SELECT}" reRender="pgMediaItemSelected" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{newsItem.selectedMediaItemId}" value="#{item.id}" />
                                                 <rich:componentControl for="mpMediaItemSelected" operation="show" event="oncomplete" />
                                             </a4j:commandButton>
@@ -199,16 +199,16 @@
                                                      autoclear="true"
                                                      fileUploadListener="#{newsItem.onUploadMediaItem}"
                                                      ajaxSingle="true"
-                                                     addControlLabel="#{msgs.news_item_MEDIA_ITEM_UPLOAD}"
+                                                     addControlLabel="#{i18n.NewsItem_MEDIA_FILE_UPLOAD_BROWSE}"
                                                      rendered="#{newsItem.selectedCatalogue != null}">
                                         <a4j:support event="onuploadcomplete" reRender="pgMediaItemUpload,pgMediaPreview" limitToList="true" />
                                         <f:facet name="label">
-                                            <h:outputText value="#{msgs.media_item_rendition_UPLOAD_INDICATOR}" />
+                                            <h:outputText value="#{i18n.NewsItem_MEDIA_FILE_UPLOAD_INDICATOR}" />
                                         </f:facet>
                                     </rich:fileUpload>
                                 </h:panelGrid>
 
-                                <a4j:commandButton styleClass="button dynamicButton" value="#{msgs.MEDIA_ITEM_UPLOAD_SELECT}" reRender="pgMediaItemSelected,pgMediaItemUpload" ajaxSingle="true" rendered="#{newsItem.userSubmission.id != null}">
+                                <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.NewsItem_MEDIA_FILE_USE_UPLOADED_FILE}" reRender="pgMediaItemSelected,pgMediaItemUpload" ajaxSingle="true" rendered="#{newsItem.userSubmission.id != null}">
                                     <f:setPropertyActionListener target="#{newsItem.selectedMediaItemId}" value="#{newsItem.userSubmission.id}" />
                                     <rich:componentControl for="mpMediaItemSelected" operation="show" event="oncomplete" />
                                 </a4j:commandButton>
@@ -217,7 +217,7 @@
                     </rich:tabPanel>
 
                     <h:panelGroup styleClass="dialogueButtons">
-                        <h:commandLink id="lnkCloseMediaAttachmentDetails" styleClass="dialogButton" value="#{msgs.CLOSE}" onclick="#{rich:component('mpMediaFileUpload')}.hide(); return false;" />
+                        <h:commandLink id="lnkCloseMediaAttachmentDetails" styleClass="dialogButton" value="#{i18n.Generic_CLOSE}" onclick="#{rich:component('mpMediaFileUpload')}.hide(); return false;" />
                     </h:panelGroup>
                 </h:panelGrid>
 
@@ -227,7 +227,7 @@
                 <rich:modalPanel id="mpMediaItemSelected" autosized="true" domElementAttachment="parent" rendered="#{newsItem.selectedAttachment != null}">
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{msgs.newsitem_MEDIA_ATTACHMENT_DETAILS}"></h:outputText>
+                            <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_DETAILS}"></h:outputText>
                         </h:panelGroup>
                     </f:facet>
                     <f:facet name="controls">
