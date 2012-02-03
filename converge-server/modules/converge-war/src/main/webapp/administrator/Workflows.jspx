@@ -16,7 +16,7 @@
                 <converge:moduleHeader moduleTitle="#{i18n.administrator_Workflows_PAGE_TITLE}" />
                 <div class="moduleContent">
                     <h:panelGrid columns="1" columnClasses="right" style="width: 100%">
-                        <a4j:commandButton id="btnNewWorkflow" actionListener="#{administrator_Workflows.onNewWorkflow}" reRender="mpWorkflowDetails" ajaxSingle="true" styleClass="button dynamicButton" value="#{i18n.administrator_Workflows_NEW_WORKFLOW}" title="#{i18n.administrator_Workflows_NEW_WORKFLOW_TOOLTIP}" oncomplete="#{rich:component('mpWorkflowDetails')}.show()">
+                        <a4j:commandButton id="btnNewWorkflow" actionListener="#{administrator_Workflows.onNewWorkflow}" reRender="mpWorkflowDetails" ajaxSingle="true" styleClass="button dynamicButton" value="#{i18n.administrator_Workflows_WORKFLOW_NEW}" title="#{i18n.administrator_Workflows_WORKFLOW_NEW_TOOLTIP}" oncomplete="#{rich:component('mpWorkflowDetails')}.show()">
                             <f:setPropertyActionListener target="#{administrator_Workflows.selectedTab}" value="tabWorkflow" />
                         </a4j:commandButton>
                     </h:panelGrid>
@@ -28,13 +28,13 @@
                             <a4j:commandLink reRender="mpWorkflowDetails" ajaxSingle="true" oncomplete="#{rich:component('mpWorkflowDetails')}.show()">
                                 <f:setPropertyActionListener target="#{administrator_Workflows.selectedTab}" value="tabWorkflow" />
                                 <f:setPropertyActionListener value="#{workflow}" target="#{administrator_Workflows.selected}" />
-                                <h:graphicImage alt="#{i18n.Workflows_WORKFLOW}" title="#{i18n.Workflows_WORKFLOW}" value="/images/icons/workflow.gif" />
+                                <h:graphicImage alt="#{i18n.administrator_Workflows_WORKFLOW}" title="#{i18n.administrator_Workflows_WORKFLOW}" value="/images/icons/workflow.gif" />
                             </a4j:commandLink>
                         </rich:column>
 
                         <rich:column sortBy="#{workflow.id}" styleClass="right columnId">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_ID}" title="#{i18n.Workflows_ID_TOOLTIP}" />
+                                <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_ID}" title="#{i18n.administrator_Workflows_WORKFLOW_ID_TOOLTIP}" />
                             </f:facet>
                             <a4j:commandLink reRender="mpWorkflowDetails" ajaxSingle="true" oncomplete="#{rich:component('mpWorkflowDetails')}.show()">
                                 <f:setPropertyActionListener target="#{administrator_Workflows.selectedTab}" value="tabWorkflow" />
@@ -47,17 +47,17 @@
 
                         <rich:column sortBy="#{workflow.name}">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.Workflows_NAME}" title="#{i18n.Workflows_NAME_TOOLTIP}" />
+                                <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_NAME}" title="#{i18n.administrator_Workflows_WORKFLOW_NAME_TOOLTIP}" />
                             </f:facet>
                             <h:outputText value="#{workflow.name}" title="#{worlflow.description}" />
                         </rich:column>
 
                         <rich:column sortBy="#{workflow.valid}">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.Workflows_WORKFLOW_VALID}" title="#{i18n.Workflows_WORKFLOW_VALID_TOOLTIP}" />
+                                <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_VALID}" title="#{i18n.administrator_Workflows_WORKFLOW_VALID_TOOLTIP}" />
                             </f:facet>
-                            <h:outputText value="#{i18n.Workflows_WORKFLOW_VALID_VALID}" rendered="#{workflow.valid}" style="color: green; font-weight: bold;" />
-                            <h:outputText value="#{i18n.Workflows_WORKFLOW_VALID_INVALID}" rendered="#{!workflow.valid}" style="color: red; font-weight: bold;" />
+                            <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_VALID_VALID}" rendered="#{workflow.valid}" style="color: green; font-weight: bold;" />
+                            <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_VALID_INVALID}" rendered="#{!workflow.valid}" style="color: red; font-weight: bold;" />
                         </rich:column>
                             
                     </rich:dataTable>
@@ -69,7 +69,7 @@
                 <rich:modalPanel id="mpWorkflowDetails" autosized="true" domElementAttachment="parent" >
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{i18n.Workflows_DETAILS}" />
+                            <h:outputText value="#{i18n.administrator_Workflows_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
                     <f:facet name="controls">
@@ -83,22 +83,22 @@
 
                         <rich:tabPanel id="tpWorkflow" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive" selectedTab="#{administrator_Workflows.selectedTab}">
 
-                            <rich:tab id="tabWorkflow" label="#{i18n.Workflows_WORKFLOW}">
+                            <rich:tab id="tabWorkflow" label="#{i18n.administrator_Workflows_WORKFLOW}">
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
-                                    <h:outputText value="#{i18n.Workflows_NAME}:" />
-                                    <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_Workflows.selected.name}" title="#{i18n.Workflows_NAME_TOOLTIP}" required="true" requiredMessage="#{i18n.Workflows_NAME_REQUIRED}"/>
+                                    <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_NAME}:" />
+                                    <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_Workflows.selected.name}" title="#{i18n.administrator_Workflows_WORKFLOW_NAME_TOOLTIP}" required="true" requiredMessage="#{i18n.administrator_Workflows_WORKFLOW_NAME_REQUIRED}"/>
 
-                                    <h:outputText value="#{i18n.Workflows_DESCRIPTION}:" />
-                                    <h:inputTextarea id="txtDescription" styleClass="text mediumTextArea" value="#{administrator_Workflows.selected.description}" title="#{i18n.Workflows_DESCRIPTION_TOOLTIP}" />
+                                    <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_DESCRIPTION}:" />
+                                    <h:inputTextarea id="txtDescription" styleClass="text mediumTextArea" value="#{administrator_Workflows.selected.description}" title="#{i18n.administrator_Workflows_WORKFLOW_DESCRIPTION_TOOLTIP}" />
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabProcess" label="#{i18n.Workflows_PROCESS}" disabled="#{administrator_Workflows.addMode}">
+                            <rich:tab id="tabProcess" label="#{i18n.administrator_Workflows_PROCESS}" disabled="#{administrator_Workflows.addMode}">
                                 <h:panelGrid id="pgWorkflowDetailsProcess" columnClasses="tabSheet" style="padding: 10px; width: 100%">
 
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                                         <h:outputText value="" />
-                                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.Workflows_STATE_NEW}" title="#{i18n.Workflows_STATE_NEW_TOOLTIP}" reRender="mpWorkflowStateDetails" ajaxSingle="true" actionListener="#{administrator_Workflows.onNewWorkflowState}">
+                                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.administrator_Workflows_STATE_NEW}" title="#{i18n.administrator_Workflows_STATE_NEW_TOOLTIP}" reRender="mpWorkflowStateDetails" ajaxSingle="true" actionListener="#{administrator_Workflows.onNewWorkflowState}">
                                             <f:setPropertyActionListener target="#{administrator_Workflows.selectedWorkflowStateTab}" value="tabWorkflowState" />
                                             <rich:componentControl for="mpWorkflowStateDetails" operation="show" event="oncomplete" />
                                         </a4j:commandButton>
@@ -115,12 +115,12 @@
                                                 <f:setPropertyActionListener target="#{administrator_Workflows.selectedWorkflowState}" value="#{state}" />
                                                 <f:setPropertyActionListener target="#{administrator_Workflows.selectedWorkflowStateTab}" value="tabWorkflowState" />
                                                 <rich:componentControl for="mpWorkflowStateDetails" operation="show" event="oncomplete" />
-                                                <h:graphicImage value="/images/icons/workflow_step.png" alt="#{i18n.Workflows_STATE}" title="#{i18n.Workflows_STATE}" />
+                                                <h:graphicImage value="/images/icons/workflow_step.png" alt="#{i18n.administrator_Workflows_STATE}" title="#{i18n.administrator_Workflows_STATE}" />
                                             </a4j:commandLink>
                                         </rich:column>
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_STATE_NAME}" title="#{i18n.Workflows_STATE_NAME_TOOLTIP}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_STATE_NAME}" title="#{i18n.administrator_Workflows_STATE_NAME_TOOLTIP}" />
                                             </f:facet>
                                             <a4j:commandLink reRender="mpWorkflowStateDetails" ajaxSingle="true">
                                                 <f:setPropertyActionListener value="#{state}" target="#{administrator_Workflows.selectedWorkflowState}" />
@@ -131,16 +131,16 @@
                                         </rich:column>
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_STATE_TYPE}"
-                                                              title="#{i18n.Workflows_STATE_TYPE_TOOLTIP}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_STATE_TYPE}"
+                                                              title="#{i18n.administrator_Workflows_STATE_TYPE_TOOLTIP}" />
                                             </f:facet>
                                             <c:set var="key" value="WORKFLOW_STATE_TYPE_#{state.type}" />
                                             <h:outputText value="#{msgs[key]}" />
                                         </rich:column>
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_STATE_ACTOR}"
-                                                              title="#{i18n.Workflows_STATE_ACTOR_TOOLTIP}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_STATE_ACTOR}"
+                                                              title="#{i18n.administrator_Workflows_STATE_ACTOR_TOOLTIP}" />
                                             </f:facet>
                                             <c:set var="permissionKey" value="WORKFLOW_STATE_PERMISSION_#{state.permission}" />
                                             <h:outputText value="#{msgs[permissionKey]} - " />
@@ -148,8 +148,8 @@
                                         </rich:column>
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_STATE_OPTIONS}"
-                                                              title="#{i18n.Workflows_STATE_OPTIONS_TOOLTIP}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_STATE_OPTIONS}"
+                                                              title="#{i18n.administrator_Workflows_STATE_OPTIONS_TOOLTIP}" />
                                             </f:facet>
                                             <h:outputText value="#{state.numberOfOptions}" />
                                         </rich:column>
@@ -174,7 +174,7 @@
 
                             <a4j:commandLink id="lnkDelete"
                                              rendered="#{administrator_Workflows.editMode}"
-                                             onclick="if (confirm('#{i18n.Workflows_PROMPT_DELETE}') != true){ return false; };"
+                                             onclick="if (confirm('#{i18n.administrator_Workflows_WORKFLOW_DELETE_PROMPT}') != true){ return false; };"
                                              actionListener="#{administrator_Workflows.onDeleteWorkflow}"
                                              styleClass="dialogButton"
                                              value="#{i18n.Generic_DELETE}"
@@ -200,7 +200,7 @@
                 <rich:modalPanel id="mpWorkflowStateDetails" autosized="true" domElementAttachment="parent" >
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{i18n.Workflows_STATE_DETAILS}" />
+                            <h:outputText value="#{i18n.administrator_Workflows_STATE_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
                     <f:facet name="controls">
@@ -220,37 +220,37 @@
                                        width="505"
                                        >
 
-                            <rich:tab id="tabWorkflowState" label="#{i18n.Workflows_STATE}">
+                            <rich:tab id="tabWorkflowState" label="#{i18n.administrator_Workflows_STATE}">
                                 <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
                                     <h:column>
-                                        <h:outputText value="#{i18n.Workflows_STATE_NAME}:" />
+                                        <h:outputText value="#{i18n.administrator_Workflows_STATE_NAME}:" />
                                         <converge:message for="txtName" />
                                     </h:column>
-                                        <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_Workflows.selectedWorkflowState.name}" title="#{i18n.Workflows_STATE_NAME_TOOLTIP}" required="true" requiredMessage="#{i18n.Workflows_STATE_NAME_REQUIRED}"/>
+                                        <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_Workflows.selectedWorkflowState.name}" title="#{i18n.administrator_Workflows_STATE_NAME_TOOLTIP}" required="true" requiredMessage="#{i18n.administrator_Workflows_STATE_NAME_REQUIRED}"/>
 
-                                        <h:outputText value="#{i18n.Workflows_STATE_DESCRIPTION}:" />
-                                        <h:inputTextarea id="txtDescription" styleClass="text mediumTextArea" value="#{administrator_Workflows.selectedWorkflowState.description}" title="#{i18n.Workflows_STATE_DESCRIPTION_TOOLTIP}" />
-                                        <h:outputText value="#{i18n.Workflows_STATE_TYPE}:" />
+                                        <h:outputText value="#{i18n.administrator_Workflows_STATE_DESCRIPTION}:" />
+                                        <h:inputTextarea id="txtDescription" styleClass="text mediumTextArea" value="#{administrator_Workflows.selectedWorkflowState.description}" title="#{i18n.administrator_Workflows_STATE_DESCRIPTION_TOOLTIP}" />
+                                        <h:outputText value="#{i18n.administrator_Workflows_STATE_TYPE}:" />
                                     <h:selectOneRadio id="raType" value="#{administrator_Workflows.selectedWorkflowStateType}">
                                         <f:converter converterId="i2m.enumTypeConverter" />
                                         <f:selectItems value="#{common.workflowStateTypes}" />
                                     </h:selectOneRadio>
 
                                     <h:column>
-                                        <h:outputText value="#{i18n.Workflows_STATE_PERMISSION}:" />
+                                        <h:outputText value="#{i18n.administrator_Workflows_STATE_PERMISSION}:" />
                                         <converge:message for="raPermission" />
                                     </h:column>
                                     <h:selectOneRadio id="raPermission"
                                                       value="#{administrator_Workflows.selectedWorkflowState.permission}"
                                                       required="true"
-                                                      requiredMessage="#{i18n.Workflows_STATE_PERMISSION_REQUIRED}">
+                                                      requiredMessage="#{i18n.administrator_Workflows_STATE_PERMISSION_REQUIRED}">
                                         <f:converter converterId="i2m.enumTypeConverter" />
                                         <f:selectItems value="#{common.workflowStatePermissions}" />
                                         <a4j:support event="onchange" reRender="selActor" />
                                     </h:selectOneRadio>
 
                                     <h:column>
-                                        <h:outputText value="#{i18n.Workflows_ADMINISTRATOR_WORKFLOW_STATE_USER_ROLE}:" />
+                                        <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STATE_USER_ROLE}:" />
                                         <converge:message for="selActor" />
                                     </h:column>
                                     <h:selectOneMenu id="selActor"
@@ -259,14 +259,14 @@
                                         <f:selectItems value="#{common.userRoles}" />
                                     </h:selectOneMenu>
 
-                                        <h:outputText value="#{i18n.Workflows_ADMINISTRATOR_WORKFLOW_STATE_ALLOW_PULLBACK}" />
+                                        <h:outputText value="#{i18n.administrator_WORKFLOW_STATE_ALLOW_PULLBACK}" />
                                     <h:selectBooleanCheckbox id="sorPullBack" value="#{administrator_Workflows.selectedWorkflowState.pullbackEnabled}" />
 
-                                    <h:outputText value="#{i18n.Workflows_ADMINISTRATOR_WORKFLOW_STATE_SHOW_IN_INBOX}" />
+                                    <h:outputText value="#{i18n.administrator_Workflows_ADMINISTRATOR_WORKFLOW_STATE_SHOW_IN_INBOX}" />
                                     <h:selectBooleanCheckbox id="sbcShowInInbox" value="#{administrator_Workflows.selectedWorkflowState.showInInbox}" />
 
                                     <h:column>
-                                        <h:outputText value="#{i18n.Workflows_STATE_DISPLAY_ORDER}:" title="#{i18n.Workflows_STATE_DISPLAY_ORDER_TOOLTIP}" />
+                                        <h:outputText value="#{i18n.administrator_Workflows_STATE_DISPLAY_ORDER}:" title="#{i18n.administrator_Workflows_STATE_DISPLAY_ORDER_TOOLTIP}" />
                                         <converge:message for="txtDisplayOrder" />
                                     </h:column>
                                     <rich:inputNumberSpinner id="txtDisplayOrder"
@@ -276,7 +276,7 @@
                                                              minValue="0"
                                                              step="1"
                                                              required="true"
-                                                             requiredMessage="#{i18n.Workflows_STATE_DISPLAY_ORDER_REQUIRED}" />
+                                                             requiredMessage="#{i18n.administrator_Workflows_STATE_DISPLAY_ORDER_REQUIRED}" />
                                 </h:panelGrid>
                             </rich:tab>
 
@@ -289,15 +289,15 @@
                             </rich:tab>
 
                             <rich:tab id="tabOptions"
-                                      label="#{i18n.Workflows_STATE_OPTIONS}"
+                                      label="#{i18n.administrator_Workflows_STATE_OPTIONS}"
                                       disabled="#{administrator_Workflows.workflowStateAddMode}">
                                 <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%;">
 
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                                         <h:outputText value="" />
                                         <a4j:commandButton styleClass="button mediumButton"
-                                                           value="#{i18n.Workflows_STATE_OPTION_NEW}"
-                                                           title="#{i18n.Workflows_STATE_OPTION_NEW_TOOLTIP}"
+                                                           value="#{i18n.administrator_Workflows_STATE_OPTION_NEW}"
+                                                           title="#{i18n.administrator_Workflows_STATE_OPTION_NEW_TOOLTIP}"
                                                            reRender="mpWorkflowStepDetails"
                                                            actionListener="#{administrator_Workflows.onNewWorkflowStep}" >
                                             <rich:componentControl for="mpWorkflowStepDetails"
@@ -322,14 +322,14 @@
                                                                        operation="show"
                                                                        event="oncomplete" />
                                                 <h:graphicImage value="/images/icons/workflow_option.gif"
-                                                                alt="#{i18n.Workflows_STATE_OPTION}"
-                                                                title="#{i18n.Workflows_STATE_OPTION}" />
+                                                                alt="#{i18n.administrator_Workflows_STATE_OPTION}"
+                                                                title="#{i18n.administrator_Workflows_STATE_OPTION}" />
                                             </a4j:commandLink>
                                         </rich:column>
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_STATE_OPTION_NAME}"
-                                                              title="#{i18n.Workflows_STATE_OPTION_NAME_TOOLTIP}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_STATE_OPTION_NAME}"
+                                                              title="#{i18n.administrator_Workflows_STATE_OPTION_NAME_TOOLTIP}" />
                                             </f:facet>
                                             <a4j:commandLink reRender="mpWorkflowStepDetails">
                                                 <f:setPropertyActionListener value="#{option}"
@@ -343,15 +343,15 @@
                                         </rich:column>
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_STATE_OPTION_TO}"
-                                                              title="#{i18n.Workflows_STATE_OPTION_TO_TOOLTIP}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_STATE_OPTION_TO}"
+                                                              title="#{i18n.administrator_Workflows_STATE_OPTION_TO_TOOLTIP}" />
                                             </f:facet>
                                             <h:outputText value="#{option.toState.name}"
                                                           title="#{option.toState.description}" />
                                         </rich:column>
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_STATE_ACTOR}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_STATE_ACTOR}" />
                                             </f:facet>
                                             <h:outputText value="#{option.toState.actorRole.name}" />
                                         </rich:column>
@@ -377,7 +377,7 @@
 
                             <a4j:commandLink id="lnkDeleteWorkflowState"
                                              rendered="#{administrator_Workflows.workflowStateEditMode}"
-                                             onclick="if (confirm('#{i18n.Workflows_STATE_PROMPT_DELETE}') != true){ return false; };"
+                                             onclick="if (confirm('#{i18n.administrator_Workflows_STATE_PROMPT_DELETE}') != true){ return false; };"
                                              actionListener="#{administrator_Workflows.onDeleteWorkflowState}"
                                              styleClass="dialogButton"
                                              value="#{i18n.Generic_DELETE}"
@@ -422,37 +422,37 @@
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:outputText value="#{i18n.WORKFLOW_STATE_OPTION_NAME}:" />
 
-                                    <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_Workflows.selectedWorkflowStep.name}" title="#{i18n.Workflows_STATE_OPTION_NAME_TOOLTIP}" required="true" requiredMessage="#{i18n.Workflows_STATE_OPTION_NAME_REQUIRED}"/>
+                                    <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_Workflows.selectedWorkflowStep.name}" title="#{i18n.administrator_Workflows_STATE_OPTION_NAME_TOOLTIP}" required="true" requiredMessage="#{i18n.administrator_Workflows_STATE_OPTION_NAME_REQUIRED}"/>
 
-                                    <h:outputText value="#{i18n.Workflows_STATE_OPTION_DESCRIPTION}:" />
+                                    <h:outputText value="#{i18n.administrator_Workflows_STATE_OPTION_DESCRIPTION}:" />
                                     <h:inputTextarea id="txtDescription"
                                                      styleClass="text mediumTextArea"
                                                      value="#{administrator_Workflows.selectedWorkflowStep.description}"
-                                                     title="#{i18n.Workflows_STATE_OPTION_DESCRIPTION_TOOLTIP}" />
+                                                     title="#{i18n.administrator_Workflows_STATE_OPTION_DESCRIPTION_TOOLTIP}" />
 
                                     <h:column>
-                                        <h:outputText value="#{i18n.Workflows_STATE_OPTION_TO}:"
-                                                      title="#{i18n.Workflows_STATE_OPTION_TO_TOOLTIP}" />
+                                        <h:outputText value="#{i18n.administrator_Workflows_STATE_OPTION_TO}:"
+                                                      title="#{i18n.administrator_Workflows_STATE_OPTION_TO_TOOLTIP}" />
                                         <converge:message for="selWorkflowState" />
                                     </h:column>
                                     <h:selectOneMenu id="selWorkflowState"
                                                      value="#{administrator_Workflows.selectedWorkflowStep.toState}"
-                                                     title="#{i18n.Workflows_STATE_OPTION_TO_TOOLTIP}"
+                                                     title="#{i18n.administrator_Workflows_STATE_OPTION_TO_TOOLTIP}"
                                                      converter="#{converters.workflowStateConverter}"
                                                      required="true"
-                                                     requiredMessage="#{i18n.Workflows_STATE_OPTION_TO_REQUIRED}">
+                                                     requiredMessage="#{i18n.administrator_Workflows_STATE_OPTION_TO_REQUIRED}">
                                         <f:selectItems value="#{administrator_Workflows.workflowStates}" />
                                     </h:selectOneMenu>
 
-                                        <h:outputText value="#{i18n.Workflows_STATE_TREAT_AS_SUBMITTED}:" title="#{i18n.Workflows_STATE_TREAT_AS_SUBMITTED_TOOLTIP}" />
+                                        <h:outputText value="#{i18n.administrator_Workflows_STATE_TREAT_AS_SUBMITTED}:" title="#{i18n.administrator_Workflows_STATE_TREAT_AS_SUBMITTED_TOOLTIP}" />
                                     <h:selectBooleanCheckbox id="sbcTreatAsSubmitted" value="#{administrator_Workflows.selectedWorkflowStep.treatAsSubmitted}" />
 
 
 
 
                                     <h:column>
-                                        <h:outputText value="#{i18n.Workflows_STATE_OPTION_DISPLAY_ORDER}:"
-                                                      title="#{i18n.Workflows_STATE_OPTION_DISPLAY_ORDER_TOOLTIP}" />
+                                        <h:outputText value="#{i18n.administrator_Workflows_STATE_OPTION_DISPLAY_ORDER}:"
+                                                      title="#{i18n.administrator_Workflows_STATE_OPTION_DISPLAY_ORDER_TOOLTIP}" />
                                         <converge:message for="txtDisplayOrder" />
                                     </h:column>
                                     <rich:inputNumberSpinner id="txtDisplayOrder"
@@ -462,7 +462,7 @@
                                                              minValue="0"
                                                              step="1"
                                                              required="true"
-                                                             requiredMessage="#{i18n.Workflows_STATE_OPTION_DISPLAY_ORDER_REQUIRED}" />
+                                                             requiredMessage="#{i18n.administrator_Workflows_STATE_OPTION_DISPLAY_ORDER_REQUIRED}" />
                                 </h:panelGrid>
                             </rich:tab>
 
@@ -488,7 +488,7 @@
 
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                                         <h:outputText value="" />
-                                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_NEW}" title="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_NEW_TOOLTIP}" reRender="frmWorkflowStepValidatorDetails" ajaxSingle="true" actionListener="#{administrator_Workflows.onNewWorkflowStepValidator}">
+                                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_NEW}" title="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_NEW_TOOLTIP}" reRender="frmWorkflowStepValidatorDetails" ajaxSingle="true" actionListener="#{administrator_Workflows.onNewWorkflowStepValidator}">
                                             <rich:componentControl for="mpWorkflowStepValidatorDetails" operation="show" event="oncomplete" />
                                             <f:setPropertyActionListener target="#{administrator_Workflows.selectedWorkflowStepValidatorTab}" value="tabWorkflowStepValidator" />
                                         </a4j:commandButton>
@@ -499,7 +499,7 @@
 
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_LABEL}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_LABEL}" />
                                             </f:facet>
                                             <a4j:commandLink reRender="frmWorkflowStepValidatorDetails" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{administrator_Workflows.selectedWorkflowStepValidator}" value="#{validator}" />
@@ -510,7 +510,7 @@
 
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_TYPE}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_TYPE}" />
                                             </f:facet>
                                             <h:outputText value="#{validator.validator.name}" />
                                         </rich:column>
@@ -522,12 +522,12 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabWorkflowStepActions" label="#{i18n.workflows_WORKFLOW_STEP_ACTIONS}" disabled="#{administrator_Workflows.workflowStepAddMode}">
+                            <rich:tab id="tabWorkflowStepActions" label="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTIONS}" disabled="#{administrator_Workflows.workflowStepAddMode}">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                                         <h:outputText value="" />
-                                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.Workflows_WORKFLOW_STEP_ACTION_NEW}" title="#{i18n.Workflows_WORKFLOW_STEP_ACTION_NEW_TOOLTIP}" reRender="frmWorkflowStepActionDetails" ajaxSingle="true" actionListener="#{administrator_Workflows.onNewWorkflowStepAction}">
+                                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_NEW}" title="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_NEW_TOOLTIP}" reRender="frmWorkflowStepActionDetails" ajaxSingle="true" actionListener="#{administrator_Workflows.onNewWorkflowStepAction}">
                                             <rich:componentControl for="mpWorkflowStepActionDetails" operation="show" event="oncomplete" />
                                             <f:setPropertyActionListener target="#{administrator_Workflows.selectedWorkflowStepActionTab}" value="tabWorkflowStepAction" />
                                         </a4j:commandButton>
@@ -541,13 +541,13 @@
                                                 <f:setPropertyActionListener target="#{administrator_Workflows.selectedWorkflowStepAction}" value="#{action}" />
                                                 <f:setPropertyActionListener target="#{administrator_Workflows.selectedWorkflowStepActionTab}" value="tabWorkflowStepAction" />
                                                 <rich:componentControl for="mpWorkflowStepActionDetails" operation="show" event="oncomplete" />
-                                                <h:graphicImage value="#{res.WORKFLOW_STEP_ACTION_ICON}" alt="#{i18n.Workflows_WORKFLOW_STEP_ACTION}" title="#{i18n.Workflows_WORKFLOW_STEP_ACTION}" />
+                                                <h:graphicImage value="#{res.WORKFLOW_STEP_ACTION_ICON}" alt="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION}" title="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION}" />
                                             </a4j:commandLink>
                                         </rich:column>
 
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_ACTION_LABEL}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_LABEL}" />
                                             </f:facet>
                                             <a4j:commandLink reRender="frmWorkflowStepActionDetails" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{administrator_Workflows.selectedWorkflowStepAction}" value="#{action}" />
@@ -559,7 +559,7 @@
 
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_ACTION_TYPE}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_TYPE}" />
                                             </f:facet>
                                             <h:outputText value="#{action.action.name}" />
                                         </rich:column>
@@ -574,7 +574,7 @@
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveWorkflowStep" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Workflows.onSaveWorkflowStep}" reRender="pgWorkflowStateDetails" oncomplete="#{rich:component('mpWorkflowStepDetails')}.hide(); return false;" />
                             <a4j:commandLink id="lnkApplyWorkflowStep" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Workflows.onApplyWorkflowStep}" reRender="pgWorkflowStateDetails, pgWorkflowStepDetails" />
-                            <a4j:commandLink id="lnkDeleteWorkflowStep" ajaxSingle="true" rendered="#{administrator_Workflows.workflowStepEditMode}" onclick="if (confirm('#{i18n.Workflows_STATE_OPTION_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Workflows.onDeleteWorkflowStep}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="pgWorkflowStateDetails">
+                            <a4j:commandLink id="lnkDeleteWorkflowStep" ajaxSingle="true" rendered="#{administrator_Workflows.workflowStepEditMode}" onclick="if (confirm('#{i18n.administrator_Workflows_STATE_OPTION_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Workflows.onDeleteWorkflowStep}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="pgWorkflowStateDetails">
                                 <rich:componentControl for="mpWorkflowStepDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
                             <h:commandLink id="lnkCloseWorkflowStepForm" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpWorkflowStepDetails')}.hide(); return false;" />
@@ -587,7 +587,7 @@
                 <rich:modalPanel id="mpWorkflowStepActionDetails" autosized="true" domElementAttachment="parent" rendered="#{administrator_Workflows.selectedWorkflowStepAction != null}">
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_ACTION_DETAILS}" />
+                            <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
                     <f:facet name="controls">
@@ -601,15 +601,15 @@
                     <h:panelGrid id="pgWorkflowStepActionDetails">
 
                         <rich:tabPanel id="tpWorkflowStepAction" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive" selectedTab="#{administrator_Workflows.selectedWorkflowStepActionTab}">
-                            <rich:tab id="tabWorkflowStepAction" label="#{i18n.Workflows_WORKFLOW_STEP_ACTION_ACTION}">
+                            <rich:tab id="tabWorkflowStepAction" label="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_ACTION}">
                                 <h:panelGrid columns="2" columnClasses="dialogueFieldLabel nowrap, dialogueFieldValue" styleClass="dialogue">
-                                    <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_ACTION_LABEL}:" />
+                                    <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_LABEL}:" />
                                     <h:inputText styleClass="text mediumInput" value="#{administrator_Workflows.selectedWorkflowStepAction.label}" />
 
-                                    <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_ACTION_EXECUTION_ORDER}:" />
-                                    <rich:inputNumberSpinner id="insExecutionOrder" value="#{administrator_Workflows.selectedWorkflowStepAction.executeOrder}" disableBrowserAutoComplete="true" enableManualInput="true" minValue="1" step="1" required="true" requiredMessage="#{i18n.Workflows_WORKFLOW_STEP_ACTION_EXECUTION_ORDER_REQUIRED}" />
+                                    <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_EXECUTION_ORDER}:" />
+                                    <rich:inputNumberSpinner id="insExecutionOrder" value="#{administrator_Workflows.selectedWorkflowStepAction.executeOrder}" disableBrowserAutoComplete="true" enableManualInput="true" minValue="1" step="1" required="true" requiredMessage="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_EXECUTION_ORDER_REQUIRED}" />
 
-                                    <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_ACTION_TYPE}:" />
+                                    <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_TYPE}:" />
                                     <h:selectOneMenu id="somActions" value="#{administrator_Workflows.selectedWorkflowStepAction.actionClass}">
                                         <f:selectItems value="#{common.workflowActions}" />
                                         <a4j:support event="onchange" reRender="pgActionProperties, aboutAction" />
@@ -622,11 +622,11 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabWorkflowStepActionProperties" label="#{i18n.Workflows_WORKFLOW_STEP_ACTION_PROPERTIES}">
+                            <rich:tab id="tabWorkflowStepActionProperties" label="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_PROPERTIES}">
                                 <h:panelGrid id="pgActionProperties" columns="1" styleClass="dialogue">
                                     <h:column>
                                         <h:panelGrid columns="3">
-                                            <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_ACTION_PROPERTY}:" />
+                                            <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_PROPERTY}:" />
                                             <h:selectOneMenu id="somActionProperties" value="#{administrator_Workflows.selectedWorkflowStepActionProperty.key}" styleClass="text mediumInput">
                                                 <f:selectItem itemLabel="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_SELECT_PROPERTY}" />
                                                 <f:selectItems value="#{administrator_Workflows.selectedWorkflowStepAction.action.availableProperties}" />
@@ -639,16 +639,16 @@
                                                 <h:outputText value="&#160;" rendered="#{help_text == ''}" />
                                             </h:panelGroup>
 
-                                            <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_ACTION_VALUE}:" />
+                                            <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_VALUE}:" />
                                             <h:inputText styleClass="text mediumInput" value="#{administrator_Workflows.selectedWorkflowStepActionProperty.value}" />
-                                            <a4j:commandButton id="btnAdd" value="#{i18n.Workflows_WORKFLOW_STEP_ACTION_PROPERTY_ADD}" actionListener="#{administrator_Workflows.onAddWorkflowStepActionProperty}" reRender="pgActionProperties" styleClass="button dynamicButton" />
+                                            <a4j:commandButton id="btnAdd" value="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_PROPERTY_ADD}" actionListener="#{administrator_Workflows.onAddWorkflowStepActionProperty}" reRender="pgActionProperties" styleClass="button dynamicButton" />
                                         </h:panelGrid>
                                     </h:column>
 
                                     <rich:dataTable value="#{administrator_Workflows.selectedWorkflowStepAction.properties}" var="property" styleClass="table scrollableDialogContent" headerClass="tableHeader" rowClasses="odd, even">
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_ACTION_PROPERTY}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_PROPERTY}" />
                                             </f:facet>
                                             <c:set var="help_key" value="#{property.key}_HELP" />
                                             <h:outputText value="#{converge:message(administrator_Workflows.selectedWorkflowStepAction.action.bundle, property.key)}" title="#{converge:message(administrator_Workflows.selectedWorkflowStepAction.action.bundle, help_key)}" />
@@ -656,7 +656,7 @@
 
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_ACTION_VALUE}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_VALUE}" />
                                             </f:facet>
                                             <rich:inplaceInput required="true" value="#{property.value}" viewClass="propertyInplace" viewHoverClass="propertyInplaceHover" />
                                         </rich:column>
@@ -677,7 +677,7 @@
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveWorkflowStepAction" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Workflows.onSaveWorkflowStepAction}" reRender="dtWorkflowStepActions" oncomplete="#{rich:component('mpWorkflowStepActionDetails')}.hide(); return false;" />
                             <a4j:commandLink id="lnkApplyWorkflowStepAction" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Workflows.onSaveWorkflowStepAction}" reRender="dtWorkflowStepActions,pgWorkflowStepActionDetails" />
-                            <a4j:commandLink id="lnkDeleteWorkflowStepAction" ajaxSingle="true" rendered="#{administrator_Workflows.workflowStepActionEditMode}" onclick="if (confirm('#{i18n.Workflows_WORKFLOW_STEP_ACTION_DELETE}') != true){ return false; };" actionListener="#{administrator_Workflows.onDeleteWorkflowStepAction}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="dtWorkflowStepActions">
+                            <a4j:commandLink id="lnkDeleteWorkflowStepAction" ajaxSingle="true" rendered="#{administrator_Workflows.workflowStepActionEditMode}" onclick="if (confirm('#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION_DELETE}') != true){ return false; };" actionListener="#{administrator_Workflows.onDeleteWorkflowStepAction}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="dtWorkflowStepActions">
                                 <rich:componentControl for="mpWorkflowStepActionDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
                             <h:commandLink id="lnkCloseWorkflowStepActionDetails" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpWorkflowStepActionDetails')}.hide(); return false;" />
@@ -690,7 +690,7 @@
                 <rich:modalPanel id="mpWorkflowStepValidatorDetails" autosized="true" domElementAttachment="parent" rendered="#{administrator_Workflows.selectedWorkflowStepValidator != null}">
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_DETAILS}" />
+                            <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
                     <f:facet name="controls">
@@ -703,15 +703,15 @@
                     <h:panelGrid id="pgWorkflowStepValidatorDetails">
 
                         <rich:tabPanel id="tpWorkflowStepValidator" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive" selectedTab="#{administrator_Workflows.selectedWorkflowStepValidatorTab}">
-                            <rich:tab id="tabWorkflowStepValidator" label="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_VALIDATOR}">
+                            <rich:tab id="tabWorkflowStepValidator" label="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_VALIDATOR}">
                                 <h:panelGrid columns="2" columnClasses="dialogueFieldLabel nowrap, dialogueFieldValue" styleClass="dialogue">
-                                    <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_LABEL}:" />
+                                    <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_LABEL}:" />
                                     <h:inputText styleClass="text mediumInput" value="#{administrator_Workflows.selectedWorkflowStepValidator.label}" />
 
-                                    <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_EXECUTION_ORDER}:" />
-                                    <rich:inputNumberSpinner id="insExecutionOrder" value="#{administrator_Workflows.selectedWorkflowStepValidator.executeOrder}" disableBrowserAutoComplete="true" enableManualInput="true" minValue="1" step="1" required="true" requiredMessage="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_EXECUTION_ORDER_REQUIRED}" />
+                                    <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_EXECUTION_ORDER}:" />
+                                    <rich:inputNumberSpinner id="insExecutionOrder" value="#{administrator_Workflows.selectedWorkflowStepValidator.executeOrder}" disableBrowserAutoComplete="true" enableManualInput="true" minValue="1" step="1" required="true" requiredMessage="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_EXECUTION_ORDER_REQUIRED}" />
 
-                                    <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_TYPE}:" />
+                                    <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_TYPE}:" />
                                     <h:selectOneMenu id="somValidators" value="#{administrator_Workflows.selectedWorkflowStepValidator.validatorClass}">
                                         <f:selectItems value="#{common.workflowValidators}" />
                                         <a4j:support event="onchange" reRender="pgValidatorProperties, aboutValidator" />
@@ -725,11 +725,11 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabWorkflowStepValidatorProperties" label="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_PROPERTIES}">
+                            <rich:tab id="tabWorkflowStepValidatorProperties" label="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_PROPERTIES}">
                                 <h:panelGrid id="pgValidatorProperties" columns="1" styleClass="dialogue">
                                     <h:column>
                                         <h:panelGrid columns="3">
-                                            <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_PROPERTY}:" />
+                                            <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_PROPERTY}:" />
                                             <h:selectOneMenu id="somValidatorProperties" value="#{administrator_Workflows.selectedWorkflowStepValidatorProperty.key}" styleClass="text mediumInput">
                                                 <f:selectItem itemLabel="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_SELECT_PROPERTY}" />
                                                 <f:selectItems value="#{administrator_Workflows.selectedWorkflowStepValidator.validator.availableProperties}" />
@@ -742,16 +742,16 @@
                                                 <h:outputText value="&#160;" rendered="#{help_text == ''}" />
                                             </h:panelGroup>
 
-                                            <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_VALUE}:" />
+                                            <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_VALUE}:" />
                                             <h:inputText styleClass="text mediumInput" value="#{administrator_Workflows.selectedWorkflowStepValidatorProperty.value}" />
-                                            <a4j:commandButton id="btnAddValidatorProperty" value="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_PROPERTY_ADD}" actionListener="#{administrator_Workflows.onAddWorkflowStepValidatorProperty}" reRender="pgValidatorProperties" styleClass="button dynamicButton" />
+                                            <a4j:commandButton id="btnAddValidatorProperty" value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_PROPERTY_ADD}" actionListener="#{administrator_Workflows.onAddWorkflowStepValidatorProperty}" reRender="pgValidatorProperties" styleClass="button dynamicButton" />
                                         </h:panelGrid>
                                     </h:column>
 
                                     <rich:dataTable value="#{administrator_Workflows.selectedWorkflowStepValidator.properties}" var="property" styleClass="table scrollableDialogContent" headerClass="tableHeader" rowClasses="odd, even">
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_PROPERTY}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_PROPERTY}" />
                                             </f:facet>
                                             <c:set var="help_key" value="#{property.key}_HELP" />
                                             <h:outputText value="#{converge:message(administrator_Workflows.selectedWorkflowStepValidator.validator.bundle, property.key)}" title="#{converge:message(administrator_Workflows.selectedWorkflowStepValidator.validator.bundle, help_key)}" />
@@ -759,7 +759,7 @@
 
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_VALUE}" />
+                                                <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_VALUE}" />
                                             </f:facet>
                                             <rich:inplaceInput required="true" value="#{property.value}" viewClass="propertyInplace" viewHoverClass="propertyInplaceHover" />
                                         </rich:column>
@@ -780,7 +780,7 @@
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveWorkflowStepValidator" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Workflows.onSaveWorkflowStepValidator}" reRender="dtWorkflowStepValidators" oncomplete="#{rich:component('mpWorkflowStepValidatorDetails')}.hide(); return false;" />
                             <a4j:commandLink id="lnkApplyWorkflowStepValidator" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Workflows.onSaveWorkflowStepValidator}" reRender="dtWorkflowStepValidators,pgWorkflowStepValidatorDetails" />
-                            <a4j:commandLink id="lnkDeleteWorkflowStepValidator" ajaxSingle="true" rendered="#{administrator_Workflows.workflowStepValidatorEditMode}" onclick="if (confirm('#{i18n.Workflows_WORKFLOW_STEP_VALIDATOR_DELETE}') != true){ return false; };" actionListener="#{administrator_Workflows.onDeleteWorkflowStepValidator}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="dtWorkflowStepValidators">
+                            <a4j:commandLink id="lnkDeleteWorkflowStepValidator" ajaxSingle="true" rendered="#{administrator_Workflows.workflowStepValidatorEditMode}" onclick="if (confirm('#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATOR_DELETE}') != true){ return false; };" actionListener="#{administrator_Workflows.onDeleteWorkflowStepValidator}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="dtWorkflowStepValidators">
                                 <rich:componentControl for="mpWorkflowStepValidatorDetails" operation="hide" event="oncomplete" />
                             </a4j:commandLink>
                             <h:commandLink id="lnkCloseWorkflowStepValidatorDetails" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpWorkflowStepValidatorDetails')}.hide(); return false;" />
