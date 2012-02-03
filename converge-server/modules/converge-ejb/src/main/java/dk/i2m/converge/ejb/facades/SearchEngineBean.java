@@ -124,6 +124,7 @@ public class SearchEngineBean implements SearchEngineLocal {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void removeFromQueue(Long id) {
         daoService.delete(IndexQueueEntry.class, id);
     }
