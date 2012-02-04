@@ -420,11 +420,11 @@
 
                             <rich:tab id="tabWorkflowStep" label="#{i18n.administrator_Workflows_WORKFLOW_STATE_OPTION_TAB}">
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
-                                    <h:outputText value="#{i18n.WORKFLOW_STATE_OPTION_NAME}:" />
+                                    <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STATE_OPTION_NAME}" />
 
                                     <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_Workflows.selectedWorkflowStep.name}" title="#{i18n.administrator_Workflows_STATE_OPTION_NAME_TOOLTIP}" required="true" requiredMessage="#{i18n.administrator_Workflows_STATE_OPTION_NAME_REQUIRED}"/>
 
-                                    <h:outputText value="#{i18n.administrator_Workflows_STATE_OPTION_DESCRIPTION}:" />
+                                    <h:outputText value="#{i18n.administrator_Workflows_STATE_OPTION_DESCRIPTION}" />
                                     <h:inputTextarea id="txtDescription"
                                                      styleClass="text mediumTextArea"
                                                      value="#{administrator_Workflows.selectedWorkflowStep.description}"
@@ -483,7 +483,7 @@
 
                             </rich:tab>
 
-                            <rich:tab id="tabWorkflowStepValidators" label="#{i18n.WORKFLOW_STEP_VALIDATION}" disabled="#{administrator_Workflows.workflowStepAddMode}">
+                            <rich:tab id="tabWorkflowStepValidators" label="#{i18n.administrator_Workflows_WORKFLOW_STEP_VALIDATION}" disabled="#{administrator_Workflows.workflowStepAddMode}">
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
 
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
