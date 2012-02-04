@@ -92,7 +92,7 @@
                     <h:panelGrid columns="3" style="width: 100%" columnClasses="left,btnC,btnC">
                         <h:inputText id="txtSearchKeyword" styleClass="text searchInput" value="#{newswire.keyword}" title="" />
                         <a4j:commandButton type="submit" styleClass="button dynamicButton searchButton" value="#{i18n.Newswire_SEARCH_BUTTON_LABEL}" actionListener="#{newswire.onSearch}" reRender="frmPage,frmQuery" />
-                        <a4j:commandButton styleClass="button dynamicButton searchButton" value="#{i18n.NewsWire_CLEAR}" actionListener="#{newswire.onClear}" reRender="frmPage,frmQuery" />
+                        <a4j:commandButton styleClass="button dynamicButton searchButton" value="#{i18n.Newswire_CLEAR}" actionListener="#{newswire.onClear}" reRender="frmPage,frmQuery" />
                     </h:panelGrid>
 
                     <div style="float: left;">
