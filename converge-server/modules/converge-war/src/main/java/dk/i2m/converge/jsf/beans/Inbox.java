@@ -1,11 +1,18 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later 
+ * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.jsf.beans;
 
@@ -43,8 +50,7 @@ import org.richfaces.model.TreeNode;
 import org.richfaces.model.TreeNodeImpl;
 
 /**
- * Managed bean for
- * <code>/Inbox.jspx</code>.
+ * Managed bean for {@code /Inbox.jspx}.
  *
  * @author Allan Lykke Christensen
  */
@@ -168,18 +174,17 @@ public class Inbox {
         newAssignment.setNextEdition(getUser().isDefaultAddNextEdition());
     }
 
+    /**
+     * Event handler for creating a new assignment.
+     * 
+     * @param event Event that invoked the handler
+     */
     public void onAddAssignment(ActionEvent event) {
 
         if (newAssignmentType.equalsIgnoreCase("tabStory")) {
             newAssignment.getAssignment().setType(AssignmentType.NEWS_ITEM);
         } else {
             newAssignment.getAssignment().setType(AssignmentType.MEDIA_ITEM);
-        }
-
-        // Not necessary with the above
-        if (newAssignment.getAssignment().getType() == null) {
-            JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_ERROR, "inbox_ASSIGNMENT_TYPE_REQUIRED");
-            return;
         }
 
         switch (newAssignment.getAssignment().getType()) {
@@ -222,7 +227,7 @@ public class Inbox {
                     JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_ERROR, "inbox_ASSIGNMENT_CREATION_ERROR");
                     LOG.log(Level.SEVERE, ex.getMessage(), ex);
                 }
-                onShowMyAssignments(event);
+                //onShowMyAssignments(event);
                 break;
             case MEDIA_ITEM:
                 if (newAssignment.getMediaItem().getCatalogue() == null) {
@@ -238,9 +243,9 @@ public class Inbox {
                 this.createdItemLink = "MediaItemDetails.xhtml?id=" + newItem.getId();
                 JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_INFO, "inbox_ASSIGNMENT_CREATED");
                 showNewsItem = false;
-                newsItems = new ListDataModel();
-                inboxTitle = newAssignment.getMediaItem().getCatalogue().getName();
-                mediaItems = new ListDataModel(catalogueFacade.findMediaItemsByOwner(getUser()));
+                //newsItems = new ListDataModel();
+                //inboxTitle = newAssignment.getMediaItem().getCatalogue().getName();
+                //mediaItems = new ListDataModel(catalogueFacade.findMediaItemsByOwner(getUser()));
                 break;
         }
     }
