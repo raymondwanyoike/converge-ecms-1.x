@@ -21,3 +21,5 @@ CREATE INDEX `idx_entity` ON `log_subject` (`entity`);
 
 ALTER TABLE newswire_service ADD COLUMN `processing` TINYINT(1) DEFAULT '0';
 ALTER TABLE media_item ADD COLUMN `held` TINYINT(1) DEFAULT '0';
+
+ALTER TABLE user_account ADD COLUMN default_work_day tinyint(1) NOT NULL DEFAULT '1';

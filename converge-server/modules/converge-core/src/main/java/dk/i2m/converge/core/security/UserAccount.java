@@ -109,6 +109,9 @@ public class UserAccount implements Serializable {
 
     @Column(name = "default_search_results_order")
     private boolean defaultSearchResultsOrder;
+    
+    @Column(name = "default_work_day")
+    private int defaultWorkDay;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "clearance_level")
@@ -832,6 +835,30 @@ public class UserAccount implements Serializable {
         this.checkedOut = checkedOut;
     }
 
+    /**
+     * Gets the default work day. The default work day is the day to show when
+     * opening the planning view. This value is number of days to add/subtract
+     * from todays day.
+     * 
+     * @return Number of days to add to todays date in the planning view
+     */
+    public int getDefaultWorkDay() {
+        return defaultWorkDay;
+    }
+
+    /**
+     * Sets the default work day. The default work day is the day to show when
+     * opening the planning view. This value is number of days to add/subtract
+     * from todays day.
+     * 
+     * @param defaultWorkDay Number of days to add to todays date in the planning view
+     */
+    public void setDefaultWorkDay(int defaultWorkDay) {
+        this.defaultWorkDay = defaultWorkDay;
+    }
+
+    
+    
     @Override
     public int hashCode() {
         int hash = 0;

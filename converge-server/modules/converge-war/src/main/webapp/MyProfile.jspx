@@ -121,6 +121,9 @@
 
                         <h:outputText value="#{i18n.MyProfile_DEFAULT_ADD_TO_NEXT_EDITION}" />
                         <h:selectBooleanCheckbox value="#{userSession.user.defaultAddNextEdition}" />
+                        
+                        <h:outputText value="#{i18n.MyProfile_DEFAULT_WORK_DAY}" />
+                        <rich:inputNumberSpinner value="#{userSession.user.defaultWorkDay}" enableManualInput="true" minValue="-100" maxValue="100" required="true" requiredMessage="#{i18n.MyProfile_DEFAULT_WORK_DAY_REQUIRED}" />
 
                         <h:outputText value="#{i18n.MyProfile_OUTLET}" />
                         <h:selectOneMenu value="#{userSession.user.defaultOutlet}" style="width: 100%;" converter="#{converters.outletConverter}">

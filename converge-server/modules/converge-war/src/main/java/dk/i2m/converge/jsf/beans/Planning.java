@@ -119,7 +119,10 @@ public class Planning implements UIEventListener {
     public void onInit() {
         Calendar startDate = Calendar.getInstance();
         startDate.setTimeZone(getUser().getTimeZone());
-        startDate.add(Calendar.DAY_OF_MONTH, 1);
+        
+        int workDay = getUser().getDefaultWorkDay();
+        
+        startDate.add(Calendar.DAY_OF_MONTH, workDay);
         selectedDate = startDate.getTime();
 
         useExistingEventDate = Calendar.getInstance();
