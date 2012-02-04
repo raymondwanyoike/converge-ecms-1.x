@@ -69,7 +69,7 @@
                 <rich:modalPanel id="mpWorkflowDetails" autosized="true" domElementAttachment="parent" >
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{i18n.administrator_Workflows_DETAILS}" />
+                            <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_DETAILS}" />
                         </h:panelGroup>
                     </f:facet>
                     <f:facet name="controls">
@@ -259,10 +259,10 @@
                                         <f:selectItems value="#{common.userRoles}" />
                                     </h:selectOneMenu>
 
-                                        <h:outputText value="#{i18n.administrator_WORKFLOW_STATE_ALLOW_PULLBACK}" />
+                                        <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STATE_ALLOW_PULLBACK}" />
                                     <h:selectBooleanCheckbox id="sorPullBack" value="#{administrator_Workflows.selectedWorkflowState.pullbackEnabled}" />
 
-                                    <h:outputText value="#{i18n.administrator_Workflows_ADMINISTRATOR_WORKFLOW_STATE_SHOW_IN_INBOX}" />
+                                    <h:outputText value="#{i18n.administrator_Workflows_WORKFLOW_STATE_SHOW_IN_INBOX}" />
                                     <h:selectBooleanCheckbox id="sbcShowInInbox" value="#{administrator_Workflows.selectedWorkflowState.showInInbox}" />
 
                                     <h:column>
