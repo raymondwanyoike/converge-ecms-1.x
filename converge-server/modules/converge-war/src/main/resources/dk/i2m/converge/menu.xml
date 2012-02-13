@@ -176,12 +176,6 @@
             </children>
         </children>
 
-        <children id="lnkAdministrationNewswires" sectionMenu="false" resetOnClick="false">
-            <action>/administration/newswires</action>
-            <label>menu_ADMINISTRATION_NEWSWIRES</label>
-            <role>ADMINISTRATOR</role>
-        </children>
-
         <children id="lnkAdministrationCatalogues" resetOnClick="false" sectionMenu="true">
             <action>/administration/catalogues</action>
             <label>menu_CATALOGUES</label>
@@ -198,6 +192,12 @@
                 <label>menu_CATALOGUES_RENDTIONS</label>
                 <role>ADMINISTRATOR</role>
             </children>
+        </children>
+
+        <children id="lnkAdministrationNewswires" sectionMenu="false" resetOnClick="false">
+            <action>/administration/newswires</action>
+            <label>menu_ADMINISTRATION_NEWSWIRES</label>
+            <role>ADMINISTRATOR</role>
         </children>
 
         <children id="lnkAdministrationCalendar" resetOnClick="false" sectionMenu="true">
