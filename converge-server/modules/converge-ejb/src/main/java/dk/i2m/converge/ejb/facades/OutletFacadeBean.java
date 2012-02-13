@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import dk.i2m.converge.core.dto.EditionAssignmentView;
 import dk.i2m.converge.core.dto.EditionView;
 import dk.i2m.converge.core.dto.OutletActionView;
 import dk.i2m.converge.core.security.UserRole;
+import dk.i2m.converge.core.subscriber.OutletSubscriber;
 import dk.i2m.converge.core.utils.BeanComparator;
 import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.messaging.EditionServiceMessageBean;
@@ -62,7 +63,7 @@ public class OutletFacadeBean implements OutletFacadeLocal {
 
     /**
      * Ensures that the necessary data has been set on the {@link Outlet}.
-     * 
+     * <p/>
      * @param outlet {@link Outlet} to validate
      */
     private void validateOutlet(Outlet outlet) {
@@ -99,7 +100,11 @@ public class OutletFacadeBean implements OutletFacadeLocal {
     }
 
     /**
-     * {@inheritDoc}
+     * Finds an {@link Outlet} in the database by its unique id.
+     *
+     * @param id Unique id of the {@link Outlet} to find
+     * @return {@link Outlet} matching the {@code id}
+     * @throws DataNotFoundException If an {@link Outlet} could not be found with the given {@code id}
      */
     @Override
     public Outlet findOutletById(Long id) throws DataNotFoundException {
@@ -154,6 +159,84 @@ public class OutletFacadeBean implements OutletFacadeLocal {
     public void deleteDepartment(Long id) {
         //TODO: Determine what to do about news item current in this department
         daoService.delete(Department.class, id);
+    }
+
+    /**
+     * Create a new subscriber of an {@link Outlet}.
+     * <p/>
+     * @param subscriber New subscriber
+     * @return Created subscriber
+     */
+    @Override
+    public OutletSubscriber createSubscriber(OutletSubscriber subscriber) {
+        return daoService.create(subscriber);
+    }
+
+    /**
+     * Update an existing subscriber.
+     * <p/>
+     * @param subscriber Subscriber to update
+     * @return Updated subscriber
+     */
+    @Override
+    public OutletSubscriber updateSubscriber(OutletSubscriber subscriber) {
+        // Check if there was a subscription change
+        try {
+            Date now = Calendar.getInstance().getTime();
+            OutletSubscriber original = findSubscriberById(subscriber.getId());
+            if (original.isSubscribed() && !subscriber.isSubscribed()) {
+                subscriber.setUnsubscriptionDate(now);
+            } else if (!original.isSubscribed() && subscriber.isSubscribed()) {
+                subscriber.setSubscriptionDate(now);
+            }
+        } catch (DataNotFoundException ex) {
+            LOG.log(Level.SEVERE, "Original subscriber does not exist");
+        }
+        
+        return daoService.update(subscriber);
+    }
+
+    /**
+     * Finds an existing subscriber by id.
+     * <p/>
+     * @param id Unique identifier of the subscriber
+     * @return Subscriber matching the {@code id}
+     * @throws DataNotFoundException If a subscriber with the given {@code id} could not be found
+     */
+    @Override
+    public OutletSubscriber findSubscriberById(Long id) throws
+            DataNotFoundException {
+        return daoService.findById(OutletSubscriber.class, id);
+    }
+
+    /**
+     * Deletes a subscriber from the database.
+     * <p/>
+     * @param id Unique identifier of the subscriber
+     */
+    @Override
+    public void deleteSubscriberById(Long id) {
+        daoService.delete(OutletSubscriber.class, id);
+    }
+
+    @Override
+    public List<OutletSubscriber> findOutletSubscribers(int start, int results) {
+        return daoService.findAll(OutletSubscriber.class, start, results);
+    }
+
+    @Override
+    public List<OutletSubscriber> findOutletSubscribers(Long outletId, int start,
+            int results) {
+        try {
+            Outlet outlet = findOutletById(outletId);
+            Map<String, Object> params = QueryBuilder.with(
+                    OutletSubscriber.OUTLET_PARAMETER, outlet).parameters();
+
+            return daoService.findWithNamedQuery(OutletSubscriber.FIND_BY_OUTLET,
+                    params, start, results);
+        } catch (DataNotFoundException ex) {
+            return Collections.EMPTY_LIST;
+        }
     }
 
     /**
@@ -227,7 +310,11 @@ public class OutletFacadeBean implements OutletFacadeLocal {
     }
 
     /**
-     * {@inheritDoc }
+     * Creates an {@link Edition} for an {@link Outlet} from an
+     * {@link EditionCandidate}.
+     *
+     * @param editionCandidate {@link EditionCandidate} from which to create the {@link Edition}
+     * @return {@link Edition} created from the {@link EditionCandidat}
      */
     @Override
     public Edition createEdition(EditionCandidate editionCandidate) {
@@ -247,7 +334,11 @@ public class OutletFacadeBean implements OutletFacadeLocal {
     }
 
     /**
-     * {@inheritDoc }
+     * Finds an {@link Edition} by its unique {@code id}.
+     *
+     * @param id Unique id of the {@link Edition}
+     * @return {@link Edition} matching the {@code id}
+     * @throws DataNotFoundException If an {@link Edition} could not be found with the given {@code id}
      */
     @Override
     public Edition findEditionById(long id) throws DataNotFoundException {
@@ -529,19 +620,13 @@ public class OutletFacadeBean implements OutletFacadeLocal {
     /**
      * Updates an existing {@link Edition} in the database.
      *
-     * @param editionId
-     * Unique identifier of the {@link Edition} to update
-     * @param open
-     * Determines if the {@link Edition} should be open
-     * @param publicationDate
-     * New publication date of the {@link Edition}
-     * @param expirationDate
-     * New expiration date of the {@link Edition}
-     * @param closeDate
-     * New close date of the {@link Edition}
+     * @param editionId       Unique identifier of the {@link Edition} to update
+     * @param open            Determines if the {@link Edition} should be open
+     * @param publicationDate New publication date of the {@link Edition}
+     * @param expirationDate  New expiration date of the {@link Edition}
+     * @param closeDate       New close date of the {@link Edition}
      * @return Update {@link Edition}
-     * @throws DataNotFoundException * If no {@link Edition} exist with the
-     * given {@code editionId}
+     * @throws DataNotFoundException If no {@link Edition} exist with the given {@code editionId}
      */
     @Override
     public Edition updateEdition(Long editionId, Boolean open,
@@ -755,9 +840,6 @@ public class OutletFacadeBean implements OutletFacadeLocal {
     @Override
     public void scheduleNewsItemPlacementActions(Long editionId,
             Long newsItemPlacementId) {
-
-        LOG.log(Level.INFO, "Called by user: {0}", ctx.getCallerPrincipal().
-                getName());
 
         Connection connection = null;
         try {

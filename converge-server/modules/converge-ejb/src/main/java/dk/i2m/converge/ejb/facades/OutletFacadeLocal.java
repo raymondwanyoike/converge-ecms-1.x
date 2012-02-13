@@ -37,19 +37,8 @@ public interface OutletFacadeLocal {
     Edition createEdition(Long outletId, Boolean open, Date publicationDate,
             Date expirationDate, Date closeDate);
 
-    /**
-     * Creates an {@link Edition} for an {@link Outlet}
-     * from an {@link EditionCandidate}.
-     *
-     * @param editionCandidate
-     * {@link EditionCandidate} from which to
-     * create the {@link Edition}
-     * @return {@link Edition} created from the
-     *         {@link EditionCandidat}
-     */
     Edition createEdition(EditionCandidate editionCandidate);
 
-    
     Outlet createOutlet(Outlet outlet);
 
     /**
@@ -98,18 +87,6 @@ public interface OutletFacadeLocal {
      */
     Department findDepartmentById(Long id) throws DataNotFoundException;
 
-    /**
-     * Finds an {@link Edition} by its unique
-     * <code>id</code>.
-     *
-     * @param id
-     * Unique id of the {@link Edition}
-     * @return {@link Edition} matching the
-     * <code>id</code>
-     * @throws DataNotFoundException
-     * If an {@link Edition} could not be found with the given
-     * <code>id</code>
-     */
     Edition findEditionById(long id) throws DataNotFoundException;
 
     /**
@@ -165,7 +142,7 @@ public interface OutletFacadeLocal {
      * {@link Outlet} for which to find {@link Edition}s
      * @param date
      * Dates for which to find {@link Edition}s
-     * @param includeOpen
+     * @param includeClosed
      * Include closed editions
      * @return {@link List} of {@link EditionCandidate}s for the given {@link Outlet}
      * and
@@ -363,4 +340,24 @@ public interface OutletFacadeLocal {
 
     List<Section> findSectionByName(Long outletId, String sectionName) throws
             DataNotFoundException;
+
+    dk.i2m.converge.core.subscriber.OutletSubscriber createSubscriber(
+            dk.i2m.converge.core.subscriber.OutletSubscriber subscriber);
+
+    dk.i2m.converge.core.subscriber.OutletSubscriber updateSubscriber(
+            dk.i2m.converge.core.subscriber.OutletSubscriber subscriber);
+
+    dk.i2m.converge.core.subscriber.OutletSubscriber findSubscriberById(
+            java.lang.Long id)
+            throws dk.i2m.converge.ejb.services.DataNotFoundException;
+
+    void deleteSubscriberById(java.lang.Long id);
+
+    java.util.List<dk.i2m.converge.core.subscriber.OutletSubscriber> findOutletSubscribers(
+            int start,
+            int results);
+
+    java.util.List<dk.i2m.converge.core.subscriber.OutletSubscriber> findOutletSubscribers(
+            java.lang.Long outletId,
+            int start, int results);
 }

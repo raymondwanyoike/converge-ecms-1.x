@@ -17,16 +17,14 @@
 package dk.i2m.converge.jsf.beans.administrator;
 
 import dk.i2m.commons.BeanComparator;
+import dk.i2m.converge.core.subscriber.OutletSubscriber;
 import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.facades.EntityReferenceException;
 import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.jsf.beans.BaseBean;
 import dk.i2m.jsf.JsfUtils;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -50,6 +48,10 @@ public class Outlets extends BaseBean {
 
     private Outlet selectedOutlet = null;
 
+    private DataModel selectedOutletSubscribers = new ListDataModel();
+
+    private OutletSubscriber selectedOutletSubscriber = null;
+
     private Department selectedDepartment = null;
 
     private Section selectedSection = null;
@@ -59,6 +61,46 @@ public class Outlets extends BaseBean {
     private EditionPattern selectedEditionPattern;
 
     private DataModel outletEditionActionProperties = null;
+
+    /**
+     * Creates a new instance of {@link Outlets}.
+     */
+    public Outlets() {
+    }
+
+    /**
+     * Gets the {@link Outlet} that is currently selected.
+     * <p/>
+     * @return Currently selected {@link Outlet}
+     */
+    public Outlet getSelectedOutlet() {
+        return selectedOutlet;
+    }
+
+    /**
+     * Sets the {@link Outlet} that was selected by the user.
+     * <p/>
+     * @param selectedOutlet {@link Outlet} selected
+     */
+    public void setSelectedOutlet(Outlet selectedOutlet) {
+        this.selectedOutlet = selectedOutlet;
+        onLoadSelectedOutletSubscribers(null);
+    }
+
+    /**
+     * Event handler for loading the subscribers of the selected outlet.
+     * <p/>
+     * @param event Event that invoked the handler
+     */
+    public void onLoadSelectedOutletSubscribers(ActionEvent event) {
+        if (getSelectedOutlet() != null && getSelectedOutlet().getId() != null) {
+            List<OutletSubscriber> subscribers = outletFacade.
+                    findOutletSubscribers(getSelectedOutlet().getId(), 0, 100);
+            this.selectedOutletSubscribers = new ListDataModel(subscribers);
+        } else {
+            this.selectedOutletSubscribers = new ListDataModel();
+        }
+    }
 
     /**
      * Gets a {@link DataModel} containing the available outlets.
@@ -72,20 +114,40 @@ public class Outlets extends BaseBean {
         return outlets;
     }
 
+    /**
+     * Gets a {@link DataModel} containing the subscribers of the {@link Outlet}.
+     * <p/>
+     * @return {@link Datamodel} containing the subscribers of the selected {@link Outlet}
+     */
+    public DataModel getSelectedOutletSubscribers() {
+        return selectedOutletSubscribers;
+    }
+
+    /**
+     * Gets the selected {@link OutletSubscriber}.
+     * <p/>
+     * @return Selected {@link OutletSubscriber} or {@code null} if no subscriber is selected
+     */
+    public OutletSubscriber getSelectedOutletSubscriber() {
+        return selectedOutletSubscriber;
+    }
+
+    /**
+     * Sets the selected {@link OutletSubscriber}.
+     * <p/>
+     * @param selectedOutletSubscriber Selected {@link OutletSubscriber}
+     */
+    public void setSelectedOutletSubscriber(
+            OutletSubscriber selectedOutletSubscriber) {
+        this.selectedOutletSubscriber = selectedOutletSubscriber;
+    }
+
     public String getSelectedOutletTab() {
         return selectedOutletTab;
     }
 
     public void setSelectedOutletTab(String selectedOutletTab) {
         this.selectedOutletTab = selectedOutletTab;
-    }
-
-    public Outlet getSelectedOutlet() {
-        return selectedOutlet;
-    }
-
-    public void setSelectedOutlet(Outlet selectedOutlet) {
-        this.selectedOutlet = selectedOutlet;
     }
 
     public Department getSelectedDepartment() {
@@ -108,10 +170,7 @@ public class Outlets extends BaseBean {
      * Determines if the {@link Outlet} is in <em>edit</em> or <em>add</em>
      * mode.
      *
-     * @return <
-     * code>true</code> if the {@link Outlet} is in <em>edit</em> mode
-     * and
-     * <code>false</code> if in <em>add</em> mode
+     * @return {@code true} if the {@link Outlet} is in <em>edit</em> mode and {@code false} if in <em>add</em> mode
      */
     public boolean isOutletEditMode() {
         if (selectedOutlet == null || selectedOutlet.getId() == null) {
@@ -124,10 +183,7 @@ public class Outlets extends BaseBean {
     /**
      * Determines if the {@link Outlet} is in <em>add</em> mode.
      *
-     * @return <
-     * code>true</code> if the {@link Outlet} is in <em>add</em> mode
-     * and
-     * <code>false</code> if in <em>edit</em> mode
+     * @return {@code true} if the {@link Outlet} is in <em>add</em> mode and {@code false} if in <em>edit</em> mode
      */
     public boolean isOutletAddMode() {
         return !isOutletEditMode();
@@ -211,8 +267,7 @@ public class Outlets extends BaseBean {
     /**
      * Event handler for deleting the {@link Outlet}.
      *
-     * @param event
-     * Event that invoked the handler
+     * @param event Event that invoked the handler
      */
     public void onDeleteOutlet(ActionEvent event) {
         outletFacade.deleteOutletById(selectedOutlet.getId());
@@ -261,10 +316,12 @@ public class Outlets extends BaseBean {
     public void onSaveSection(ActionEvent event) {
         if (isSectionAddMode()) {
             selectedSection = outletFacade.createSection(selectedSection);
+            // TODO: i18n
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     "outlets_SECTION_CREATED");
         } else {
             selectedSection = outletFacade.updateSection(selectedSection);
+            // TODO: i18n
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     "outlets_SECTION_UPDATED");
         }
@@ -274,14 +331,64 @@ public class Outlets extends BaseBean {
     public void onDeleteSection(ActionEvent event) {
         try {
             outletFacade.deleteSection(selectedSection.getId());
+            // TODO: i18n
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     "outlets_SECTION_DELETED");
         } catch (EntityReferenceException ex) {
+            // TODO: i18n
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     "outlets_SECTION_CANNOT_BE_DELETED_ENTITY_REFERENCE");
         }
 
         reloadSelectedOutlet();
+    }
+
+    /**
+     * Event handler for preparing the creation of a new outlet subscriber.
+     * <p/>
+     * @param event Event that invoked the handler
+     */
+    public void onNewOutletSubscriber(ActionEvent event) {
+        this.selectedOutletSubscriber = new OutletSubscriber();
+        this.selectedOutletSubscriber.setOutlet(selectedOutlet);
+    }
+
+    public void onSaveOutletSubscriber(ActionEvent event) {
+        Date now = Calendar.getInstance().getTime();
+        if (isOutletAddMode()) {
+            if (!selectedOutletSubscriber.isSubscribed()) {
+                selectedOutletSubscriber.setUnsubscriptionDate(now);
+            } else {
+                selectedOutletSubscriber.setSubscriptionDate(now);
+            }
+            
+            selectedOutletSubscriber = outletFacade.createSubscriber(
+                    selectedOutletSubscriber);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
+                    "administrator_Outlets_OUTLET_SUBSCRIBER_CREATED", null);
+        } else {
+            selectedOutletSubscriber = outletFacade.updateSubscriber(
+                    selectedOutletSubscriber);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
+                    "administrator_Outlets_OUTLET_SUBSCRIBER_UPDATED", null);
+        }
+        onLoadSelectedOutletSubscribers(event);
+    }
+
+    public void onDeleteOutletSubscriber(ActionEvent event) {
+        outletFacade.deleteSubscriberById(selectedOutletSubscriber.getId());
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
+                "administrator_Outlets_OUTLET_SUBSCRIBER_DELETED", null);
+        onLoadSelectedOutletSubscribers(event);
+    }
+
+    public boolean isOutletSubscriberAddMode() {
+        if (selectedOutletSubscriber == null || selectedOutletSubscriber.getId()
+                == null) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void reloadSelectedOutlet() {
@@ -402,28 +509,38 @@ public class Outlets extends BaseBean {
         return !isActionEditMode();
     }
 
+    /**
+     * Event handler for removing an action from an {@link Outlet}.
+     * <p/>
+     * @param event Event that invoked the handler
+     */
     public void onDeleteOutletAction(ActionEvent event) {
         selectedOutlet.getEditionActions().remove(selectedOutletEditionAction);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false,
-                "The action was deleted", null);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
+                "administrator_Outlets_OUTLET_ACTION_REMOVE", null);
 
     }
 
+    /**
+     * Event handler for updating or creating an outlet action.
+     * <p/>
+     * @param event Event that invoked the handler
+     */
     public void onSaveOutletAction(ActionEvent event) {
         if (isActionAddMode()) {
             selectedOutletEditionAction.setOutlet(selectedOutlet);
             selectedOutletEditionAction = outletFacade.createOutletAction(
                     selectedOutletEditionAction);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false,
-                    "The action was created", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
+                    "administrator_Outlets_OUTLET_ACTION_CREATED", null);
         } else {
             selectedOutletEditionAction = outletFacade.updateOutletAction(
                     selectedOutletEditionAction);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false,
-                    "The action was updated", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
+                    "administrator_Outlets_OUTLET_ACTION_UPDATED", null);
         }
 
-        // Update the outlet (as it will not have different steps)
+        // Update the outlet (as it will now have different actions)
         try {
             selectedOutlet = outletFacade.findOutletById(selectedOutlet.getId());
         } catch (DataNotFoundException ex) {
@@ -475,7 +592,7 @@ public class Outlets extends BaseBean {
                     "outlet_EDITION_PATTERN_CREATED");
         }
 
-        // Update the outlet (as it will not have different steps)
+        // Update the outlet (as it will now have different patterns)
         try {
             selectedOutlet = outletFacade.findOutletById(selectedOutlet.getId());
         } catch (DataNotFoundException ex) {

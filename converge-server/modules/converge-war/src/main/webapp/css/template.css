@@ -1776,3 +1776,6 @@ div.metrics > span {margin-left:0.5em !important;}
 .classificationTooltip { width: 350px; }
 .renditionTooltip { width: 350px; }
 .mediaItemHeld { background-color: #ff0000; color: white; font-size: 2em; font-weight: bold; }
+
+.subscribers { width: 98%; height: 300px; overflow:auto; position: relative; display: block; border: 0px; padding: 8px; font-family:'Lucida Grande', helvetica, verdana, sans-serif, arial; font-size: 1em; background-color: transparent; }
+.unsubscribed { color: red; }

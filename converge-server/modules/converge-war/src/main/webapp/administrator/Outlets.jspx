@@ -54,7 +54,7 @@
 
                         <rich:column id="colTitle" sortBy="#{outlet.title}" sortOrder="ASCENDING">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.Generic_TITLE}" title="#{i18n.Outlets_TITLE_TOOLTIP}" />
+                                <h:outputText value="#{i18n.administrator_Outlets_OUTLET_TITLE}" title="#{i18n.administrator_Outlets_OUTLET_TITLE_TOOLTIP}" />
                             </f:facet>
                             <a4j:commandLink reRender="frmOutletDetails" ajaxSingle="true">
                                 <f:setPropertyActionListener value="#{outlet}" target="#{administrator_Outlets.selectedOutlet}" />
@@ -68,8 +68,8 @@
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Outlets_TYPE}" title="#{i18n.Outlets_TYPE_TOOLTIP}" />
                             </f:facet>
-                            <c:set var="key" value="OUTLET_TYPE_#{outlet.type}" />
-                            <h:outputText value="#{msgs[key]}" />
+                            <c:set var="key" value="Generic_OUTLET_TYPE_#{outlet.type}" />
+                            <h:outputText value="#{i18n[key]}" />
                         </rich:column>
 
                         <rich:column id="colLanguage" sortBy="#{outlet.language.name}">
@@ -113,15 +113,15 @@
                             </h:graphicImage>
                         </h:panelGroup>
                     </f:facet>
-                    
+
                     <h:panelGrid id="pgOutletDetails" style="width: 480px;">
 
                         <rich:tabPanel id="tpOutlet" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive" selectedTab="#{administrator_Outlets.selectedOutletTab}">
 
                             <rich:tab id="tabOutlet" label="#{i18n.Outlets_OUTLET}">
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
-                                    <h:outputText value="#{i18n.Generic_TITLE}:" />
-                                    <h:inputText id="txtTitle" styleClass="text mediumInput" value="#{administrator_Outlets.selectedOutlet.title}" title="#{i18n.Outlets_TITLE_TOOLTIP}" required="true" requiredMessage="#{i18n.Outlets_TITLE_REQUIRED}"/>
+                                    <h:outputText value="#{i18n.administrator_Outlets_OUTLET_TITLE}:" />
+                                    <h:inputText id="txtTitle" styleClass="text mediumInput" value="#{administrator_Outlets.selectedOutlet.title}" title="#{i18n.administrator_Outlets_OUTLET_TITLE_TOOLTIP}" required="true" requiredMessage="#{i18n.Outlets_TITLE_REQUIRED}"/>
 
                                     <h:outputText value="#{i18n.Outlets_TYPE}:" />
                                     <h:selectOneRadio id="radOutletType" value="#{administrator_Outlets.selectedOutlet.type}" title="#{i18n.Outlets_TYPE_TOOLTIP}" required="true" requiredMessage="#{i18n.Outlets_TYPE_REQUIRED}">
@@ -158,7 +158,7 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                                    <rich:tab id="tabSections" label="#{i18n.Outlets_SECTIONS}" disabled="#{administrator_Outlets.outletAddMode}">
+                            <rich:tab id="tabSections" label="#{i18n.Outlets_SECTIONS}" disabled="#{administrator_Outlets.outletAddMode}">
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
 
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
@@ -201,7 +201,7 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                           <rich:tab id="tabEditionPatterns" label="#{i18n.Outlets_EDITIONS}">
+                            <rich:tab id="tabEditionPatterns" label="#{i18n.Outlets_EDITIONS}">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
@@ -218,7 +218,7 @@
                                             <a4j:commandLink reRender="frmEditionPatternDetails" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{administrator_Outlets.selectedEditionPattern}" value="#{editionPattern}" />
                                                 <rich:componentControl for="mpEditionPatternDetails" operation="show" event="oncomplete" />
-                                                <h:graphicImage value="#{res.EDITION_OPEN_ICON}" />
+                                                <h:graphicImage value="#{i18n.resource_ICON_EDITION_OPEN}" />
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -233,8 +233,8 @@
 
                                         <rich:column styleClass="left">
                                             <f:facet name="header">#{i18n.Outlets_EDITION_PATTERN_DAY}</f:facet>
-                                            <c:set var="key" value="DAY_#{editionPattern.day}" />
-                                            <h:outputText value="#{msgs[key]}" />
+                                            <c:set var="key" value="Outlets_DAY_#{editionPattern.day}" />
+                                            <h:outputText value="#{i18n[key]}" />
                                         </rich:column>
 
                                         <rich:column styleClass="left">
@@ -274,8 +274,59 @@
                             </rich:tab>
 
 
+                            <rich:tab id="tabSubscribers" label="#{i18n.administrator_Outlets_SUBSCRIBERS}">
 
-                           <rich:tab id="tabEvents" label="#{i18n.Outlets_ACTIONS}">
+                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
+
+                                    <rich:dataTable id="dtSubscribers" value="#{administrator_Outlets.selectedOutletSubscribers}" var="subscriber" styleClass="table subscribers" headerClass="tableHeader" rowClasses="odd, even">
+
+                                        <rich:column styleClass="columnIcon center">
+                                            <f:facet name="header">&#160;</f:facet>
+                                            <a4j:commandLink ajaxSingle="true">
+                                                <h:graphicImage value="#{i18n.resource_ICON_OUTLET_SUBSCRIBER}" />
+                                            </a4j:commandLink>
+                                        </rich:column>
+
+                                        <rich:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_NAME}" />
+                                            </f:facet>
+                                            <h:outputText value="#{subscriber.name}" />
+                                        </rich:column>
+
+                                        <rich:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_STATUS}" />
+                                            </f:facet>
+                                            <h:outputText value="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_STATUS_SUBSCRIBED}" rendered="#{subscriber.subscribed}" />
+                                            <h:outputText value="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_STATUS_UNSUBSCRIBED}" rendered="#{!subscriber.subscribed}" />
+                                        </rich:column>
+
+                                        <rich:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_SUBSCRIBED}" title="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_SUBSCRIBED_TOOLTIP}" />
+                                            </f:facet>
+                                            <h:outputText value="#{subscriber.subscriptionDate}" rendered="#{subscriber.subscribed}">
+                                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_SHORT_DATE_AND_TIME}" />
+                                            </h:outputText>
+                                            <h:outputText value="#{subscriber.unsubscriptionDate}" styleClass="unsubscribed" rendered="#{!subscriber.subscribed}">
+                                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_SHORT_DATE_AND_TIME}" />
+                                            </h:outputText>
+                                        </rich:column>
+
+
+                                        <rich:column styleClass="columnIcon center">
+                                            <f:facet name="header"><a4j:commandButton styleClass="button smallButton" value="#{i18n.Generic_NEW}" ajaxSingle="true" reRender="frmOutletSubscriber" actionListener="#{administrator_Outlets.onNewOutletSubscriber}" oncomplete="#{rich:component('mpOutletSubscriber')}.show();" /></f:facet>
+                                            <a4j:commandButton styleClass="button smallButton" value="#{i18n.Generic_MODIFY}" ajaxSingle="true" reRender="frmOutletSubscriber" oncomplete="#{rich:component('mpOutletSubscriber')}.show();">
+                                                <f:setPropertyActionListener target="#{administrator_Outlets.selectedOutletSubscriber}" value="#{subscriber}" />
+                                            </a4j:commandButton>
+                                        </rich:column>
+                                    </rich:dataTable>
+                                    <rich:spacer width="450" height="1" />
+                                </h:panelGrid>
+                            </rich:tab>
+
+                            <rich:tab id="tabEvents" label="#{i18n.Outlets_ACTIONS}">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
@@ -294,7 +345,7 @@
                                                 <f:setPropertyActionListener target="#{administrator_Outlets.selectedOutletEditionAction}" value="#{action}" />
                                                 <f:setPropertyActionListener target="#{administrator_Outlets.selectedOutletEditionDetailsTab}" value="tabOutletEvent" />
                                                 <rich:componentControl for="mpOutletEventDetails" operation="show" event="oncomplete" />
-                                                <h:graphicImage value="#{res.WORKFLOW_STEP_ACTION_ICON}" />
+                                                <h:graphicImage value="#{i18n.resource_ICON_WORKFLOW_STEP_ACTION}" />
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -319,22 +370,22 @@
 
                                         <rich:column>
                                             <f:facet name="header">
-                                                <h:outputText value="Manual" />
+                                                <h:outputText value="#{i18n.administrator_Outlets_WORKFLOW_STEP_EXECUTION}" />
                                             </f:facet>
-                                            <h:outputText value="#{i18n.Generic_YES}" rendered="#{action.manualAction}" />
-                                            <h:outputText value="#{i18n.Generic_NO}" rendered="#{!action.manualAction}" />
+                                            <h:outputText value="#{i18n.administrator_Outlets_WORKFLOW_STEP_EXECUTION_MANUAL}" rendered="#{action.manualAction}" />
+                                            <h:outputText value="#{i18n.administrator_Outlets_WORKFLOW_STEP_EXECUTION_AUTOMATIC}" rendered="#{!action.manualAction}" />
                                         </rich:column>
 
 
                                         <rich:column styleClass="columnIcon center">
                                             <f:facet name="header">
                                                 <a4j:commandLink id="lnkRecloseOutlet" title="#{i18n.Outlets_EXECUTE_ALL_ACTIONS}" actionListener="#{administrator_Outlets.onRecloseEditions}" reRender="pgOutletDetails, frmPage" >
-                                                    <h:graphicImage value="#{res.RUN_ALL_ICON}" />
+                                                    <h:graphicImage value="#{i18n.resource_ICON_RUN_ALL_ACTIONS}" />
                                                 </a4j:commandLink>
                                             </f:facet>
                                             <a4j:commandLink ajaxSingle="true" title="#{i18n.Outlets_EXECUTE_ACTION}">
                                                 <f:setPropertyActionListener target="#{administrator_Outlets.executeAction}" value="#{action}" />
-                                                <h:graphicImage value="#{res.RUN_ICON}" />
+                                                <h:graphicImage value="#{i18n.resource_ICON_RUN_ACTION}" />
                                             </a4j:commandLink>
                                         </rich:column>
                                     </rich:dataTable>
@@ -537,7 +588,7 @@
                                         <f:selectItems value="#{common.outletActions}" />
                                         <a4j:support event="onchange" reRender="pgActionProperties, aboutAction" />
                                     </h:selectOneMenu>
-                                    
+
                                     <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_ABOUT}" />
                                     <h:panelGroup id="aboutAction" styleClass="pluginInstanceAbout mediumInput" layout="block">
                                         <h:outputText value="#{administrator_Outlets.selectedOutletEditionAction.action.about}" escape="false" />
@@ -556,14 +607,14 @@
                                                 <f:selectItems value="#{administrator_Outlets.selectedOutletEditionAction.action.availableProperties}" />
                                                 <a4j:support event="onchange" reRender="colHelp" />
                                             </h:selectOneMenu>
-                                            
+
                                             <h:panelGroup id="colHelp">
                                                 <c:set var="help_key" value="#{administrator_Outlets.selectedOutletEditionActionProperty.key}_HELP" />
                                                 <c:set var="help_text" value="#{converge:message(administrator_Outlets.selectedOutletEditionAction.action.bundle, help_key)}" />
-                                                <h:graphicImage url="#{res.HELP_ICON}" title="#{help_text}" rendered="#{help_text != ''}" />
+                                                <h:graphicImage url="#{i18n.resource_ICON_HELP}" title="#{help_text}" rendered="#{help_text != ''}" />
                                                 <h:outputText value="&#160;" rendered="#{help_text == ''}" />
                                             </h:panelGroup>
-                                            
+
                                             <h:outputText value="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTY_VALUE_INPUT}" />
                                             <h:inputText styleClass="text mediumInput" value="#{administrator_Outlets.selectedOutletEditionActionProperty.value}" />
                                             <a4j:commandButton id="btnAdd" value="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTY_ADD}" actionListener="#{administrator_Outlets.onAddActionProperty}" reRender="pgActionProperties" styleClass="button dynamicButton" />
@@ -589,7 +640,7 @@
                                         <rich:column styleClass="center columnIcon">
                                             <a4j:commandLink id="lnkRemoveActionProperty" reRender="pgActionProperties" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{administrator_Outlets.deleteProperty}" value="#{property}" />
-                                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
+                                                <h:graphicImage value="#{i18n.resource_ICON_DELETE}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -683,6 +734,60 @@
                             <rich:componentControl for="mpEditionPatternDetails" operation="hide" event="oncomplete" />
                         </a4j:commandLink>
                         <h:commandLink id="lnkCloseEditionPatternForm" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpEditionPatternDetails')}.hide(); return false;" />
+                    </h:panelGroup>
+
+                </rich:modalPanel>
+            </h:form>
+
+
+            <h:form id="frmOutletSubscriber">
+                <rich:modalPanel id="mpOutletSubscriber" autosized="true" domElementAttachment="parent" rendered="#{administrator_Outlets.selectedOutletSubscriber != null}">
+                    <f:facet name="header">
+                        <h:panelGroup>
+                            <h:outputText value="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_DETAILS}" />
+                        </h:panelGroup>
+                    </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
+                                <rich:componentControl for="mpOutletSubscriber" operation="hide" event="onclick"/>
+                            </h:graphicImage>
+                        </h:panelGroup>
+                    </f:facet>
+                    <h:panelGrid id="pgOutletSubscriberDetails" style="width: 480px;">
+
+                        <rich:tabPanel id="tpOutletSubscriber" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+                            <rich:tab label="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_PROFILE}">
+                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
+                                    <h:outputText value="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_NAME}:" />
+                                    <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_Outlets.selectedOutletSubscriber.name}" />
+                                    <h:outputText value="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_EMAIL}:" />
+                                    <h:inputText id="txtEmail" styleClass="text mediumInput" value="#{administrator_Outlets.selectedOutletSubscriber.email}" />
+                                    <h:outputText value="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_PHONE}:" />
+                                    <h:inputText id="txtPhone" styleClass="text mediumInput" value="#{administrator_Outlets.selectedOutletSubscriber.phone}" />
+                                    <h:outputText value="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_LOCATION}:" />
+                                    <h:inputText id="txtLocation" styleClass="text mediumInput" value="#{administrator_Outlets.selectedOutletSubscriber.location}" />
+                                    <h:outputText value="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_SOURCE}:" />
+                                    <h:inputText id="txtSource" styleClass="text mediumInput" value="#{administrator_Outlets.selectedOutletSubscriber.source}" />
+                                    <h:outputText value="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_STATUS}:" />
+                                    <h:selectOneRadio value="#{administrator_Outlets.selectedOutletSubscriber.subscribed}">
+                                        <f:selectItem itemLabel="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_STATUS_SUBSCRIBED}" itemValue="#{true}" />
+                                        <f:selectItem itemLabel="#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_STATUS_UNSUBSCRIBED}" itemValue="#{false}" />
+                                    </h:selectOneRadio>
+                                </h:panelGrid>
+                            </rich:tab>
+                        </rich:tabPanel>
+                    </h:panelGrid>
+
+                    <h:panelGroup styleClass="dialogueButtons">
+                        <a4j:commandLink id="lnkSaveOutletSubscriber" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Outlets.onSaveOutletSubscriber}" reRender="dtSubscribers">
+                            <rich:componentControl for="mpOutletSubscriber" operation="hide" event="oncomplete" />
+                        </a4j:commandLink>
+                        <a4j:commandLink id="lnkApplyOutletSubscriber" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Outlets.onSaveOutletSubscriber}" reRender="dtSubscribers" />
+                        <a4j:commandLink id="lnkDeleteOutletSubscriber" rendered="#{!administrator_Outlets.outletSubscriberAddMode}" onclick="if (confirm('#{i18n.administrator_Outlets_OUTLET_SUBSCRIBER_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Outlets.onDeleteOutletSubscriber}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="dtSubscribers">
+                            <rich:componentControl for="mpOutletSubscriber" operation="hide" event="oncomplete" />
+                        </a4j:commandLink>
+                        <h:commandLink id="lnkCloseOutletSubscriber" styleClass="dialogButton" value="#{i18n.Generic_CLOSE}" onclick="#{rich:component('mpOutletSubscriber')}.hide(); return false;" />
                     </h:panelGroup>
 
                 </rich:modalPanel>

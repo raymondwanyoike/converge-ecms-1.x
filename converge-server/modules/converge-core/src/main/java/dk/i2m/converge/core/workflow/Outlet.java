@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,27 +18,13 @@ package dk.i2m.converge.core.workflow;
 
 import dk.i2m.converge.core.content.Language;
 import dk.i2m.converge.core.security.UserRole;
+import dk.i2m.converge.core.subscriber.OutletSubscriber;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import org.eclipse.persistence.annotations.PrivateOwned;
 
 /**
@@ -71,8 +57,10 @@ public class Outlet implements Serializable {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "outlet_role",
-    joinColumns = {@JoinColumn(referencedColumnName = "id", name = "outlet_id", nullable = false)},
-    inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "role_id", nullable = false)})
+    joinColumns = {@JoinColumn(referencedColumnName = "id", name = "outlet_id",
+        nullable = false)},
+    inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name =
+        "role_id", nullable = false)})
     private List<UserRole> roles = new ArrayList<UserRole>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -85,15 +73,25 @@ public class Outlet implements Serializable {
 
     @OneToMany(mappedBy = "outlet", fetch = FetchType.LAZY)
     @PrivateOwned
-    private List<OutletEditionAction> editionActions = new ArrayList<OutletEditionAction>();
+    private List<OutletEditionAction> editionActions =
+            new ArrayList<OutletEditionAction>();
 
-    @OneToMany(mappedBy = "outlet", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "outlet", cascade = CascadeType.PERSIST, fetch =
+    FetchType.LAZY)
     @PrivateOwned
-    private List<EditionPattern> editionPatterns = new ArrayList<EditionPattern>();
+    private List<EditionPattern> editionPatterns =
+            new ArrayList<EditionPattern>();
 
     @ManyToOne
     @JoinColumn(name = "language_id")
     private Language language;
+
+    @OneToMany(mappedBy = "outlet")
+    private List<OutletSubscriber> subscribers =
+            new ArrayList<OutletSubscriber>();
+
+    @Transient
+    private int numberOfSubscribers = 0;
 
     /**
      * Creates a new instance of {@link Outlet}.
@@ -113,8 +111,7 @@ public class Outlet implements Serializable {
     /**
      * Sets the unique identifier of the {@link Outlet}.
      *
-     * @param id
-     *          Unique identifier of the {@link Outlet}
+     * @param id Unique identifier of the {@link Outlet}
      */
     public void setId(Long id) {
         this.id = id;
@@ -132,8 +129,7 @@ public class Outlet implements Serializable {
     /**
      * Sets the title of the {@link Outlet}.
      *
-     * @param title
-     *          Title of the {@link Outlet}
+     * @param title Title of the {@link Outlet}
      */
     public void setTitle(String title) {
         this.title = title;
@@ -180,7 +176,7 @@ public class Outlet implements Serializable {
      * full names.
      *
      * @return {@link List} of active {@link Section}s sorted by their full
-     *         names
+     * names
      */
     public List<Section> getActiveSections() {
         List<Section> activeSections = new ArrayList<Section>();
@@ -206,11 +202,10 @@ public class Outlet implements Serializable {
     }
 
     /**
-     * Gets a {@link List} of action that should be executed
-     * automatically upon closing.
-     * 
-     * @return {@link List} of action that should be executed
-     *         upon closing
+     * Gets a {@link List} of action that should be executed automatically upon
+     * closing.
+     * <p/>
+     * @return {@link List} of action that should be executed upon closing
      */
     public List<OutletEditionAction> getAutomaticEditionActions() {
         List<OutletEditionAction> auto = new ArrayList<OutletEditionAction>();
@@ -256,33 +251,63 @@ public class Outlet implements Serializable {
     /**
      * Sets the {@link Language} of the {@link Outlet}.
      *
-     * @param language
-     *          {@link Language} of the {@link Outlet}
+     * @param language {@link Language} of the {@link Outlet}
      */
     public void setLanguage(Language language) {
         this.language = language;
     }
-    
+
     /**
      * Determines if the {@link Outlet} is valid and operational.
-     * An {@link Outlet} is valid and operational if all the necessary 
+     * An {@link Outlet} is valid and operational if all the necessary
      * fields have been set.
-     * 
+     * <p/>
      * @return {@code true} if the {@link Outlet} is valid, otherwise {@code false}
      */
     public boolean isValid() {
-        if (getWorkflow() == null) { 
+        if (getWorkflow() == null) {
             return false;
         }
         if (getLanguage() == null) {
             return false;
         }
-        
+
         if (!getWorkflow().isValid()) {
             return false;
         }
-        
+
         return true;
+    }
+
+    /**
+     * Contains a list of subscribers of the {@link Outlet}.
+     * <p/>
+     * @return {@link List} of subscribers of the {@link Outlet}
+     */
+    public List<OutletSubscriber> getSubscribers() {
+        return subscribers;
+    }
+
+    public void setSubscribers(List<OutletSubscriber> subscribers) {
+        this.subscribers = subscribers;
+    }
+
+    /**
+     * Gets the number of subscribers of the {@link Outlet}.
+     * 
+     * @return Number of subscribers
+     */
+    public int getNumberOfSubscribers() {
+        return numberOfSubscribers;
+    }
+
+    /**
+     * Sets the number of subscribers of the {@link Outlet}.
+     * 
+     * @param numberOfSubscribers Number of Subscribers
+     */
+    public void setNumberOfSubscribers(int numberOfSubscribers) {
+        this.numberOfSubscribers = numberOfSubscribers;
     }
 
     @Override
