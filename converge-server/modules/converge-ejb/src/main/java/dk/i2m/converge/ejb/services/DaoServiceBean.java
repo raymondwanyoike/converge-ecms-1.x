@@ -217,12 +217,10 @@ public class DaoServiceBean implements DaoServiceLocal {
     /**
      * Finds a {@link List} of entity returned by the given named query.
      *
-     * @param namedQueryName
-     *          Name of the query
-     * @param parameters
-     *          Parameters of the query
-     * @param resultLimit
-     *          Maximum number of results
+     * @param namedQueryName Name of the query
+     * @param parameters     Parameters of the query
+     * @param start          First record of the result set
+     * @param resultLimit    Maximum number of results
      * @return {@link List} of entities returned by the given query
      */
     @Override
