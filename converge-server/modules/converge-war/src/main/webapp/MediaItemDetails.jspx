@@ -172,9 +172,9 @@
                                 <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                             </f:facet>
                             <h:outputLink target="_blank" value="#{rendition.mediaItemRendition.absoluteFilename}" rendered="#{rendition.available}">
-                                <h:graphicImage value="#{i18n.resource_ICON_MEDIA_ITEM_RENDITION_GO_TO}" title="#{rendition.rendition.label}"/>
+                                <h:graphicImage value="#{i18n.resource_ICON_MEDIA_ITEM_RENDITION_GO_TO}" title="#{i18n.MediaItemDetails_MEDIA_ITEM_RENDITION_GO_TO}"/>
                             </h:outputLink>
-                            <h:graphicImage value="#{i18n.resource_ICON_MEDIA_ITEM_RENDITION_GO_TO_DISABLED}" title="#{rendition.rendition.label}" rendered="#{!rendition.available}" />
+                            <h:graphicImage value="#{i18n.resource_ICON_MEDIA_ITEM_RENDITION_GO_TO_DISABLED}" title="#{i18n.MediaItemDetails_MEDIA_ITEM_RENDITION_GO_TO_DISABLED}" rendered="#{!rendition.available}" />
                         </rich:column>
                         <rich:column id="colRendition">
                             <f:facet name="header">
@@ -546,7 +546,7 @@
                                         <h:outputText value="#{i18n.MediaItemDetails_RENDITION_VIDEO_SAMPLING_METHOD}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.videoSamplingMethod}" styleClass="text mediumInput" />
 
-                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_VIDEO_DURATION}" />
+                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_DURATION}" />
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.duration}" styleClass="text smallInput">
                                             <f:convertNumber integerOnly="true" groupingUsed="false" />
                                         </h:inputText>
