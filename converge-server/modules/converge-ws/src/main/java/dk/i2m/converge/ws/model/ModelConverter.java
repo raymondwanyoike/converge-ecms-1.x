@@ -89,6 +89,7 @@ public class ModelConverter {
         item.setDateLine(DATE_LINE_FORMAT.format(nip.getEdition().
                 getPublicationDate().getTime()));
         item.setStory(nip.getNewsItem().getStory());
+        item.setStory(item.getStory().replaceAll("\\p{Cntrl}", " "));
         item.setDisplayOrder(nip.getPosition());
         item.setStart(nip.getStart());
 
