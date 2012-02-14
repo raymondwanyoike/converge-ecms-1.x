@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2011 Interactive Media Management. All Rights Reserved.
+ *  Copyright (C) 2011-2012 Interactive Media Management. All Rights Reserved.
  * 
  *  NOTICE:  All information contained herein is, and remains the property of 
  *  INTERACTIVE MEDIA MANAGEMENT and its suppliers, if any.  The intellectual 
@@ -103,13 +103,9 @@ public class SubscriberFacade {
     /**
      * Updates an existing {@link Subscriber} profile.
      * <p/>
-     * @param phone
-     * Header parameter containing the phone number identifying the
-     *          {@link Subscriber}
-     * @param password
-     * Header parameter containing the password matching the phone
-     * number of the {@link Subscriber}
-     * @param subscriber * Updated {@link Subscriber} profiler
+     * @param phone Header parameter containing the phone number identifying the {@link Subscriber}
+     * @param password Header parameter containing the password matching the phone number of the {@link Subscriber}
+     * @return {@code true} if the user is authenticated, otherwise {@code false}
      */
     @GET
     @Path("authenticate")
@@ -127,13 +123,9 @@ public class SubscriberFacade {
     /**
      * Updates an existing {@link Subscriber} profile.
      * <p/>
-     * @param phone
-     * Header parameter containing the phone number identifying the
-     *          {@link Subscriber}
-     * @param password
-     * Header parameter containing the password matching the phone
-     * number of the {@link Subscriber}
-     * @param subscriber * Updated {@link Subscriber} profiler
+     * @param phone      Header parameter containing the phone number identifying the {@link Subscriber}
+     * @param password   Header parameter containing the password matching the phone number of the {@link Subscriber}
+     * @param subscriber Updated {@link Subscriber} profiler
      */
     @PUT
     @Path("update")
@@ -178,14 +170,9 @@ public class SubscriberFacade {
     /**
      * Updates the category subscription of a given {@link Subscriber}.
      * <p/>
-     * @param phone
-     * Header parameter containing the phone number identifying the
-     *          {@link Subscriber}
-     * @param password
-     * Header parameter containing the password matching the phone
-     * number of the {@link Subscriber}
-     * @param categories
-     * List of subscribed categories
+     * @param phone      Header parameter containing the phone number identifying the {@link Subscriber}
+     * @param password   Header parameter containing the password matching the phone number of the {@link Subscriber}
+     * @param categories List of subscribed categories
      */
     @POST
     @Path("subscribe")
@@ -217,14 +204,9 @@ public class SubscriberFacade {
     /**
      * Updates the category subscription of a given {@link Subscriber}.
      * <p/>
-     * @param phone
-     * Header parameter containing the phone number identifying the
-     *          {@link Subscriber}
-     * @param password
-     * Header parameter containing the password matching the phone
-     * number of the {@link Subscriber}
-     * @param items
-     * List of subscribed categories
+     * @param phone    Header parameter containing the phone number identifying the {@link Subscriber}
+     * @param password Header parameter containing the password matching the phone number of the {@link Subscriber}
+     * @param items    List of subscribed categories
      */
     @POST
     @Path("readNews")
@@ -279,8 +261,11 @@ public class SubscriberFacade {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery cq = cb.createQuery();
         Root subs = cq.from(Subscriber.class);
-        cq.select(subs).where(cb.equal(subs.get("phone"), phone)).
-                where(cb.equal(subs.get("password"), password));
+        
+        Predicate phoneIs = cb.equal(subs.get("phone"), phone);
+        Predicate passwordIs = cb.equal(subs.get("password"), password);
+        
+        cq.select(subs).where(cb.and(phoneIs, passwordIs));
 
         List<Subscriber> matches = em.createQuery(cq).getResultList();
 
@@ -295,14 +280,10 @@ public class SubscriberFacade {
      * Gets the {@link Section}s available for subscription by the given
      * {@link Subscriber}.
      * <p/>
-     * @param phone
-     * Phone number of the {@link Subscriber}
-     * @param password
-     * Password of the {@link Subscriber}
-     * @param outlet
-     * Unique identifier of the {@link Outlet}
-     * @param key
-     * Secret key of the {@link Outlet}
+     * @param phone    Phone number of the {@link Subscriber}
+     * @param password Password of the {@link Subscriber}
+     * @param outlet   Unique identifier of the {@link Outlet}
+     * @param key      Secret key of the {@link Outlet}
      * @return {@link List} of available sections for subscription. If the
      * phone number and password is incorrect, or the outlet and key
      * doesn't match a 401 HTTP status code is returned
@@ -325,8 +306,11 @@ public class SubscriberFacade {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery cq = cb.createQuery();
         Root o = cq.from(Outlet.class);
-        cq.select(o).where(cb.equal(o.get("id"), outlet)).
-                where(cb.equal(o.get("key"), key));
+        
+        Predicate idMatch = cb.equal(o.get("id"), outlet);
+        Predicate keyMatch = cb.equal(o.get("key"), key);
+        Predicate condition = cb.and(idMatch, keyMatch);
+        cq.select(o).where(condition);
 
         List<Outlet> matches = em.createQuery(cq).getResultList();
 
@@ -405,8 +389,10 @@ public class SubscriberFacade {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery cq = cb.createQuery();
         Root subs = cq.from(Subscriber.class);
-        cq.select(subs).where(cb.equal(subs.get("phone"), phone)).
-                where(cb.equal(subs.get("password"), password));
+        Predicate phoneIs = cb.equal(subs.get("phone"), phone);
+        Predicate passwordIs = cb.equal(subs.get("password"), password);
+
+        cq.select(subs).where(cb.and(phoneIs, passwordIs));
 
         List<Subscriber> matches = em.createQuery(cq).getResultList();
 
