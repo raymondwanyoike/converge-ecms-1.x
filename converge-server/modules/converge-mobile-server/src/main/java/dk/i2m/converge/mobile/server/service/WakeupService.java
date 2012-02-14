@@ -73,7 +73,7 @@ public class WakeupService {
 
     @EJB
     private ConfigFacadeLocal cfgFacade;
-    
+
     @EJB
     private SectionFacadeLocal sectionFacade;
 
@@ -153,7 +153,8 @@ public class WakeupService {
             Config rndStory = cfgFacade.find(Config.Property.RENDITION_STORY);
             Config imgLocation = cfgFacade.find(Config.Property.IMAGE_LOCATION);
             Config imgUrl = cfgFacade.find(Config.Property.IMAGE_URL);
-            Config imgTimeout = cfgFacade.find(Config.Property.IMAGE_DOWNLOAD_TIMEOUT);
+            Config imgTimeout = cfgFacade.find(
+                    Config.Property.IMAGE_DOWNLOAD_TIMEOUT);
             int timeout = Integer.valueOf(imgTimeout.getValue());
 
             for (dk.i2m.converge.wsclient.NewsItem item : externalEdition.
@@ -171,21 +172,24 @@ public class WakeupService {
                     // Generate thumbs
                     if (!item.getMedia().isEmpty()) {
 
-                        Collections.sort(item.getMedia(), new BeanComparator("priority"));
+                        Collections.sort(item.getMedia(), new BeanComparator(
+                                "priority"));
 
                         MediaItem img = item.getMedia().iterator().next();
 
                         for (MediaItemRendition mir : img.getRenditions()) {
                             String postfix = "";
-                            
+
                             boolean isThumbImg = false;
                             boolean isStoryImg = false;
-                            
-                            
-                            if (mir.getName().equalsIgnoreCase(rndThumb.getValue())) {
+
+
+                            if (mir.getName().equalsIgnoreCase(
+                                    rndThumb.getValue())) {
                                 isThumbImg = true;
                                 postfix = "-thumb";
-                            } else if (mir.getName().equalsIgnoreCase(rndStory.getValue())) {
+                            } else if (mir.getName().equalsIgnoreCase(rndStory.
+                                    getValue())) {
                                 isStoryImg = true;
                                 postfix = "-story";
                             } else {
@@ -196,7 +200,8 @@ public class WakeupService {
                             try {
                                 String filename = "" + img.getId() + postfix;
                                 URL mirImg = new URL(mir.getUrl());
-                                File copyTo = new File(imgLocation.getValue(), filename);
+                                File copyTo = new File(imgLocation.getValue(),
+                                        filename);
                                 LOG.log(Level.INFO, "Downloading {0} to {1}",
                                         new Object[]{mirImg.toExternalForm(),
                                             copyTo.getCanonicalPath()});
@@ -204,9 +209,11 @@ public class WakeupService {
                                         mirImg, copyTo, timeout, timeout);
 
                                 if (isThumbImg) {
-                                    newsItem.setThumbUrl(imgUrl.getValue() + "/" + filename);
+                                    newsItem.setThumbUrl(imgUrl.getValue() + "/"
+                                            + filename);
                                 } else if (isStoryImg) {
-                                    newsItem.setImgUrl(imgUrl.getValue() + "/" + filename);
+                                    newsItem.setImgUrl(imgUrl.getValue() + "/"
+                                            + filename);
                                 }
                             } catch (IOException ex) {
                                 LOG.log(Level.SEVERE, null, ex);
@@ -216,15 +223,18 @@ public class WakeupService {
                     } else {
                         // No media items - use categoy image
                         String sid = String.valueOf(item.getSection().getId());
-                        
-                        dk.i2m.converge.mobile.server.domain.Section s = sectionFacade.findByExternalId(item.getSection().getId());
-                        
+
+                        dk.i2m.converge.mobile.server.domain.Section s =
+                                sectionFacade.findByExternalId(item.getSection().
+                                getId());
+
                         if (s.isDefaultStoryImageAvailable()) {
                             newsItem.setImgUrl(s.getDefaultStoryImageUrl());
                         }
-                        
+
                         if (s.isDefaultStoryThumbImageAvailable()) {
-                            newsItem.setThumbUrl(s.getDefaultStoryThumbImageUrl());
+                            newsItem.setThumbUrl(
+                                    s.getDefaultStoryThumbImageUrl());
                         }
                     }
 
