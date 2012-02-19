@@ -97,6 +97,11 @@ public class TranscodeHook extends CatalogueHook {
 
         // Determine if we need to act on the uploaded rendition
         MediaItemRendition uploadRendition = event.getRendition();
+        if (!uploadRendition.isVideo()) {
+            // Ignore non-videos
+            return;
+        }
+        
         Rendition rendition = uploadRendition.getRendition();
 
         if (!rendition.getName().equalsIgnoreCase(getProperty(

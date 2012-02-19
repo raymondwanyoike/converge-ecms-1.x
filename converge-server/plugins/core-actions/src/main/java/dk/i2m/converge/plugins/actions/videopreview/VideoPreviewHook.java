@@ -86,7 +86,7 @@ public class VideoPreviewHook extends CatalogueHook {
     public void execute(PluginContext ctx, CatalogueEvent event,
             CatalogueHookInstance instance) throws CatalogueEventException {
         instanceProperties = instance.getPropertiesAsMap();
-
+        
         validateProperties();
 
         boolean executeOnUpdate = false;
@@ -110,6 +110,10 @@ public class VideoPreviewHook extends CatalogueHook {
 
         // Determine if we need to act on the uploaded rendition
         MediaItemRendition uploadRendition = event.getRendition();
+        if (!uploadRendition.isVideo()) {
+            return;
+        }
+        
         Rendition rendition = uploadRendition.getRendition();
 
         if (!rendition.getName().equalsIgnoreCase(getProperty(
@@ -155,6 +159,7 @@ public class VideoPreviewHook extends CatalogueHook {
             }
         }
         
+        ctx.log(LogSeverity.FINE, "Generating preview for " + uploadRendition.getAbsoluteFilename(), instance, instance.getId());
         if (isPropertySet(Property.GRAB_AT)) {
             Long grabAt = getPropertyAsLong(Property.GRAB_AT);
             video = new StillVideo(grabAt, width, uploadRendition.getAbsoluteFilename());
@@ -168,6 +173,8 @@ public class VideoPreviewHook extends CatalogueHook {
             ctx.log(LogSeverity.SEVERE, "Could not grab still image from video. " + t.getMessage(), instance, instance.getId());
             return;
         }
+        ctx.log(LogSeverity.FINE, "Finished generating preview for " + uploadRendition.getAbsoluteFilename(), instance, instance.getId());
+        
         if (video.isStillAvailable()) {
             // Create temporary file to store the still
             String prefix = "xxx-" + uploadRendition.getMediaItem().getId();
@@ -182,11 +189,14 @@ public class VideoPreviewHook extends CatalogueHook {
                 MediaItemRendition mir = ctx.createMediaItemRendition(tempFile,
                         event.getItem().getId(), generateRendition.getId(),
                         tempFile.getName() + ".png", "image/png");
+                ctx.log(LogSeverity.FINE, "Preview successfully generated for " + uploadRendition.getAbsoluteFilename(), instance, instance.getId());
             } catch (IOException ex) {
                 throw new CatalogueEventException(ex);
             } catch (IllegalArgumentException ex) {
                 throw new CatalogueEventException("Could not resize image", ex);
             }
+        } else {
+            ctx.log(LogSeverity.FINE, "Could not generate preview for " + uploadRendition.getAbsoluteFilename(), instance, instance.getId());            
         }
     }
 
