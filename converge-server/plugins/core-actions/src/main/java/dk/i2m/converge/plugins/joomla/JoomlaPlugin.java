@@ -447,9 +447,10 @@ public abstract class JoomlaPlugin {
      *
      * @param connection Connection to the Joomla installation
      * @param placement  News item to upload
+     * @return Unique identifier of the create article on Joomla
      * @throws JoomlaActionException If the news item could not be uploaded
      */
-    protected void newArticle(JoomlaConnection connection,
+    protected Integer newArticle(JoomlaConnection connection,
             NewsItemPlacement placement) throws JoomlaActionException {
 
         NewsItem newsItem = placement.getNewsItem();
@@ -489,14 +490,17 @@ public abstract class JoomlaPlugin {
                     generateKeywords(newsItem),
                     generateMetaDescription(newsItem),
                     publishDate, expireDate);
+            
 
             if (foreignId != null) {
                 LOG.log(Level.INFO,
                         "News item #{0} created or updated in Joomla with article id #{1}",
                         new Object[]{newsItem.getId(), foreignId});
+                return foreignId;
             } else {
                 LOG.log(Level.WARNING,
                         "Foreign key was not received from Converge Joomla API");
+                return 0;
             }
 
         } catch (JoomlaException ex) {

@@ -80,7 +80,12 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
                 if (item.isEndState()) {
                     if (isCategoryMapped(placement)) {
                         try {
-                            newArticle(connection, placement);
+                            Integer aid = newArticle(connection, placement);
+                            pluginContext.log(LogSeverity.INFO,
+                                    bundle.getString("LOG_UPLOADED_WITH_ID_X"),
+                                    new Object[]{placement.getNewsItem().getId(),
+                                        aid}, placement.getNewsItem(),
+                                    placement.getNewsItem().getId());
                         } catch (JoomlaActionException ex) {
                             pluginContext.log(LogSeverity.SEVERE, bundle.
                                     getString("LOG_COULD_NOT_CREATE_ARTICLE"),
@@ -89,8 +94,8 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
                             LOG.log(Level.FINE, "", ex);
                         }
                     } else {
-                        pluginContext.log(LogSeverity.INFO, bundle.
-                                getString("LOG_SECTION_NOT_MAPPED"),
+                        pluginContext.log(LogSeverity.INFO, bundle.getString(
+                                "LOG_SECTION_NOT_MAPPED"),
                                 new Object[]{placement.getNewsItem().getId(),
                                     placement.getSection().getFullName()},
                                 action, action.getId());
@@ -120,7 +125,8 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
             connection.validateConnection();
         } catch (JoomlaException ex) {
             pluginContext.log(LogSeverity.SEVERE, bundle.getString(
-                    "LOG_INVALID_CONNECTION"), new Object[]{ex.getMessage()}, action, action.getId());
+                    "LOG_INVALID_CONNECTION"), new Object[]{ex.getMessage()},
+                    action, action.getId());
             return;
         }
 
@@ -132,10 +138,17 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
             if (placement.getNewsItem().isEndState()) {
                 if (isCategoryMapped(placement)) {
                     try {
-                        newArticle(connection, placement);
+                        Integer aid = newArticle(connection, placement);
+                        pluginContext.log(LogSeverity.INFO, bundle.getString(
+                                "LOG_UPLOADED_WITH_ID_X"),
+                                new Object[]{placement.getNewsItem().getId(),
+                                    aid}, placement.getNewsItem(),
+                                placement.getNewsItem().getId());
                     } catch (JoomlaActionException ex) {
-                        pluginContext.log(LogSeverity.SEVERE, bundle.getString("LOG_COULD_NOT_UPLOAD_X_BECAUSE_Y"),
-                                new Object[]{placement.getNewsItem().getId(), ex.getMessage()}, placement.getNewsItem(),
+                        pluginContext.log(LogSeverity.SEVERE, bundle.getString(
+                                "LOG_COULD_NOT_UPLOAD_X_BECAUSE_Y"),
+                                new Object[]{placement.getNewsItem().getId(),
+                                    ex.getMessage()}, placement.getNewsItem(),
                                 placement.getNewsItem().getId());
                     }
                 } else {
