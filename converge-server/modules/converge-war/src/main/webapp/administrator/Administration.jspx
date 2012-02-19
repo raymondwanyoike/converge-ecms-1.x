@@ -12,7 +12,7 @@
           xmlns:converge="http://com.interactivemediamanagement.converge/tags">
 
     <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
-        <ui:define name="title">#{i18n.Administration_Title}</ui:define>
+        <ui:define name="title">#{i18n.administrator_Administration_PAGE_TITLE}</ui:define>
         <ui:define name="body">
             <converge:message for="frmAboutConverge" />
             <h:form id="frmAboutConverge">

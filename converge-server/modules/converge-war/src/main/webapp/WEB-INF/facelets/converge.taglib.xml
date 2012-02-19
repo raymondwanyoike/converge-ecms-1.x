@@ -262,5 +262,35 @@
         <function-class>dk.i2m.converge.jsf.functions.JsfFunctions</function-class>
         <function-signature>boolean isValid()</function-signature>
     </function>
+    
+    <function>
+        <function-name>formatDuration</function-name>
+        <function-class>dk.i2m.converge.jsf.functions.DurationFunctions</function-class>
+        <function-signature>java.lang.String formatDuration(java.lang.Long)</function-signature>
+    </function>
+    
+    <function>
+        <function-name>formatDays</function-name>
+        <function-class>dk.i2m.converge.jsf.functions.DurationFunctions</function-class>
+        <function-signature>java.lang.Integer formatDays(java.lang.Long)</function-signature>
+    </function>
+    
+    <function>
+        <function-name>formatHours</function-name>
+        <function-class>dk.i2m.converge.jsf.functions.DurationFunctions</function-class>
+        <function-signature>java.lang.Integer formatHours(java.lang.Long)</function-signature>
+    </function>
+    
+    <function>
+        <function-name>formatMinutes</function-name>
+        <function-class>dk.i2m.converge.jsf.functions.DurationFunctions</function-class>
+        <function-signature>java.lang.Integer formatMinutes(java.lang.Long)</function-signature>
+    </function>
+    
+    <function>
+        <function-name>formatSeconds</function-name>
+        <function-class>dk.i2m.converge.jsf.functions.DurationFunctions</function-class>
+        <function-signature>java.lang.Integer formatSeconds(java.lang.Long)</function-signature>
+    </function>
 
 </facelet-taglib>
