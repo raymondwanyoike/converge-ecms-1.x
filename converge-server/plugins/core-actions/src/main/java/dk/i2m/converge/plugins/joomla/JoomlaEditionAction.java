@@ -59,6 +59,7 @@ public class JoomlaEditionAction extends JoomlaPlugin implements EditionAction {
     @Override
     public void execute(PluginContext ctx, Edition edition,
             OutletEditionAction action) {
+        this.pluginContext = ctx;
         loadSettings(action);
         JoomlaConnection connection = createConnection();
 
