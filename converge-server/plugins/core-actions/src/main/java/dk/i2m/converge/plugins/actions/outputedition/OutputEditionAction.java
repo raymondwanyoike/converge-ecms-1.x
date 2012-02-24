@@ -48,6 +48,8 @@ public class OutputEditionAction implements EditionAction {
     public static final String TEMPLATE_TAG_NEWS_ITEM_PLACEMENT = "newsItemPlacement";
     public static final String TEMPLATE_TAG_EDITION = "edition";
     public static final String TEMPLATE_TAG_MEDIA_ITEM_RENDITION = "mediaItemRendition";
+    public static final String TEMPLATE_TAG_MEDIA_ITEM_ATTACHMENT = "mediaItemAttachment";
+    
     private static final DateFormat DATE_PARSER = new SimpleDateFormat(
             "yyyy-MM-dd HH:mm:ss");
     private ResourceBundle bundle = ResourceBundle.getBundle(
@@ -268,6 +270,7 @@ public class OutputEditionAction implements EditionAction {
                     templateRendition.put(TEMPLATE_TAG_MEDIA_ITEM_RENDITION, mir);
                     templateRendition.put(TEMPLATE_TAG_EDITION, edition);
                     templateRendition.put(TEMPLATE_TAG_NEWS_ITEM_PLACEMENT, p);
+                    templateRendition.put(TEMPLATE_TAG_MEDIA_ITEM_ATTACHMENT, attachment);
                     
                     String outputFilename = compileTemplate(outputMediaItemFilename, templateRendition);
                     File copyFrom = new File(mir.getFileLocation());
