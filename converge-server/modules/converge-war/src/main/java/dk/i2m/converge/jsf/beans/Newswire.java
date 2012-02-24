@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 - 2011 Interactive Media Management
+ * Copyright 2010 - 2012 Interactive Media Management
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ import dk.i2m.converge.ejb.services.NewswireServiceLocal;
 import dk.i2m.converge.jsf.components.tags.DialogAssignment;
 import dk.i2m.converge.jsf.components.tags.DialogEventSelection;
 import dk.i2m.jsf.JsfUtils;
+import static dk.i2m.jsf.JsfUtils.createMessage;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -44,7 +45,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
-import static dk.i2m.jsf.JsfUtils.*;
 
 /**
  * Request-scoped backing bean for the {@code Newswire.jspx} page.
@@ -134,6 +134,13 @@ public class Newswire {
         setSortField("date");
         setSortOrder("false");
 
+        // Ignore search if user hasn't subscribed to any services;
+        if (getUserAccount().getActiveNewswireServices().isEmpty()) {
+            searchResults = new ListDataModel(new ArrayList());
+            pages = new ListDataModel(new ArrayList());
+            return;
+        }
+        
         StringBuilder query = new StringBuilder();
         for (NewswireService service : getUserAccount().getActiveNewswireServices()) {
             if (query.length() > 0) {
