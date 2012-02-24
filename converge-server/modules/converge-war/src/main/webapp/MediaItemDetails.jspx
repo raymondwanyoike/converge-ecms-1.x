@@ -91,7 +91,7 @@
             <a4j:outputPanel ajaxRendered="true">
                 <v:message />
             </a4j:outputPanel>
-
+            
             <c:if test="#{!mediaItemDetails.authorized}">
                 <h:panelGrid>
                     <h:outputText value="#{i18n.MediaItemDetails_UNAUTHORISED}" />
@@ -361,6 +361,9 @@
                         <h:outputText value="#{mediaItemDetails.selectedMediaItem.catalogue.name}" />
                         <h:outputText value="#{i18n.MediaItemDetails_CATALOGUE_DESCRIPTION}" />
                         <h:outputText value="#{mediaItemDetails.selectedMediaItem.catalogue.description}" />
+                        <h:outputText value="#{i18n.MediaItemDetails_CATALOGUE_MAX_FILE_UPLOAD_SIZE}" />
+                        <h:outputText value="#{converge:displaySize(mediaItemDetails.selectedMediaItem.catalogue.maxFileUploadSize*1024)}" rendered="#{mediaItemDetails.selectedMediaItem.catalogue.maxFileUploadSize != 0}" />
+                        <h:outputText value="#{i18n.MediaItemDetails_CATALOGUE_MAX_FILE_UPLOAD_SIZE_NO_LIMIT}" rendered="#{mediaItemDetails.selectedMediaItem.catalogue.maxFileUploadSize == 0}" />
                         <h:outputText value="#{i18n.MediaItemDetails_CATALOGUE_CAPACITY}" />
                         <rich:progressBar minValue="0" maxValue="#{mediaItemDetails.selectedMediaItem.catalogue.space}" value="#{mediaItemDetails.selectedMediaItem.catalogue.space - mediaItemDetails.selectedMediaItem.catalogue.spaceAvailable}" enabled="false">
                             <h:outputText value="#{converge:messagePattern('i18n', 'MediaItemDetails_CATALOGUE_CAPACITY_X_REMAINING_OF_Y', converge:displaySize(mediaItemDetails.selectedMediaItem.catalogue.spaceAvailable), converge:displaySize(mediaItemDetails.selectedMediaItem.catalogue.space), '', '', '')}" />

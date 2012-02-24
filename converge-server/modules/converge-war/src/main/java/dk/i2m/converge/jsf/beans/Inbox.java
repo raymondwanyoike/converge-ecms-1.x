@@ -289,14 +289,10 @@ public class Inbox {
         this.selectedNewsItem = selectedNewsItem;
     }
 
-    public boolean isPrivilegedToCreateNewAssignments() {
-        return !getPrivilegedOutlets().isEmpty() || getUser().isPrivileged(SystemPrivilege.MY_PHOTOS);
-    }
-
     public Map<String, Outlet> getPrivilegedOutlets() {
         Map<String, Outlet> outlets = new LinkedHashMap<String, Outlet>();
 
-        for (Outlet outlet : getUser().getPrivilegedOutlets(SystemPrivilege.MY_NEWS_ITEMS, SystemPrivilege.MY_PHOTOS)) {
+        for (Outlet outlet : getUser().getPrivilegedOutlets(SystemPrivilege.MY_NEWS_ITEMS)) {
             outlets.put(outlet.getTitle(), outlet);
         }
 
@@ -325,20 +321,20 @@ public class Inbox {
                 }
             }
 
+            List<Catalogue> myCatalogues = catalogueFacade.findCataloguesByUser(
+                    getUser().getUsername());
 
-            List<Catalogue> repositories = catalogueFacade.findWritableCatalogues();
-
-            for (Catalogue repository : repositories) {
+            for (Catalogue myCatalogue : myCatalogues) {
                 TreeNode node = new TreeNodeImpl();
-                node.setData(new OutletNode(repository, null, repository.getClass().getName()));
+                node.setData(new OutletNode(myCatalogue, null, myCatalogue.getClass().getName()));
 
                 for (MediaItemStatus status : MediaItemStatus.values()) {
                     TreeNode subNode = new TreeNodeImpl();
-                    subNode.setData(new OutletNode(status, repository, MediaItemStatus.class.getName()));
+                    subNode.setData(new OutletNode(status, myCatalogue, MediaItemStatus.class.getName()));
                     node.addChild(status.name(), subNode);
                 }
 
-                outletsNode.addChild("M" + repository.getId(), node);
+                outletsNode.addChild("M" + myCatalogue.getId(), node);
             }
         }
 

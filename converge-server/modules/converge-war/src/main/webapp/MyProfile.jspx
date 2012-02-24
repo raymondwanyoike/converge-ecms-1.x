@@ -141,7 +141,7 @@
                         <h:outputText value="#{i18n.MyProfile_DEFAULT_CATALGUE}" />
                         <h:selectOneMenu value="#{userSession.user.defaultMediaRepository}" style="width: 100%;" converter="#{converters.mediaRepositoryConverter}">
                             <f:selectItem itemLabel="" />
-                            <f:selectItems value="#{common.writableMediaRepositories}" />
+                            <f:selectItems value="#{userSession.myCatalogues}" />
                         </h:selectOneMenu>
                         <h:outputText value="&#160;" />
                         <h:outputText value="&#160;" />
@@ -149,11 +149,9 @@
                         <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.Generic_SAVE}" actionListener="#{userSession.onUpdateProfile}" reRender="frmPage" />
                     </h:panelGrid>
                 </div>
-
             </h:form>
 
             <converge:moduleSpacer />
-
 
             <h:form id="frmPage">
                 <converge:moduleHeader moduleTitle="#{i18n.MyProfile_PRIVILEGES}" />

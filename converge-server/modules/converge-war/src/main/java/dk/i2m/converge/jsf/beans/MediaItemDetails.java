@@ -24,7 +24,6 @@ import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
-import dk.i2m.converge.ejb.services.MetaDataServiceLocal;
 import dk.i2m.jsf.JsfUtils;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,14 +48,9 @@ import org.richfaces.event.UploadEvent;
 public class MediaItemDetails {
 
     private static final Logger LOG = Logger.getLogger(MediaItemDetails.class.getName());
-    @EJB
-    private CatalogueFacadeLocal catalogueFacade;
-    @EJB
-    private MetaDataFacadeLocal metaDataFacade;
-    @EJB
-    private MetaDataServiceLocal metaDataService;
-    @EJB
-    private UserFacadeLocal userFacade;
+    @EJB private CatalogueFacadeLocal catalogueFacade;
+    @EJB private MetaDataFacadeLocal metaDataFacade;
+    @EJB private UserFacadeLocal userFacade;
     private MediaItem selectedMediaItem;
     private Long id;
     private MediaItemRendition selectedRendition = new MediaItemRendition();
@@ -64,6 +58,9 @@ public class MediaItemDetails {
     private DataModel usage;
     private boolean conceptAdded = false;
     private String newConcept = "";
+    private boolean renditionUploadFailed = false;
+    private int renditionUploadFailedSize = 0;
+    
     /**
      * Dev Note: Could not use a Concept object for direct entry as it is
      * abstract.
@@ -246,6 +243,18 @@ public class MediaItemDetails {
         org.richfaces.model.UploadItem item = event.getUploadItem();
         LOG.log(Level.FINE, "Processing rendition ''{0}'' of content-type ''{1}''", new Object[]{item.getFileName(), item.getContentType()});
 
+        Catalogue c = selectedMediaItem.getCatalogue();
+        
+        if (c.getMaxFileUploadSize() != 0 && (item.getFileSize()/1024 > c.getMaxFileUploadSize())) {
+            renditionUploadFailed = true;
+            renditionUploadFailedSize = item.getFileSize();
+            // Delete file
+            if (item.isTempFile()) {
+                item.getFile().delete();
+            }
+            return;
+        }
+        
         if (item.isTempFile()) {
             java.io.File tempFile = item.getFile();
 
@@ -275,6 +284,18 @@ public class MediaItemDetails {
         org.richfaces.model.UploadItem item = event.getUploadItem();
         LOG.log(Level.FINE, "Processing rendition ''{0}'' of content-type ''{1}''", new Object[]{item.getFileName(), item.getContentType()});
 
+        Catalogue c = selectedMediaItem.getCatalogue();
+        
+        if (c.getMaxFileUploadSize() != 0 && (item.getFileSize()/1024 > c.getMaxFileUploadSize())) {
+            renditionUploadFailed = true;
+            renditionUploadFailedSize = item.getFileSize();
+            // Delete file
+            if (item.isTempFile()) {
+                item.getFile().delete();
+            }
+            return;
+        }
+                
         if (item.isTempFile()) {
             java.io.File tempFile = item.getFile();
 
@@ -296,6 +317,13 @@ public class MediaItemDetails {
     }
 
     public void onSaveNewRendition(ActionEvent event) {
+        if (renditionUploadFailed) {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "MediaItemDetails_RENDITION_UPLOAD_SIZE_ERROR", renditionUploadFailedSize);
+            renditionUploadFailed = false;
+            renditionUploadFailedSize = 0;
+            return;
+        }
+
         this.selectedMediaItem.getRenditions().add(selectedRendition);
         this.selectedMediaItem = catalogueFacade.update(selectedMediaItem);
         this.selectedMediaItem = null;
@@ -305,6 +333,13 @@ public class MediaItemDetails {
     }
 
     public void onSaveRendition(ActionEvent event) {
+        if (renditionUploadFailed) {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "i18n", "MediaItemDetails_RENDITION_UPLOAD_SIZE_ERROR", renditionUploadFailedSize);
+            renditionUploadFailed = false;
+            renditionUploadFailedSize = 0;
+            return;
+        }
+        
         catalogueFacade.update(selectedRendition);
         this.availableRenditions = null;
         Long theId = this.selectedMediaItem.getId();

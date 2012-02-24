@@ -88,7 +88,7 @@ public class NewsItemArchive {
         }
     }
 
-    public dk.i2m.converge.core.content.NewsItem getSelectedNewsItem() {
+     public dk.i2m.converge.core.content.NewsItem getSelectedNewsItem() {
         return selectedNewsItem;
     }
     

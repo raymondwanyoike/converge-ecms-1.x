@@ -16,7 +16,7 @@
                         <converge:moduleHeader moduleTitle="#{converge:abbreviate(userSession.user.fullName, 25)}" />
                         <div class="moduleContent">
                             <h:panelGrid columns="2">
-                                <c:if test="#{inbox.privilegedToCreateNewAssignments}">
+                                <c:if test="#{userSession.privilegedToCreateNewAssignments}">
                                     <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{msgs.inbox_NEW_ASSIGNMENT}" title="#{msgs.inbox_NEW_ASSIGNMENT}" />
                                     <a4j:commandLink reRender="frmNewAssignment" actionListener="#{inbox.onNewAssignment}" oncomplete="#{rich:component('mpNewAssignment')}.show();#{rich:element('frmNewAssignment:txtStoryTitle')}.focus()">
                                         <h:outputText value="#{i18n.Inbox_NEW_ASSIGNMENT}" />

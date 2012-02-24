@@ -229,7 +229,7 @@
                                     <h:outputText value="#{i18n.Inbox_ASSIGNMENT_MEDIA_REPOSITORY}" />
                                     <h:selectOneMenu id="somMediaRepository" styleClass="text mediumInput" value="#{inbox.newAssignment.mediaItem.catalogue}" converter="#{converters.mediaRepositoryConverter}">
                                         <f:selectItem itemLabel="" />
-                                        <f:selectItems value="#{common.writableMediaRepositories}" />
+                                        <f:selectItems value="#{userSession.myCatalogues}" />
                                     </h:selectOneMenu>
                                 </h:panelGrid>
 

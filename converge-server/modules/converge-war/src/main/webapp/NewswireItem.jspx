@@ -73,7 +73,7 @@
                     <h:panelGrid columns="3">
                         <h:outputText value="#{i18n.NewswireItem_IMPORT_CATALOGUE}" />
                         <h:selectOneMenu id="somImportCatalogue" value="#{newswireitem.importCatalogue}" converter="#{converters.mediaRepositoryConverter}">
-                            <f:selectItems value="#{common.writableMediaRepositories}" />
+                            <f:selectItems value="#{userSession.myCatalogues}" />
                         </h:selectOneMenu>
                         <a4j:commandButton process="somImportCatalogue" ajaxSingle="true" reRender="frmPage" actionListener="#{newswireitem.onAddToCatalogue}" value="#{i18n.NewswireItem_IMPORT_TO_CATALOGUE}" />
                     </h:panelGrid>

@@ -124,6 +124,33 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     public List<Catalogue> findWritableCatalogues() {
         return daoService.findWithNamedQuery(Catalogue.FIND_WRITABLE);
     }
+    
+    
+    /**
+     * Finds a {@link List} of {@link Catalogue}s accessible to a given 
+     * {@link UserAccount}.
+     * 
+     * @param username
+     *          Username of the {@link UserAccount} for which to find the accessible
+     *          {@link Catalogue}s
+     * @return {@link List} of {@link Catalogue}s accessible to the given 
+     *         {@link UserAccount}
+     */
+    @Override
+    public List<Catalogue> findCataloguesByUser(String username) {
+        UserAccount ua;
+        try {
+            ua = userFacade.findById(username);
+        } catch (DataNotFoundException ex) {
+            return Collections.EMPTY_LIST;
+        }
+        
+        List<Catalogue> catalogues = daoService.findWithNamedQuery(Catalogue.FIND_BY_USER,
+                QueryBuilder.with(Catalogue.PARAM_FIND_BY_USER_USER, ua).parameters());
+        
+        return catalogues;
+    }
+    
 
     /**
      * Finds an existing {@link Catalogue} in the database.

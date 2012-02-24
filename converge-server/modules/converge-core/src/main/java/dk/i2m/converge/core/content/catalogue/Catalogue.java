@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,22 +23,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
+import javax.persistence.*;
 import org.eclipse.persistence.annotations.PrivateOwned;
 
 /**
@@ -54,18 +39,25 @@ import org.eclipse.persistence.annotations.PrivateOwned;
 @Entity()
 @Table(name = "catalogue")
 @NamedQueries({
+    @NamedQuery(name = Catalogue.FIND_BY_USER, query = "SELECT c FROM Catalogue c JOIN c.userRole u JOIN c.editorRole e JOIN u.userAccounts a JOIN e.userAccounts AS editors WHERE c.enabled=true AND (a = :" + Catalogue.PARAM_FIND_BY_USER_USER + " OR editors = :" + Catalogue.PARAM_FIND_BY_USER_USER + ")"),
     @NamedQuery(name = Catalogue.FIND_ENABLED, query = "SELECT c FROM Catalogue c WHERE c.enabled=true"),
     @NamedQuery(name = Catalogue.FIND_WRITABLE, query = "SELECT c FROM Catalogue c WHERE c.readOnly=false AND c.enabled=true")
 })
 public class Catalogue implements Serializable {
 
-    /** Query for finding the list of enabled media repositories. */
+    /** Query for finding the list of catalogues for a given user. */
+    public static final String FIND_BY_USER = "Catalogue.findByUser";
+    
+    /** Query for finding the list of enabled catalogues. */
     public static final String FIND_ENABLED = "Catalogue.findEnabled";
 
-    /** Query for finding the list of writable media repositories. */
+    /** Query for finding the list of writable catalogues. */
     public static final String FIND_WRITABLE = "Catalogue.findWritable";
 
-    private static final long serialVersionUID = 2L;
+    /** Parameter used in the {@link Catalogue#FIND_BY_USER} query. */
+    public static final String PARAM_FIND_BY_USER_USER = "user";
+
+    private static final long serialVersionUID = 3L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -111,6 +103,13 @@ public class Catalogue implements Serializable {
     @ManyToOne
     @JoinColumn(name = "editor_role_id")
     private UserRole editorRole;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_role_id")
+    private UserRole userRole;
+    
+    @Column(name = "max_file_upload_size")
+    private Long maxFileUploadSize;
 
     @OneToMany(mappedBy = "catalogue")
     private List<NewswireItemAttachment> newswireItemAttachments;
@@ -129,14 +128,34 @@ public class Catalogue implements Serializable {
      * Creates a new instance of {@link Catalogue}.
      */
     public Catalogue() {
+        this.maxFileUploadSize = 0L;
     }
 
+    /**
+     * Gets the unique identifier of the {@link Catalogue}.
+     * 
+     * @return Unique identifier of the {@link Catalogue}
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * Sets the unique identifier of the {@link Catalogue}.
+     * 
+     * @param id
+     *          Unique identifier of the {@link Catalogue}
+     */
     public void setId(Long id) {
         this.id = id;
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -185,14 +204,6 @@ public class Catalogue implements Serializable {
         this.watchLocation = watchLocation;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public boolean isReadOnly() {
         return readOnly;
     }
@@ -209,12 +220,50 @@ public class Catalogue implements Serializable {
         this.itemCount = itemCount;
     }
 
+    /**
+     * Get the {@link UserRole} of the editor of the {@link Catalogue}. Only
+     * users with this {@link UserRole} can approve items for this 
+     * {@link Catalogue}.
+     * 
+     * @return {@link UserRole} of the editor
+     */
     public UserRole getEditorRole() {
         return editorRole;
     }
 
+    /**
+     * Set the {@link UserRole} of the editor of the {@link Catalogue}. Only
+     * users with this {@link UserRole} can approve items for this 
+     * {@link Catalogue}.
+     * 
+     * @param editorRole
+     *          {@link UserRole} of editors who should be able to approve items
+     */
     public void setEditorRole(UserRole editorRole) {
         this.editorRole = editorRole;
+    }
+
+    /**
+     * Get the {@link UserRole} of users who should be able to submit items
+     * to this {@link Catalogue}. Users without this {@link UserRole} cannot
+     * submit items to the {@link Catalogue}.
+     * 
+     * @return {@link UserRole} of users who should be able to submit items
+     */
+    public UserRole getUserRole() {
+        return userRole;
+    }
+
+    /**
+     * Set the {@link UserRole} of users who should be able to submit items
+     * to this {@link Catalogue}. Users without this {@link UserRole} cannot
+     * submit items to the {@link Catalogue}.
+     * 
+     * @param userRole
+     *          {@link UserRole} of users who should be able to submit items
+     */
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
     }
 
     public String getWebAccess() {
@@ -311,6 +360,27 @@ public class Catalogue implements Serializable {
      */
     public void setRenditions(List<Rendition> renditions) {
         this.renditions = renditions;
+    }
+
+    /**
+     * Gets the maximum allowed file size (KB) for this {@link Catalogue}. A 
+     * value of 0 indicates that there is no upload limit.
+     * 
+     * @return Maximum size of file upload in kilobytes.
+     */
+    public Long getMaxFileUploadSize() {
+        return maxFileUploadSize;
+    }
+
+    /**
+     * Sets the maximum allowed file size (KB) for this {@link Catalogue}.
+     * 
+     * @param maxFileUploadSize 
+     *          Maximum size of file upload in kilobytes allowed. 0 indicates
+     *          that there is no upload limit
+     */
+    public void setMaxFileUploadSize(Long maxFileUploadSize) {
+        this.maxFileUploadSize = maxFileUploadSize;
     }
     
     /**

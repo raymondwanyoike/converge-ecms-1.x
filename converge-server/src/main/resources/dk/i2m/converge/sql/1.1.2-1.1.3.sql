@@ -24,8 +24,6 @@ ALTER TABLE media_item ADD COLUMN `held` TINYINT(1) DEFAULT '0';
 
 ALTER TABLE user_account ADD COLUMN default_work_day tinyint(1) NOT NULL DEFAULT '1';
 
-
-
 CREATE TABLE `outlet_subscriber` (
     `id` BIGINT NOT NULL AUTO_INCREMENT ,
     `subscription_date` datetime DEFAULT null,
@@ -40,3 +38,8 @@ CREATE TABLE `outlet_subscriber` (
     `outlet_id` bigint(20) DEFAULT NULL,
     PRIMARY KEY (`id`)
 );
+
+ALTER TABLE `catalogue` ADD COLUMN `user_role_id` bigint(20) DEFAULT NULL;
+CREATE INDEX `fk_catalogue_user_role` ON `catalogue` (`user_role_id`);
+
+ALTER TABLE `catalogue` ADD COLUMN `max_file_upload_size` bigint(20) DEFAULT 0;

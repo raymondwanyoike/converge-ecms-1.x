@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +20,15 @@ import dk.i2m.commons.FileUtils;
 import dk.i2m.commons.ImageUtils;
 import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.Notification;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.reporting.activity.UserActivitySummary;
 import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.core.security.UserAccount;
+import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.Section;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.ReportingFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
@@ -59,6 +62,8 @@ public class UserSession {
     private static final Logger LOG = Logger.getLogger(UserSession.class.getName());
 
     @EJB private UserFacadeLocal userFacade;
+    
+    @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @EJB private SystemFacadeLocal systemFacade;
 
@@ -79,8 +84,12 @@ public class UserSession {
     private MenuItem sectionMenu;
 
     private Map<String, List<Outlet>> privilegedOutlets = new HashMap<String, List<Outlet>>();
-
+    
     private Map<String, Boolean> privileges = new HashMap<String, Boolean>();
+    
+    private Map<Long, Boolean> catalogueEditor = new HashMap<Long, Boolean>();
+    
+    private List<Catalogue> catalogues = new ArrayList<Catalogue>();
 
     private Notification selectedNotification;
 
@@ -99,24 +108,39 @@ public class UserSession {
     @PostConstruct
     public void onInit() throws UserSessionException {
         fetchUser();
+        updatePrivileges();
         generateMenu();
     }
 
     /**
+     * Internal method for updating the user privileges.
+     */
+    private void updatePrivileges() {
+        String uid = getUser().getUsername();
+        List<UserRole> userRoles = getUser().getUserRoles();
+        this.catalogues = catalogueFacade.findCataloguesByUser(uid);
+        
+        this.catalogueEditor.clear();
+        List<Catalogue> allCatalogues = catalogueFacade.findAllCatalogues();
+        for (Catalogue c : allCatalogues) {
+            this.catalogueEditor.put(c.getId(), userRoles.contains(c.getEditorRole()));
+        }
+    }
+    
+    /**
      * Determines if the user is an administrator.
      *
-     * @return <code>true</code> if the user is an administrator, otherwise
-     *         <code>false</code>
+     * @return {@code true} if the user is an administrator, otherwise
+     *         {@code false}
      */
     public boolean isAdministrator() {
         return isUserInRole("ADMINISTRATOR");
     }
 
-
     /**
-     * Gets the current user, or <code>null</code> if the user is not logged in.
+     * Gets the current user, or {@code null} if the user is not logged in.
      *
-     * @return Current user logged in.
+     * @return Current user logged in
      */
     public UserAccount getUser() {
         return user;
@@ -127,8 +151,8 @@ public class UserSession {
      *
      * @param role
      *          Name of the role
-     * @return <code>true</code> if the user is in the given role, otherwise
-     *         <code>false</code>
+     * @return {@code true} if the user is in the given role, otherwise
+     *         {@code false}
      */
     public boolean isUserInRole(String role) {
         FacesContext ctx = FacesContext.getCurrentInstance();
@@ -143,6 +167,19 @@ public class UserSession {
      */
     public boolean isCatalogueEditor() {
         return userFacade.isCatalogueEditor(getUser().getUsername());
+    }
+    
+    /**
+     * Gets a {@link Map} of {@link Catalogues} with the {@link Catalogue} id
+     * in the key of the {@link Map}, and a {@link Boolean} value in the value
+     * of the {@link Map}. The {@link Boolean} value indicates if the current
+     * user is an editor for the given {@link Catalogue}.
+     * 
+     * @return {@link Map} of {@link Catalogues} indicator whether the current
+     *         user is an editor.
+     */
+    public Map<Long, Boolean> getCatalogueEditorRole() {
+        return catalogueEditor;
     }
 
     public UserActivitySummary getLastMonthActivity() {
@@ -328,6 +365,17 @@ public class UserSession {
     }
 
     /**
+     * Determine if the current user is allowed to create new assignments.
+     * 
+     * @return {@code true} if the current user is allowed to create either news
+     *         items for outlets or media items for catalogues, otherwise 
+     *         {@code false}
+     */
+    public boolean isPrivilegedToCreateNewAssignments() {
+        return !getPrivilegedOutlets().isEmpty() || !getMyCatalogues().isEmpty();
+    }
+    
+    /**
      * Gets a {@link Map} of {@link Outlet}s indexed by the privileges of the
      * current user. The name of the {@link SystemPrivilege} is used as the key
      * and the value is a {@link List} of the {@link Outlet} where the user has
@@ -361,6 +409,19 @@ public class UserSession {
         }
 
         return sections;
+    }
+    
+    /**
+     * Gets the privileged catalogues of the current user.
+     * 
+     * @return {@link Map} of privileged catalogues of the current user
+     */
+    public Map<String, Catalogue> getMyCatalogues() {
+        Map<String, Catalogue> mine = new LinkedHashMap<String, Catalogue>();
+        for (Catalogue c : this.catalogues) {
+            mine.put(c.getName(), c);
+        }
+        return mine;
     }
 
     /**
@@ -498,8 +559,14 @@ public class UserSession {
         userFacade.dismiss(getUser());
     }
 
+    /**
+     * Gets the URL of the user photo.
+     * 
+     * @return URL of the user photo
+     */
     public String getPhotoUrl() {
-        return "/UserPhoto?uid=" + getUser().getId() + "&t=" + java.util.Calendar.getInstance().getTimeInMillis();
+        Long unique = java.util.Calendar.getInstance().getTimeInMillis();
+        return "/UserPhoto?uid=" + getUser().getId() + "&t=" + unique;
     }
 
     /**
