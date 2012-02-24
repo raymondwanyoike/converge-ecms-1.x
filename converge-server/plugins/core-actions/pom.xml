@@ -50,8 +50,13 @@
         <dependency>
             <groupId>xuggle</groupId>
             <artifactId>xuggle-xuggler</artifactId>
-            <version>3.4.1012.201001312056</version>
+            <version>4.0.0</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev</groupId>
+            <artifactId>pdf-renderer</artifactId>
+            <version>1.8</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
@@ -131,6 +136,11 @@
             <id>xuggleRepository</id>
             <name>Xuggle Repository</name>
             <url>http://xuggle.googlecode.com/svn/trunk/repo/share/java</url>
+        </repository>
+        <repository>
+            <id>maven.atlassian.com</id>
+            <name>Atlassian Public Repository</name>
+            <url>https://maven.atlassian.com/public</url>
         </repository>
     </repositories>
 
