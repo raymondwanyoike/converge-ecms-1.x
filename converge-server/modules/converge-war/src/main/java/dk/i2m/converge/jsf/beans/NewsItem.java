@@ -1,11 +1,18 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later 
+ * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.jsf.beans;
 
@@ -173,7 +180,7 @@ public class NewsItem {
      * are selected through the subject selection dialog.
      *
      * @param suggestion
-* String for which to base the suggestions
+     *          String for which to base the suggestions
      * @return {@link List} of suggested {@link Concept}s based on
      *         {@code suggestion}
      */
@@ -280,7 +287,7 @@ public class NewsItem {
      * news item will be checked-out from the database.
      *
      * @param id
-* Unique identifier of the news item to load
+     *          Unique identifier of the news item to load
      */
     public void setId(Long id) {
         LOG.log(Level.FINE, "Setting News Item #{0}", id);
@@ -1032,12 +1039,11 @@ public class NewsItem {
     public void onUseAttachment(ActionEvent event) {
         if (this.userSubmission.getId() != null) {
             this.userSubmission.setDescription(selectedAttachment.getCaption());
-            this.userSubmission.setByLine(selectedAttachment.getMediaItem().
-                    getByLine());
+            this.userSubmission.setByLine(selectedAttachment.getMediaItem().getByLine());
+            
         }
 
-        this.selectedAttachment.setDisplayOrder(this.selectedNewsItem.
-                getNextAssetAttachmentDisplayOrder());
+        this.selectedAttachment.setDisplayOrder(this.selectedNewsItem.getNextAssetAttachmentDisplayOrder());
         this.selectedAttachment = newsItemFacade.create(selectedAttachment);
         this.selectedNewsItem.getMediaAttachments().add(selectedAttachment);
 
