@@ -236,81 +236,6 @@ public class MediaItemDetails {
         return renditions;
     }
 
-    public void newRenditionUploadListener(UploadEvent event) {
-        if (event == null) {
-            return;
-        }
-        org.richfaces.model.UploadItem item = event.getUploadItem();
-        LOG.log(Level.FINE, "Processing rendition ''{0}'' of content-type ''{1}''", new Object[]{item.getFileName(), item.getContentType()});
-
-        Catalogue c = selectedMediaItem.getCatalogue();
-        
-        if (c.getMaxFileUploadSize() != 0 && (item.getFileSize()/1024 > c.getMaxFileUploadSize())) {
-            renditionUploadFailed = true;
-            renditionUploadFailedSize = item.getFileSize();
-            // Delete file
-            if (item.isTempFile()) {
-                item.getFile().delete();
-            }
-            return;
-        }
-        
-        if (item.isTempFile()) {
-            java.io.File tempFile = item.getFile();
-
-            try {
-                selectedRendition = catalogueFacade.create(tempFile, selectedMediaItem, uploadRendition, item.getFileName(), item.getContentType());
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "media_item_rendition_UPLOADED");
-            } catch (IOException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "media_item_rendition_UPLOAD_ERROR");
-                LOG.log(Level.WARNING, "Could not upload MediaItemRendition.", ex);
-            }
-
-        } else {
-            LOG.severe("RichFaces is not set-up to use tempFiles for storing file uploads");
-        }
-        this.availableRenditions = null;
-    }
-
-    /**
-     * Listener for uploading a new rendition.
-     * <p/>
-     * @param event Event that invoked the listener
-     */
-    public void renditionUploadListener(UploadEvent event) {
-        if (event == null) {
-            return;
-        }
-        org.richfaces.model.UploadItem item = event.getUploadItem();
-        LOG.log(Level.FINE, "Processing rendition ''{0}'' of content-type ''{1}''", new Object[]{item.getFileName(), item.getContentType()});
-
-        Catalogue c = selectedMediaItem.getCatalogue();
-        
-        if (c.getMaxFileUploadSize() != 0 && (item.getFileSize()/1024 > c.getMaxFileUploadSize())) {
-            renditionUploadFailed = true;
-            renditionUploadFailedSize = item.getFileSize();
-            // Delete file
-            if (item.isTempFile()) {
-                item.getFile().delete();
-            }
-            return;
-        }
-                
-        if (item.isTempFile()) {
-            java.io.File tempFile = item.getFile();
-
-            try {
-                selectedRendition = catalogueFacade.update(tempFile, item.getFileName(), item.getContentType(), selectedRendition);
-            } catch (IOException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "media_item_rendition_UPLOAD_ERROR");
-                LOG.log(Level.WARNING, "Could not upload MediaItemRendition.", ex);
-            }
-
-        } else {
-            LOG.severe("RichFaces is not set-up to use tempFiles for storing file uploads");
-        }
-    }
-
     public void onNewRendition(ActionEvent event) {
         this.selectedRendition = new MediaItemRendition();
         this.selectedRendition.setMediaItem(this.selectedMediaItem);
@@ -330,6 +255,18 @@ public class MediaItemDetails {
         setId(getId());
 
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "media_item_rendition_CREATED");
+    }
+    
+    /**
+     * Reloads the current {@link MediaItem}. This is used after changes has
+     * been made to a rendition.
+     * 
+     * @param event
+     *          Event that invoked the handler
+     */
+    public void onReload(ActionEvent event) {
+        this.selectedMediaItem = null;
+        setId(getId());
     }
 
     public void onSaveRendition(ActionEvent event) {

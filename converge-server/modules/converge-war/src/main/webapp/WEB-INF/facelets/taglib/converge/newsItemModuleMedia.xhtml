@@ -37,28 +37,28 @@
                     <h:panelGroup rendered="#{attachment.mediaItem.original.audio}" layout="block">
                         <div id="container#{attachment.id}">#{i18n.jwplayer_LOADING_PLAYER}</div>
                         <script type="text/javascript"> 
-                        jwplayer("container#{attachment.id}").setup({
-                            flashplayer: "#{facesContext.externalContext.request.contextPath}/scripts/jwplayer/player.swf", 
-                            file: "#{attachment.mediaItem.original.absoluteFilename}", 
-                            plugins: {},
-                            height: 60, 
-                            width: 250,
-                            volume: 100
-                    });
+                            jwplayer("container#{attachment.id}").setup({
+                                flashplayer: "#{facesContext.externalContext.request.contextPath}/scripts/jwplayer/player.swf", 
+                                file: "#{attachment.mediaItem.original.absoluteFilename}", 
+                                plugins: {},
+                                height: 60, 
+                                width: 250,
+                                volume: 100
+                            });
                         </script>
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{attachment.mediaItem.original.video}" layout="block">
                         <div id="container#{attachment.id}">#{i18n.jwplayer_LOADING_PLAYER}</div>
                         <script type="text/javascript"> 
-                        jwplayer("container#{attachment.id}").setup({
-                            flashplayer: "#{facesContext.externalContext.request.contextPath}/scripts/jwplayer/player.swf", 
-                            file: "#{attachment.mediaItem.original.absoluteFilename}", 
-                            image: "#{attachment.mediaItem.preview.absoluteFilename}",
-                            plugins: {},
-                            width: 250,
-                            volume: 100
-                    });
+                            jwplayer("container#{attachment.id}").setup({
+                                flashplayer: "#{facesContext.externalContext.request.contextPath}/scripts/jwplayer/player.swf", 
+                                file: "#{attachment.mediaItem.original.absoluteFilename}", 
+                                image: "#{attachment.mediaItem.preview.absoluteFilename}",
+                                plugins: {},
+                                width: 250,
+                                volume: 100
+                            });
                         </script>
                     </h:panelGroup>
 
@@ -98,7 +98,7 @@
                                 <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
                             </h:outputText>
                         </h:outputLink>
-                        
+
                     </h:panelGrid>
 
                 </h:panelGrid>
@@ -184,35 +184,27 @@
                                 </h:selectOneMenu>
 
                                 <h:panelGrid id="pgMedia" columnClasses="tabSheet" styleClass="tabSheetGrid">
-                                    <h:outputLink value="#{newsItem.userSubmission.original.absoluteFilename}" rendered="#{newsItem.userSubmission.renditionsAttached &amp;&amp; newsItem.userSubmission.previewAvailable}" target="_blank">
-                                        <h:graphicImage id="pgMediaPreview" url="#{newsItem.userSubmission.preview.absoluteFilename}?#{common.localTime.time}"  />
-                                    </h:outputLink>
 
-                                    <h:outputLink value="#{newsItem.userSubmission.original.absoluteFilename}" rendered="#{newsItem.userSubmission.renditionsAttached &amp;&amp; !newsItem.userSubmission.previewAvailable}" target="_blank">
-                                        <h:graphicImage url="/images/unknown-media-item.png" />
-                                    </h:outputLink>
-
-                                    <rich:fileUpload id="fuMediaItemFile"
-                                                     allowFlash="false"
-                                                     listHeight="60" listWidth="450"
-                                                     maxFilesQuantity="1"
-                                                     immediateUpload="true"
-                                                     autoclear="true"
-                                                     fileUploadListener="#{newsItem.onUploadMediaItem}"
-                                                     ajaxSingle="true"
-                                                     addControlLabel="#{i18n.NewsItem_MEDIA_FILE_UPLOAD_BROWSE}"
-                                                     rendered="#{newsItem.selectedCatalogue != null}">
-                                        <a4j:support event="onuploadcomplete" reRender="pgMediaItemUpload,pgMediaPreview" limitToList="true" />
-                                        <f:facet name="label">
-                                            <h:outputText value="#{i18n.NewsItem_MEDIA_FILE_UPLOAD_INDICATOR}" />
-                                        </f:facet>
-                                    </rich:fileUpload>
+                                    <a4j:outputPanel rendered="#{newsItem.selectedCatalogue != null}">
+                                        <h:outputText value="#{i18n.NewsItem_MEDIA_FILE_UPLOAD_HINT}" style="font-style: italic;" />
+                                        <applet archive="applets/jupload/wjhk.jupload.jar?version=#{common.buildNumber}" style="border: none;" border="0"
+                                                code="wjhk.jupload2.JUploadApplet" height="150" mayscript="true"
+                                                name="JUpload" width="440">
+                                            <param name="postURL" value="#{facesContext.externalContext.request.contextPath}/FileUploadServlet?uploadType=newMediaItem&amp;catalogueId=#{newsItem.selectedCatalogue.id}"/>
+                                            <param name="showLogWindow" value="false" />
+                                            <param name="nbFilesPerRequest" value="1" />
+                                            <param name="uploadPolicy" value="ConvergePolicy" />
+                                            <param name="maxFileSize" value="#{newsItem.selectedCatalogue.maxFileUploadSize*1024}" />
+                                            <param name="afterUploadURL" value="javascript:onMediaItemUploadComplete('%body%');" />
+                                            Java Runtime 1.5 or higher plugin required.
+                                        </applet>
+                                    </a4j:outputPanel>
                                 </h:panelGrid>
 
-                                <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.NewsItem_MEDIA_FILE_USE_UPLOADED_FILE}" reRender="pgMediaItemSelected,pgMediaItemUpload" ajaxSingle="true" rendered="#{newsItem.userSubmission.id != null}">
-                                    <f:setPropertyActionListener target="#{newsItem.selectedMediaItemId}" value="#{newsItem.userSubmission.id}" />
+                                <a4j:jsFunction name="onMediaItemUploadComplete" reRender="pgMediaItemSelected,pgMediaItemUpload" ajaxSingle="true">
+                                    <a4j:actionparam name="response" assignTo="#{newsItem.uploadedMediaItem}"/>
                                     <rich:componentControl for="mpMediaItemSelected" operation="show" event="oncomplete" />
-                                </a4j:commandButton>
+                                </a4j:jsFunction>
                             </h:panelGrid>
                         </rich:tab>
                     </rich:tabPanel>
@@ -261,8 +253,7 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkUpdateAttachment" actionListener="#{newsItem.onUpdateAttachment}" styleClass="dialogButton" value="#{i18n.Generic_UPDATE}" reRender="dtMediaFiles" rendered="#{newsItem.selectedAttachment.id != null}" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpMediaItemSelected')}.hide(); return false; }" />
-                            <a4j:commandLink id="lnkUseAttachment" actionListener="#{newsItem.onUseAttachment}" styleClass="dialogButton" value="#{i18n.Generic_ADD}" reRender="dtMediaFiles,searchResults,pgMediaItemUpload" rendered="#{newsItem.selectedAttachment.id == null &amp;&amp; !newsItem.selectedAttachment.mediaItem.held}" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpMediaItemSelected')}.hide(); return false; }" />
+                            <a4j:commandLink id="lnkUseAttachment" actionListener="#{newsItem.onUseAttachment}" styleClass="dialogButton" value="#{i18n.Generic_ADD}" reRender="dtMediaFiles,searchResults,pgMediaItemUpload" rendered="#{!newsItem.selectedAttachment.mediaItem.held}" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpMediaItemSelected')}.hide(); return false; }" />
                             <h:commandLink id="lnkCloseMediaItemSelection" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpMediaItemSelected')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>

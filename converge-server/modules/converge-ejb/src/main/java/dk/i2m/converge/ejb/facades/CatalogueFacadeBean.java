@@ -201,7 +201,13 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         return daoService.findAll(Rendition.class);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * Finds a {@link Rendition} from its unique identifier.
+     * 
+     * @param id Unique identifier of the {@link Rendition}
+     * @return {@link Rendition} matching the unique {@code id}
+     * @throws DataNotFoundException If the {@link Rendition} could not be found
+     */
     @Override
     public Rendition findRenditionById(Long id) throws DataNotFoundException {
         return daoService.findById(Rendition.class, id);

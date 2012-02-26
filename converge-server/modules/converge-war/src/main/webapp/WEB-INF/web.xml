@@ -67,6 +67,10 @@
         <servlet-name>NewswireItemAttachment</servlet-name>
         <servlet-class>dk.i2m.converge.web.servlets.NewswireItemAttachment</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>FileUploadServlet</servlet-name>
+        <servlet-class>dk.i2m.converge.web.servlets.FileUploadServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>*.xhtml</url-pattern>
@@ -115,6 +119,10 @@
     <servlet-mapping>
         <servlet-name>NewswireItemAttachment</servlet-name>
         <url-pattern>/NewswireItemAttachment</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FileUploadServlet</servlet-name>
+        <url-pattern>/FileUploadServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>90</session-timeout>
