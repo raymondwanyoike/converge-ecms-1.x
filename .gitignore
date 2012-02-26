@@ -25,3 +25,5 @@
 /converge-server/converge-installer/target/
 /converge-maven/create-newswire-decoder/target/
 /converge-server/plugins/converge-plugin-newsml12/target/
+/converge-server/modules/converge-war/nb-configuration.xml
+
