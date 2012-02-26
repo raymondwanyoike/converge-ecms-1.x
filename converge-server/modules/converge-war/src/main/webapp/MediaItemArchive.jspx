@@ -11,8 +11,8 @@
                     <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{mediaItemArchive.selectedMediaItem.id}" rendered="#{mediaItemArchive.editor}">
                         <h:graphicImage url="/images/icons/edit-media-item.png" alt="#{i18n.MediaItemArchive_CONTROL_EDIT}" title="#{i18n.MediaItemArchive_CONTROL_EDIT}" />
                     </h:outputLink>
-                    <h:graphicImage url="/images/icons/print.png" title="#{i18n.MediaItemArchive_CONTROL_PRINT}" alt="#{i18n.MediaItemArchive_CONTROL_PRINT}" onclick="javascript:window.print();" />
-                    <h:graphicImage url="/images/icons/remove.gif" title="#{i18n.MediaItemArchive_CONTROL_CLOSE}" alt="#{i18n.MediaItemArchive_CONTROL_CLOSE}" onclick="javascript:window.close();" />
+                    <h:graphicImage url="#{i18n.resource_ICON_PRINT}" title="#{i18n.MediaItemArchive_CONTROL_PRINT}" alt="#{i18n.MediaItemArchive_CONTROL_PRINT}" onclick="javascript:window.print();" />
+                    <h:graphicImage url="#{i18n.resource_ICON_REMOVE}" title="#{i18n.MediaItemArchive_CONTROL_CLOSE}" alt="#{i18n.MediaItemArchive_CONTROL_CLOSE}" onclick="javascript:window.close();" />
                 </div>
 
                 <h1 style="margin-bottom: 5px; padding-bottom: 0px;">#{mediaItemArchive.selectedMediaItem.title}</h1>
