@@ -208,6 +208,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     public NewsItem step(NewsItem newsItem, Long step, String comment) throws
             WorkflowStateTransitionException {
 
+        // Get current user
         String uid = ctx.getCallerPrincipal().getName();
         UserAccount ua = null;
         try {
@@ -218,6 +219,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
                     "Could not resolve transition initator", ex);
         }
 
+        // Log the workflow step
         pluginContext.log(LogSeverity.INFO, "Promoting news item #{0} to {1}",
                 new Object[]{newsItem.getId(), step}, newsItem, newsItem.getId());
 
@@ -262,6 +264,8 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         transition.setBriefVersion(newsItem.getBrief());
         transition.setComment(comment);
         transition.setSubmitted(transitionStep.isTreatAsSubmitted());
+        // Strip unwanted characters
+        newsItem.setStory(newsItem.getStory().replaceAll("\\p{Cntrl}", " "));
         newsItem.setCurrentState(nextState);
         newsItem.getHistory().add(transition);
         newsItem.setUpdated(now);
