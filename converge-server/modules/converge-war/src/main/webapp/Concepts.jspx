@@ -554,11 +554,11 @@
 
                         <h:outputText value="#{i18n.Concepts_TYPE}" />
                         <h:selectOneRadio value="#{concepts.newType}">
-                            <f:selectItem itemLabel="#{i18n['dk.i2m.converge.core.metadata.Subject_NAME']}" itemValue="dk.i2m.converge.core.metadata.Subject" />
-                            <f:selectItem itemLabel="#{i18n['dk.i2m.converge.core.metadata.Organisation_NAME']}" itemValue="dk.i2m.converge.core.metadata.Organisation" />
-                            <f:selectItem itemLabel="#{i18n['dk.i2m.converge.core.metadata.Person_NAME']}" itemValue="dk.i2m.converge.core.metadata.Person" />
-                            <f:selectItem itemLabel="#{i18n['dk.i2m.converge.core.metadata.GeoArea_NAME']}" itemValue="dk.i2m.converge.core.metadata.GeoArea" />
-                            <f:selectItem itemLabel="#{i18n['dk.i2m.converge.core.metadata.PointOfInterest_NAME']}" itemValue="dk.i2m.converge.core.metadata.PointOfInterest" />
+                            <f:selectItem itemLabel="#{i18n['Generic_dk.i2m.converge.core.metadata.Subject_NAME']}" itemValue="dk.i2m.converge.core.metadata.Subject" />
+                            <f:selectItem itemLabel="#{i18n['Generic_dk.i2m.converge.core.metadata.Organisation_NAME']}" itemValue="dk.i2m.converge.core.metadata.Organisation" />
+                            <f:selectItem itemLabel="#{i18n['Generic_dk.i2m.converge.core.metadata.Person_NAME']}" itemValue="dk.i2m.converge.core.metadata.Person" />
+                            <f:selectItem itemLabel="#{i18n['Generic_dk.i2m.converge.core.metadata.GeoArea_NAME']}" itemValue="dk.i2m.converge.core.metadata.GeoArea" />
+                            <f:selectItem itemLabel="#{i18n['Generic_dk.i2m.converge.core.metadata.PointOfInterest_NAME']}" itemValue="dk.i2m.converge.core.metadata.PointOfInterest" />
                         </h:selectOneRadio>
 
                         <h:panelGroup styleClass="dialogueButtons">
