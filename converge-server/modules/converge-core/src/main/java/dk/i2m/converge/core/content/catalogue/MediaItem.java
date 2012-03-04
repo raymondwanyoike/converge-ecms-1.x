@@ -40,8 +40,8 @@ import javax.persistence.*;
     @NamedQuery(name = MediaItem.FIND_BY_CATALOGUE, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.catalogue = :catalogue ORDER BY m.id ASC"),
     @NamedQuery(name = MediaItem.FIND_BY_STATUS, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.status = :status ORDER BY m.updated DESC"),
     @NamedQuery(name = MediaItem.FIND_BY_OWNER, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.owner = :owner ORDER BY m.id DESC"),
-    @NamedQuery(name = MediaItem.FIND_CURRENT_AS_OWNER, query = "SELECT DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :mediaRepository AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.APPROVED AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.REJECTED AND m.owner = :user ORDER BY m.updated DESC"),
-    @NamedQuery(name = MediaItem.FIND_CURRENT_AS_EDITOR, query = "SELECT DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :mediaRepository AND m.status = dk.i2m.converge.core.content.catalogue.MediaItemStatus.SUBMITTED AND (:user MEMBER OF c.editorRole.userAccounts) ORDER BY m.updated DESC"),
+    @NamedQuery(name = MediaItem.FIND_CURRENT_AS_OWNER, query = "SELECT DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :mediaRepository AND m.owner = :user AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.APPROVED AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.REJECTED ORDER BY m.updated DESC"),
+    @NamedQuery(name = MediaItem.FIND_CURRENT_AS_EDITOR, query = "SELECT DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :mediaRepository AND (:user MEMBER OF c.editorRole.userAccounts) AND m.status = dk.i2m.converge.core.content.catalogue.MediaItemStatus.SUBMITTED ORDER BY m.updated DESC"),
     @NamedQuery(name = MediaItem.FIND_BY_OWNER_AND_STATUS, query = "SELECT  DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :mediaRepository AND (m.owner = :user OR :user MEMBER OF c.editorRole.userAccounts) AND m.status = :status ORDER BY m.updated DESC")
 })
 public class MediaItem implements Serializable {
