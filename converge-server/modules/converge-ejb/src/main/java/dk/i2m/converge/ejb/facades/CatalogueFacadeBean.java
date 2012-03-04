@@ -42,6 +42,7 @@ import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 /**
@@ -124,16 +125,15 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     public List<Catalogue> findWritableCatalogues() {
         return daoService.findWithNamedQuery(Catalogue.FIND_WRITABLE);
     }
-    
-    
+
     /**
-     * Finds a {@link List} of {@link Catalogue}s accessible to a given 
+     * Finds a {@link List} of {@link Catalogue}s accessible to a given
      * {@link UserAccount}.
-     * 
+     * <p/>
      * @param username
-     *          Username of the {@link UserAccount} for which to find the accessible
+* Username of the {@link UserAccount} for which to find the accessible
      *          {@link Catalogue}s
-     * @return {@link List} of {@link Catalogue}s accessible to the given 
+     * @return {@link List} of {@link Catalogue}s accessible to the given
      *         {@link UserAccount}
      */
     @Override
@@ -144,13 +144,14 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         } catch (DataNotFoundException ex) {
             return Collections.EMPTY_LIST;
         }
-        
-        List<Catalogue> catalogues = daoService.findWithNamedQuery(Catalogue.FIND_BY_USER,
-                QueryBuilder.with(Catalogue.PARAM_FIND_BY_USER_USER, ua).parameters());
-        
+
+        List<Catalogue> catalogues = daoService.findWithNamedQuery(
+                Catalogue.FIND_BY_USER,
+                QueryBuilder.with(Catalogue.PARAM_FIND_BY_USER_USER, ua).
+                parameters());
+
         return catalogues;
     }
-    
 
     /**
      * Finds an existing {@link Catalogue} in the database.
@@ -179,15 +180,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
                 MediaItem.FIND_BY_STATUS, parameters);
 
         for (MediaItem item : items) {
-            //try {
-            //byte[] file = FileUtils.getBytes(new URL(item.getAbsoluteFilename()));
-            //generateThumbnail(file, item);
             searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, item.getId(),
                     QueueEntryOperation.UPDATE);
-            //} catch (IOException ex) {
-            //    logger.log(Level.SEVERE, ex.getMessage());
-            //    logger.log(Level.FINE, "", ex);
-            //}
         }
     }
 
@@ -203,7 +197,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     /**
      * Finds a {@link Rendition} from its unique identifier.
-     * 
+     * <p/>
      * @param id Unique identifier of the {@link Rendition}
      * @return {@link Rendition} matching the unique {@code id}
      * @throws DataNotFoundException If the {@link Rendition} could not be found
@@ -723,12 +717,12 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     @Override
     public List<MediaItem> findCurrentMediaItems(UserAccount user,
-            Long mediaRepositoryId) {
+            Long catalogueId) {
         try {
-            Catalogue mr = daoService.findById(Catalogue.class,
-                    mediaRepositoryId);
+            Catalogue catalogue = daoService.findById(Catalogue.class,
+                    catalogueId);
             Map<String, Object> params = QueryBuilder.with("user", user).and(
-                    "mediaRepository", mr).parameters();
+                    "mediaRepository", catalogue).parameters();
 
             List<MediaItem> items = new ArrayList<MediaItem>();
 
@@ -887,7 +881,6 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * @param file      File to archive
      * @param catalogue Catalogue used for archiving the file
      * @param rendition Rendition to store
-     * @param rendition {@link MediaItemRendition} to archive
      * @return Path where the rendition was stored on the {@link Catalogue}
      * @throws IOException * If the file could not be archived
      */
@@ -919,7 +912,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         // Move file to the new location
         LOG.log(Level.FINE, "Archiving {0} at {1}", new Object[]{file.
                     getAbsolutePath(), mediaFile.getAbsolutePath()});
-        copyFile(file, mediaFile);
+        FileUtils.copyFile(file, mediaFile);
 
         rendition.setPath(cataloguePath.toString());
 
@@ -964,39 +957,9 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         File mediaFile = new File(dir, fileName);
 
         // Move file to the new location
-        copyFile(file, mediaFile);
+        FileUtils.copyFile(file, mediaFile);
 
         return cataloguePath.toString();
-    }
-
-    /**
-     * Utility method for copying a file from one
-     * location to another.
-     * <p/>
-     * @param sourceFile Source {@link File}
-     * @param destFile   Destination {@link File}
-     * @throws IOException * If the {@link File} could not be copied
-     */
-    private static void copyFile(File sourceFile, File destFile) throws
-            IOException {
-        if (!destFile.exists()) {
-            destFile.createNewFile();
-        }
-
-        FileChannel source = null;
-        FileChannel destination = null;
-        try {
-            source = new FileInputStream(sourceFile).getChannel();
-            destination = new FileOutputStream(destFile).getChannel();
-            destination.transferFrom(source, 0, source.size());
-        } finally {
-            if (source != null) {
-                source.close();
-            }
-            if (destination != null) {
-                destination.close();
-            }
-        }
     }
 
     @Override

@@ -76,9 +76,9 @@ public interface CatalogueFacadeLocal {
 
     java.util.List<dk.i2m.converge.core.content.catalogue.MediaItem> findMediaItemsByOwner(dk.i2m.converge.core.security.UserAccount owner);
 
-    List<MediaItem> findCurrentMediaItems(UserAccount user, Long mediaRepositoryId);
+    List<MediaItem> findCurrentMediaItems(UserAccount user, Long catalogueId);
 
-    List<MediaItem> findCurrentMediaItems(UserAccount user, MediaItemStatus mediaItemStatus, Long mediaRepositoryId);
+    List<MediaItem> findCurrentMediaItems(UserAccount user, MediaItemStatus mediaItemStatus, Long catalogueId);
 
     boolean isMediaItemUsed(Long id);
 
