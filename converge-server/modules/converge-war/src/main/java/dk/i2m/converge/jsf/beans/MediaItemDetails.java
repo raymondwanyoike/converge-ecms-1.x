@@ -25,7 +25,6 @@ import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.jsf.JsfUtils;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,6 @@ import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import org.richfaces.component.html.HtmlTree;
 import org.richfaces.event.NodeSelectedEvent;
-import org.richfaces.event.UploadEvent;
 
 /**
  * Backing bean for {@code /MediaItemDetails.jspx}.
