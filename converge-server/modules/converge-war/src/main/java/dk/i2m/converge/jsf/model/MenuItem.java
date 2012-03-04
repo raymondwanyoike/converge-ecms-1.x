@@ -47,6 +47,8 @@ public class MenuItem {
     private String action = "";
 
     private String type = "";
+    
+    private String style = "";
 
     /** Is this {@link MenuItem} currently selected?. */
     private boolean active = false;
@@ -273,6 +275,16 @@ public class MenuItem {
         return action;
     }
 
+    public String getStyle() {
+        return style;
+    }
+
+    public void setStyle(String style) {
+        this.style = style;
+    }
+
+    
+    
     /**
      * Sets the action to return if the {@link MenuItem} is clicked.
      *
@@ -398,7 +410,15 @@ public class MenuItem {
             return false;
         }
     }
-
+    
+    public boolean isWikiPage() {
+        if (action == null || !action.startsWith("wiki:")) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
     /**
      * Sets the menu manager of the {@link MenuItem}.
      *

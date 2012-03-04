@@ -120,7 +120,7 @@ a.subheader_link, a.subheader_link:visited, a.subheader_link:hover {
     z-index: 3;}
 
 #navigation li:hover span {
-    background:transparent url(../images/selected_menu_left.jpg) no-repeat scroll 0 10pt;
+    background:transparent url('../images/selected_menu_left.jpg') no-repeat scroll 0 10pt;
     color:#FFFFFF;}
 
 #navigation ul li:hover {
@@ -247,6 +247,66 @@ a.subheader_link, a.subheader_link:visited, a.subheader_link:hover {
     width:11px;
     float:left;
     background: url(../images/tab_notification_right.png) no-repeat top;
+}
+
+.green_tab {
+    padding-left:10px;
+    color:#000000;
+    font-weight: bold;
+    text-shadow: #cccccc 0px 0px 2px;
+    cursor:pointer;
+    font-size:11px;
+    float:right;
+}
+
+.green_tab .left {
+    height: 23px;
+    width: 11px;
+    float: left;
+    background: url('../images/tab_green_left.png') no-repeat top;
+}
+.green_tab .middle {
+    height: 23px;
+    float: left;
+    line-height: 20px;
+    background: url('../images/tab_green_middle.png') repeat-x top;
+}
+
+.green_tab .right {
+    height: 23px;
+    width: 11px;
+    float: left;
+    background: url('../images/tab_green_right.png') no-repeat top;
+}
+
+.red_tab {
+    padding-left:10px;
+    color:#ffffff;
+    font-weight: bold;
+    text-shadow: #000000 0px 0px 2px;
+    cursor:pointer;
+    font-size:11px;
+    float:right;
+}
+
+.red_tab .left {
+    height: 23px;
+    width: 11px;
+    float: left;
+    background: url('../images/tab_red_left.png') no-repeat top;
+}
+.red_tab .middle {
+    height: 23px;
+    float: left;
+    line-height: 20px;
+    background: url('../images/tab_red_middle.png') repeat-x top;
+}
+
+.red_tab .right {
+    height: 23px;
+    width: 11px;
+    float: left;
+    background: url('../images/tab_red_right.png') no-repeat top;
 }
 
 
@@ -1245,9 +1305,15 @@ form {
     padding: 4px;
 }
 
-
 .rich-picklist-control-disabled,
-.rich-picklist-control-top, .rich-picklist-control-bottom, .rich-picklist-control-up, .rich-picklist-control-down, .rich-picklist-control-copyall, .rich-picklist-control-copy, .rich-picklist-control-remove, .rich-picklist-control-removeall {
+.rich-picklist-control-top, 
+.rich-picklist-control-bottom, 
+.rich-picklist-control-up, 
+.rich-picklist-control-down, 
+.rich-picklist-control-copyall, 
+.rich-picklist-control-copy, 
+.rich-picklist-control-remove, 
+.rich-picklist-control-removeall {
     border: 0px;
 }
 
@@ -1256,7 +1322,10 @@ form {
     color: #777777;
 }
 
-.rich-mpnl-body { background-color: rgb(236, 236, 236); }
+
+.rich-mpnl-body { 
+    background-color: rgb(236, 236, 236); 
+}
 
 .rich-mpnl-header {
     background-image: url(../images/template/tables/header_background.gif);
@@ -1779,3 +1848,79 @@ div.metrics > span {margin-left:0.5em !important;}
 
 .subscribers { width: 98%; height: 300px; overflow:auto; position: relative; display: block; border: 0px; padding: 8px; font-family:'Lucida Grande', helvetica, verdana, sans-serif, arial; font-size: 1em; background-color: transparent; }
 .unsubscribed { color: red; }
+
+.uploadedMediaItem { border: 1px solid #aaaaaa; margin-left: 1%; margin-right: 1%; }
+.uploadedMediaItemByLine { width: 98%; margin-left: 1%; margin-right: 1% }
+
+/* Wiki Page Styles */
+#frmWikiPage .rich-mpnl-body { 
+    background: white; 
+    font-size: 1.2em; 
+}
+
+.wikiContent { 
+    width: 98%; 
+    height: 500px; 
+    overflow:auto; 
+    position: relative; 
+    display: block; 
+    border: 0px; 
+    padding: 8px; 
+    font-family: Palatino, Georgia, Times, 'Times New Roman', serif; 
+    font-size: 1.1em; 
+    background-color: transparent; 
+}
+.wikiLastUpdated { 
+    font-style: italic; 
+    font-size: 0.7em;
+    color: #A00;
+}
+
+.wikiTitle { 
+    font-size: 1.3em; 
+}
+
+.wikiTitleEdit {
+    width: 700px; 
+    margin-right: 7px;
+}
+
+.wikiEditDialogButtons {
+    margin-right: 9px;
+}
+
+
+#globalMessage {
+    position:fixed;
+    top:0px;
+    left:0px;
+    width:100%;
+    z-index:105;
+    text-align:center;
+    font-weight:bold;
+    font-size:150%;
+    color:white;
+    padding:10px 0px 10px 0px;
+    background-color:#8E1609;
+}
+
+#globalMessage span {
+    text-align: center;
+    width: 95%;
+    float:left;
+}
+
+.close-notify {
+    white-space: nowrap;
+    float:right;
+    margin-right:10px;
+    color:#fff;
+    text-decoration:none;
+    border:2px #fff solid;
+    padding-left:3px;
+    padding-right:3px
+}
+
+.close-notify a {
+    color: #fff;
+}

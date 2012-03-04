@@ -53,11 +53,6 @@
         <privilege>CONTACTS_READ</privilege>
     </item>
 
-    <item id="lnkHelp" type="submenu">
-        <label>menu_HELP</label>
-        <action>/help</action>
-    </item>
-
     <item id="lnkMyProfile" type="submenu">
         <label>menu_MY_PROFILE</label>
         <action>/myprofile</action>

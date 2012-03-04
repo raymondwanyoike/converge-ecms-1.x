@@ -248,6 +248,12 @@
     </managed-bean>
 
     <managed-bean>
+        <managed-bean-name>classificationDialog</managed-bean-name>
+        <managed-bean-class>dk.i2m.converge.jsf.beans.ClassificationDialog</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
         <managed-bean-name>converters</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.Converters</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>

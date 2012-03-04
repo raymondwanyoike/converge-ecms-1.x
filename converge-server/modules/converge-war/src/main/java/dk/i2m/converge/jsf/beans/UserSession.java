@@ -26,12 +26,15 @@ import dk.i2m.converge.core.reporting.activity.UserActivitySummary;
 import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
+import dk.i2m.converge.core.wiki.Page;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.ReportingFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
+import dk.i2m.converge.ejb.facades.WikiFacadeBean;
+import dk.i2m.converge.ejb.facades.WikiFacadeBeanLocal;
 import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.jsf.model.MenuHelper;
 import dk.i2m.converge.jsf.model.MenuItem;
@@ -59,15 +62,18 @@ import org.richfaces.event.UploadEvent;
  */
 public class UserSession {
 
-    private static final Logger LOG = Logger.getLogger(UserSession.class.getName());
+    private static final Logger LOG =
+            Logger.getLogger(UserSession.class.getName());
 
     @EJB private UserFacadeLocal userFacade;
-    
+
     @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @EJB private SystemFacadeLocal systemFacade;
 
     @EJB private ReportingFacadeLocal reportingFacade;
+
+    @EJB private WikiFacadeBeanLocal wikiFacade;
 
     private UserAccount user;
 
@@ -83,12 +89,13 @@ public class UserSession {
 
     private MenuItem sectionMenu;
 
-    private Map<String, List<Outlet>> privilegedOutlets = new HashMap<String, List<Outlet>>();
-    
+    private Map<String, List<Outlet>> privilegedOutlets =
+            new HashMap<String, List<Outlet>>();
+
     private Map<String, Boolean> privileges = new HashMap<String, Boolean>();
-    
+
     private Map<Long, Boolean> catalogueEditor = new HashMap<Long, Boolean>();
-    
+
     private List<Catalogue> catalogues = new ArrayList<Catalogue>();
 
     private Notification selectedNotification;
@@ -98,6 +105,10 @@ public class UserSession {
     private UserActivitySummary lastMonthActivity;
 
     private UserActivitySummary thisMonthActivity;
+
+    private Page displayWikiPage = null;
+
+    private String wikiPageTitle;
 
     /**
      * Creates a new instance of {@link UserSession}.
@@ -119,14 +130,15 @@ public class UserSession {
         String uid = getUser().getUsername();
         List<UserRole> userRoles = getUser().getUserRoles();
         this.catalogues = catalogueFacade.findCataloguesByUser(uid);
-        
+
         this.catalogueEditor.clear();
         List<Catalogue> allCatalogues = catalogueFacade.findAllCatalogues();
         for (Catalogue c : allCatalogues) {
-            this.catalogueEditor.put(c.getId(), userRoles.contains(c.getEditorRole()));
+            this.catalogueEditor.put(c.getId(), userRoles.contains(c.
+                    getEditorRole()));
         }
     }
-    
+
     /**
      * Determines if the user is an administrator.
      *
@@ -149,8 +161,7 @@ public class UserSession {
     /**
      * Determines if the current user is in a given role.
      *
-     * @param role
-     *          Name of the role
+     * @param role Name of the role
      * @return {@code true} if the user is in the given role, otherwise
      *         {@code false}
      */
@@ -161,22 +172,22 @@ public class UserSession {
 
     /**
      * Determines if the current user is an editor of a catalogue.
-     * 
+     * <p/>
      * @return {@code true} if the current user is an editor of a
-     *         catalogue, otherwise {@code false}
+     * catalogue, otherwise {@code false}
      */
     public boolean isCatalogueEditor() {
         return userFacade.isCatalogueEditor(getUser().getUsername());
     }
-    
+
     /**
      * Gets a {@link Map} of {@link Catalogues} with the {@link Catalogue} id
      * in the key of the {@link Map}, and a {@link Boolean} value in the value
      * of the {@link Map}. The {@link Boolean} value indicates if the current
      * user is an editor for the given {@link Catalogue}.
-     * 
+     * <p/>
      * @return {@link Map} of {@link Catalogues} indicator whether the current
-     *         user is an editor.
+     * user is an editor.
      */
     public Map<Long, Boolean> getCatalogueEditorRole() {
         return catalogueEditor;
@@ -255,17 +266,17 @@ public class UserSession {
     }
 
     /**
-     * Fetches user information and authorisation.  This method should only be
+     * Fetches user information and authorisation. This method should only be
      * executed once per user session.
      *
-     * @throws UserSessionException
-     *          If a user is not currently logged in or if the user could not be
-     *          found in the database and directory
+     * @throws UserSessionException If a user is not currently logged in or if the user could not be
+     * found in the database and directory
      */
     private void fetchUser() throws UserSessionException {
         FacesContext ctx = FacesContext.getCurrentInstance();
         String uid = ctx.getExternalContext().getRemoteUser();
-        String ip = ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).getRemoteAddr();
+        String ip = ((HttpServletRequest) FacesContext.getCurrentInstance().
+                getExternalContext().getRequest()).getRemoteAddr();
 
         LOG.log(Level.FINE, "Initialising user session for {0}", uid);
         privilegedOutlets.clear();
@@ -332,13 +343,23 @@ public class UserSession {
                 LOG.log(Level.FINE, "Not showing {0}", item.getId());
             }
         }
+
+        List<Page> wikiPages = wikiFacade.findSubmenuPages();
+
+        for (Page page : wikiPages) {
+            String menuId = "lnkWikiPage" + page.getId();
+            String menuAction = "wiki:" + page.getTitle();
+            MenuItem item = new MenuItem(menuId, page.getTitle(), menuAction,
+                    this);
+            item.setStyle(page.getSubmenuStyle());
+            addSubmenuItem(item);
+        }
     }
 
     /**
      * Helper method for adding a {@link MenuItem} to the page header.
      *
-     * @param menuItem
-     *          {@link MenuItem} to add to the page header
+     * @param menuItem {@link MenuItem} to add to the page header
      */
     private void addMenuItem(MenuItem menuItem) {
         this.items.add(menuItem);
@@ -347,8 +368,7 @@ public class UserSession {
     /**
      * Helper method for adding a {@link MenuItem} to the sub-menu.
      *
-     * @param menuItem
-     *          {@link MenuItem} to add to the sub-menu
+     * @param menuItem {@link MenuItem} to add to the sub-menu
      */
     private void addSubmenuItem(MenuItem menuItem) {
         this.submenuItems.add(menuItem);
@@ -357,8 +377,7 @@ public class UserSession {
     /**
      * Helper method for adding a {@link MenuItem} to the page header.
      *
-     * @param menuItem
-     *          {@link MenuItem} to add to the page header
+     * @param menuItem {@link MenuItem} to add to the page header
      */
     private void setupAdminMenu(MenuItem menuItem) {
         administration = menuItem;
@@ -366,15 +385,15 @@ public class UserSession {
 
     /**
      * Determine if the current user is allowed to create new assignments.
-     * 
+     * <p/>
      * @return {@code true} if the current user is allowed to create either news
-     *         items for outlets or media items for catalogues, otherwise 
+     * items for outlets or media items for catalogues, otherwise
      *         {@code false}
      */
     public boolean isPrivilegedToCreateNewAssignments() {
         return !getPrivilegedOutlets().isEmpty() || !getMyCatalogues().isEmpty();
     }
-    
+
     /**
      * Gets a {@link Map} of {@link Outlet}s indexed by the privileges of the
      * current user. The name of the {@link SystemPrivilege} is used as the key
@@ -386,11 +405,12 @@ public class UserSession {
     public Map<String, List<Outlet>> getPrivilegedOutlets() {
         return privilegedOutlets;
     }
-    
+
     public Map<String, Outlet> getMyNewsItemsOutlets() {
         Map<String, Outlet> outlets = new LinkedHashMap<String, Outlet>();
 
-        for (Outlet outlet : getUser().getPrivilegedOutlets(SystemPrivilege.MY_NEWS_ITEMS)) {
+        for (Outlet outlet : getUser().getPrivilegedOutlets(
+                SystemPrivilege.MY_NEWS_ITEMS)) {
             outlets.put(outlet.getTitle(), outlet);
         }
 
@@ -410,10 +430,10 @@ public class UserSession {
 
         return sections;
     }
-    
+
     /**
      * Gets the privileged catalogues of the current user.
-     * 
+     * <p/>
      * @return {@link Map} of privileged catalogues of the current user
      */
     public Map<String, Catalogue> getMyCatalogues() {
@@ -427,7 +447,7 @@ public class UserSession {
     /**
      * Refreshes the {@link UserActivitySummary} for the past two months.
      * After executing this method, the activity summary is available in
-     * {@link UserSession#getLastMonthActivity()} and 
+     * {@link UserSession#getLastMonthActivity()} and
      * {@link UserSession#getThisMonthActivity()}.
      */
     public void onRefreshUserActivity() {
@@ -435,14 +455,22 @@ public class UserSession {
         lastMonth.add(java.util.Calendar.MONTH, -1);
         java.util.Calendar thisMonth = java.util.Calendar.getInstance();
 
-        java.util.Calendar lastMonthFirstDay = CalendarUtils.getFirstDayOfMonth(lastMonth);
-        java.util.Calendar lastMonthLastDay = CalendarUtils.getLastDayOfMonth(lastMonth);
+        java.util.Calendar lastMonthFirstDay = CalendarUtils.getFirstDayOfMonth(
+                lastMonth);
+        java.util.Calendar lastMonthLastDay = CalendarUtils.getLastDayOfMonth(
+                lastMonth);
 
-        java.util.Calendar thisMonthFirstDay = CalendarUtils.getFirstDayOfMonth(thisMonth);
-        java.util.Calendar thisMonthLastDay = CalendarUtils.getLastDayOfMonth(thisMonth);
+        java.util.Calendar thisMonthFirstDay = CalendarUtils.getFirstDayOfMonth(
+                thisMonth);
+        java.util.Calendar thisMonthLastDay = CalendarUtils.getLastDayOfMonth(
+                thisMonth);
 
-        this.lastMonthActivity = reportingFacade.generateUserActivitySummary(lastMonthFirstDay.getTime(), lastMonthLastDay.getTime(), getUser());
-        this.thisMonthActivity = reportingFacade.generateUserActivitySummary(thisMonthFirstDay.getTime(), thisMonthLastDay.getTime(), getUser());
+        this.lastMonthActivity =
+                reportingFacade.generateUserActivitySummary(lastMonthFirstDay.
+                getTime(), lastMonthLastDay.getTime(), getUser());
+        this.thisMonthActivity =
+                reportingFacade.generateUserActivitySummary(thisMonthFirstDay.
+                getTime(), thisMonthLastDay.getTime(), getUser());
     }
 
     /**
@@ -469,15 +497,15 @@ public class UserSession {
         return selectedNewswireService;
     }
 
-    public void setSelectedNewswireService(NewswireService selectedNewswireService) {
+    public void setSelectedNewswireService(
+            NewswireService selectedNewswireService) {
         this.selectedNewswireService = selectedNewswireService;
     }
 
     /**
      * Event handler for updating the profile of the user.
      *
-     * @param event
-     *          Event that invoked the handler
+     * @param event Event that invoked the handler
      */
     public void onUpdateProfile(ActionEvent event) {
         userFacade.update(this.user);
@@ -485,17 +513,18 @@ public class UserSession {
             fetchUser();
         } catch (UserSessionException ex) {
             LOG.log(Level.SEVERE, null, ex);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
+                    ex.getMessage(), null);
         }
 
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "profile_PROFILE_UPDATED_MSG");
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                "profile_PROFILE_UPDATED_MSG");
     }
 
     /**
      * Event handler for uploading a new profile photo.
      *
-     * @param event
-     *          Event that invoked the handler
+     * @param event Event that invoked the handler
      */
     public void onUploadProfilePhoto(UploadEvent event) {
         if (event == null) {
@@ -506,12 +535,17 @@ public class UserSession {
         if (item.isTempFile()) {
             java.io.File tempFile = item.getFile();
 
-            String workingDirectory = systemFacade.getProperty(ConfigurationKey.WORKING_DIRECTORY) + System.getProperty("file.separator") + "users" + System.getProperty("file.separator");
+            String workingDirectory = systemFacade.getProperty(
+                    ConfigurationKey.WORKING_DIRECTORY) + System.getProperty(
+                    "file.separator") + "users" + System.getProperty(
+                    "file.separator");
             try {
                 byte[] uploadedFile = FileUtils.getBytes(tempFile);
-                byte[] thumb = ImageUtils.generateThumbnail(uploadedFile, 48, 48, 100);
+                byte[] thumb = ImageUtils.generateThumbnail(uploadedFile, 48, 48,
+                        100);
 
-                FileUtils.writeToFile(thumb, workingDirectory + user.getId() + ".jpg");
+                FileUtils.writeToFile(thumb, workingDirectory + user.getId()
+                        + ".jpg");
 
 //                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "profile_PHOTO_UPDATED_MSG");
             } catch (IOException ex) {
@@ -523,25 +557,15 @@ public class UserSession {
             }
 
         } else {
-            LOG.severe("RichFaces is not set-up to use tempFiles " + "for storing file uploads");
+            LOG.severe("RichFaces is not set-up to use tempFiles "
+                    + "for storing file uploads");
         }
-    }
-
-    /**
-     * Event handler for accessing the user notifications.
-     *
-     * @return <code>/notifications</code> (JSF navigation rule)
-     */
-    public String onNotifications() {
-        resetActive();
-        return "/notifications";
     }
 
     /**
      * Event handler for dismissing the selected {@link Notification}.
      *
-     * @param event
-     *          Event that invoked the handler
+     * @param event Event that invoked the handler
      */
     public void onDismissNotification(ActionEvent event) {
         if (selectedNotification != null) {
@@ -552,8 +576,7 @@ public class UserSession {
     /**
      * Event handler for dismissing all {@link Notification}s.
      *
-     * @param event
-     *          Event that invoked the handler
+     * @param event Event that invoked the handler
      */
     public void onDismissAllNotifications(ActionEvent event) {
         userFacade.dismiss(getUser());
@@ -561,7 +584,7 @@ public class UserSession {
 
     /**
      * Gets the URL of the user photo.
-     * 
+     * <p/>
      * @return URL of the user photo
      */
     public String getPhotoUrl() {
@@ -571,10 +594,85 @@ public class UserSession {
 
     /**
      * Sets the {@link Locale} of the current user.
-     * 
+     * <p/>
      * @param locale {@link Locale} of the current user
      */
     private void setLocale(Locale locale) {
         FacesContext.getCurrentInstance().getViewRoot().setLocale(locale);
+    }
+
+    /**
+     * Event handler (setPropertyActionListener) for selecting the wiki page
+     * that should be displayed.
+     * <p/>
+     * @param wikiPage Name of the wiki page to be displayed.
+     */
+    public void setLoadWikiPage(String wikiPage) {
+        this.wikiPageTitle = wikiPage;
+        String pageTitle = wikiPage.replaceFirst("wiki:", "");
+        try {
+            setDisplayWikiPage(wikiFacade.findPageByTitle(pageTitle));
+        } catch (DataNotFoundException ex) {
+            LOG.log(Level.WARNING, "Unknown wiki page requested. {0}", ex.
+                    getMessage());
+        }
+    }
+
+    /**
+     * Event handler for preparation of a new wiki page.
+     * 
+     * @param event Event that invoked the handler
+     */
+    public void onCreateWikiPage(ActionEvent event) {
+        this.displayWikiPage = new Page();
+    }
+
+    /**
+     * Event handler for saving the currently opened wiki page.
+     * <p/>
+     * @param event Event that invoked the handler
+     */
+    public void onSaveWikiPage(ActionEvent event) {
+        displayWikiPage.setLastUpdater(getUser());
+        if (displayWikiPage.getId() == null) {
+            displayWikiPage.setSubmenu(true);
+            displayWikiPage = wikiFacade.create(displayWikiPage);
+        } else {
+            wikiFacade.update(displayWikiPage);
+        }
+        this.items.clear();
+        this.submenuItems.clear();
+        generateMenu();
+        
+    }
+
+    /**
+     * Event handler for deleting the currently selected wiki page.
+     * 
+     * @param event Event that invoked the handler
+     */
+    public void onDeleteWikiPage(ActionEvent event) {
+        wikiFacade.deletePageById(displayWikiPage.getId());
+        this.items.clear();
+        this.submenuItems.clear();
+        generateMenu();
+    }
+
+    /**
+     * Sets the wiki page that has to be displayed.
+     * <p/>
+     * @param displayWikiPage Wiki page to display
+     */
+    public void setDisplayWikiPage(Page displayWikiPage) {
+        this.displayWikiPage = displayWikiPage;
+    }
+
+    /**
+     * Gets the wiki page that should be displayed.
+     * <p/>
+     * @return Wiki page that should be displayed
+     */
+    public Page getDisplayWikiPage() {
+        return displayWikiPage;
     }
 }

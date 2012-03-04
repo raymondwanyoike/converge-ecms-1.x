@@ -52,5 +52,7 @@ public enum SystemPrivilege {
     /** Remove newswire item from search engine. */
     NEWSWIRE_ITEM_REMOVE,
     /** Remove news item from search engine. */
-    SEARCH_ENGINE_RESULT_REMOVE
+    SEARCH_ENGINE_RESULT_REMOVE,
+    /** Allow management of wiki pages. */
+    MANAGE_WIKI_PAGE,
 }

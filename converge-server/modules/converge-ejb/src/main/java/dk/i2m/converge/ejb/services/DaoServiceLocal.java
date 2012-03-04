@@ -132,6 +132,23 @@ public interface DaoServiceLocal {
      *          If an entity could not be found
      */
      <T> T findObjectWithNamedQuery(Class<T> type, String namedQueryName, Map<String, Object> parameters) throws DataNotFoundException;
+     
+     /**
+     * Finds a {@link List} of entity returned by the given named query.
+     *
+     * @param <T>
+     *          Type of object to retrieve
+     * @param type
+     *          Type of object to retrieve
+     * @param namedQueryName
+     *          Name of the query
+     * @param queryBuilder
+     *          Builder containing the query parameters
+     * @return Matched entity
+     * @throws DataNotFoundException
+     *          If an entity could not be found
+     */
+     <T> T findObjectWithNamedQuery(Class<T> type, String namedQueryName, QueryBuilder queryBuilder) throws DataNotFoundException;
 
     /**
      * Finds a {@link List} of entity returned by the given named query.

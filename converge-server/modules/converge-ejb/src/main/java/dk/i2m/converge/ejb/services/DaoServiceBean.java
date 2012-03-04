@@ -173,6 +173,12 @@ public class DaoServiceBean implements DaoServiceLocal {
             return results.iterator().next();
         }
     }
+    
+    /** {@inheritDoc } */
+    @Override
+    public <T> T findObjectWithNamedQuery(Class<T> type, String namedQueryName, QueryBuilder queryBuilder) throws DataNotFoundException {
+        return findObjectWithNamedQuery(type, namedQueryName, queryBuilder.parameters());
+    }
 
     /**
      * Finds a {@link List} of entity returned by the given named query.
