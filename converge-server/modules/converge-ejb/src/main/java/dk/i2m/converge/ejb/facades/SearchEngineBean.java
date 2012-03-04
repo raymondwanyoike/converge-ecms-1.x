@@ -698,10 +698,12 @@ public class SearchEngineBean implements SearchEngineLocal {
 
             try {
                 Tika tika = new Tika();
-                hit.setPreviewContentType(tika.detect(new URL(
-                        hit.getPreviewLink())));
+                String contentType = tika.detect(new URL(hit.getPreviewLink()));
+                hit.setPreviewContentType(contentType);
             } catch (IOException ex) {
-                LOG.log(Level.SEVERE, null, ex);
+                LOG.log(Level.WARNING, "Could not set the content type "
+                        + "of the preview link. {0}",
+                        new Object[]{ex.getMessage()});
             }
 
         } else {
