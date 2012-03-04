@@ -10,3 +10,6 @@ CREATE TABLE `wiki_page` (
     `created` datetime DEFAULT null,
     PRIMARY KEY (`id`)
 );
+
+
+ALTER TABLE newswire_service ADD COLUMN `copyright` TEXT DEFAULT '';

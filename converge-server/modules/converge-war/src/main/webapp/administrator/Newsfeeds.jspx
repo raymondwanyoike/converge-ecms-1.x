@@ -184,6 +184,12 @@
                                     </h:panelGroup>
                                 </h:panelGrid>
                             </rich:tab>
+                            
+                            <rich:tab id="tabCopyright" label="#{i18n.administrator_Newsfeeds_COPYRIGHTS}">
+                                <h:panelGrid columns="2" columnClasses="dialogueFieldLabel nowrap, dialogueFieldValue" styleClass="dialogue">
+                                    <h:inputTextarea styleClass="text mediumTextArea" value="#{administrator_Newsfeeds.selectedNewsfeed.copyright}"/>
+                                </h:panelGrid>
+                            </rich:tab>
 
                             <rich:tab id="tabProperties" label="#{i18n.NewsFeeds_PROPERTIES}">
                                 <h:panelGrid id="pgProperties" columns="1" styleClass="dialogue">

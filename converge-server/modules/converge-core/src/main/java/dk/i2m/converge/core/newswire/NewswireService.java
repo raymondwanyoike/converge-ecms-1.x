@@ -104,6 +104,10 @@ public class NewswireService implements Serializable {
 
     @ManyToMany(mappedBy = "appliesTo", fetch = FetchType.LAZY)
     private List<NewswireBasket> baskets = new ArrayList<NewswireBasket>();
+    
+    @Column(name = "copyright")
+    @Lob
+    private String copyright = "";
 
     /**
      * Creates a new instance of {@link NewswireService}.
@@ -331,6 +335,24 @@ public class NewswireService implements Serializable {
         this.numberOfSubscribers = numberOfSubscribers;
     }
 
+    /**
+     * Gets the copyright for items in this service.
+     * 
+     * @return Copyright notice for items in this service
+     */
+    public String getCopyright() {
+        return copyright;
+    }
+
+    /**
+     * Sets the copyright notice for items in this service.
+     * 
+     * @param copyright Notice for items in this service
+     */
+    public void setCopyright(String copyright) {
+        this.copyright = copyright;
+    }
+    
     /**
      * Gets a {@link Map} containing the properties of the service.
      *

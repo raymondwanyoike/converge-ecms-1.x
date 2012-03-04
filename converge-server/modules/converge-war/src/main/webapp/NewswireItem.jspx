@@ -20,6 +20,10 @@
                             <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                         </h:outputText></span></h2>
 
+                <c:if test="#{newswireitem.selectedItem.newswireService.copyright != ''}">
+                    <p class="newswireServiceCopyright"><h:outputText value="#{newswireitem.selectedItem.newswireService.copyright}" escape="false" /></p>
+                </c:if>
+
                 <c:if test="#{newswireitem.selectedItem.url != ''}">
                     <h:outputLink value="#{newswireitem.selectedItem.url}">#{i18n.NewswireItem_FULL_STORY}</h:outputLink>
                 </c:if>
@@ -69,7 +73,7 @@
                         <h:message for="frmPage" style="color: green; font-weight: bold;"  />
                     </a4j:outputPanel>
                     <div style="display:block;clear: both; "></div>
-                    
+
                     <h:panelGrid columns="3">
                         <h:outputText value="#{i18n.NewswireItem_IMPORT_CATALOGUE}" />
                         <h:selectOneMenu id="somImportCatalogue" value="#{newswireitem.importCatalogue}" converter="#{converters.mediaRepositoryConverter}">
