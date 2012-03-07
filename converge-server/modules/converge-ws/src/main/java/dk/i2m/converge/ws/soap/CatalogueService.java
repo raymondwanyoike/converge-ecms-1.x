@@ -16,22 +16,28 @@
  */
 package dk.i2m.converge.ws.soap;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.catalogue.*;
+import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
+import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 
 /**
  * SOAP Web Service for working with digital asset {@link Catalogue}s.
@@ -44,6 +50,8 @@ public class CatalogueService {
     @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @EJB private UserFacadeLocal userFacade;
+    
+    @EJB private MetaDataFacadeLocal metaDataFacade;
 
     @Resource private WebServiceContext context;
 
@@ -94,7 +102,7 @@ public class CatalogueService {
             @WebParam(name = "rendition") String renditionName,
             @WebParam(name = "filename") String filename,
             @WebParam(name = "contentType") String contentType,
-            @WebParam(name = "file") File file
+            @WebParam(name = "file") String base64File
             ) throws DigitalAssetNotFoundException, RenditionNotFoundException, IOException {
         
         MediaItem item;
@@ -110,6 +118,11 @@ public class CatalogueService {
         } catch (DataNotFoundException ex) {
             throw new RenditionNotFoundException(ex);
         }
+        
+        // Convert Base64 file into real file
+        File file = File.createTempFile("catalogueService", "upload");
+        byte[] decoded = Base64.decodeBase64(base64File.getBytes());
+        FileUtils.writeByteArrayToFile(file, decoded);
        
         MediaItemRendition mir = catalogueFacade.create(file, item, rendition, filename, contentType);
         
@@ -149,6 +162,24 @@ public class CatalogueService {
 
         item.setStatus(mediaItemStatus);
         catalogueFacade.update(item);
+    }
+    
+    /**
+     * Adds a {@link Concept} to a digital asset.
+     * 
+     * @param digitalAssetsId Unique identifier of the digital asset
+     * @param conceptId Unique identifier of the concept
+     */
+    public void addConceptToDigitalAsset(Long digitalAssetsId, Long conceptId) {
+        try {
+            Concept concept = metaDataFacade.findConceptById(conceptId);
+            MediaItem digitalAsset = catalogueFacade.findMediaItemById(digitalAssetsId);
+            digitalAsset.getConcepts().add(concept);
+            catalogueFacade.update(digitalAsset);
+        } catch (DataNotFoundException ex) {
+            Logger.getLogger(CatalogueService.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
