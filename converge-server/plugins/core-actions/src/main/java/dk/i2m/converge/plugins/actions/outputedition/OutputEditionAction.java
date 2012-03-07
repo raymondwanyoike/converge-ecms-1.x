@@ -302,7 +302,7 @@ public class OutputEditionAction implements EditionAction {
 
     @Override
     public boolean isSupportPlacementExecute() {
-        return true;
+        return false;
     }
 
     @Override
