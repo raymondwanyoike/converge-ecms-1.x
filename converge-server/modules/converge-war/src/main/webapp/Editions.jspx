@@ -188,6 +188,13 @@
                                 <h:outputText value="#{i18n.Editions_EDITION_DETAILS}" />
                             </h:panelGroup>
                         </f:facet>
+                        <f:facet name="controls">
+                            <h:panelGroup>
+                                <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
+                                    <rich:componentControl for="mpEditionDetails" operation="hide" event="onclick"/>
+                                </h:graphicImage>
+                            </h:panelGroup>
+                        </f:facet>
                         <h:panelGrid id="pgEditionDetails" style="width: 480px;">
 
                             <rich:tabPanel switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
@@ -270,7 +277,7 @@
                                 <a4j:commandLink id="lnkDeleteEdition" rendered="#{planning.editionEditMode}" onclick="if (confirm('#{i18n.Editions_EDITION_PROMPT_DELETE}') != true){ return false; };" actionListener="#{planning.onDeleteEdition}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="frmPage">
                                     <rich:componentControl for="mpEditionDetails" operation="hide" event="oncomplete" />
                                 </a4j:commandLink>
-                                <h:commandLink id="lnkCloseOutletForm" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpEditionDetails')}.hide(); return false;" />
+                                <h:commandLink id="lnkCloseOutletForm" styleClass="dialogButton" value="#{i18n.Generic_CLOSE}" onclick="#{rich:component('mpEditionDetails')}.hide(); return false;" />
                             </h:panelGroup>
                         </h:panelGrid>
                     </rich:modalPanel>
