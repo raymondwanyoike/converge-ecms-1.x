@@ -192,6 +192,7 @@
                                                 name="JUpload" width="440">
                                             <param name="postURL" value="#{facesContext.externalContext.request.contextPath}/FileUploadServlet?uploadType=newMediaItem&amp;catalogueId=#{newsItem.selectedCatalogue.id}"/>
                                             <param name="showLogWindow" value="false" />
+                                            <param name="retryMaxNumberOf" value="50" />
                                             <param name="nbFilesPerRequest" value="1" />
                                             <param name="uploadPolicy" value="ConvergePolicy" />
                                             <param name="maxFileSize" value="#{newsItem.selectedCatalogue.maxFileUploadSize*1024}" />

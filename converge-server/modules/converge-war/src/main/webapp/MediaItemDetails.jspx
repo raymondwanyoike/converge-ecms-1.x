@@ -471,6 +471,7 @@
                                             <param name="postURL" value="#{facesContext.externalContext.request.contextPath}/FileUploadServlet?uploadType=replaceRendition&amp;mediaItemId=#{mediaItemDetails.selectedMediaItem.id}&amp;renditionId=#{mediaItemDetails.selectedRendition.rendition.id}"/>
                                             <param name="showLogWindow" value="false" />
                                             <param name="nbFilesPerRequest" value="1" />
+                                            <param name="retryMaxNumberOf" value="50" />
                                             <param name="uploadPolicy" value="ConvergePolicy" />
                                             <param name="maxFileSize" value="#{mediaItemDetails.selectedMediaItem.catalogue.maxFileUploadSize*1024}" />
                                             <param name="afterUploadURL" value="javascript:onUpdateRenditionUploadComplete();" />
@@ -605,6 +606,7 @@
                                             <param name="postURL" value="#{facesContext.externalContext.request.contextPath}/FileUploadServlet?uploadType=newRendition&amp;mediaItemId=#{mediaItemDetails.selectedMediaItem.id}&amp;renditionId=#{mediaItemDetails.uploadRendition.id}"/>
                                             <param name="showLogWindow" value="false" />
                                             <param name="nbFilesPerRequest" value="1" />
+                                            <param name="retryMaxNumberOf" value="50" />
                                             <param name="uploadPolicy" value="ConvergePolicy" />
                                             <param name="maxFileSize" value="#{mediaItemDetails.selectedMediaItem.catalogue.maxFileUploadSize*1024}" />
                                             <param name="afterUploadURL" value="javascript:onNewRenditionUploadComplete();" />
