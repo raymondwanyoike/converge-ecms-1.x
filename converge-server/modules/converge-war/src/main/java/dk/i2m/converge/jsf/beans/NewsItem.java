@@ -979,7 +979,7 @@ public class NewsItem {
         this.selectedNewsItem.getMediaAttachments().add(selectedAttachment);
 
         onPreAttachMediaFile(event);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n", "NewsItem_MEDIA_ITEM_ATTACHED_TO_NEWS_ITEM");
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n", "NewsItem_MEDIA_ITEM_ATTACHED_TO_NEWS_ITEM", null);
     }
 
     public void onPreAttachMediaFile(ActionEvent event) {
