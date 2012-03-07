@@ -211,9 +211,9 @@ public class Common {
      */
     public Map<String, OutletType> getOutletTypes() {
         Map<String, OutletType> types = new LinkedHashMap<String, OutletType>();
-
+        
         for (OutletType type : OutletType.values()) {
-            types.put(JsfUtils.getResourceBundle().getString("OUTLET_TYPE_" + type.name()), type);
+            types.put(i18n.getString("Generic_OUTLET_TYPE_" + type.name()), type);
         }
 
         return types;

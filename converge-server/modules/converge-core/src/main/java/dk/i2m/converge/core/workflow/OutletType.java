@@ -26,5 +26,5 @@ package dk.i2m.converge.core.workflow;
  */
 public enum OutletType {
 
-    PRINT, AUDIO, VIDEO, WEB, MOBILE
+    PRINT, AUDIO, VIDEO, WEB, MOBILE, NEWSLETTER
 }

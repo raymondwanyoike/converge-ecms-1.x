@@ -271,6 +271,7 @@ public class Outlets extends BaseBean {
      */
     public void onDeleteOutlet(ActionEvent event) {
         outletFacade.deleteOutletById(selectedOutlet.getId());
+        this.outlets = null;
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 "OUTLET_DELETED");
     }

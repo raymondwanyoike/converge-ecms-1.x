@@ -201,7 +201,7 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabEditionPatterns" label="#{i18n.Outlets_EDITIONS}">
+                            <rich:tab id="tabEditionPatterns" label="#{i18n.Outlets_EDITIONS}" disabled="#{administrator_Outlets.outletAddMode}">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
@@ -274,7 +274,7 @@
                             </rich:tab>
 
 
-                            <rich:tab id="tabSubscribers" label="#{i18n.administrator_Outlets_SUBSCRIBERS}">
+                            <rich:tab id="tabSubscribers" label="#{i18n.administrator_Outlets_SUBSCRIBERS}" disabled="#{administrator_Outlets.outletAddMode}">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
 
@@ -326,7 +326,7 @@
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab id="tabEvents" label="#{i18n.Outlets_ACTIONS}">
+                            <rich:tab id="tabEvents" label="#{i18n.Outlets_ACTIONS}" disabled="#{administrator_Outlets.outletAddMode}">
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
