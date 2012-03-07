@@ -39,6 +39,12 @@
             <url-pattern>/NewsItemService/*</url-pattern>
             <url-pattern>/NewsItemService*</url-pattern>
         </web-resource-collection>
+        <web-resource-collection>
+            <web-resource-name>DigitalAssets Services</web-resource-name>
+            <description/>
+            <url-pattern>/DigitalAssetService/*</url-pattern>
+            <url-pattern>/DigitalAssetService*</url-pattern>
+        </web-resource-collection>
         <auth-constraint>
             <description>Converge Administrator</description>
             <role-name>ADMINISTRATOR</role-name>
