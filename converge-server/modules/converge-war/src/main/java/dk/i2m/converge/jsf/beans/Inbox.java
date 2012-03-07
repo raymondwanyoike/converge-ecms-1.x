@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.jsf.beans;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.AssignmentType;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemActor;
@@ -29,7 +30,6 @@ import dk.i2m.converge.core.views.InboxView;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.ejb.facades.*;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.jsf.components.tags.DialogSelfAssignment;
 import dk.i2m.jsf.JsfUtils;
 import java.util.ArrayList;

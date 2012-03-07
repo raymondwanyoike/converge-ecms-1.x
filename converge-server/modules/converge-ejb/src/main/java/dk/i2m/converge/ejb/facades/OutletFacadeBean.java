@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.ejb.facades;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.dto.EditionAssignmentView;
 import dk.i2m.converge.core.dto.EditionView;
@@ -26,7 +27,6 @@ import dk.i2m.converge.core.utils.BeanComparator;
 import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.messaging.EditionServiceMessageBean;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.QueryBuilder;
 import dk.i2m.converge.utils.CalendarUtils;
 import java.util.*;

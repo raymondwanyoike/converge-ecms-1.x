@@ -18,6 +18,7 @@ package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.commons.BeanComparator;
 import dk.i2m.converge.core.ConfigurationKey;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.content.*;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
@@ -34,7 +35,6 @@ import dk.i2m.converge.domain.search.SearchResult;
 import dk.i2m.converge.domain.search.SearchResults;
 import dk.i2m.converge.ejb.facades.*;
 import dk.i2m.converge.ejb.services.ConfigurationServiceLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.MetaDataServiceLocal;
 import dk.i2m.jsf.JsfUtils;
 import java.text.MessageFormat;

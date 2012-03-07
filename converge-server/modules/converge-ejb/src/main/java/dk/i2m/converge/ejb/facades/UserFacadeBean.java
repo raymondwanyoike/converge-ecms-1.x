@@ -18,7 +18,7 @@ package dk.i2m.converge.ejb.facades;
 
 import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.security.Privilege;
 import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.core.security.UserAccount;

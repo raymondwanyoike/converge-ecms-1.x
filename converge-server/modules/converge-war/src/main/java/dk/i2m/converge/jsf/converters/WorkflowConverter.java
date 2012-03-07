@@ -16,7 +16,7 @@
  */
 package dk.i2m.converge.jsf.converters;
 
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.workflow.Workflow;
 import dk.i2m.converge.ejb.facades.WorkflowFacadeLocal;
 import java.util.logging.Level;

@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.jsf.beans;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.logging.LogEntry;
 import dk.i2m.converge.core.calendar.Event;
 import dk.i2m.converge.core.content.NewsItem;
@@ -27,7 +28,6 @@ import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.facades.*;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.jsf.components.tags.DialogAssignment;
 import dk.i2m.converge.jsf.components.tags.DialogEventSelection;
 import dk.i2m.converge.jsf.components.tags.UIEvent;

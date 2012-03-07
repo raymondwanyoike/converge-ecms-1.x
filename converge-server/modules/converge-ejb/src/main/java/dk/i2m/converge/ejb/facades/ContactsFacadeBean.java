@@ -26,7 +26,7 @@ import dk.i2m.converge.ejb.services.DirectoryException;
 import dk.i2m.converge.ejb.services.QueryBuilder;
 import dk.i2m.converge.ejb.services.UserNotFoundException;
 import dk.i2m.converge.ejb.services.UserServiceLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;

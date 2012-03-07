@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.ejb.services;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.EnrichException;
 import com.adobe.xmp.XMPException;
 import com.adobe.xmp.XMPMeta;

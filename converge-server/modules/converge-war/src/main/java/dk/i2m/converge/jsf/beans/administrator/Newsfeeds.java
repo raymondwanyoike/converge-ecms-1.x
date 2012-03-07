@@ -16,21 +16,21 @@
  */
 package dk.i2m.converge.jsf.beans.administrator;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.logging.LogEntry;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.newswire.NewswireServiceProperty;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.NewswireServiceLocal;
 import dk.i2m.converge.plugins.decoders.rss.RssDecoder;
 import dk.i2m.jsf.JsfUtils;
+import static dk.i2m.jsf.JsfUtils.createMessage;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
-import static dk.i2m.jsf.JsfUtils.*;
 
 /**
  * Backing bean for {@code /administrator/Newsfeeds.jspx}.

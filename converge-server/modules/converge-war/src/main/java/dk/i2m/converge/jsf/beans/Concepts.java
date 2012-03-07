@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.jsf.beans;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.metadata.Subject;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.metadata.GeoArea;
@@ -23,7 +24,6 @@ import dk.i2m.converge.core.metadata.Organisation;
 import dk.i2m.converge.core.metadata.Person;
 import dk.i2m.converge.core.metadata.PointOfInterest;
 import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.jsf.JsfUtils;
 import java.io.IOException;
 import java.util.ArrayList;

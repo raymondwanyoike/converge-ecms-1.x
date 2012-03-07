@@ -23,7 +23,7 @@ import dk.i2m.converge.core.content.Language;
 import dk.i2m.converge.core.logging.LogSubject;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.domain.Property;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import java.util.List;
 import javax.ejb.Local;
 

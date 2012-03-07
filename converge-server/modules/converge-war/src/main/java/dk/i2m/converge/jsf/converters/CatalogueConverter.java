@@ -16,9 +16,9 @@
  */
 package dk.i2m.converge.jsf.converters;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.component.UIComponent;

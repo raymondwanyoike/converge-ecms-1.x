@@ -18,7 +18,7 @@ package dk.i2m.converge.jsf.converters;
 
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.workflow.Section;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
 import dk.i2m.converge.ejb.services.NewswireServiceLocal;
 import java.util.logging.Level;

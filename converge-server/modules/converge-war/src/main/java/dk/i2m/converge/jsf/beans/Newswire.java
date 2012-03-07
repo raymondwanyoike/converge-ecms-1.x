@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.jsf.beans;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.ContentTag;
 import dk.i2m.converge.core.newswire.NewswireBasket;
 import dk.i2m.converge.core.newswire.NewswireItem;
@@ -26,7 +27,6 @@ import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.domain.search.SearchResult;
 import dk.i2m.converge.domain.search.SearchResults;
 import dk.i2m.converge.ejb.facades.*;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.NewswireServiceLocal;
 import dk.i2m.converge.jsf.components.tags.DialogAssignment;
 import dk.i2m.converge.jsf.components.tags.DialogEventSelection;

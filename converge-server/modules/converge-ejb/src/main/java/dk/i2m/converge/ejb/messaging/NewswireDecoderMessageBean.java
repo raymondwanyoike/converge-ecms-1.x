@@ -22,7 +22,7 @@ import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.plugin.NewswireDecoder;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.ejb.services.NewswireServiceLocal;
 import dk.i2m.converge.ejb.services.PluginContextBeanLocal;
 import java.util.Calendar;

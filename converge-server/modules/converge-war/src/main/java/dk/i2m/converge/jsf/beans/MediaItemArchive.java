@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.jsf.beans;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
@@ -24,7 +25,6 @@ import dk.i2m.converge.core.content.catalogue.RenditionNotFoundException;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.jsf.JsfUtils;
 import java.util.ArrayList;
 import java.util.List;

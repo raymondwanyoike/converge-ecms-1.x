@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 package dk.i2m.converge.ejb.messaging;
 
-import dk.i2m.converge.core.logging.LogEntry;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.plugin.EditionAction;
@@ -28,9 +28,7 @@ import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ejb.services.PluginContextBeanLocal;
-import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
@@ -51,7 +49,6 @@ import javax.jms.MessageListener;
  * <li>newsItemPlacementId (If the bean is to execute the action on a single
  * placement rather than a complete edition)</li>
  * </ul>
- *
  *
  * @author Allan Lykke Christensen
  */
@@ -99,13 +96,15 @@ public class EditionServiceMessageBean implements MessageListener {
         try {
             boolean placementExecution = false;
             Long newsItemPlacementId = 0L;
-            
+
             Long editionId = msg.getLongProperty(Property.EDITION_ID.name());
             Long actionId = msg.getLongProperty(Property.ACTION_ID.name());
             String uid = msg.getStringProperty(Property.USER_ACCOUNT_ID.name());
 
             try {
-                newsItemPlacementId = msg.getLongProperty(Property.NEWS_ITEM_PLACEMENT_ID.name());
+                newsItemPlacementId =
+                        msg.getLongProperty(
+                        Property.NEWS_ITEM_PLACEMENT_ID.name());
                 placementExecution = true;
             } catch (NumberFormatException ex) {
                 placementExecution = false;

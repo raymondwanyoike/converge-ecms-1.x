@@ -16,7 +16,7 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.metadata.Subject;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.nar.newsml.g2.power.KnowledgeItem;
@@ -233,5 +233,5 @@ public interface MetaDataFacadeLocal {
 
     void deleteOpenCalaisMapping(java.lang.Long id);
 
-    dk.i2m.converge.core.metadata.Concept findOpenCalaisMapping(java.lang.String typeGroup, java.lang.String field, java.lang.String value) throws dk.i2m.converge.ejb.services.DataNotFoundException;
+    dk.i2m.converge.core.metadata.Concept findOpenCalaisMapping(java.lang.String typeGroup, java.lang.String field, java.lang.String value) throws dk.i2m.converge.core.DataNotFoundException;
 }

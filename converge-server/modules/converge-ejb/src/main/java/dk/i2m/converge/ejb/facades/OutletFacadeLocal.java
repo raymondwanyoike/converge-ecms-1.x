@@ -18,7 +18,7 @@ package dk.i2m.converge.ejb.facades;
 
 import dk.i2m.converge.core.dto.OutletActionView;
 import dk.i2m.converge.core.workflow.*;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -349,7 +349,7 @@ public interface OutletFacadeLocal {
 
     dk.i2m.converge.core.subscriber.OutletSubscriber findSubscriberById(
             java.lang.Long id)
-            throws dk.i2m.converge.ejb.services.DataNotFoundException;
+            throws dk.i2m.converge.core.DataNotFoundException;
 
     void deleteSubscriberById(java.lang.Long id);
 

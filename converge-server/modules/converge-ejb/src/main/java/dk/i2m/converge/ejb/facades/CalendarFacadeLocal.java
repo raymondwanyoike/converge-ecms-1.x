@@ -16,7 +16,7 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.calendar.Event;
 import dk.i2m.converge.core.calendar.EventCategory;
 import java.util.Calendar;

@@ -23,7 +23,7 @@ import dk.i2m.converge.core.content.markets.MarketValue;
 import dk.i2m.converge.core.content.weather.Forecast;
 import dk.i2m.converge.core.content.weather.Location;
 import dk.i2m.converge.core.content.weather.Situation;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import java.util.List;
 import javax.ejb.Local;
 

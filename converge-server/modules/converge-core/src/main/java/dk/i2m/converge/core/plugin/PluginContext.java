@@ -17,9 +17,11 @@
 package dk.i2m.converge.core.plugin;
 
 import dk.i2m.converge.core.ConfigurationKey;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.content.NewsItem;
+import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.content.catalogue.Rendition;
@@ -32,6 +34,7 @@ import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.security.UserAccount;
+import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.WorkflowState;
 import java.util.List;
@@ -263,4 +266,47 @@ public interface PluginContext {
      * Empty string if nothing was detected
      */
     String extractContent(MediaItemRendition mediaItemRendition);
+    
+    /**
+     * Finds an {@link Outlet} by its unique identifier.
+     * 
+     * @param id Unique identifier of the {@link Outlet}
+     * @return {@link Outlet} matching the unique identifier
+     * @throws DataNotFoundException If an {@link Outlet} with the given {@code id} could not be found
+     */
+    Outlet findOutletById(Long id) throws DataNotFoundException;
+    
+    /**
+     * Finds the next {@link Edition} of a given {@link Outlet}.
+     * 
+     * @param id Unique identifier of the {@link Outlet}
+     * @return Next {@link Edition} for the given {@link Outlet}
+     * @throws DataNotFoundException If the {@link Outlet} does not have any future {@link Edition}s
+     */
+    Edition findNextEdition(Long id) throws DataNotFoundException;
+
+    /**
+     * Update an existing {@link Edition}.
+     * 
+     * @param edition {@link Edition} to update
+     * @return Updated {@link Edition}
+     */
+    Edition updateEdition(Edition edition);
+
+    /**
+     * Creates a new {@link Edition}.
+     * 
+     * @param edition {@link Edition} to create
+     * @return Created {@link Edition}
+     */
+    Edition createEdition(Edition edition);
+    
+    /**
+     * Creates a new {@link NewsItemPlacement} for a {@link NewsItem}.
+     * 
+     * @param placement {@link NewsItemPlacement} to create
+     * @return Created {@link NewsItemPlacement}
+     */
+    NewsItemPlacement createPlacement(NewsItemPlacement placement);
+    
 }

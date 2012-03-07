@@ -19,7 +19,7 @@ package dk.i2m.converge.ejb.facades;
 import dk.i2m.converge.core.content.ContentTag;
 import dk.i2m.converge.core.metadata.OpenCalaisMapping;
 import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.metadata.Subject;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
 import dk.i2m.converge.ejb.services.DirectoryException;

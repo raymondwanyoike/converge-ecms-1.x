@@ -17,11 +17,16 @@
 package dk.i2m.converge.ejb.services;
 
 import dk.i2m.converge.core.ConfigurationKey;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.content.ContentTag;
 import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.content.catalogue.*;
+import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.content.catalogue.Catalogue;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
+import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.content.forex.Rate;
 import dk.i2m.converge.core.content.markets.MarketValue;
 import dk.i2m.converge.core.content.weather.Forecast;
@@ -34,6 +39,7 @@ import dk.i2m.converge.core.search.QueueEntryOperation;
 import dk.i2m.converge.core.search.QueueEntryType;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.security.UserAccount;
+import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.ejb.facades.*;
 import java.io.File;
@@ -74,18 +80,20 @@ public class PluginContextBean implements PluginContextBeanLocal {
 
     @EJB private MetaDataServiceLocal metaDataService;
 
+    @EJB private OutletFacadeLocal outletFacade;
+
     private UserAccount currentUserAccount = null;
 
     @Override
     public void setCurrentUserAccount(UserAccount userAccount) {
         this.currentUserAccount = userAccount;
     }
-    
+
     @Override
     public UserAccount getCurrentUserAccount() {
         return this.currentUserAccount;
     }
-    
+
     @Override
     public String getWorkingDirectory() {
         return cfgService.getString(ConfigurationKey.WORKING_DIRECTORY);
@@ -94,8 +102,8 @@ public class PluginContextBean implements PluginContextBeanLocal {
     @Override
     public NewswireItem createNewswireItem(NewswireItem item) {
         if (item.getTitle().trim().isEmpty()) {
-           // TODO: I18n
-           item.setTitle("Untitled");
+            // TODO: I18n
+            item.setTitle("Untitled");
         }
         return newswireService.create(item);
     }
@@ -272,5 +280,35 @@ public class PluginContextBean implements PluginContextBeanLocal {
             List<LogSubject> subjects) {
         systemFacade.log(severity, message, subjects);
     }
+
+    /** {@inheritDoc } */
+    @Override
+    public Outlet findOutletById(Long id) throws DataNotFoundException {
+        return outletFacade.findOutletById(id);
+    }
+
+    /** {@inheritDoc } */
+    @Override
+    public Edition findNextEdition(Long id) throws DataNotFoundException {
+        Outlet outlet = outletFacade.findOutletById(id);
+        return outletFacade.findNextEdition(outlet);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Edition updateEdition(Edition edition) {
+        return outletFacade.updateEdition(edition);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Edition createEdition(Edition edition) {
+        return outletFacade.createEdition(edition);
+    }
     
+    /** {@inheritDoc} */
+    @Override
+    public NewsItemPlacement createPlacement(NewsItemPlacement placement) {
+        return newsItemFacade.createPlacement(placement);
+    }
 }

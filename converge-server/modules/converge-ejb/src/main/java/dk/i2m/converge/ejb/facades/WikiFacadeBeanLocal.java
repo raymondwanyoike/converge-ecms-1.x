@@ -17,7 +17,7 @@
 package dk.i2m.converge.ejb.facades;
 
 import dk.i2m.converge.core.wiki.Page;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import java.util.List;
 import javax.ejb.Local;
 

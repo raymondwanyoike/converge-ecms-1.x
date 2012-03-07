@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.ejb.services;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;

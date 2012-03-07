@@ -24,7 +24,7 @@ import dk.i2m.converge.core.content.weather.Forecast;
 import dk.i2m.converge.core.content.weather.Location;
 import dk.i2m.converge.core.content.weather.Situation;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

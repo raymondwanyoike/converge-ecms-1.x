@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.ejb.facades;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.Announcement;
 import dk.i2m.converge.core.AppVersion;
 import dk.i2m.converge.core.BackgroundTask;

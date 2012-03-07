@@ -16,9 +16,9 @@
  */
 package dk.i2m.converge.jsf.beans.administrator;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.jsf.JsfUtils;
 import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.ejb.services;
+package dk.i2m.converge.core;
 
 /**
  * {@link Exception} to be thrown when an entity has been requested through the

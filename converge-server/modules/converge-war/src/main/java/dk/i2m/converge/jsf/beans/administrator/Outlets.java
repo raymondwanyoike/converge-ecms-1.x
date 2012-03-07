@@ -17,11 +17,11 @@
 package dk.i2m.converge.jsf.beans.administrator;
 
 import dk.i2m.commons.BeanComparator;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.subscriber.OutletSubscriber;
 import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.facades.EntityReferenceException;
 import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.jsf.beans.BaseBean;
 import dk.i2m.jsf.JsfUtils;
 import java.util.*;

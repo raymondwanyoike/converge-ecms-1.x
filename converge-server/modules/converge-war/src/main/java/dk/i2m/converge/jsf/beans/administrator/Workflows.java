@@ -9,6 +9,7 @@
  */
 package dk.i2m.converge.jsf.beans.administrator;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.NewsItemField;
 import dk.i2m.converge.core.workflow.NewsItemFieldVisible;
 import dk.i2m.converge.ejb.facades.WorkflowFacadeLocal;
@@ -22,7 +23,6 @@ import dk.i2m.converge.core.workflow.WorkflowStepAction;
 import dk.i2m.converge.core.workflow.WorkflowStepActionProperty;
 import dk.i2m.converge.core.workflow.WorkflowStepValidator;
 import dk.i2m.converge.core.workflow.WorkflowStepValidatorProperty;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.jsf.JsfUtils;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

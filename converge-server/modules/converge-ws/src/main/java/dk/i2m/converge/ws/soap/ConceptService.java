@@ -9,9 +9,9 @@
  */
 package dk.i2m.converge.ws.soap;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.ejb.EJB;

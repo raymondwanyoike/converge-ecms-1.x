@@ -16,12 +16,12 @@
  */
 package dk.i2m.converge.jsf.beans;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.contacts.Contact;
 import dk.i2m.converge.core.contacts.ContactAddress;
 import dk.i2m.converge.core.contacts.ContactEmail;
 import dk.i2m.converge.core.contacts.ContactPhone;
 import dk.i2m.converge.ejb.facades.ContactsFacadeLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.DataModel;

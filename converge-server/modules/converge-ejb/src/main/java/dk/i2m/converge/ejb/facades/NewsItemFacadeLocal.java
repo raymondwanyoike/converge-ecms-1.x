@@ -18,7 +18,7 @@ package dk.i2m.converge.ejb.facades;
 
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.views.CurrentAssignment;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.content.ContentItemPermission;
 import dk.i2m.converge.core.content.NewsItem;
@@ -61,7 +61,7 @@ public interface NewsItemFacadeLocal {
     NewsItem step(NewsItem newsItem, WorkflowState state, String comment) throws WorkflowStateTransitionException;
 
     
-    NewsItemHolder checkout(java.lang.Long id) throws dk.i2m.converge.ejb.services.DataNotFoundException;
+    NewsItemHolder checkout(java.lang.Long id) throws dk.i2m.converge.core.DataNotFoundException;
 
     /**
      * Determines if a given {@link NewsItem} has been checked out.

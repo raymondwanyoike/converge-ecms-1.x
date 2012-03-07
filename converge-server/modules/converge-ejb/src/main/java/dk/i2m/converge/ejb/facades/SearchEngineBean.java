@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.ejb.facades;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemActor;

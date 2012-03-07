@@ -9,6 +9,7 @@
  */
 package dk.i2m.converge.jsf.beans.administrator;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.CatalogueHookInstance;
 import dk.i2m.converge.core.content.catalogue.CatalogueHookInstanceProperty;
@@ -16,11 +17,9 @@ import dk.i2m.converge.core.plugin.CatalogueHook;
 import dk.i2m.converge.core.plugin.Plugin;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.jsf.JsfUtils;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;

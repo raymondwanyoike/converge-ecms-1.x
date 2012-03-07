@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.ws.soap;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.metadata.Concept;
@@ -24,7 +25,6 @@ import dk.i2m.converge.core.views.InboxView;
 import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.converge.ejb.facades.*;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
 import dk.i2m.converge.ws.model.ModelConverter;
 import java.util.ArrayList;
 import java.util.List;

@@ -19,7 +19,7 @@ package dk.i2m.converge.ejb.facades;
 import dk.i2m.converge.core.content.catalogue.*;
 import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.ejb.services.DataNotFoundException;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.ejb.services.InvalidMediaRepositoryException;
 import dk.i2m.converge.ejb.services.MediaRepositoryIndexingException;
 import java.io.IOException;
@@ -70,7 +70,7 @@ public interface CatalogueFacadeLocal {
 
     void deleteMediaItemById(Long id);
 
-    dk.i2m.converge.core.content.catalogue.MediaItem findMediaItemById(java.lang.Long id) throws dk.i2m.converge.ejb.services.DataNotFoundException;
+    dk.i2m.converge.core.content.catalogue.MediaItem findMediaItemById(java.lang.Long id) throws dk.i2m.converge.core.DataNotFoundException;
 
     java.util.List<dk.i2m.converge.core.content.catalogue.MediaItem> findMediaItemsByStatus(MediaItemStatus status);
 
@@ -98,9 +98,9 @@ public interface CatalogueFacadeLocal {
 
     CatalogueHookInstance updateCatalogueAction(CatalogueHookInstance action);
 
-    void executeBatchHook(dk.i2m.converge.core.content.catalogue.CatalogueHookInstance hookInstance, java.lang.Long catalogueId) throws dk.i2m.converge.ejb.services.DataNotFoundException;
+    void executeBatchHook(dk.i2m.converge.core.content.catalogue.CatalogueHookInstance hookInstance, java.lang.Long catalogueId) throws dk.i2m.converge.core.DataNotFoundException;
 
-    void executeHook(java.lang.Long mediaItemId, java.lang.Long hookInstanceId) throws dk.i2m.converge.ejb.services.DataNotFoundException;
+    void executeHook(java.lang.Long mediaItemId, java.lang.Long hookInstanceId) throws dk.i2m.converge.core.DataNotFoundException;
 
     java.util.List<dk.i2m.converge.core.content.catalogue.Catalogue> findCataloguesByUser(java.lang.String username);
 }

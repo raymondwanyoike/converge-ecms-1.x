@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.ejb.services;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.content.ContentTag;
 import dk.i2m.converge.core.newswire.*;
