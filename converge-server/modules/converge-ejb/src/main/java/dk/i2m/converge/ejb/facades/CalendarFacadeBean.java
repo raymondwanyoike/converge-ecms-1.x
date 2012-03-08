@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,11 +33,7 @@ import javax.ejb.Stateless;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.Description;
-import net.fortuna.ical4j.model.property.Location;
-import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Version;
+import net.fortuna.ical4j.model.property.*;
 import net.fortuna.ical4j.util.UidGenerator;
 
 /**
@@ -52,7 +48,7 @@ public class CalendarFacadeBean implements CalendarFacadeLocal {
 
     @EJB private ConfigurationServiceLocal cfgService;
 
-    private static final Logger log = Logger.getLogger(CalendarFacadeBean.class.
+    private static final Logger LOG = Logger.getLogger(CalendarFacadeBean.class.
             getName());
 
     /** {@inheritDoc} */
@@ -140,11 +136,11 @@ public class CalendarFacadeBean implements CalendarFacadeLocal {
         vcal.getProperties().add(Version.VERSION_2_0);
         vcal.getProperties().add(CalScale.GREGORIAN);
 
-        UidGenerator ug = null;
+        UidGenerator ug;
         try {
             ug = new UidGenerator("1");
         } catch (SocketException ex) {
-            log.log(Level.SEVERE,
+            LOG.log(Level.SEVERE,
                     "Could not initialise UidGenerator for calendar", ex);
             return vcal.toString();
         }
