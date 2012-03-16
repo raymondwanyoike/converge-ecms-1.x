@@ -11,5 +11,6 @@ CREATE TABLE `wiki_page` (
     PRIMARY KEY (`id`)
 );
 
+ALTER TABLE `newswire_service` ADD COLUMN `copyright` TEXT DEFAULT '';
 
-ALTER TABLE newswire_service ADD COLUMN `copyright` TEXT DEFAULT '';
+ALTER TABLE `catalogue_hook` ADD COLUMN `asynchronous` TINYINT(1) DEFAULT '0';

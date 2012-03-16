@@ -124,7 +124,7 @@ public class CatalogueService {
         byte[] decoded = Base64.decodeBase64(base64File.getBytes());
         FileUtils.writeByteArrayToFile(file, decoded);
        
-        MediaItemRendition mir = catalogueFacade.create(file, item, rendition, filename, contentType);
+        MediaItemRendition mir = catalogueFacade.create(file, item, rendition, filename, contentType, true);
         
         return mir.getId();
     }
@@ -170,7 +170,8 @@ public class CatalogueService {
      * @param digitalAssetsId Unique identifier of the digital asset
      * @param conceptId Unique identifier of the concept
      */
-    public void addConceptToDigitalAsset(Long digitalAssetsId, Long conceptId) {
+    @WebMethod(operationName = "addConceptToDigitalAsset")
+    public void addConceptToDigitalAsset(@WebParam(name = "digitalAssetId") Long digitalAssetsId, @WebParam(name = "conceptId") Long conceptId) {
         try {
             Concept concept = metaDataFacade.findConceptById(conceptId);
             MediaItem digitalAsset = catalogueFacade.findMediaItemById(digitalAssetsId);

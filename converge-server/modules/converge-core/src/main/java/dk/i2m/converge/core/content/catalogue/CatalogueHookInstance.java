@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,20 +23,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import org.eclipse.persistence.annotations.PrivateOwned;
 
 /**
+ * Configured instance of a {@link CatalogueHook}.
  *
  * @author Allan Lykke Christensen
  */
@@ -67,9 +58,14 @@ public class CatalogueHookInstance implements Serializable {
     @Column(name = "manual")
     private boolean manual = false;
 
-    @OneToMany(mappedBy = "catalogueHook", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Column(name = "asynchronous")
+    private boolean asynchronous = false;
+
+    @OneToMany(mappedBy = "catalogueHook", cascade = CascadeType.ALL, fetch =
+    FetchType.EAGER)
     @PrivateOwned
-    private List<CatalogueHookInstanceProperty> properties = new ArrayList<CatalogueHookInstanceProperty>();
+    private List<CatalogueHookInstanceProperty> properties =
+            new ArrayList<CatalogueHookInstanceProperty>();
 
     public CatalogueHookInstance() {
     }
@@ -122,6 +118,24 @@ public class CatalogueHookInstance implements Serializable {
         this.manual = manual;
     }
 
+    /**
+     * Determines if the hook should be executed asynchronously.
+     * <p/>
+     * @return {@code true} if the hook should be executed asynchronously, otherwise {@code false}
+     */
+    public boolean isAsynchronous() {
+        return asynchronous;
+    }
+
+    /**
+     * Sets the type of operation for the hook.
+     * <p/>
+     * @param asynchronous {@code true} if the hook should be executed asynchronously, otherwise {@code false}
+     */
+    public void setAsynchronous(boolean asynchronous) {
+        this.asynchronous = asynchronous;
+    }
+
     public List<CatalogueHookInstanceProperty> getProperties() {
         return properties;
     }
@@ -144,11 +158,16 @@ public class CatalogueHookInstance implements Serializable {
             CatalogueHook hook = (CatalogueHook) c.newInstance();
             return hook;
         } catch (ClassNotFoundException ex) {
-            throw new CatalogueEventException("Could not find action: " + getHookClass(), ex);
+            throw new CatalogueEventException("Could not find action: "
+                    + getHookClass(), ex);
         } catch (InstantiationException ex) {
-            throw new CatalogueEventException("Could not instantiate hook [" + getHookClass() + "]. Check to ensure that the hook has a public contructor with no arguments", ex);
+            throw new CatalogueEventException(
+                    "Could not instantiate hook [" + getHookClass()
+                    + "]. Check to ensure that the hook has a public contructor with no arguments",
+                    ex);
         } catch (IllegalAccessException ex) {
-            throw new CatalogueEventException("Could not access hook: " + getHookClass(), ex);
+            throw new CatalogueEventException("Could not access hook: "
+                    + getHookClass(), ex);
         }
     }
 
@@ -161,7 +180,8 @@ public class CatalogueHookInstance implements Serializable {
             return false;
         }
         final CatalogueHookInstance other = (CatalogueHookInstance) obj;
-        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+        if (this.id != other.id
+                && (this.id == null || !this.id.equals(other.id))) {
             return false;
         }
         return true;

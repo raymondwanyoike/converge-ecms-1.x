@@ -73,6 +73,7 @@ CREATE TABLE `catalogue_hook` (
   `label` varchar(255) DEFAULT NULL,
   `catalogue_id` bigint(20) DEFAULT NULL,
   `manual` tinyint(1) DEFAULT '0',
+  `asynchronous` TINYINT(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `FK_catalogue_hook_catalogue` (`catalogue_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -468,6 +469,7 @@ CREATE TABLE `media_item` (
   `owner` bigint(20) DEFAULT NULL,
   `status` varchar(255) DEFAULT NULL,
   `byline` mediumtext,
+  `held` TINYINT(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `FK_media_item_media_repository_id` (`catalogue_id`),
   KEY `FK_media_item_rendition_id` (`rendition_id`),
@@ -779,6 +781,8 @@ CREATE TABLE `newswire_service` (
   `decoder_class` mediumtext,
   `active` tinyint(4) DEFAULT '0',
   `days_to_keep` int(11) DEFAULT '0',
+  `copyright` TEXT DEFAULT '',
+  `processing` TINYINT(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -1265,10 +1269,20 @@ CREATE INDEX `idx_severity` ON `log_entry` (`severity`);
 CREATE INDEX `idx_entity_and_id` ON `log_subject` (`entity`, `entity_id`);
 CREATE INDEX `idx_entity` ON `log_subject` (`entity`);
 
-ALTER TABLE newswire_service ADD COLUMN `processing` TINYINT(1) DEFAULT '0';
-ALTER TABLE media_item ADD COLUMN `held` TINYINT(1) DEFAULT '0';
+CREATE TABLE `wiki_page` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT ,
+    `show_submenu` tinyint(1) DEFAULT '0',
+    `submenu_style` VARCHAR(255) DEFAULT '',
+    `title` VARCHAR(255) DEFAULT '',
+    `display_order` INT NULL,
+    `page_content` TEXT DEFAULT '',
+    `last_updater` bigint(20) DEFAULT NULL,
+    `updated` datetime DEFAULT null,
+    `created` datetime DEFAULT null,
+    PRIMARY KEY (`id`)
+);
 
-INSERT INTO `app_version` (`id`, `from_version`, `to_version`, `migrated`, `migrated_date`) VALUES (1,'','1.1.2',1,'2012-01-02 23:40:00');
+INSERT INTO `app_version` (`id`, `from_version`, `to_version`, `migrated`, `migrated_date`) VALUES (1,'','1.1.4',1,'2012-03-08 23:40:00');
 INSERT INTO `SEQUENCE` (`SEQ_NAME`, `SEQ_COUNT`) VALUES ('SEQ_GEN', 0);
 
 INSERT INTO rendition (name, label, description) VALUES ('rnd:thumbnail', 'Thumbnail', 'A very small rendition of an image, giving only a general idea of its content.');

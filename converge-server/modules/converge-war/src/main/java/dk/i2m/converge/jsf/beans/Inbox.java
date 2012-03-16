@@ -29,13 +29,13 @@ import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.views.InboxView;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.WorkflowState;
-import dk.i2m.converge.ejb.facades.*;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
+import dk.i2m.converge.ejb.facades.DuplicateExecutionException;
+import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
+import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
 import dk.i2m.converge.jsf.components.tags.DialogSelfAssignment;
 import dk.i2m.jsf.JsfUtils;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -50,7 +50,7 @@ import org.richfaces.model.TreeNode;
 import org.richfaces.model.TreeNodeImpl;
 
 /**
- * Managed bean for {@code /Inbox.jspx}.
+ * Backing bean for {@code /Inbox.jspx}.
  *
  * @author Allan Lykke Christensen
  */
@@ -58,9 +58,10 @@ public class Inbox {
 
     private static final Logger LOG = Logger.getLogger(Inbox.class.getName());
 
-    @EJB private NewsItemFacadeLocal newsItemFacade;
+    /** ResourceBundle containing internationalised messages. */
+    private ResourceBundle bundle = JsfUtils.getResourceBundle("i18n");
 
-    @EJB private OutletFacadeLocal outletFacade;
+    @EJB private NewsItemFacadeLocal newsItemFacade;
 
     @EJB private CatalogueFacadeLocal catalogueFacade;
 
@@ -104,7 +105,8 @@ public class Inbox {
      * @return Title of the inbox
      */
     public String getInboxTitle() {
-        return JsfUtils.getResourceBundle().getString("INBOX") + " - " + inboxTitle;
+        return JsfUtils.getMessage("i18n", "Inbox_INBOX_X", new Object[]{
+                    inboxTitle});
     }
 
     public String getNewAssignmentType() {
@@ -138,7 +140,7 @@ public class Inbox {
      * Action listeners for preparing the creation of a new assignment.
      *
      * @param event
-     *          {@link ActionEvent} that invoked the listener.
+* {@link ActionEvent} that invoked the listener.
      */
     public void onNewAssignment(ActionEvent event) {
         try {
@@ -157,26 +159,36 @@ public class Inbox {
 
         newAssignment = new DialogSelfAssignment();
 
-        newAssignment.getAssignment().setDeadline(java.util.Calendar.getInstance());
-        newAssignment.getAssignment().getDeadline().setTimeZone(getUser().getTimeZone());
-        if (newAssignment.getAssignment().getDeadline().get(java.util.Calendar.HOUR_OF_DAY) >= 15) {
-            newAssignment.getAssignment().getDeadline().add(java.util.Calendar.DAY_OF_MONTH, 1);
+        newAssignment.getAssignment().setDeadline(
+                java.util.Calendar.getInstance());
+        newAssignment.getAssignment().getDeadline().setTimeZone(getUser().
+                getTimeZone());
+        if (newAssignment.getAssignment().getDeadline().get(
+                java.util.Calendar.HOUR_OF_DAY) >= 15) {
+            newAssignment.getAssignment().getDeadline().add(
+                    java.util.Calendar.DAY_OF_MONTH, 1);
         }
-        newAssignment.getAssignment().getDeadline().set(java.util.Calendar.HOUR_OF_DAY, 15);
-        newAssignment.getAssignment().getDeadline().set(java.util.Calendar.MINUTE, 0);
-        newAssignment.getAssignment().getDeadline().set(java.util.Calendar.SECOND, 0);
+        newAssignment.getAssignment().getDeadline().set(
+                java.util.Calendar.HOUR_OF_DAY, 15);
+        newAssignment.getAssignment().getDeadline().set(
+                java.util.Calendar.MINUTE, 0);
+        newAssignment.getAssignment().getDeadline().set(
+                java.util.Calendar.SECOND, 0);
         newAssignment.getNewsItem().setOutlet(getUser().getDefaultOutlet());
         if (newAssignment.getNewsItem().getOutlet() != null) {
-            newAssignment.getNewsItem().setLanguage(newAssignment.getNewsItem().getOutlet().getLanguage());
+            newAssignment.getNewsItem().setLanguage(newAssignment.getNewsItem().
+                    getOutlet().getLanguage());
         }
-        newAssignment.getAssignment().setType(getUser().getDefaultAssignmentType());
-        newAssignment.getMediaItem().setCatalogue(getUser().getDefaultMediaRepository());
+        newAssignment.getAssignment().setType(
+                getUser().getDefaultAssignmentType());
+        newAssignment.getMediaItem().setCatalogue(getUser().
+                getDefaultMediaRepository());
         newAssignment.setNextEdition(getUser().isDefaultAddNextEdition());
     }
 
     /**
      * Event handler for creating a new assignment.
-     * 
+     * <p/>
      * @param event Event that invoked the handler
      */
     public void onAddAssignment(ActionEvent event) {
@@ -190,62 +202,76 @@ public class Inbox {
         switch (newAssignment.getAssignment().getType()) {
             case NEWS_ITEM:
                 if (newAssignment.getNewsItem().getOutlet() == null) {
-                    JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_ERROR, "inbox_NEWS_ITEM_OUTLET_REQUIRED");
+                    JsfUtils.createMessage("frmInbox",
+                            FacesMessage.SEVERITY_ERROR, "i18n",
+                            "Inbox_NEWS_ITEM_OUTLET_REQUIRED", new Object[]{});
                     return;
                 }
 
                 try {
                     selectedNewsItem = newAssignment.getNewsItem();
                     NewsItemActor nia = new NewsItemActor();
-                    nia.setRole(selectedNewsItem.getOutlet().getWorkflow().getStartState().getActorRole());
+                    nia.setRole(selectedNewsItem.getOutlet().getWorkflow().
+                            getStartState().getActorRole());
                     nia.setUser(getUser());
                     nia.setNewsItem(selectedNewsItem);
                     selectedNewsItem.getActors().add(nia);
-                    selectedNewsItem.setDeadline(newAssignment.getAssignment().getDeadline());
+                    selectedNewsItem.setDeadline(newAssignment.getAssignment().
+                            getDeadline());
 
                     if (selectedNewsItem.getOutlet() != null) {
-                        selectedNewsItem.setLanguage(selectedNewsItem.getOutlet().getLanguage());
+                        selectedNewsItem.setLanguage(selectedNewsItem.getOutlet().
+                                getLanguage());
                     }
                     selectedNewsItem.setTitle(newAssignment.getTitle());
                     selectedNewsItem = newsItemFacade.start(selectedNewsItem);
-                    this.createdItemLink = "NewsItem.xhtml?id=" + selectedNewsItem.getId();
+                    this.createdItemLink = "NewsItem.xhtml?id="
+                            + selectedNewsItem.getId();
 
                     if (newAssignment.isNextEdition()) {
                         try {
-                            NewsItemPlacement placement = newsItemFacade.addToNextEdition(selectedNewsItem, getUser().getDefaultSection());
+                            NewsItemPlacement placement = newsItemFacade.
+                                    addToNextEdition(selectedNewsItem, getUser().
+                                    getDefaultSection());
                             selectedNewsItem = placement.getNewsItem();
                         } catch (DataNotFoundException ex) {
                             LOG.log(Level.INFO, "Could not find next edition");
                         }
                     }
 
-                    JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_INFO, "inbox_ASSIGNMENT_CREATED");
+                    JsfUtils.createMessage("frmInbox",
+                            FacesMessage.SEVERITY_INFO,
+                            "inbox_ASSIGNMENT_CREATED");
                 } catch (DuplicateExecutionException ex) {
                     // Double click prevention - stamp in log
                     LOG.log(Level.INFO, ex.getMessage());
                 } catch (WorkflowStateTransitionException ex) {
-                    JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_ERROR, "inbox_ASSIGNMENT_CREATION_ERROR");
+                    JsfUtils.createMessage("frmInbox",
+                            FacesMessage.SEVERITY_ERROR,
+                            "inbox_ASSIGNMENT_CREATION_ERROR");
                     LOG.log(Level.SEVERE, ex.getMessage(), ex);
                 }
-                //onShowMyAssignments(event);
                 break;
             case MEDIA_ITEM:
                 if (newAssignment.getMediaItem().getCatalogue() == null) {
-                    JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_ERROR, "inbox_MEDIA_ITEM_MEDIA_REPOSITORY_REQUIRED");
+                    JsfUtils.createMessage("frmInbox",
+                            FacesMessage.SEVERITY_ERROR,
+                            "inbox_MEDIA_ITEM_MEDIA_REPOSITORY_REQUIRED");
                     return;
                 }
 
-                newAssignment.getMediaItem().setStatus(MediaItemStatus.UNSUBMITTED);
+                newAssignment.getMediaItem().setStatus(
+                        MediaItemStatus.UNSUBMITTED);
                 newAssignment.getMediaItem().setTitle(newAssignment.getTitle());
                 newAssignment.getMediaItem().setOwner(getUser());
                 newAssignment.getMediaItem().setByLine(getUser().getFullName());
-                MediaItem newItem = catalogueFacade.create(newAssignment.getMediaItem());
-                this.createdItemLink = "MediaItemDetails.xhtml?id=" + newItem.getId();
-                JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_INFO, "inbox_ASSIGNMENT_CREATED");
+                MediaItem newItem = catalogueFacade.create(newAssignment.
+                        getMediaItem());
+                this.createdItemLink = "MediaItemDetails.xhtml?id=" + newItem.
+                        getId();
+                JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_INFO,
+                        "inbox_ASSIGNMENT_CREATED");
                 showNewsItem = false;
-                //newsItems = new ListDataModel();
-                //inboxTitle = newAssignment.getMediaItem().getCatalogue().getName();
-                //mediaItems = new ListDataModel(catalogueFacade.findMediaItemsByOwner(getUser()));
                 break;
         }
     }
@@ -258,26 +284,27 @@ public class Inbox {
      * Action Listener for removing articles marked as deleted.
      *
      * @param event
-     *          {@link ActionEvent} that invoked the listener
+* {@link ActionEvent} that invoked the listener
      */
     public void onEmptyTrash(ActionEvent event) {
-        int deleted = 0;
-        deleted = newsItemFacade.emptyTrash(getUser().getUsername());
+        int deleted = newsItemFacade.emptyTrash(getUser().getUsername());
         onShowMyAssignments(event);
 
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "ARTICLES_DELETED", new Object[]{deleted});
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                "ARTICLES_DELETED", new Object[]{deleted});
     }
 
     /**
      * Event handler for showing the current assignments of the user.
-     * 
-     * @param event 
-     *          Event that invoked the handler
+     * <p/>
+     * @param event * Event that invoked the handler
      */
     public void onShowMyAssignments(ActionEvent event) {
         showNewsItem = true;
-        inboxTitle = JsfUtils.getResourceBundle().getString("inbox_MY_ASSIGNMENTS");
-        List<InboxView> inboxView = newsItemFacade.findInbox(getUser().getUsername());
+        inboxTitle = JsfUtils.getResourceBundle().getString(
+                "inbox_MY_ASSIGNMENTS");
+        List<InboxView> inboxView = newsItemFacade.findInbox(getUser().
+                getUsername());
         this.newsItems = new ListDataModel(inboxView);
     }
 
@@ -292,7 +319,8 @@ public class Inbox {
     public Map<String, Outlet> getPrivilegedOutlets() {
         Map<String, Outlet> outlets = new LinkedHashMap<String, Outlet>();
 
-        for (Outlet outlet : getUser().getPrivilegedOutlets(SystemPrivilege.MY_NEWS_ITEMS)) {
+        for (Outlet outlet : getUser().getPrivilegedOutlets(
+                SystemPrivilege.MY_NEWS_ITEMS)) {
             outlets.put(outlet.getTitle(), outlet);
         }
 
@@ -302,18 +330,22 @@ public class Inbox {
     public TreeNode getOutletsNode() {
         if (outletsNode == null) {
             outletsNode = new TreeNodeImpl();
-            List<Outlet> outlets = getUser().getPrivilegedOutlets(SystemPrivilege.MY_NEWS_ITEMS);
+            List<Outlet> outlets = getUser().getPrivilegedOutlets(
+                    SystemPrivilege.MY_NEWS_ITEMS);
 
             for (Outlet outlet : outlets) {
                 if (outlet.isValid()) {
                     TreeNode node = new TreeNodeImpl();
-                    node.setData(new OutletNode(outlet, null, outlet.getClass().getName()));
+                    node.setData(new OutletNode(outlet, null, outlet.getClass().
+                            getName()));
 
-                    List<WorkflowState> states = outlet.getWorkflow().getStates();
+                    List<WorkflowState> states =
+                            outlet.getWorkflow().getStates();
 
                     for (WorkflowState state : states) {
                         TreeNode subNode = new TreeNodeImpl();
-                        subNode.setData(new OutletNode(state, outlet, state.getClass().getName()));
+                        subNode.setData(new OutletNode(state, outlet, state.
+                                getClass().getName()));
                         node.addChild(state.getId(), subNode);
                     }
 
@@ -326,11 +358,13 @@ public class Inbox {
 
             for (Catalogue myCatalogue : myCatalogues) {
                 TreeNode node = new TreeNodeImpl();
-                node.setData(new OutletNode(myCatalogue, null, myCatalogue.getClass().getName()));
+                node.setData(new OutletNode(myCatalogue, null, myCatalogue.
+                        getClass().getName()));
 
                 for (MediaItemStatus status : MediaItemStatus.values()) {
                     TreeNode subNode = new TreeNodeImpl();
-                    subNode.setData(new OutletNode(status, myCatalogue, MediaItemStatus.class.getName()));
+                    subNode.setData(new OutletNode(status, myCatalogue,
+                            MediaItemStatus.class.getName()));
                     node.addChild(status.name(), subNode);
                 }
 
@@ -341,6 +375,11 @@ public class Inbox {
         return outletsNode;
     }
 
+    /**
+     * Event handler for handling selection of outlet and catalogue folders.
+     * <p/>
+     * @param event Event that invoked the handler
+     */
     public void onOutletFolderSelect(NodeSelectedEvent event) {
         this.catalogueEditor = false;
         HtmlTree tree = (HtmlTree) event.getComponent();
@@ -352,7 +391,8 @@ public class Inbox {
             mediaItems = new ListDataModel();
             Outlet outlet = (Outlet) node.getData();
             inboxTitle = outlet.getTitle();
-            newsItems = new ListDataModel(newsItemFacade.findOutletBox(getUser().getUsername(), outlet));
+            newsItems = new ListDataModel(newsItemFacade.findOutletBox(getUser().
+                    getUsername(), outlet));
         } else if (node.getData() instanceof WorkflowState) {
             showNewsItem = true;
             mediaItems = new ListDataModel();
@@ -360,9 +400,13 @@ public class Inbox {
             Outlet outlet = (Outlet) node.getParentData();
             inboxTitle = outlet.getTitle() + " - " + state.getName();
             if (state.equals(outlet.getWorkflow().getEndState())) {
-                newsItems = new ListDataModel(newsItemFacade.findOutletBox(getUser().getUsername(), outlet, state, 0, 100));
+                newsItems =
+                        new ListDataModel(newsItemFacade.findOutletBox(getUser().
+                        getUsername(), outlet, state, 0, 100));
             } else {
-                newsItems = new ListDataModel(newsItemFacade.findOutletBox(getUser().getUsername(), outlet, state));
+                newsItems =
+                        new ListDataModel(newsItemFacade.findOutletBox(getUser().
+                        getUsername(), outlet, state));
             }
         } else if (node.getData() instanceof Catalogue) {
             showNewsItem = false;
@@ -372,24 +416,47 @@ public class Inbox {
                 this.catalogueEditor = true;
             }
             inboxTitle = repository.getName();
-            mediaItems = new ListDataModel(catalogueFacade.findCurrentMediaItems(getUser(), repository.getId()));
+            mediaItems =
+                    new ListDataModel(catalogueFacade.findCurrentMediaItems(
+                    getUser(), repository.getId()));
         } else if (node.getData() instanceof MediaItemStatus) {
             showNewsItem = false;
             newsItems = new ListDataModel();
-            Catalogue repository = (Catalogue) node.getParentData();
-            if (getUser().getUserRoles().contains(repository.getEditorRole())) {
+            Catalogue catalogue = (Catalogue) node.getParentData();
+            if (getUser().getUserRoles().contains(catalogue.getEditorRole())) {
                 this.catalogueEditor = true;
             }
             MediaItemStatus status = (MediaItemStatus) node.getData();
 
-            String catalogueStatus = JsfUtils.getResourceBundle().getString("MEDIA_ITEM_STATUS_" + status.name());
-            inboxTitle = repository.getName() + " " + catalogueStatus;
-            mediaItems = new ListDataModel(catalogueFacade.findCurrentMediaItems(getUser(), status, repository.getId()));
+            String catalogueStatus = JsfUtils.getMessage("18n", "Generic_MEDIA_ITEM_STATUS_"
+                    + status.name(), new Object[]{});
+            inboxTitle = JsfUtils.getMessage("i18n", "Inbox_CATALOGUE_STATUS",
+                    new Object[]{catalogue.getName(), catalogueStatus});
+            mediaItems =
+                    new ListDataModel(catalogueFacade.findCurrentMediaItems(
+                    getUser(), status, catalogue.getId()));
         }
     }
 
+    /**
+     * Event handler for updating the state of an {@link MediaItem} from the
+     * list of {@link MediaItem}s in a {@link Catalogue} folder.
+     * <p/>
+     * @param item {@link MediaItem} to update
+     */
     public void setUpdateMediaItem(MediaItem item) {
-        catalogueFacade.update(item);
+        // The media item must be removed and added to keep its version 
+        // identifier current. If it is not updated in the datamodel, it will 
+        // throw an internal server error upon the second update
+
+        // Remove media item from data model
+        ((List<MediaItem>) getMediaItems().getWrappedData()).remove(item);
+
+        // Update the media item in the database
+        item = catalogueFacade.update(item);
+
+        // Add the media item back in the data model
+        ((List<MediaItem>) getMediaItems().getWrappedData()).add(item);
     }
 
     public boolean isCatalogueEditor() {
@@ -406,10 +473,13 @@ public class Inbox {
         if (this.duplicateNewsItem != null) {
             onNewAssignment(null);
 
-            newAssignment.getNewsItem().setTitle(getDuplicateNewsItem().getTitle());
+            newAssignment.getNewsItem().setTitle(
+                    getDuplicateNewsItem().getTitle());
             newAssignment.setTitle(getDuplicateNewsItem().getTitle());
-            newAssignment.getNewsItem().setBrief(getDuplicateNewsItem().getBrief());
-            newAssignment.getNewsItem().setStory(getDuplicateNewsItem().getStory());
+            newAssignment.getNewsItem().setBrief(
+                    getDuplicateNewsItem().getBrief());
+            newAssignment.getNewsItem().setStory(
+                    getDuplicateNewsItem().getStory());
             newAssignment.getNewsItem().setVersionOf(getDuplicateNewsItem());
         }
     }
@@ -482,7 +552,8 @@ public class Inbox {
                 return false;
             }
             final OutletNode other = (OutletNode) obj;
-            if (this.data != other.data && (this.data == null || !this.data.equals(other.data))) {
+            if (this.data != other.data && (this.data == null || !this.data.
+                    equals(other.data))) {
                 return false;
             }
             return true;
@@ -543,7 +614,8 @@ public class Inbox {
                 return false;
             }
             final MediaRepositoryNode other = (MediaRepositoryNode) obj;
-            if (this.data != other.data && (this.data == null || !this.data.equals(other.data))) {
+            if (this.data != other.data && (this.data == null || !this.data.
+                    equals(other.data))) {
                 return false;
             }
             return true;

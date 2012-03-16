@@ -1925,3 +1925,30 @@ div.metrics > span {margin-left:0.5em !important;}
     color: #fff;
 }
 
+.inbox_media_item_id {
+    float: left;
+    background: #EFEFEF;
+    padding: 6px;
+    color: black;
+    border: 1px solid silver;
+    display: inline;
+    margin-right: 10px;
+}
+
+.inbox_media_item_title {
+    margin-top: 2px;
+    float: left;
+    font-weight: bold;
+}
+
+.inbox_media_item_submitter {
+    float: left;
+    font-style: italic;
+    font-size: 0.9em;
+    color: #666666;
+}
+
+.inbox_media_item_description {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}

@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.jsf.beans;
 
+import dk.i2m.converge.core.metadata.ConceptOutput;
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.metadata.Subject;
 import dk.i2m.converge.core.metadata.Concept;
@@ -35,11 +36,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.LocaleUtils;
+import org.richfaces.component.UITree;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
 
@@ -70,7 +76,8 @@ public class Concepts {
 
     private List<UploadItem> uploadedConcepts = new ArrayList<UploadItem>();
 
-    private Map<String, String> availableLanguages = new LinkedHashMap<String, String>();
+    private Map<String, String> availableLanguages =
+            new LinkedHashMap<String, String>();
 
     private Concept selectedConcept;
 
@@ -85,7 +92,7 @@ public class Concepts {
     private Concept selectedMetaDataConcept;
 
     private String conceptAddType = "";
-
+    
     public Long getId() {
         return id;
     }
@@ -95,11 +102,13 @@ public class Concepts {
 
         if (id != null) {
             try {
-                Logger.getLogger(Concepts.class.getName()).log(Level.INFO, "Loading concept {0}", id);
+                Logger.getLogger(Concepts.class.getName()).log(Level.INFO,
+                        "Loading concept {0}", id);
                 selectedConcept = metaDataFacade.findConceptById(id);
                 show = "SHOW_CONCEPT";
             } catch (DataNotFoundException ex) {
-                Logger.getLogger(Concepts.class.getName()).log(Level.SEVERE, "Unknown concept identifier", ex);
+                Logger.getLogger(Concepts.class.getName()).log(Level.SEVERE,
+                        "Unknown concept identifier", ex);
             }
         }
     }
@@ -137,11 +146,14 @@ public class Concepts {
             updatingConcept = true;
             mostRecent = null;
         } catch (InstantiationException ex) {
-            Logger.getLogger(Concepts.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Concepts.class.getName()).log(Level.SEVERE, null,
+                    ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(Concepts.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Concepts.class.getName()).log(Level.SEVERE, null,
+                    ex);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Concepts.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Concepts.class.getName()).log(Level.SEVERE, null,
+                    ex);
         }
     }
 
@@ -194,7 +206,8 @@ public class Concepts {
 
             String xml = new String(fileData);
 
-            String languages[] = metaDataFacade.getLanguagesAvailableForImport(xml);
+            String languages[] = metaDataFacade.getLanguagesAvailableForImport(
+                    xml);
 
             for (String lang : languages) {
                 lang = lang.replaceAll("-", "_");
@@ -207,8 +220,7 @@ public class Concepts {
     /**
      * Event handler for uploading and importing concepts.
      *
-     * @param event
-     *          Event that invoked the handler
+     * @param event Event that invoked the handler
      */
     public void onUploadConcepts(UploadEvent event) throws IOException {
         UploadItem item = event.getUploadItem();
@@ -218,21 +230,55 @@ public class Concepts {
     /**
      * Event handler for preparing the import of concepts.
      *
-     * @param event
-     *          Event that invoked the handler
+     * @param event Event that invoked the handler
      */
     public void onPreImport(ActionEvent event) {
         this.uploadedConcepts = new ArrayList<UploadItem>();
         this.availableLanguages = new LinkedHashMap<String, String>();
     }
+    
+    /**
+     * Event handler for exporting subjects in a Microsoft Excel spreadsheet.
+     * 
+     * @param event Event that invoked the handler
+     */
+    public void onExportSubjects(ActionEvent event) {
+        byte[] output = metaDataFacade.exportConcepts(Subject.class, ConceptOutput.MICROSOFT_EXCEL);
+        
+         try {
+            // here you need to get the byte[] representation of 
+            // the file you want to send
+            byte[] binary_data = output;
+            String filename = "subjects.xls";
+            FacesContext fctx = FacesContext.getCurrentInstance();   
+            ExternalContext ectx = fctx.getExternalContext();
+ 
+            
+            
+            HttpServletResponse response = (HttpServletResponse) ectx.getResponse();
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+            response.setHeader("Content-Transfer-Encoding", "Binary");
+            response.setHeader("Pragma", "private");
+            response.setHeader("cache-control", "private, must-revalidate");
+            response.setContentType("application/vnd.ms-excel");
+ 
+            ServletOutputStream outs = response.getOutputStream();
+            outs.write(binary_data);
+            outs.flush();
+            outs.close();
+            response.flushBuffer();
+ 
+            fctx.responseComplete();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 
     /**
      * Event handler for importing the uploaded subject files.
      *
-     * @param event
-     *          Event that invoked the handler
-     * @throws java.io.IOException
-     *          If any of the uploaded files could not be read
+     * @param event Event that invoked the handler
+     * @throws IOException If any of the uploaded files could not be read
      */
     public void onImport(ActionEvent event) throws IOException {
         int imported = 0;
@@ -247,24 +293,26 @@ public class Concepts {
 
             String xml = new String(fileData);
 
-            if (getImportLanguage() == null) {
-                System.out.println("No language selected");
-            } else {
-                imported += metaDataFacade.importKnowledgeItem(xml, getImportLanguage());
+            if (getImportLanguage() != null) {
+                imported += metaDataFacade.importKnowledgeItem(xml,
+                        getImportLanguage());
             }
         }
 
-        JsfUtils.createMessage("frmSubjects", FacesMessage.SEVERITY_INFO, "concepts_SUBJECTS_IMPORTED", imported);
+        JsfUtils.createMessage("frmSubjects", FacesMessage.SEVERITY_INFO,
+                "concepts_SUBJECTS_IMPORTED", imported);
     }
 
     public void onDeleteConcept(ActionEvent event) {
         if (getSelectedConcept() != null) {
-            metaDataFacade.delete(getSelectedConcept().getClass(), getSelectedConcept().getId());
+            metaDataFacade.delete(getSelectedConcept().getClass(),
+                    getSelectedConcept().getId());
         }
         updatingConcept = false;
         show = "OVERVIEW";
         mostRecent = null;
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "concepts_CONCEPT_DELETED");
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                "concepts_CONCEPT_DELETED");
     }
 
     public void onNewConcept(ActionEvent event) {
@@ -305,7 +353,8 @@ public class Concepts {
 
     public DataModel getMostRecent() {
         if (mostRecent == null) {
-            mostRecent = new ListDataModel(metaDataFacade.findRecentConcepts(10));
+            mostRecent =
+                    new ListDataModel(metaDataFacade.findRecentConcepts(10));
         }
         return mostRecent;
     }
@@ -367,9 +416,9 @@ public class Concepts {
      * files.
      *
      * @return {@link Map} of {@link Locale}s with the available languages for
-     *         importing subjects codes
+     * importing subjects codes
      * @throws IOException
-     *          If any of the uploaded files could not be read
+* If any of the uploaded files could not be read
      */
     public Map<String, String> getAvailableImportLanguages() {
         return this.availableLanguages;
@@ -396,7 +445,8 @@ public class Concepts {
     }
 
     public DataModel getMetaDataOrganisations() {
-        return new ListDataModel(metaDataFacade.findConceptByType(Organisation.class));
+        return new ListDataModel(metaDataFacade.findConceptByType(
+                Organisation.class));
     }
 
     public DataModel getMetaDataLocations() {
@@ -404,7 +454,8 @@ public class Concepts {
     }
 
     public DataModel getMetaDataPointsOfInterest() {
-        return new ListDataModel(metaDataFacade.findConceptByType(PointOfInterest.class));
+        return new ListDataModel(metaDataFacade.findConceptByType(
+                PointOfInterest.class));
     }
 
     public DataModel getMetaDataPersons() {
@@ -416,42 +467,65 @@ public class Concepts {
         if (conceptAddType.equalsIgnoreCase("RELATED")) {
             selectedConcept.getRelated().add(selectedMetaDataConcept);
             selectedConcept = metaDataFacade.update(selectedConcept);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "concepts_META_DATA_X_SELECTED_RELATED", new Object[]{getSelectedMetaDataConcept().getName(), getSelectedConcept().getName()});
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    "concepts_META_DATA_X_SELECTED_RELATED",
+                    new Object[]{getSelectedMetaDataConcept().getName(),
+                        getSelectedConcept().getName()});
         } else if (conceptAddType.equalsIgnoreCase("SAME_AS")) {
             selectedConcept.getSameAs().add(selectedMetaDataConcept);
             selectedConcept = metaDataFacade.update(selectedConcept);
 
             try {
-                selectedMetaDataConcept = metaDataFacade.findConceptById(selectedMetaDataConcept.getId());
+                selectedMetaDataConcept =
+                        metaDataFacade.findConceptById(selectedMetaDataConcept.
+                        getId());
                 selectedMetaDataConcept.getSameAs().add(selectedConcept);
-                selectedMetaDataConcept = metaDataFacade.update(selectedMetaDataConcept);
-                selectedConcept = metaDataFacade.findConceptById(selectedConcept.getId());
+                selectedMetaDataConcept = metaDataFacade.update(
+                        selectedMetaDataConcept);
+                selectedConcept =
+                        metaDataFacade.findConceptById(selectedConcept.getId());
             } catch (Exception ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        false, ex.getMessage(), null);
             }
 
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "concepts_META_DATA_X_SELECTED_SAME_AS", new Object[]{getSelectedMetaDataConcept().getName(), getSelectedConcept().getName()});
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    "concepts_META_DATA_X_SELECTED_SAME_AS",
+                    new Object[]{getSelectedMetaDataConcept().getName(),
+                        getSelectedConcept().getName()});
         } else if (conceptAddType.equalsIgnoreCase("BROADER")) {
             selectedConcept.getBroader().add(selectedMetaDataConcept);
             selectedConcept = metaDataFacade.update(selectedConcept);
 
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "concepts_META_DATA_X_SELECTED_BROADER", new Object[]{getSelectedMetaDataConcept().getName(), getSelectedConcept().getName()});
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    "concepts_META_DATA_X_SELECTED_BROADER",
+                    new Object[]{getSelectedMetaDataConcept().getName(),
+                        getSelectedConcept().getName()});
         } else if (conceptAddType.equalsIgnoreCase("NARROWER")) {
             selectedConcept.getNarrower().add(selectedMetaDataConcept);
             selectedConcept = metaDataFacade.update(selectedConcept);
 
             try {
-                selectedMetaDataConcept = metaDataFacade.findConceptById(selectedMetaDataConcept.getId());
+                selectedMetaDataConcept =
+                        metaDataFacade.findConceptById(selectedMetaDataConcept.
+                        getId());
                 selectedMetaDataConcept.getBroader().add(selectedConcept);
-                selectedMetaDataConcept = metaDataFacade.update(selectedMetaDataConcept);
-                selectedConcept = metaDataFacade.findConceptById(selectedConcept.getId());
+                selectedMetaDataConcept = metaDataFacade.update(
+                        selectedMetaDataConcept);
+                selectedConcept =
+                        metaDataFacade.findConceptById(selectedConcept.getId());
             } catch (Exception ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        false, ex.getMessage(), null);
             }
 
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "concepts_META_DATA_X_SELECTED_NARROWER", new Object[]{getSelectedMetaDataConcept().getName(), getSelectedConcept().getName()});
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    "concepts_META_DATA_X_SELECTED_NARROWER",
+                    new Object[]{getSelectedMetaDataConcept().getName(),
+                        getSelectedConcept().getName()});
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "concepts_META_DATA_SELECTED_ERROR", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    "concepts_META_DATA_SELECTED_ERROR", null);
         }
 
     }
@@ -489,42 +563,51 @@ public class Concepts {
         selectedMetaDataConcept = metaDataFacade.update(selectedMetaDataConcept);
 
         try {
-            selectedConcept = metaDataFacade.findConceptById(selectedConcept.getId());
+            selectedConcept = metaDataFacade.findConceptById(selectedConcept.
+                    getId());
         } catch (DataNotFoundException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
+                    ex.getMessage(), null);
         }
     }
 
     public void onRemoveBroaderFromConcept(ActionEvent event) {
         try {
-            selectedConcept = metaDataFacade.findConceptById(selectedConcept.getId());
+            selectedConcept = metaDataFacade.findConceptById(selectedConcept.
+                    getId());
             selectedConcept.getBroader().remove(selectedMetaDataConcept);
             selectedConcept = metaDataFacade.update(selectedConcept);
         } catch (DataNotFoundException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
+                    ex.getMessage(), null);
         }
     }
 
     public void onRemoveRelatedFromConcept(ActionEvent event) {
         try {
-            selectedConcept = metaDataFacade.findConceptById(selectedConcept.getId());
+            selectedConcept = metaDataFacade.findConceptById(selectedConcept.
+                    getId());
             selectedConcept.getRelated().remove(selectedMetaDataConcept);
             selectedConcept = metaDataFacade.update(selectedConcept);
         } catch (DataNotFoundException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
+                    ex.getMessage(), null);
         }
     }
 
     public void onRemoveSameAsFromConcept(ActionEvent event) {
         try {
             selectedMetaDataConcept.getSameAs().remove(selectedConcept);
-            selectedMetaDataConcept = metaDataFacade.update(selectedMetaDataConcept);
+            selectedMetaDataConcept = metaDataFacade.update(
+                    selectedMetaDataConcept);
 
-            selectedConcept = metaDataFacade.findConceptById(selectedConcept.getId());
+            selectedConcept = metaDataFacade.findConceptById(selectedConcept.
+                    getId());
             selectedConcept.getSameAs().remove(selectedMetaDataConcept);
             selectedConcept = metaDataFacade.update(selectedConcept);
         } catch (DataNotFoundException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
+                    ex.getMessage(), null);
         }
     }
 
