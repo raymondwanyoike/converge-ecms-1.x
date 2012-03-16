@@ -32,7 +32,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * {@link CatalogueHook} for generating a still image from a video.
+ * {@link CatalogueHook} for generating a still image from a video. This hook
+ * depends upon Xuggler being available.
  *
  * @author Allan Lykke Christensen
  */
@@ -47,10 +48,8 @@ public class VideoPreviewHook extends CatalogueHook {
 
     private Map<String, String> availableProperties = null;
 
-    private void validateProperties() {
-    }
-
-    enum Property {
+    /** Properties available for configuring the hook. */
+    public enum Property {
 
         GRAB_AT,
         ORIGINAL_RENDITION,
@@ -62,32 +61,10 @@ public class VideoPreviewHook extends CatalogueHook {
         ENABLE_ON_UPDATE
     }
 
-    private boolean isPropertySet(Property p) {
-        return instanceProperties.containsKey(p.name());
-    }
-
-    private String getProperty(Property p) {
-        return instanceProperties.get(p.name());
-    }
-
-    private Boolean getPropertyAsBoolean(Property p) {
-        return Boolean.parseBoolean(getProperty(p));
-    }
-    
-    private Long getPropertyAsLong(Property p) {
-        return Long.valueOf(getProperty(p));
-    }
-    
-    private Integer getPropertyAsInteger(Property p) {
-        return Integer.valueOf(getProperty(p));
-    }
-
     @Override
     public void execute(PluginContext ctx, CatalogueEvent event,
             CatalogueHookInstance instance) throws CatalogueEventException {
         instanceProperties = instance.getPropertiesAsMap();
-        
-        validateProperties();
 
         boolean executeOnUpdate = false;
 
@@ -107,13 +84,12 @@ public class VideoPreviewHook extends CatalogueHook {
             return;
         }
 
-
         // Determine if we need to act on the uploaded rendition
         MediaItemRendition uploadRendition = event.getRendition();
         if (!uploadRendition.isVideo()) {
             return;
         }
-        
+
         Rendition rendition = uploadRendition.getRendition();
 
         if (!rendition.getName().equalsIgnoreCase(getProperty(
@@ -137,13 +113,15 @@ public class VideoPreviewHook extends CatalogueHook {
 
         // Generate the still
         StillVideo video;
-        
-        boolean useGenerateDimensions = getPropertyAsBoolean(Property.GENERATE_RENDITION_USE_DEFAULT_DIMENSION);
-        boolean useDefaultimensions = getPropertyAsBoolean(Property.GENERATE_RENDITION_USE_ORIGINAL_DIMENSION);
-        
+
+        boolean useGenerateDimensions = getPropertyAsBoolean(
+                Property.GENERATE_RENDITION_USE_DEFAULT_DIMENSION);
+        boolean useDefaultimensions = getPropertyAsBoolean(
+                Property.GENERATE_RENDITION_USE_ORIGINAL_DIMENSION);
+
         int width = 0;
         int height = 0;
-        
+
         if (useGenerateDimensions) {
             width = generateRendition.getDefaultWidth();
             height = generateRendition.getDefaultHeight();
@@ -155,26 +133,32 @@ public class VideoPreviewHook extends CatalogueHook {
                 width = getPropertyAsInteger(Property.GENERATE_RENDITION_WIDTH);
             }
             if (isPropertySet(Property.GENERATE_RENDITION_HEIGHT)) {
-                height = getPropertyAsInteger(Property.GENERATE_RENDITION_HEIGHT);
+                height =
+                        getPropertyAsInteger(Property.GENERATE_RENDITION_HEIGHT);
             }
         }
-        
-        ctx.log(LogSeverity.FINE, "Generating preview for " + uploadRendition.getAbsoluteFilename(), instance, instance.getId());
+
+        ctx.log(LogSeverity.FINE, "Generating preview for " + uploadRendition.
+                getAbsoluteFilename(), instance, instance.getId());
         if (isPropertySet(Property.GRAB_AT)) {
             Long grabAt = getPropertyAsLong(Property.GRAB_AT);
-            video = new StillVideo(grabAt, width, uploadRendition.getAbsoluteFilename());
+            video = new StillVideo(grabAt, width, uploadRendition.
+                    getAbsoluteFilename());
         } else {
             video = new StillVideo(width, uploadRendition.getAbsoluteFilename());
         }
-        
+
         try {
             video.grab();
         } catch (Throwable t) {
-            ctx.log(LogSeverity.SEVERE, "Could not grab still image from video. " + t.getMessage(), instance, instance.getId());
+            ctx.log(LogSeverity.SEVERE, "Could not grab still image from video. "
+                    + t.getMessage(), instance, instance.getId());
             return;
         }
-        ctx.log(LogSeverity.FINE, "Finished generating preview for " + uploadRendition.getAbsoluteFilename(), instance, instance.getId());
-        
+        ctx.log(LogSeverity.FINE, "Finished generating preview for "
+                + uploadRendition.getAbsoluteFilename(), instance, instance.
+                getId());
+
         if (video.isStillAvailable()) {
             // Create temporary file to store the still
             String prefix = "xxx-" + uploadRendition.getMediaItem().getId();
@@ -189,14 +173,18 @@ public class VideoPreviewHook extends CatalogueHook {
                 MediaItemRendition mir = ctx.createMediaItemRendition(tempFile,
                         event.getItem().getId(), generateRendition.getId(),
                         tempFile.getName() + ".png", "image/png");
-                ctx.log(LogSeverity.FINE, "Preview successfully generated for " + uploadRendition.getAbsoluteFilename(), instance, instance.getId());
+                ctx.log(LogSeverity.FINE, "Preview successfully generated for "
+                        + uploadRendition.getAbsoluteFilename(), instance,
+                        instance.getId());
             } catch (IOException ex) {
                 throw new CatalogueEventException(ex);
             } catch (IllegalArgumentException ex) {
                 throw new CatalogueEventException("Could not resize image", ex);
             }
         } else {
-            ctx.log(LogSeverity.FINE, "Could not generate preview for " + uploadRendition.getAbsoluteFilename(), instance, instance.getId());            
+            ctx.log(LogSeverity.FINE, "Could not generate preview for "
+                    + uploadRendition.getAbsoluteFilename(), instance, instance.
+                    getId());
         }
     }
 
@@ -250,5 +238,25 @@ public class VideoPreviewHook extends CatalogueHook {
     @Override
     public boolean isSupportBatch() {
         return true;
+    }
+
+    private boolean isPropertySet(Property p) {
+        return instanceProperties.containsKey(p.name());
+    }
+
+    private String getProperty(Property p) {
+        return instanceProperties.get(p.name());
+    }
+
+    private Boolean getPropertyAsBoolean(Property p) {
+        return Boolean.parseBoolean(getProperty(p));
+    }
+
+    private Long getPropertyAsLong(Property p) {
+        return Long.valueOf(getProperty(p));
+    }
+
+    private Integer getPropertyAsInteger(Property p) {
+        return Integer.valueOf(getProperty(p));
     }
 }
