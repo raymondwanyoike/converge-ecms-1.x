@@ -135,11 +135,11 @@ public class NewswireItem {
         if (importCatalogue != null) {
             MediaItem item = catalogueFacade.create(selectedItem,
                     importCatalogue);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
-                    "NewswireItem_IMPORT_SUCCESSFUL", importCatalogue.getName());
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "NewswireItem_IMPORT_SUCCESSFUL", new Object[]{importCatalogue.getName()});
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    "i18n", "NewswireItem_IMPORT_FAILED", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                    "NewswireItem_IMPORT_FAILED");
         }
     }
 }
