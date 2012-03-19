@@ -1,7 +1,5 @@
 /*
- * WorkflowStateType.java
- * 
- * Copyright (C) 2009 Interactive Media Management
+ * Copyright (C) 2009 - 2012 Interactive Media Management
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,5 +25,12 @@ package dk.i2m.converge.core.workflow;
  */
 public enum WorkflowStateType {
 
-    START, MIDDLE, END, TRASH;
+    /** Start of the workflow. */
+    START,
+    /** Normal workflow state. */
+    MIDDLE,
+    /** End of the workflow. */
+    END,
+    /** Trash state of the workflow. Items scheduled for deletion */
+    TRASH;
 }
