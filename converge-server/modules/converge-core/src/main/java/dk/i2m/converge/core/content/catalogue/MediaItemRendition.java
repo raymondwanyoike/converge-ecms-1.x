@@ -25,7 +25,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Persisted model representing a {@link Rendition} of a 
+ * Persisted model representing a {@link Rendition} of a
  * {@link MediaItem}.
  *
  * @author Allan Lykke Christensen
@@ -135,7 +135,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * Gets the unique identifier of the {@link MediaItemRendition}.
-     * 
+     * <p/>
      * @return Unique identifier of the {@link MediaItemRendition}
      */
     public Long getId() {
@@ -144,9 +144,8 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * Sets the unique identifier of the {@link MediaItemRendition}.
-     * 
-     * @param id 
-     *          Unique identifier of the {@link MediaItemRendition}
+     * <p/>
+     * @param id * Unique identifier of the {@link MediaItemRendition}
      */
     public void setId(Long id) {
         this.id = id;
@@ -168,6 +167,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The locator of the target resource.
+     * <p/>
      * @return the filename
      */
     public String getFilename() {
@@ -176,6 +176,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The locator of the target resource.
+     * <p/>
      * @param filename the filename to set
      */
     public void setFilename(String filename) {
@@ -185,9 +186,9 @@ public class MediaItemRendition implements Serializable {
     /**
      * Gets the path on the catalogue where the
      * file can be found.
-     * 
+     * <p/>
      * @return Path on the catalogue where the file
-     *         can be found
+     * can be found
      */
     public String getPath() {
         return path;
@@ -196,10 +197,9 @@ public class MediaItemRendition implements Serializable {
     /**
      * Sets the path on the catalogue where the
      * file can be found.
-     * 
-     * @param path 
-     *          Path on the catalogue where the file
-     *          can be found
+     * <p/>
+     * @param path * Path on the catalogue where the file
+     * can be found
      */
     public void setPath(String path) {
         this.path = path;
@@ -207,6 +207,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The IANA (Internet Assigned Numbers Authority) MIME type of the target resource.
+     * <p/>
      * @return the contentType
      */
     public String getContentType() {
@@ -215,6 +216,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The IANA (Internet Assigned Numbers Authority) MIME type of the target resource.
+     * <p/>
      * @param contentType the contentType to set
      */
     public void setContentType(String contentType) {
@@ -237,6 +239,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The width of an image in pixels.
+     * <p/>
      * @return the width
      */
     public Integer getWidth() {
@@ -245,6 +248,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The width of an image in pixels.
+     * <p/>
      * @param width the width to set
      */
     public void setWidth(Integer width) {
@@ -253,6 +257,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The height of an image in pixels.
+     * <p/>
      * @return the height
      */
     public Integer getHeight() {
@@ -261,6 +266,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The height of an image in pixels.
+     * <p/>
      * @param height the height to set
      */
     public void setHeight(Integer height) {
@@ -269,6 +275,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The colour space of an image.
+     * <p/>
      * @return the colourSpace
      */
     public String getColourSpace() {
@@ -277,6 +284,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The colour space of an image.
+     * <p/>
      * @param colourSpace the colourSpace to set
      */
     public void setColourSpace(String colourSpace) {
@@ -293,6 +301,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The audio bit rate in Kbps.
+     * <p/>
      * @return the audioBitrate
      */
     public Integer getAudioBitrate() {
@@ -301,6 +310,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The audio bit rate in Kbps.
+     * <p/>
      * @param audioBitrate the audioBitrate to set
      */
     public void setAudioBitrate(Integer audioBitrate) {
@@ -309,6 +319,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The audio sound system.
+     * <p/>
      * @return the audioChannels
      */
     public String getAudioChannels() {
@@ -317,6 +328,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The audio sound system.
+     * <p/>
      * @param audioChannels the audioChannels to set
      */
     public void setAudioChannels(String audioChannels) {
@@ -325,6 +337,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The applicable codec for audio data.
+     * <p/>
      * @return the audioCodec
      */
     public String getAudioCodec() {
@@ -333,6 +346,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The applicable codec for audio data.
+     * <p/>
      * @param audioCodec the audioCodec to set
      */
     public void setAudioCodec(String audioCodec) {
@@ -341,6 +355,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The number of audio samples per second, expressed as a sampling frequency in Hz.
+     * <p/>
      * @return the audioSampleRate
      */
     public Integer getAudioSampleRate() {
@@ -349,6 +364,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The number of audio samples per second, expressed as a sampling frequency in Hz.
+     * <p/>
      * @param audioSampleRate the audioSampleRate to set
      */
     public void setAudioSampleRate(Integer audioSampleRate) {
@@ -357,6 +373,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The number of bits per audio sample.
+     * <p/>
      * @return the audioSampleSize
      */
     public Integer getAudioSampleSize() {
@@ -365,6 +382,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The number of bits per audio sample.
+     * <p/>
      * @param audioSampleSize the audioSampleSize to set
      */
     public void setAudioSampleSize(Integer audioSampleSize) {
@@ -373,6 +391,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * An indication that the audio data is encoded with a variable bit rate.
+     * <p/>
      * @return the audioVariableBitrate
      */
     public boolean isAudioVariableBitrate() {
@@ -381,6 +400,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * An indication that the audio data is encoded with a variable bit rate.
+     * <p/>
      * @param audioVariableBitrate the audioVariableBitrate to set
      */
     public void setAudioVariableBitrate(boolean audioVariableBitrate) {
@@ -389,6 +409,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The clip duration in seconds.
+     * <p/>
      * @return the duration
      */
     public Integer getDuration() {
@@ -397,6 +418,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * The clip duration in seconds.
+     * <p/>
      * @param duration the duration to set
      */
     public void setDuration(Integer duration) {
@@ -475,11 +497,13 @@ public class MediaItemRendition implements Serializable {
      * @return Absolute URL of the {@link MediaItem}
      */
     public String getAbsoluteFilename() {
-        if (mediaItem == null || mediaItem.getCatalogue() == null || getFilename() == null) {
+        if (mediaItem == null || mediaItem.getCatalogue() == null
+                || getFilename() == null) {
             return "#";
         }
 
-        StringBuilder absoluteFilename = new StringBuilder(mediaItem.getCatalogue().getWebAccess());
+        StringBuilder absoluteFilename = new StringBuilder(mediaItem.
+                getCatalogue().getWebAccess());
         absoluteFilename.append("/");
         if (!StringUtils.isBlank(getPath())) {
             absoluteFilename.append(getPath().replaceAll(File.separator, "/"));
@@ -488,7 +512,8 @@ public class MediaItemRendition implements Serializable {
 
         if (!StringUtils.isBlank(getFilename())) {
             try {
-                absoluteFilename.append(URIUtil.encodePath(getFilename(), "UTF-8"));
+                absoluteFilename.append(URIUtil.encodePath(getFilename(),
+                        "UTF-8"));
             } catch (URIException ex) {
                 absoluteFilename.append(getFilename());
             }
@@ -499,7 +524,7 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * Gets the physical file location of the file.
-     * 
+     * <p/>
      * @return Physical file location of the file
      */
     public String getFileLocation() {
@@ -511,7 +536,8 @@ public class MediaItemRendition implements Serializable {
             filePath = getPath();
         }
 
-        return mediaItem.getCatalogue().getLocation() + File.separator + filePath + File.separator + getFilename();
+        return mediaItem.getCatalogue().getLocation() + File.separator
+                + filePath + File.separator + getFilename();
     }
 
     /**
@@ -522,40 +548,33 @@ public class MediaItemRendition implements Serializable {
      */
     public String getExtension() {
         return FilenameUtils.getExtension(getFilename());
-//        if (getFilename() == null || getFilename().trim().isEmpty()) {
-//            return "";
-//        } else {
-//            int extIndex = getFilename().lastIndexOf(".");
-//            if (extIndex != getFilename().length()) {
-//                return getFilename().substring(extIndex + 1);
-//            } else {
-//                return "";
-//            }
-//        }
     }
 
     /**
      * Determines if the {@link Rendition} is a video.
-     * 
-     * @return {@code true} if the {@link Rendition}
-     *         is a video, otherwise {@code false}
+     * <p/>
+     * @return {@code true} if the {@link Rendition} is a video, otherwise {@code false}
      */
     public boolean isVideo() {
-        try {
-            return getContentType().startsWith("video");
-        } catch (Exception ex) {
+        if (getContentType() == null) {
+            return false;
+        } else if (getContentType().startsWith("video")) {
+            return true;
+        } else if (getContentType().startsWith("application/vnd.rn-realmedia")) {
+            return true;
+        } else {
             return false;
         }
     }
 
     /**
      * Determines if the {@link Rendition} is an audio clip.
-     * 
+     * <p/>
      * @return {@code true} if the {@ink Rendition}
-     *         is an audio clip, otherwise {@code false}
+     * is an audio clip, otherwise {@code false}
      */
     public boolean isAudio() {
-        try{
+        try {
             return getContentType().startsWith("audio");
         } catch (Exception ex) {
             return false;
@@ -564,9 +583,9 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * Determines if the {@link Rendition} is an image.
-     * 
+     * <p/>
      * @return {@code true} if the {@ink Rendition}
-     *         is an image, otherwise {@code false}
+     * is an image, otherwise {@code false}
      */
     public boolean isImage() {
         try {
@@ -578,9 +597,9 @@ public class MediaItemRendition implements Serializable {
 
     /**
      * Determines if the {@link Rendition} is a document.
-     * 
+     * <p/>
      * @return {@code true} if the {@ink Rendition}
-     *         is a document, otherwise {@code false}
+     * is a document, otherwise {@code false}
      */
     public boolean isDocument() {
         try {
@@ -600,7 +619,8 @@ public class MediaItemRendition implements Serializable {
                 return true;
             }
 
-            if (getContentType().startsWith("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+            if (getContentType().startsWith(
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
                 return true;
             }
         } catch (Exception ex) {
@@ -614,15 +634,17 @@ public class MediaItemRendition implements Serializable {
      * Determines if the {@link Rendition} of this {@link MediaItemRendition}
      * is the same as the original {@link Rendition} of the {@link MediaItem}
      * {@link Catalogue}.
-     * 
+     * <p/>
      * @return {@code true} if this is the original {@link Rendition},
-     *         otherwise {@code false}
+     * otherwise {@code false}
      */
     public boolean isOriginalRendition() {
-        if (getMediaItem() == null || getMediaItem().getCatalogue() == null || getMediaItem().getCatalogue().getOriginalRendition() == null) {
+        if (getMediaItem() == null || getMediaItem().getCatalogue() == null
+                || getMediaItem().getCatalogue().getOriginalRendition() == null) {
             return false;
         } else {
-            if (getMediaItem().getCatalogue().getOriginalRendition().equals(getRendition())) {
+            if (getMediaItem().getCatalogue().getOriginalRendition().equals(
+                    getRendition())) {
                 return true;
             } else {
                 return false;
@@ -643,7 +665,8 @@ public class MediaItemRendition implements Serializable {
             return false;
         }
         MediaItemRendition other = (MediaItemRendition) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null
+                && !this.id.equals(other.id))) {
             return false;
         }
         return true;

@@ -290,6 +290,18 @@
                                         <f:selectItems value="#{common.catalogueActions}" />
                                         <a4j:support event="onchange" reRender="pgActionProperties, aboutAction" />
                                     </h:selectOneMenu>
+                                    
+                                    <h:outputText value="#{i18n.administrator_Catalogues_MEDIA_ITEM_ACTION_EXECUTION}" />
+                                    <h:selectOneRadio value="#{administrator_Catalogues.selectedCatalogueAction.manual}">
+                                        <f:selectItem itemLabel="#{i18n.administrator_Catalogues_MEDIA_ITEM_ACTION_EXECUTION_AUTOMATIC}" itemValue="#{false}" />
+                                        <f:selectItem itemLabel="#{i18n.administrator_Catalogues_MEDIA_ITEM_ACTION_EXECUTION_MANUAL}" itemValue="#{true}" />
+                                    </h:selectOneRadio>
+                                    
+                                    <h:outputText value="#{i18n.administrator_Catalogues_MEDIA_ITEM_ACTION_OPERATION}" />
+                                    <h:selectOneRadio value="#{administrator_Catalogues.selectedCatalogueAction.asynchronous}">
+                                        <f:selectItem itemLabel="#{i18n.administrator_Catalogues_MEDIA_ITEM_ACTION_OPERATION_ASYNCHRONOUS}" itemValue="#{true}" />
+                                        <f:selectItem itemLabel="#{i18n.administrator_Catalogues_MEDIA_ITEM_ACTION_OPERATION_SYNCHRONOUS}" itemValue="#{false}" />
+                                    </h:selectOneRadio>
 
                                     <h:outputText value="#{i18n.administrator_Catalogues_CATALOGUE_ACTION_ABOUT}" />
                                     <h:panelGroup id="aboutAction" styleClass="pluginInstanceAbout mediumInput" layout="block">

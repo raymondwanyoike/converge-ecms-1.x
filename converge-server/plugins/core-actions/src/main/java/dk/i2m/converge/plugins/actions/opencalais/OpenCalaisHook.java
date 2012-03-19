@@ -1,13 +1,17 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later 
+ * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with 
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.plugins.actions.opencalais;
 
@@ -27,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * {@link CatalogueHook} for enriching a document using OpenCalais.
  *
  * @author Allan Lykke Christensen
  */
@@ -35,26 +40,31 @@ public class OpenCalaisHook extends CatalogueHook {
 
     private Map<String, String> availableProperties = null;
 
-    private Map<String, String> instanceProperties = new HashMap<String, String>();
+    private Map<String, String> instanceProperties =
+            new HashMap<String, String>();
 
-    private static final Logger LOG = Logger.getLogger(OpenCalaisHook.class.getName());
+    private static final Logger LOG = Logger.getLogger(OpenCalaisHook.class.
+            getName());
 
     public enum Property {
 
+        /** Name of the rendition to use for enrichment. If this property is not in the configuration, the original rendition will be used. */
         ENRICH_RENDITION
     }
 
-    private ResourceBundle bundle = ResourceBundle.getBundle("dk.i2m.converge.plugins.actions.opencalais.CatalogueHookMessages");
+    private ResourceBundle bundle = ResourceBundle.getBundle(
+            "dk.i2m.converge.plugins.actions.opencalais.CatalogueHookMessages");
 
     private String enrichRendition;
 
     @Override
-    public void execute(PluginContext ctx, CatalogueEvent event, CatalogueHookInstance instance) throws CatalogueEventException {
+    public void execute(PluginContext ctx, CatalogueEvent event,
+            CatalogueHookInstance instance) throws CatalogueEventException {
 
         // Check that we only re-act to the Upload of new renditions
-        if (event.getType() != CatalogueEvent.Event.UploadRendition) {
-            return;
-        }
+//        if (event.getType() != CatalogueEvent.Event.UploadRendition) {
+//            return;
+//        }
 
         instanceProperties = instance.getPropertiesAsMap();
 
@@ -63,7 +73,8 @@ public class OpenCalaisHook extends CatalogueHook {
         Rendition rendition = uploadRendition.getRendition();
 
         if (instanceProperties.containsKey(Property.ENRICH_RENDITION.name())) {
-            enrichRendition = instanceProperties.get(Property.ENRICH_RENDITION.name());
+            enrichRendition = instanceProperties.get(Property.ENRICH_RENDITION.
+                    name());
         } else {
             try {
                 enrichRendition = uploadRendition.getMediaItem().getCatalogue().
@@ -130,7 +141,8 @@ public class OpenCalaisHook extends CatalogueHook {
     @Override
     public Date getDate() {
         try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat format =
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             return format.parse(bundle.getString("PLUGIN_BUILD_TIME"));
         } catch (Exception ex) {
             return Calendar.getInstance().getTime();

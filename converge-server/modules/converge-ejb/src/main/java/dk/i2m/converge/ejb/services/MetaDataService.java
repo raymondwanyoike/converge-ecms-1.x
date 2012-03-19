@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,43 +16,38 @@
  */
 package dk.i2m.converge.ejb.services;
 
-import dk.i2m.converge.core.DataNotFoundException;
-import dk.i2m.converge.core.EnrichException;
 import com.adobe.xmp.XMPException;
 import com.adobe.xmp.XMPMeta;
 import com.adobe.xmp.XMPMetaFactory;
 import com.adobe.xmp.properties.XMPProperty;
 import com.google.common.base.Splitter;
-import com.xuggle.xuggler.Global;
-import com.xuggle.xuggler.ICodec;
-import com.xuggle.xuggler.IContainer;
-import com.xuggle.xuggler.IProperty;
-import com.xuggle.xuggler.IStream;
-import com.xuggle.xuggler.IStreamCoder;
+import com.xuggle.xuggler.*;
 import dk.i2m.converge.core.ConfigurationKey;
+import dk.i2m.converge.core.DataNotFoundException;
+import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
-import dk.i2m.converge.core.metadata.Concept;
-import dk.i2m.converge.core.metadata.GeoArea;
-import dk.i2m.converge.core.metadata.OpenCalaisMapping;
-import dk.i2m.converge.core.metadata.Organisation;
-import dk.i2m.converge.core.metadata.Person;
-import dk.i2m.converge.core.metadata.PointOfInterest;
+import dk.i2m.converge.core.metadata.*;
 import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import net.sf.json.JSONObject;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.pdfbox.cos.COSDocument;
+import org.apache.pdfbox.pdfparser.PDFParser;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.sanselan.ImageInfo;
 import org.apache.sanselan.ImageReadException;
 import org.apache.sanselan.Sanselan;
@@ -66,18 +61,6 @@ import org.blinkenlights.jid3.MP3File;
 import org.blinkenlights.jid3.MediaFile;
 import org.blinkenlights.jid3.v1.ID3V1_0Tag;
 import org.blinkenlights.jid3.v2.ID3V2_3_0Tag;
-import net.sf.json.JSONObject;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.lang.StringUtils;
-import org.apache.pdfbox.cos.COSDocument;
-import org.apache.pdfbox.pdfparser.PDFParser;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
-import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.hwpf.extractor.WordExtractor;
 
 /**
  * Service bean used for extracting meta data from files.
@@ -87,28 +70,25 @@ import org.apache.poi.hwpf.extractor.WordExtractor;
 @Stateless
 public class MetaDataService implements MetaDataServiceLocal {
 
-    private static final Logger LOG = Logger.getLogger(MetaDataService.class.getName());
+    private static final Logger LOG = Logger.getLogger(MetaDataService.class.
+            getName());
 
     /** URL to the OpenCalais service. */
-    private static final String OPEN_CALAIS_URL = "http://api.opencalais.com/tag/rs/enrich";
+    private static final String OPEN_CALAIS_URL =
+            "http://api.opencalais.com/tag/rs/enrich";
 
     /** Namespace of the dublin core. */
     private static final String NS_DC = "http://purl.org/dc/elements/1.1/";
 
     /** Namespace of photoshop tags. */
-    private static final String NS_PHOTOSHOP = "http://ns.adobe.com/photoshop/1.0/";
+    private static final String NS_PHOTOSHOP =
+            "http://ns.adobe.com/photoshop/1.0/";
 
     @EJB private ConfigurationServiceLocal cfgService;
 
     @EJB private MetaDataFacadeLocal metaDataFacade;
 
-    /**
-     * Extract meta data from any file.
-     * 
-     * @param location
-     *          Location of the file
-     * @return {@link Map} of meta data
-     */
+    /** {@inheritDoc } */
     @Override
     public Map<String, String> extract(String location) {
         Map<String, String> metaData = new HashMap<String, String>();
@@ -146,17 +126,10 @@ public class MetaDataService implements MetaDataServiceLocal {
         return metaData;
     }
 
-    /**
-     * Extract MP3 meta data from audio file.
-     * 
-     * @param location
-     *          Location of the file
-     * @return {@link Map} of MP3 meta data
-     * @throws CannotExtractMetaDataException
-     *          If meta data could not be extracted from the given file
-     */
+    /** {@inheritDoc } */
     @Override
-    public Map<String, String> extractFromMp3(String location) throws CannotExtractMetaDataException {
+    public Map<String, String> extractFromMp3(String location) throws
+            CannotExtractMetaDataException {
         MediaFile oMediaFile = new MP3File(new File(location));
         Map<String, String> properties = new HashMap<String, String>();
         try {
@@ -182,7 +155,8 @@ public class MetaDataService implements MetaDataServiceLocal {
                     }
 
                     if (tagV2.getTIT2TextInformationFrame() != null) {
-                        properties.put("headline", tagV2.getTIT2TextInformationFrame().getTitle());
+                        properties.put("headline", tagV2.
+                                getTIT2TextInformationFrame().getTitle());
                     }
 
                     if (tagV2.getComment() != null) {
@@ -198,18 +172,10 @@ public class MetaDataService implements MetaDataServiceLocal {
         return properties;
     }
 
-    /**
-     * Extract XMP meta data from a media file.
-     * 
-     * @param location
-     *          Location of the file
-     * @return {@link Map} of XMP meta data
-     * @throws CannotExtractMetaDataException
-     *          If meta data could not be extracted from
-     *          the given file
-     */
+    /** {@inheritDoc } */
     @Override
-    public Map<String, String> extractXmp(String location) throws CannotExtractMetaDataException {
+    public Map<String, String> extractXmp(String location) throws
+            CannotExtractMetaDataException {
         Map<String, String> properties = new HashMap<String, String>();
         try {
             String xml = Sanselan.getXmpXml(new File(location));
@@ -227,26 +193,34 @@ public class MetaDataService implements MetaDataServiceLocal {
             //}
 
             if (xmpMeta.doesPropertyExist(NS_PHOTOSHOP, "Headline")) {
-                XMPProperty headlineProperty = xmpMeta.getProperty(NS_PHOTOSHOP, "Headline");
-                properties.put("headline", ((String) headlineProperty.getValue()).trim());
+                XMPProperty headlineProperty = xmpMeta.getProperty(NS_PHOTOSHOP,
+                        "Headline");
+                properties.put("headline",
+                        ((String) headlineProperty.getValue()).trim());
             }
 
             if (xmpMeta.doesArrayItemExist(NS_DC, "description", 1)) {
-                XMPProperty descriptionProperty = xmpMeta.getArrayItem(NS_DC, "description", 1);
-                properties.put("description", ((String) descriptionProperty.getValue()).trim());
+                XMPProperty descriptionProperty = xmpMeta.getArrayItem(NS_DC,
+                        "description", 1);
+                properties.put("description", ((String) descriptionProperty.
+                        getValue()).trim());
             }
 
             if (xmpMeta.doesArrayItemExist(NS_DC, "title", 1)) {
-                XMPProperty titleProperty = xmpMeta.getArrayItem(NS_DC, "title", 1);
-                properties.put("title", ((String) titleProperty.getValue()).trim());
+                XMPProperty titleProperty = xmpMeta.getArrayItem(NS_DC, "title",
+                        1);
+                properties.put("title",
+                        ((String) titleProperty.getValue()).trim());
             }
 
             int subjectCount = xmpMeta.countArrayItems(NS_DC, "subject");
             if (subjectCount > 0) {
 
                 for (int i = 1; i <= subjectCount; i++) {
-                    XMPProperty subjectProperty = xmpMeta.getArrayItem(NS_DC, "subject", i);
-                    properties.put("subject-" + i, ((String) subjectProperty.getValue()).trim());
+                    XMPProperty subjectProperty = xmpMeta.getArrayItem(NS_DC,
+                            "subject", i);
+                    properties.put("subject-" + i, ((String) subjectProperty.
+                            getValue()).trim());
                 }
             }
 
@@ -261,18 +235,10 @@ public class MetaDataService implements MetaDataServiceLocal {
         return properties;
     }
 
-    /**
-     * Extract IPTC meta data from an image file.
-     * 
-     * @param location
-     *          Location of the file
-     * @return {@link Map} of IPTC meta data
-     * @throws CannotExtractMetaDataException
-     *          If meta data could not be extracted from
-     *          the given file
-     */
+    /** {@inheritDoc } */
     @Override
-    public Map<String, String> extractIPTC(String location) throws CannotExtractMetaDataException {
+    public Map<String, String> extractIPTC(String location) throws
+            CannotExtractMetaDataException {
         Map<String, String> properties = new HashMap<String, String>();
 
         try {
@@ -282,11 +248,13 @@ public class MetaDataService implements MetaDataServiceLocal {
                 ArrayList items = meta.getItems();
                 for (int i = 0; i < items.size(); i++) {
                     try {
-                        ImageMetadata.Item item = (ImageMetadata.Item) items.get(i);
+                        ImageMetadata.Item item =
+                                (ImageMetadata.Item) items.get(i);
 
                         if (item instanceof TiffImageMetadata.Item) {
                             TiffImageMetadata.Item tiff = (Item) item;
-                            properties.put(tiff.getTiffField().getTagName(), "" + tiff.getTiffField().getValue());
+                            properties.put(tiff.getTiffField().getTagName(), ""
+                                    + tiff.getTiffField().getValue());
                         } else {
                             properties.put(item.getKeyword(), item.getText());
                         }
@@ -305,28 +273,22 @@ public class MetaDataService implements MetaDataServiceLocal {
         return properties;
     }
 
-    /**
-     * Extract IPTC meta data from an image file.
-     * 
-     * @param location
-     *          Location of the file
-     * @return {@link Map} of IPTC meta data
-     * @throws CannotExtractMetaDataException
-     *          If meta data could not be extracted from
-     *          the given file
-     */
+    /** {@inheritDoc } */
     @Override
-    public Map<String, String> extractImageInfo(String location) throws CannotExtractMetaDataException {
+    public Map<String, String> extractImageInfo(String location) throws
+            CannotExtractMetaDataException {
         Map<String, String> properties = new HashMap<String, String>();
 
         try {
             ImageInfo imageInfo = Sanselan.getImageInfo(new File(location));
 
             if (imageInfo != null) {
-                properties.put("colourSpace", imageInfo.getColorTypeDescription());
+                properties.put("colourSpace",
+                        imageInfo.getColorTypeDescription());
                 properties.put("height", String.valueOf(imageInfo.getHeight()));
                 properties.put("width", String.valueOf(imageInfo.getWidth()));
-                properties.put("progressive", String.valueOf(imageInfo.getIsProgressive()));
+                properties.put("progressive", String.valueOf(imageInfo.
+                        getIsProgressive()));
             }
         } catch (ImageReadException ex) {
             throw new CannotExtractMetaDataException(ex);
@@ -337,7 +299,8 @@ public class MetaDataService implements MetaDataServiceLocal {
         return properties;
     }
 
-    public Map<String, String> extractMediaContainer(String location) throws CannotExtractMetaDataException {
+    public Map<String, String> extractMediaContainer(String location) throws
+            CannotExtractMetaDataException {
         Map<String, String> properties = new HashMap<String, String>();
 
 
@@ -346,35 +309,43 @@ public class MetaDataService implements MetaDataServiceLocal {
 
             // Open up the container
             if (container.open(location, IContainer.Type.READ, null) < 0) {
-                throw new CannotExtractMetaDataException("could not open file: " + location);
+                throw new CannotExtractMetaDataException("could not open file: "
+                        + location);
             }
 
             if (container.queryStreamMetaData() < 0) {
-                throw new CannotExtractMetaDataException("couldn't query stream meta data for some reason...");
+                throw new CannotExtractMetaDataException(
+                        "couldn't query stream meta data for some reason...");
             }
 
             for (int i = 0; i < container.getNumProperties(); i++) {
                 IProperty prop = container.getPropertyMetaData(i);
-                properties.put(prop.getName(), container.getPropertyAsString(prop.getName()));
+                properties.put(prop.getName(),
+                        container.getPropertyAsString(prop.getName()));
             }
 
             properties.put("streams", String.valueOf(container.getNumStreams()));
             if (container.getDuration() == Global.NO_PTS) {
-                properties.put("duration", String.valueOf(container.getDuration()));
+                properties.put("duration", String.valueOf(
+                        container.getDuration()));
             } else {
-                properties.put("duration", String.valueOf(container.getDuration() / 1000));
+                properties.put("duration", String.valueOf(container.getDuration()
+                        / 1000));
             }
 
             if (container.getStartTime() == Global.NO_PTS) {
-                properties.put("startTime", String.valueOf(container.getStartTime()));
+                properties.put("startTime", String.valueOf(container.
+                        getStartTime()));
             } else {
-                properties.put("startTime", String.valueOf(container.getStartTime() / 1000));
+                properties.put("startTime", String.valueOf(container.
+                        getStartTime() / 1000));
             }
             properties.put("bitrate", String.valueOf(container.getBitRate()));
 
 
             for (String meta : container.getMetaData().getKeys()) {
-                properties.put("container." + meta, container.getMetaData().getValue(meta));
+                properties.put("container." + meta, container.getMetaData().
+                        getValue(meta));
             }
 
             for (int i = 0; i < container.getNumStreams(); i++) {
@@ -383,40 +354,46 @@ public class MetaDataService implements MetaDataServiceLocal {
                 IStreamCoder coder = stream.getStreamCoder();
 
                 for (String meta : stream.getMetaData().getKeys()) {
-                    properties.put("stream." + i + ".meta." + meta, stream.getMetaData().getValue(meta));
+                    properties.put("stream." + i + ".meta." + meta, stream.
+                            getMetaData().getValue(meta));
                 }
-                properties.put("stream." + i + ".type", coder.getCodecType().name());
-                properties.put("stream." + i + ".codec", coder.getCodecID().name());
-                properties.put("stream." + i + ".duration", String.valueOf(stream.getDuration()));
+                properties.put("stream." + i + ".type", coder.getCodecType().
+                        name());
+                properties.put("stream." + i + ".codec",
+                        coder.getCodecID().name());
+                properties.put("stream." + i + ".duration",
+                        String.valueOf(stream.getDuration()));
 
                 if (coder.getCodecType() == ICodec.Type.CODEC_TYPE_AUDIO) {
-                    properties.put("stream." + i + ".sampleRate", String.valueOf(coder.getSampleRate()));
-                    properties.put("stream." + i + ".channels", String.valueOf(coder.getChannels()));
-                    properties.put("stream." + i + ".format", coder.getSampleFormat().name());
+                    properties.put("stream." + i + ".sampleRate",
+                            String.valueOf(coder.getSampleRate()));
+                    properties.put("stream." + i + ".channels",
+                            String.valueOf(coder.getChannels()));
+                    properties.put("stream." + i + ".format", coder.
+                            getSampleFormat().name());
                 } else if (coder.getCodecType() == ICodec.Type.CODEC_TYPE_VIDEO) {
-                    properties.put("stream." + i + ".width", String.valueOf(coder.getWidth()));
-                    properties.put("stream." + i + ".height", String.valueOf(coder.getHeight()));
-                    properties.put("stream." + i + ".format", coder.getPixelType().name());
-                    properties.put("stream." + i + ".frameRate", String.valueOf(coder.getFrameRate().getDouble()));
+                    properties.put("stream." + i + ".width",
+                            String.valueOf(coder.getWidth()));
+                    properties.put("stream." + i + ".height",
+                            String.valueOf(coder.getHeight()));
+                    properties.put("stream." + i + ".format",
+                            coder.getPixelType().name());
+                    properties.put("stream." + i + ".frameRate",
+                            String.valueOf(coder.getFrameRate().getDouble()));
                 }
             }
         } catch (UnsatisfiedLinkError ex) {
-            LOG.log(Level.SEVERE, "Could not extract meta data. {0}", ex.getMessage());
+            LOG.log(Level.SEVERE, "Could not extract meta data. {0}", ex.
+                    getMessage());
         } catch (NoClassDefFoundError ex) {
-            LOG.log(Level.SEVERE, "Could not extract meta data. {0}", ex.getMessage());
+            LOG.log(Level.SEVERE, "Could not extract meta data. {0}", ex.
+                    getMessage());
         }
 
         return properties;
     }
 
-    /**
-     * Gets {@link Concept}s from the given story using the OpenCalais service.
-     * 
-     * @param story
-     *          Story for which to get {@link Concept}s
-     * @return {@link List} of {@link Concept}s matching the story
-     * @throws EnrichException  
-     */
+    /** {@inheritDoc } */
     @Override
     public List<Concept> enrich(String story) throws EnrichException {
 
@@ -444,7 +421,8 @@ public class MetaDataService implements MetaDataServiceLocal {
         List<Concept> concepts = new ArrayList<Concept>();
 
         PostMethod method = new PostMethod(OPEN_CALAIS_URL);
-        method.setRequestHeader("x-calais-licenseID", cfgService.getString(ConfigurationKey.OPEN_CALAIS_API_KEY));
+        method.setRequestHeader("x-calais-licenseID",
+                cfgService.getString(ConfigurationKey.OPEN_CALAIS_API_KEY));
         method.setRequestHeader("Content-Type", "text/raw; charset=UTF-8");
         method.setRequestHeader("Accept", "application/json");
         method.setRequestHeader("enableMetadataType", "SocialTags");
@@ -457,14 +435,16 @@ public class MetaDataService implements MetaDataServiceLocal {
             HttpClient client = new HttpClient();
             int returnCode = client.executeMethod(method);
             if (returnCode == HttpStatus.SC_NOT_IMPLEMENTED) {
-                System.err.println("The Post method is not implemented by this URI");
+                LOG.log(Level.WARNING, "The Post method is not implemented by this URI");
                 // still consume the response body
                 method.getResponseBodyAsString();
             } else if (returnCode == HttpStatus.SC_OK) {
 
-                JSONObject response = JSONObject.fromObject(method.getResponseBodyAsString());
+                JSONObject response = JSONObject.fromObject(method.
+                        getResponseBodyAsString());
 
-                List<OpenCalaisMapping> mappings = metaDataFacade.getOpenCalaisMappings();
+                List<OpenCalaisMapping> mappings = metaDataFacade.
+                        getOpenCalaisMappings();
 
 
                 for (Object key : response.keySet()) {
@@ -480,44 +460,55 @@ public class MetaDataService implements MetaDataServiceLocal {
                         boolean mappingOccured = false;
                         for (OpenCalaisMapping mapping : mappings) {
                             try {
-                                fieldValue = (String) entity.get(mapping.getField());
+                                fieldValue = (String) entity.get(mapping.
+                                        getField());
                                 ;
                             } catch (Exception ex) {
                                 fieldValue = "";
                             }
 
-                            if (mapping.getTypeGroup().equals(typeGroup) && entity.containsKey(mapping.getField()) && fieldValue.equals(mapping.getValue())) {
+                            if (mapping.getTypeGroup().equals(typeGroup)
+                                    && entity.containsKey(mapping.getField())
+                                    && fieldValue.equals(mapping.getValue())) {
                                 concepts.add(mapping.getConcept());
                                 mappingOccured = true;
                             }
                         }
 
-
                         if (!mappingOccured) {
 
-                            if (((String) entity.get("_typeGroup")).equalsIgnoreCase("entities")) {
-                                String conceptType = (String) entity.get("_type");
+                            if (((String) entity.get("_typeGroup")).
+                                    equalsIgnoreCase("entities")) {
+                                String conceptType =
+                                        (String) entity.get("_type");
                                 String conceptName = (String) entity.get("name");
                                 Concept match = null;
                                 try {
-                                    match = metaDataFacade.findConceptByName(conceptName);
+                                    match = metaDataFacade.findConceptByName(
+                                            conceptName);
                                 } catch (DataNotFoundException dnfe) {
                                 }
 
 
                                 if (entity.containsKey("_type")) {
-                                    if (conceptType.equalsIgnoreCase("company") || conceptType.equalsIgnoreCase("organization")) {
+                                    if (conceptType.equalsIgnoreCase("company")
+                                            || conceptType.equalsIgnoreCase(
+                                            "organization")) {
 
-                                        if (match == null || (!(match instanceof Organisation))) {
-                                            match = new Organisation(conceptName, "");
+                                        if (match == null
+                                                || (!(match instanceof Organisation))) {
+                                            match = new Organisation(conceptName,
+                                                    "");
                                             match = metaDataFacade.create(match);
                                         }
 
                                         if (match instanceof Organisation) {
                                             concepts.add(match);
                                         }
-                                    } else if (conceptType.equalsIgnoreCase("person")) {
-                                        if (match == null || (!(match instanceof Person))) {
+                                    } else if (conceptType.equalsIgnoreCase(
+                                            "person")) {
+                                        if (match == null
+                                                || (!(match instanceof Person))) {
                                             match = new Person(conceptName, "");
                                             match = metaDataFacade.create(match);
                                         }
@@ -525,8 +516,16 @@ public class MetaDataService implements MetaDataServiceLocal {
                                         if (match instanceof Person) {
                                             concepts.add(match);
                                         }
-                                    } else if (conceptType.equalsIgnoreCase("city") || conceptType.equalsIgnoreCase("country") || conceptType.equalsIgnoreCase("continent") || conceptType.equalsIgnoreCase("ProvinceOrState") || conceptType.equalsIgnoreCase("region")) {
-                                        if (match == null || (!(match instanceof GeoArea))) {
+                                    } else if (conceptType.equalsIgnoreCase(
+                                            "city") || conceptType.
+                                            equalsIgnoreCase("country")
+                                            || conceptType.equalsIgnoreCase(
+                                            "continent") || conceptType.
+                                            equalsIgnoreCase("ProvinceOrState")
+                                            || conceptType.equalsIgnoreCase(
+                                            "region")) {
+                                        if (match == null
+                                                || (!(match instanceof GeoArea))) {
                                             match = new GeoArea(conceptName, "");
                                             match = metaDataFacade.create(match);
                                         }
@@ -534,9 +533,12 @@ public class MetaDataService implements MetaDataServiceLocal {
                                         if (match instanceof GeoArea) {
                                             concepts.add(match);
                                         }
-                                    } else if (conceptType.equalsIgnoreCase("facility")) {
-                                        if (match == null || (!(match instanceof PointOfInterest))) {
-                                            match = new PointOfInterest(conceptName, "");
+                                    } else if (conceptType.equalsIgnoreCase(
+                                            "facility")) {
+                                        if (match == null
+                                                || (!(match instanceof PointOfInterest))) {
+                                            match = new PointOfInterest(
+                                                    conceptName, "");
                                             match = metaDataFacade.create(match);
                                         }
 
@@ -550,7 +552,10 @@ public class MetaDataService implements MetaDataServiceLocal {
                     }
                 }
             } else {
-                LOG.log(Level.WARNING, "Invalid response received from OpenCalais [{0}] {1}", new Object[]{returnCode, method.getResponseBodyAsString()});
+                LOG.log(Level.WARNING,
+                        "Invalid response received from OpenCalais [{0}] {1}",
+                        new Object[]{returnCode,
+                            method.getResponseBodyAsString()});
             }
 
         } catch (Exception e) {
@@ -568,6 +573,7 @@ public class MetaDataService implements MetaDataServiceLocal {
         return concepts;
     }
 
+    /** {@inheritDoc } */
     @Override
     public String extractContent(MediaItemRendition mir) {
         String contentType = mir.getContentType();
@@ -608,7 +614,9 @@ public class MetaDataService implements MetaDataServiceLocal {
 
             } catch (MalformedURLException ex) {
             }
-        } else if (contentType.equals("application/msword") || contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+        } else if (contentType.equals("application/msword")
+                || contentType.equals(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
             try {
                 URL originalFile = new URL(mir.getAbsoluteFilename());
                 HWPFDocument doc = new HWPFDocument(originalFile.openStream());
@@ -619,6 +627,5 @@ public class MetaDataService implements MetaDataServiceLocal {
             }
         }
         return story;
-
     }
 }

@@ -106,6 +106,9 @@
                                             <h:outputText value="#{i18n.Concepts_IMPORT_CONCEPTS}" />
                                             <rich:componentControl for="mpImport" operation="show" event="oncomplete" />
                                         </a4j:commandLink>
+
+                                        <h:graphicImage value="#{i18n.resource_ICON_BULLET}" rendered="#{userSession.privileged['MANAGE_CONCEPTS']}" />
+                                        <h:commandLink actionListener="#{concepts.onExportSubjects}" target="_blank" value="#{i18n.Concepts_EXPORT_CONCEPTS}" rendered="#{userSession.privileged['MANAGE_CONCEPTS']}" />
                                     </h:panelGrid>
                                 </div>
                             </h:form>

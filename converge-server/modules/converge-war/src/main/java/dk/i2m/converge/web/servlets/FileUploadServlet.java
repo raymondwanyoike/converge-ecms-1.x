@@ -321,7 +321,7 @@ public class FileUploadServlet extends HttpServlet {
         try {
             mir = catalogueFacade.create(uploadedFile,
                     mediaItem, mir.getRendition(), filename,
-                    fileItem.getContentType());
+                    fileItem.getContentType(), true);
 
             LOG.log(Level.FINE,
                     "New media item and rendition created: {0} / {1}",
@@ -376,7 +376,7 @@ public class FileUploadServlet extends HttpServlet {
                 new File(getTemporaryDirectory(), fileItem.getName());
         try {
             mediaItemRendition = catalogueFacade.update(uploadedFile, fileItem.
-                    getName(), fileItem.getContentType(), mediaItemRendition);
+                    getName(), fileItem.getContentType(), mediaItemRendition, true);
             this.returnValue = "" + mediaItemRendition.getId();
             LOG.log(Level.FINE, "Media item #{0} was updated",
                     new Object[]{mediaItemRendition.getId()});
@@ -421,7 +421,7 @@ public class FileUploadServlet extends HttpServlet {
         File uploadedFile = new File(getTemporaryDirectory(), fileItem.getName());
         MediaItemRendition mediaItemRendition;
         try {
-            mediaItemRendition = catalogueFacade.create(uploadedFile, mediaItem, rendition, fileItem.getName(), fileItem.getContentType());
+            mediaItemRendition = catalogueFacade.create(uploadedFile, mediaItem, rendition, fileItem.getName(), fileItem.getContentType(), true);
             LOG.log(Level.FINE, "New media item rendition created: {0}", mediaItemRendition.getId());
             this.returnValue = "" + mediaItemRendition.getId();
         } catch (IOException ex) {

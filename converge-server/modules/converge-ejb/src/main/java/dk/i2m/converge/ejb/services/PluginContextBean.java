@@ -221,7 +221,7 @@ public class PluginContextBean implements PluginContextBeanLocal {
             MediaItem mediaItem = catalogueFacade.findMediaItemById(mediaItemId);
             Rendition rendition = catalogueFacade.findRenditionById(renditionId);
             return catalogueFacade.create(file, mediaItem, rendition, filename,
-                    contentType);
+                    contentType, false);
         } catch (DataNotFoundException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -233,7 +233,7 @@ public class PluginContextBean implements PluginContextBeanLocal {
             dk.i2m.converge.core.content.catalogue.MediaItemRendition mediaItemRendition)
             throws IOException {
         return catalogueFacade.update(file, filename, contentType,
-                mediaItemRendition);
+                mediaItemRendition, false);
     }
 
     @Override

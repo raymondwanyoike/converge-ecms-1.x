@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,16 @@
 package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.converge.core.calendar.Event;
-import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.ejb.facades.CalendarFacadeLocal;
-import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
-import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
-import dk.i2m.converge.ejb.facades.UserFacadeLocal;
-import dk.i2m.converge.ejb.facades.WorkflowFacadeLocal;
+import dk.i2m.converge.core.workflow.Outlet;
+import dk.i2m.converge.ejb.facades.*;
 import dk.i2m.converge.jsf.components.tags.DialogAssignment;
 import dk.i2m.converge.utils.CalendarUtils;
 import dk.i2m.jsf.JsfUtils;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -41,7 +35,7 @@ import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 
 /**
- * Backing bean for <code>Calendar.jspx</code>.
+ * Backing bean for {@code Calendar.jspx}.
  *
  * @author Allan Lykke Christensen
  */
@@ -51,8 +45,6 @@ public class Calendar {
 
         YEAR, MONTH, WEEK, DAY, UPCOMING
     }
-
-    private static final Logger logger = Logger.getLogger(Calendar.class.getName());
 
     @EJB private CalendarFacadeLocal calendarFacade;
 
@@ -140,13 +132,13 @@ public class Calendar {
         String msg;
         if (isEditMode()) {
             this.selectedEvent = calendarFacade.update(selectedEvent);
-            msg = "EVENT_MSG_UPDATED";
+            msg = "Calendar_EVENT_MSG_UPDATED";
         } else {
             this.selectedEvent = calendarFacade.create(this.selectedEvent);
-            msg = "EVENT_MSG_CREATED";
+            msg = "Calendar_EVENT_MSG_CREATED";
         }
 
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, msg);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(), msg);
 
         onRefreshSchedule(event);
     }
@@ -158,20 +150,20 @@ public class Calendar {
      *          Event that invoked the handler
      */
     public void onDeleteEvent(ActionEvent event) {
-        try {
             calendarFacade.delete(selectedEvent.getId());
             onRefreshSchedule(event);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "EVENT_MSG_DELETED");
-        } catch (Exception e) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, e.getMessage(), null);
-            logger.log(Level.SEVERE, "Could not delete event", e);
-        }
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(), "Calendar_EVENT_MSG_DELETED");
     }
 
+    /**
+     * Event handler for showing events in the selected year.
+     * 
+     * @param event
+     *          Event that invoked the handler
+     */
     public void onShowYear(ActionEvent event) {
         this.view = CalendarView.YEAR;
-        this.title = JsfUtils.getResourceBundle().getString("calendar_BY_YEAR");
-        this.title = MessageFormat.format(this.title, selectedDate.getTime());
+        this.title = JsfUtils.getMessage(Bundle.i18n.name(), "Calendar_BY_YEAR", new Object[]{selectedDate.getTime()});
 
         java.util.Calendar startDate = CalendarUtils.getFirstDayOfYear(selectedDate);
         startDate.setTimeZone(getUserAccount().getTimeZone());
@@ -185,7 +177,7 @@ public class Calendar {
 
     public void onShowMonth(ActionEvent event) {
         this.view = CalendarView.MONTH;
-        this.title = JsfUtils.getResourceBundle().getString("calendar_BY_MONTH");
+        this.title = JsfUtils.getResourceBundle(Bundle.i18n.name()).getString("Calendar_BY_MONTH");
         this.title = MessageFormat.format(this.title, selectedDate.getTime());
 
         java.util.Calendar startDate = CalendarUtils.getFirstDayOfMonth(selectedDate);
@@ -199,7 +191,7 @@ public class Calendar {
 
     public void onShowWeek(ActionEvent event) {
         this.view = CalendarView.WEEK;
-        this.title = JsfUtils.getResourceBundle().getString("calendar_BY_WEEK");
+        this.title = JsfUtils.getResourceBundle(Bundle.i18n.name()).getString("Calendar_BY_WEEK");
 
         java.util.Calendar startDate = CalendarUtils.getFirstDayOfWeek(selectedDate);
         startDate.setTimeZone(getUserAccount().getTimeZone());
@@ -215,7 +207,7 @@ public class Calendar {
 
     public void onShowDay(ActionEvent event) {
         this.view = CalendarView.DAY;
-        this.title = JsfUtils.getResourceBundle().getString("calendar_BY_DAY");
+        this.title = JsfUtils.getResourceBundle(Bundle.i18n.name()).getString("Calendar_BY_DAY");
 
         java.util.Calendar startDate = CalendarUtils.getStartOfDay(selectedDate);
         startDate.setTimeZone(getUserAccount().getTimeZone());
@@ -229,7 +221,7 @@ public class Calendar {
 
     public void onShowUpcoming(ActionEvent event) {
         this.view = CalendarView.UPCOMING;
-        this.title = JsfUtils.getResourceBundle().getString("calendar_BY_UPCOMING");
+        this.title = JsfUtils.getResourceBundle(Bundle.i18n.name()).getString("Calendar_BY_UPCOMING");
         List<Event> events = calendarFacade.findUpcoming();
         this.schedule.setWrappedData(events);
     }
@@ -250,9 +242,8 @@ public class Calendar {
         dialogAssignment.onChangeOutlet(null);
         dialogAssignment.getAssignment().setEvent(selectedEvent);
 
-        String msg = JsfUtils.getResourceBundle().getString("planning_COVER_X_EVENT");
+        String msg = JsfUtils.getResourceBundle(Bundle.i18n.name()).getString("Calendar_COVER_X_EVENT");
         dialogAssignment.getAssignment().setTitle(MessageFormat.format(msg, selectedEvent.getSummary()));
-
 
         if (selectedDate != null) {
             dialogAssignment.getAssignment().setDeadline(selectedDate);
@@ -295,8 +286,7 @@ public class Calendar {
     }
 
     public String getTitle() {
-        String pre = JsfUtils.getResourceBundle().getString("calendar_EVENTS");
-        return pre + " - " + title;
+        return JsfUtils.getMessage(Bundle.i18n.name(), "Calendar_EVENTS", new Object[]{title});
     }
 
     public void setTitle(String title) {

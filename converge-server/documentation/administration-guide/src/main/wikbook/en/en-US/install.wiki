@@ -7,7 +7,7 @@ or from the [[SourceForge.net project page>>https://sourceforge.net/projects/con
 
 = Obtaining dependencies =
 
-* [[Xuggler 3.4 "Forrest">>http://www.xuggle.com/xuggler/downloads/]]
+* Xuggler 4.0 (must be built from source)
 * [[Apache Solr 1.4.1>>http://www.bizdirusa.com/mirrors/apache//lucene/solr/1.4.1/]]
 * [[Glassfish 2.1.1>>http://glassfish.java.net/downloads/v2.1.1-final.html]]
 
@@ -153,6 +153,18 @@ The administrator would then typically have the following distinguished name
 
 1. Create a directory ##/home/converge/solr/## (or which ever folder was specified in the application server JVM settings above)
 1. Extract all files from ##UNPACK_DIR/solr.zip## to ##/home/converge/solr/##
+
+
+== Building Xuggler from Scratch (Ubuntu) ==
+
+ 1. Log into the Ubuntu box
+ 1. Download the dependencies ##sudo apt-get install libavcodec-extra-52 libavdevice-extra-52 libavfilter-extra-0 libavformat-extra-52 libavutil-extra-49 libpostproc-extra-51 libswscale-extra-0 ant gcc yasm-1 openssl pkg-config perl g++ build-essential libstdc++6 git-core##
+ 1. (On Ubuntu 10.04 and earlier): ##sudo ln -s /usr/bin/yasm-1 /usr/bin/yasm##
+ 1. Download the Xuggle source: ##git clone git://github.com/xuggle/xuggle-xuggler.git##
+ 1. Build the Xuggle sources: ##ant clobber stage##
+ 1. Run the Xuggle tests: ##ant run-tests##
+ 1. Install the compile code into the O/S: ##sudo ant install##
+
 
 = Deploy =
 

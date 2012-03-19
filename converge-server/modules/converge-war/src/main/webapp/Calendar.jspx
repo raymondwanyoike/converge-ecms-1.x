@@ -13,20 +13,22 @@
                 <converge:moduleHeader moduleTitle="#{calendar.title}" />
                 <div class="moduleContent">
                     <rich:dataTable id="dtSchedule" value="#{calendar.schedule}" var="event" rows="25" width="100%" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
+
                         <rich:column styleClass="columnIcon center">
                             <f:facet name="header">
                                 <a4j:status id="scheduleProgress">
                                     <f:facet name="start">
-                                        <h:graphicImage value="#{res.AJAX_LOADING_ICON}" title="#{i18n.Generic_UPDATING}" alt="#{i18n.Generic_UPDATING}" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_AJAX_LOADING}" title="#{i18n.Generic_UPDATING}" alt="#{i18n.Generic_UPDATING}" />
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>
-                            <h:graphicImage value="#{res.EVENT_ICON}" title="#{i18n.Calendar_EVENT}" alt="#{i18n.Calendar_EVENT}"/>
+                            <h:graphicImage value="#{i18n.resource_ICON_EVENT}" title="#{i18n.Calendar_EVENT}" alt="#{i18n.Calendar_EVENT}"/>
 
                         </rich:column>
+
                         <rich:column styleClass="left" sortBy="#{event.startDate}" width="185px">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.Generic_DATE}" />
+                                <h:outputText value="#{i18n.Calendar_EVENT_LIST_DATE}" />
                             </f:facet>
 
                             <h:panelGroup rendered="#{event.allDayEvent}">
@@ -49,6 +51,7 @@
                                 </h:outputText>
                             </h:panelGroup>
                         </rich:column>
+
                         <rich:column styleClass="left" sortBy="#{event.summary}" filterEvent="onkeyup">
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Calendar_EVENT_SUMMARY}" />
@@ -60,14 +63,13 @@
                             </h:outputFormat>
                             <converge:eventToolTip value="#{event}" />
                         </rich:column>
+
                         <rich:column styleClass="left" sortBy="#{event.location}" filterEvent="onkeyup">
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Calendar_EVENT_LOCATION}" />
                             </f:facet>
                             <h:outputText value="#{event.location}" />
                         </rich:column>
-
-
 
                         <rich:column styleClass="left" sortBy="#{event.category}" filterEvent="onkeyup">
                             <f:facet name="header">
@@ -98,7 +100,7 @@
                             <a4j:commandLink onclick="if (confirm('#{i18n.Calendar_EVENT_PROMPT_DELETE}') != true){ return false; };">
                                 <f:setPropertyActionListener value="#{event}" target="#{calendar.selectedEvent}" />
                                 <a4j:support event="oncomplete" actionListener="#{calendar.onDeleteEvent}" reRender="frmPage" limitToList="true" />
-                                <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{res.DELETE_ICON}"/>
+                                <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{i18n.resource_ICON_DELETE}"/>
                             </a4j:commandLink>
                         </rich:column>
 
@@ -106,7 +108,7 @@
                             <a4j:commandLink id="lnkEditEvent" reRender="frmEventDetails">
                                 <f:setPropertyActionListener value="#{event}" target="#{calendar.selectedEvent}" />
                                 <rich:componentControl for="mpEventDetails" operation="show" event="oncomplete" />
-                                <h:graphicImage alt="#{i18n.Generic_UPDATE}" title="#{i18n.Generic_UPDATE}" value="#{res.UPDATE_ICON}"/>
+                                <h:graphicImage alt="#{i18n.Generic_UPDATE}" title="#{i18n.Generic_UPDATE}" value="#{i18n.resource_ICON_EDIT}"/>
                             </a4j:commandLink>
                         </rich:column>
 
@@ -116,7 +118,7 @@
                                 <a4j:support event="oncomplete" actionListener="#{calendar.onNewAssignment}" reRender="frmAssignmentDetails">
                                     <rich:componentControl for="mpAssignmentDetails" operation="show" event="oncomplete" />
                                 </a4j:support>
-                                <h:graphicImage alt="#{i18n.Calendar_ASSIGN}" title="#{i18n.Calendar_ASSIGN}" value="#{res.ASSIGNMENT_ICON}"/>
+                                <h:graphicImage alt="#{i18n.Calendar_ASSIGN}" title="#{i18n.Calendar_ASSIGN}" value="#{i18n.resource_ICON_ASSIGNMENT}"/>
                             </a4j:commandLink>
                         </rich:column>
                     </rich:dataTable>
@@ -134,7 +136,7 @@
                     <f:facet name="controls">
                         <h:panelGroup>
                             <h:graphicImage id="imgCloseEventDetails"
-                                            value="#{res.DIALOGUE_CLOSE_ICON}"
+                                            value="#{i18n.resource_ICON_DIALOGUE_CLOSE}"
                                             style="link" />
                             <rich:componentControl for="mpEventDetails"
                                                    attachTo="imgCloseEventDetails"
@@ -237,7 +239,7 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseEventSubscribe" value="#{res.DIALOGUE_CLOSE_ICON}" style="link" />
+                            <h:graphicImage id="imgCloseEventSubscribe" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
                             <rich:componentControl for="mpCalendarSubscribe"
                                                    attachTo="imgCloseEventSubscribe"
                                                    operation="hide"

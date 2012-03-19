@@ -20,8 +20,8 @@
                                 <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                             </f:facet>
                             <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
-                                <h:graphicImage value="#{res.NEWS_ITEM_ICON}" rendered="#{!item.locked}" title="#{item.status}" alt="#{item.status}"  />
-                                <h:graphicImage value="#{res.LOCK_ICON}" rendered="#{item.locked}" title="#{converge:messagePattern('i18n', 'Inbox_ITEM_LOCKED', item.checkedOutBy, item.checkedOut, null, null, null)}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" rendered="#{!item.locked}" title="#{item.status}" alt="#{item.status}"  />
+                                <h:graphicImage value="#{i18n.resource_ICON_LOCK}" rendered="#{item.locked}" title="#{converge:messagePattern('i18n', 'Inbox_ITEM_LOCKED', item.checkedOutBy, item.checkedOut, null, null, null)}" />
                             </h:outputLink>
                         </rich:column>
 
@@ -107,44 +107,45 @@
                                 </a4j:status>
                             </f:facet>
 
-                            <h:graphicImage url="#{res.EMPTY_FRAME}" rendered="#{!item.renditionsAttached}" />
-
-                            <h:graphicImage url="#{item.preview.absoluteFilename}" rendered="#{item.previewAvailable &amp;&amp; !item.preview.video &amp;&amp; !item.preview.audio}" />
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{item.id}">
+                                <h:graphicImage url="#{i18n.resource_IMAGE_EMPTY_FRAME}" rendered="#{!item.renditionsAttached}" />
+                                <h:graphicImage url="#{item.preview.absoluteFilename}" rendered="#{item.previewAvailable &amp;&amp; !item.preview.video &amp;&amp; !item.preview.audio}" />
+                            </h:outputLink>
 
                             <h:panelGroup rendered="#{item.renditionsAttached &amp;&amp; (item.preview.video || item.preview.audio)}">
                                 <converge:mediaPlayer id="#{item.id}" value="#{item.preview.absoluteFilename}" width="150" height="150" controlbar="none" />
                             </h:panelGroup>
                         </rich:column>
 
-                        <rich:column sortBy="#{item.id}" sortOrder="DESCENDING" styleClass="right columnId">
+                        <rich:column sortBy="#{item.id}" sortOrder="DESCENDING" styleClass="left">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.Inbox_MEDIA_ITEM_ID}"  />
-                            </f:facet>
-                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{item.id}">
-                                <h:outputText value="#{item.id}">
-                                    <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
-                                </h:outputText>
-                            </h:outputLink>
-                        </rich:column>
-
-                        <rich:column sortBy="#{item.title}" styleClass="left">
-                            <f:facet name="header">
-                                <h:outputText value="#{i18n.Generic_TITLE}" title="#{i18n.Inbox_ARTICLE_TITLE_TOOLTIP}" />
+                                <h:outputText value="#{i18n.Inbox_MEDIA_ITEM_DETAILS}" />
                             </f:facet>
                             <h:panelGrid>
-                                <h:panelGrid>
-                                    <h:outputText value="#{item.title}" title="" styleClass="bold" />
+                                <h:column>
+                                    <h:panelGroup class="inbox_media_item_id" layout="block">
+                                        <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{item.id}">
+                                            <h:outputText value="#{item.id}">
+                                                <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
+                                            </h:outputText>
+                                        </h:outputLink>
+                                    </h:panelGroup>
+                                    <h:panelGroup class="inbox_media_item_title" layout="block">
+                                        <h:panelGrid>
+                                            <h:outputText value="#{item.title}" />
+                                            <h:outputFormat class="inbox_media_item_submitter" value="#{i18n.Inbox_SUBMITTED_BY_X_LAST_UPDATED_ON_Y}">
+                                                <f:param value="#{item.owner.fullName}" />
+                                                <f:param value="#{item.updated.time}" />
+                                            </h:outputFormat>
+                                        </h:panelGrid>
+                                    </h:panelGroup>
+                                </h:column>
+                                <h:panelGroup class="inbox_media_item_description" layout="block">
                                     <h:outputText value="#{item.description}" />
-                                </h:panelGrid>
-                            </h:panelGrid>
-                        </rich:column>
-
-                        <rich:column sortBy="#{item.owner}" styleClass="left">
-                            <f:facet name="header">
-                                <h:outputText value="#{i18n.Inbox_SUBMITTER}" />
-                            </f:facet>
-                            <h:panelGrid>
-                                <h:outputText value="#{item.owner.fullName}" title="" />
+                                </h:panelGroup>
+                                <rich:dataList value="#{item.subjects}" var="subject">
+                                    <h:outputText value="#{subject.fullTitle}" title="#{subject.definition}" />
+                                </rich:dataList>
                             </h:panelGrid>
                         </rich:column>
 
@@ -161,18 +162,8 @@
                                     </a4j:support>
                                 </rich:inplaceSelect>
                             </h:panelGroup>
-
-
                         </rich:column>
 
-                        <rich:column sortBy="#{item.updated.time}" styleClass="columnDateTime">
-                            <f:facet name="header">
-                                <h:outputText value="#{i18n.Inbox_UPDATED}" />
-                            </f:facet>
-                            <h:outputText value="#{item.updated.time}">
-                                <f:convertDateTime type="both" pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
-                            </h:outputText>
-                        </rich:column>
 
                     </rich:dataTable>
                     <rich:datascroller id="scInboxMedia" for="dtInboxMedia" align="center" maxPages="99" renderIfSinglePage="false" reRender="scInboxMedia" rendered="#{inbox.showMediaItem}"  />
@@ -271,9 +262,9 @@
                                         <h:outputText value="#{i18n.Inbox_NEWS_ITEM_TITLE}:" />
                                         <converge:message for="txtNewsItemTitle" />
                                     </h:column>
-                                        <h:inputText id="txtNewsItemTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" required="true" requiredMessage="#{i18n.Inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
+                                    <h:inputText id="txtNewsItemTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" required="true" requiredMessage="#{i18n.Inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
 
-                                        <h:outputText value="#{i18n.Inbox_NEWS_ITEM_DEADLINE}:" />
+                                    <h:outputText value="#{i18n.Inbox_NEWS_ITEM_DEADLINE}:" />
                                     <rich:calendar popup="true"
                                                    required="true"
                                                    requiredMessage="#{i18n.Inbox_NEWS_ITEM_DEADLINE_REQUIRED}"

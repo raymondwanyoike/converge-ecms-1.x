@@ -18,6 +18,7 @@ package dk.i2m.converge.core.content.catalogue;
 
 import dk.i2m.converge.core.content.Assignment;
 import dk.i2m.converge.core.metadata.Concept;
+import dk.i2m.converge.core.metadata.Subject;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.utils.BeanComparator;
 import java.io.Serializable;
@@ -29,7 +30,7 @@ import javax.persistence.*;
 
 /**
  * Persisted model represents a digital asset belonging to a {@link Catalogue}
- * A {@link MediaItem} could be an image, audio recording, video clip or 
+ * A {@link MediaItem} could be an image, audio recording, video clip or
  * document.
  *
  * @author Allan Lykke Christensen
@@ -42,7 +43,7 @@ import javax.persistence.*;
     @NamedQuery(name = MediaItem.FIND_BY_OWNER, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.owner = :owner ORDER BY m.id DESC"),
     @NamedQuery(name = MediaItem.FIND_CURRENT_AS_OWNER, query = "SELECT DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :mediaRepository AND m.owner = :user AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.APPROVED AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.REJECTED ORDER BY m.updated DESC"),
     @NamedQuery(name = MediaItem.FIND_CURRENT_AS_EDITOR, query = "SELECT DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :mediaRepository AND (:user MEMBER OF c.editorRole.userAccounts) AND m.status = dk.i2m.converge.core.content.catalogue.MediaItemStatus.SUBMITTED ORDER BY m.updated DESC"),
-    @NamedQuery(name = MediaItem.FIND_BY_OWNER_AND_STATUS, query = "SELECT  DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :mediaRepository AND (m.owner = :user OR :user MEMBER OF c.editorRole.userAccounts) AND m.status = :status ORDER BY m.updated DESC")
+    @NamedQuery(name = MediaItem.FIND_BY_OWNER_AND_STATUS, query = "SELECT  DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :catalogue AND (m.owner = :user OR :user MEMBER OF c.editorRole.userAccounts) AND m.status = :status ORDER BY m.updated DESC")
 })
 public class MediaItem implements Serializable {
 
@@ -107,19 +108,20 @@ public class MediaItem implements Serializable {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "media_item_concept",
-    joinColumns = {@JoinColumn(referencedColumnName = "id", name = "media_item_id", nullable = false)},
-    inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "concept_id", nullable = false)})
+               joinColumns = {@JoinColumn(referencedColumnName = "id", name = "media_item_id", nullable = false)},
+               inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "concept_id", nullable = false)})
     private List<Concept> concepts = new ArrayList<Concept>();
 
     @OneToMany(mappedBy = "mediaItem", fetch = FetchType.EAGER)
     private List<MediaItemRendition> renditions = new ArrayList<MediaItemRendition>();
 
+    @Column(name = "held")
+    private boolean held = false;
+    
     @javax.persistence.Version
     @Column(name = "opt_lock")
     private int versionIdentifier;
-    
-    @Column(name = "held")
-    private boolean held = false;
+
 
     /**
      * Creates a new instance of {@link MediaItem}.
@@ -183,6 +185,23 @@ public class MediaItem implements Serializable {
         this.concepts = concepts;
     }
 
+    /**
+     * Gets a {@link List} of {@link Subject}s. The {@link List} is derived
+     * from the list of {@link Concept}s attached to the {@link MediaItem}.
+     *
+     * @return {@link List} of derived {@link Subject}s from the {@link List} of
+     *         attached {@link Concept}s
+     */
+    public List<Subject> getSubjects() {
+        List<Subject> subjects = new ArrayList<Subject>();
+        for (Concept c : getConcepts()) {
+            if (c instanceof Subject) {
+                subjects.add((Subject) c);
+            }
+        }
+        return subjects;
+    }
+
     public Assignment getAssignment() {
         return assignment;
     }
@@ -234,20 +253,21 @@ public class MediaItem implements Serializable {
     /**
      * Determines if the {@link MediaItem} is being held. That is, if usage of
      * this item should be prevented.
-     * 
-     * @return {@code true} if the {@link MediaItem} is held, otherwise 
+     *
+     * @return {@code true} if the {@link MediaItem} is held, otherwise
      *         {@code false}
      */
     public boolean isHeld() {
         return held;
     }
-    
+
     /**
-     * Set the "Held" status of the {@link MediaItem} is being held. That is, if 
+     * Set the "Held" status of the {@link MediaItem} is being held. That is, if
      * usage of this item should be prevented.
      * 
-     * @param held {@code true} if the {@link MediaItem} is held, otherwise 
-     *             {@code false}
+     * @param held 
+     *          {@code true} if the {@link MediaItem} is held, otherwise
+     *          {@code false}
      */
     public void setHeld(boolean held) {
         this.held = held;
@@ -256,9 +276,9 @@ public class MediaItem implements Serializable {
     /**
      * Gets a {@link List} of {@link Rendition}s not attached
      * to this {@link MediaItem}.
-     * 
-     * @return {@link List} of {@link Rendition}s not attached
-     *         to the {@link MediaItem}
+     *
+     * @return {@link List} of {@link Rendition}s not attached to the 
+     *         {@link MediaItem}
      */
     public List<Rendition> getMissingRenditions() {
         List<Rendition> missing = new ArrayList<Rendition>();
@@ -275,7 +295,7 @@ public class MediaItem implements Serializable {
                 missing.add(rendition);
             }
         }
-        
+
         // Sort the renditions by the label
         Collections.sort(missing, new BeanComparator("label"));
 
@@ -285,7 +305,7 @@ public class MediaItem implements Serializable {
     /**
      * Gets a {@link List} of {@link Rendition}s for this
      * {@link MediaItem}.
-     * 
+     * <p/>
      * @return {@link List} of {@link Rendition}s for this
      *         {@link MediaItem}
      */
@@ -297,10 +317,9 @@ public class MediaItem implements Serializable {
     /**
      * Sets a {@link List} of {@link Rendition}s for this
      * {@link MediaItem}.
-     * 
-     * @param renditions 
-     *          {@link List} of {@link Rendition}s for this
-     *          {@link MediaItem}
+     *
+     * @param renditions
+     *          {@link List} of {@link Rendition}s for this {@link MediaItem}
      */
     public void setRenditions(List<MediaItemRendition> renditions) {
         this.renditions = renditions;
@@ -318,15 +337,16 @@ public class MediaItem implements Serializable {
      * Gets the {@link MediaItemRendition} that should be used to show
      * a preview of the {@link MediaItem}. The preview is based on the
      * {@link Rendition} selected for preview on the {@link Catalogue}.
-     * 
-     * @return {@link MediaItemRendition} to be used for preview, or {@code null}
-     *         if no {@link MediaItemRendition} is suitable for displaying
-     *         a preview.
+     * <p/>
+     * @return {@link MediaItemRendition} to be used for preview, or 
+     *         {@code null} if no {@link MediaItemRendition} is suitable for 
+     *         displaying a preview.
      */
     public MediaItemRendition getPreview() {
         if (isPreviewAvailable()) {
             try {
-                MediaItemRendition preview = findRendition(catalogue.getPreviewRendition());
+                MediaItemRendition preview = findRendition(catalogue.
+                        getPreviewRendition());
                 return preview;
             } catch (RenditionNotFoundException ex) {
                 return null;
@@ -337,7 +357,7 @@ public class MediaItem implements Serializable {
 
     /**
      * Determines if a preview is available of the {@link MediaItem}.
-     * 
+     * <p/>
      * @return {@code true} if a preview is available, otherwise {@link code false}
      */
     public boolean isPreviewAvailable() {
@@ -355,18 +375,18 @@ public class MediaItem implements Serializable {
 
     /**
      * Gets the {@link MediaItemRendition} that represents the original
-     * {@link MediaItem}. The preview is based on the {@link Rendition} 
+     * {@link MediaItem}. The preview is based on the {@link Rendition}
      * selected as the original on the {@link Catalogue}.
-     * 
+     * <p/>
      * @return {@link MediaItemRendition} representing the original
-     *         {@link MediaItem}, or {@code null} if no 
-     *         {@link MediaItemRendition} is suitable for displaying
-     *         a preview.
+     *         {@link MediaItem}, or {@code null} if no
+     *         {@link MediaItemRendition} is suitable for displaying a preview.
      */
     public MediaItemRendition getOriginal() {
         if (isOriginalAvailable()) {
             try {
-                MediaItemRendition original = findRendition(catalogue.getOriginalRendition());
+                MediaItemRendition original = findRendition(catalogue.
+                        getOriginalRendition());
                 return original;
             } catch (RenditionNotFoundException ex) {
                 return null;
@@ -377,7 +397,7 @@ public class MediaItem implements Serializable {
 
     /**
      * Determines if a preview is available of the {@link MediaItem}.
-     * 
+     * <p/>
      * @return {@code true} if a preview is available, otherwise {@link code false}
      */
     public boolean isOriginalAvailable() {
@@ -395,29 +415,31 @@ public class MediaItem implements Serializable {
 
     /**
      * Finds the {@link MediaItemRendition} of a given {@link Rendition}.
-     * 
+     * <p/>
      * @param rendition
      *          {@link Rendition} to find
      * @return {@link MediaItemRendition} of the given {@link Rendition}
      * @throws RenditionNotFoundException 
-     *          If non of the {@link MediaItemRendition} matched the
-     *          given {@link Rendition}
+     *          If non of the {@link MediaItemRendition} matched the given 
+     *          {@link Rendition}
      */
-    public MediaItemRendition findRendition(Rendition rendition) throws RenditionNotFoundException {
+    public MediaItemRendition findRendition(Rendition rendition) throws
+            RenditionNotFoundException {
         return findRendition(rendition.getName());
     }
 
     /**
      * Finds the {@link MediaItemRendition} of a given {@link Rendition}.
-     * 
-     * @param rendition
+     *
+     * @param rendition 
      *          {@link Rendition} to find
      * @return {@link MediaItemRendition} of the given {@link Rendition}
      * @throws RenditionNotFoundException 
-     *          If non of the {@link MediaItemRendition} matched the
-     *          given {@link Rendition}
+     *          If non of the {@link MediaItemRendition} matched the given
+     *          {@link Rendition}
      */
-    public MediaItemRendition findRendition(String rendition) throws RenditionNotFoundException {
+    public MediaItemRendition findRendition(String rendition) throws
+            RenditionNotFoundException {
 
         for (MediaItemRendition mir : getRenditions()) {
             if (mir.getRendition().getName().equalsIgnoreCase(rendition)) {
@@ -429,9 +451,9 @@ public class MediaItem implements Serializable {
 
     /**
      * Determines if any {@link Rendition}s have been attached.
-     * 
-     * @return {@code true} if one or more {@link Rendition}s 
-     *         have been attached, otherwise {@code false}
+     *
+     * @return {@code true} if one or more {@link Rendition}s have been 
+     *         attached, otherwise {@code false}
      */
     public boolean isRenditionsAttached() {
         if (getRenditions() == null || getRenditions().isEmpty()) {
@@ -442,13 +464,13 @@ public class MediaItem implements Serializable {
     }
 
     /**
-     * Determines if a given {@link Rendition} is attached
-     * to the {@link MediaItem}.
-     * 
+     * Determines if a given {@link Rendition} is attached to the 
+     * {@link MediaItem}.
+     *
      * @param rendition
      *          Name of the {@link Rendition}
-     * @return {@code true} if the given {@link Rendition} is
-     *         attached, otherwise {@code false}
+     * @return {@code true} if the given {@link Rendition} is attached,
+     *         otherwise {@code false}
      */
     public boolean isRenditionAttached(String rendition) {
         try {
@@ -468,7 +490,8 @@ public class MediaItem implements Serializable {
             return false;
         }
         final MediaItem other = (MediaItem) obj;
-        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+        if (this.id != other.id
+                && (this.id == null || !this.id.equals(other.id))) {
             return false;
         }
         return true;
