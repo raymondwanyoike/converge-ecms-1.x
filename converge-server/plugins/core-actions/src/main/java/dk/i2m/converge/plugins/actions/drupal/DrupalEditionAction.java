@@ -31,7 +31,6 @@ import dk.i2m.converge.plugins.actions.drupal.client.DrupalConnector;
 import dk.i2m.converge.plugins.actions.drupal.client.fields.TextField;
 import dk.i2m.converge.plugins.actions.drupal.client.messages.DrupalMessage;
 import dk.i2m.converge.plugins.actions.drupal.client.modules.FieldModule;
-import dk.i2m.converge.plugins.actions.drupal.client.resources.FileResource;
 import dk.i2m.converge.plugins.actions.drupal.client.resources.NodeResource;
 import dk.i2m.converge.plugins.actions.drupal.client.resources.UserResource;
 import java.text.SimpleDateFormat;
