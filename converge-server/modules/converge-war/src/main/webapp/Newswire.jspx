@@ -34,7 +34,7 @@
 
                     <h:dataTable value="#{newswire.baskets}" var="basket" rendered="#{newswire.baskets.rowCount &gt; 0}">
                         <h:column>
-                            <h:graphicImage value="#{res.BASKET_ICON}" alt="" title="" />
+                            <h:graphicImage value="#{i18n.resource_ICON_BASKET}" alt="" title="" />
                         </h:column>
                         <h:column>
                             <a4j:commandLink ajaxSingle="true">
@@ -46,7 +46,7 @@
                         <h:column>
                             <a4j:commandLink ajaxSingle="true" reRender="frmBasketDetail" oncomplete="#{rich:component('mpBasketDetail')}.show();">
                                 <f:setPropertyActionListener value="#{basket}" target="#{newswire.selectedBasket}" />
-                                <h:outputText value="(#{i18n.Generic_EDIT})" />
+                                <h:outputText value="#{i18n.Newswire_BASKET_EDIT}" />
                             </a4j:commandLink>
                         </h:column>
                     </h:dataTable>
@@ -186,7 +186,7 @@
                                         <span class="searchResultDescription" style="font-weight: bold; text-transform: uppercase;"><h:outputText value="#{item.note}" escape="false" /></span>
                                         <span class="searchResultDate" style="text-transform:  uppercase;">&#160;
                                             <h:outputText value="#{item.earliestDate}" rendered="#{item.earliestDate != null}">
-                                                <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                                             </h:outputText>
                                         </span>
 
@@ -230,12 +230,18 @@
                                 <rich:dataList value="#{newswire.results.facets[facetName]}" var="facet" style="margin-top: 5px;">
                                     <a4j:commandLink actionListener="#{newswire.onAddFacet}" reRender="frmQuery, frmPage" onclick="jQuery( 'html, body' ).animate( { scrollTop: 0 }, 'slow' );" rendered="#{!facet.selected}">
                                         <f:param name="addFacet" value="#{facet.query}" />
-                                        <h:outputText value="#{facet.name} (#{facet.matches})" />
+                                        <h:outputFormat value="#{i18n.Newswire_SEARCH_FILTER_FACET_EXPAND_X_WITH_Y_RESULTS}">
+                                            <f:param value="#{facet.name}" />
+                                            <f:param value="#{facet.matches}" />
+                                        </h:outputFormat>
                                     </a4j:commandLink>
 
                                     <a4j:commandLink actionListener="#{newswire.onRemoveFacet}" style="font-weight: bold; color: red;" reRender="frmQuery, frmPage" onclick="jQuery( 'html, body' ).animate( { scrollTop: 0 }, 'slow' );" rendered="#{facet.selected}">
                                         <f:param name="filterQuery" value="#{facet.query}" />
-                                        <h:outputText value="(-) #{facet.name} (#{facet.matches})" />
+                                        <h:outputFormat value="#{i18n.Newswire_SEARCH_FILTER_FACET_COLLAPSE_X_WITH_Y_RESULTS}">
+                                            <f:param value="#{facet.name}" />
+                                            <f:param value="#{facet.matches}" />
+                                        </h:outputFormat>
                                     </a4j:commandLink>
                                 </rich:dataList>
                             </ui:repeat>
@@ -394,24 +400,24 @@
 
                         <rich:tabPanel switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
 
-                            <rich:tab label="Search Terms">
+                            <rich:tab label="#{i18n.Newswire_BASKET_SEARCH_TERMS}">
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
-                                    <h:outputText value="Basket title:" />
+                                    <h:outputText value="#{i18n.Newswire_BASKET_TITLE}" />
                                     <h:inputText value="#{newswire.selectedBasket.title}" styleClass="mediumInput" />
 
-                                    <h:outputText value="Free-text search terms:" />
+                                    <h:outputText value="#{i18n.Newswire_BASKET_FREE_TEXT_SEARCH_TERMS}" />
                                     <h:inputTextarea rows="6" cols="60" styleClass="mediumTextArea" value="#{newswire.selectedBasket.searchTerm}" />
                                 </h:panelGrid>
 
                             </rich:tab>
 
-                            <rich:tab label="Tags">
+                            <rich:tab label="#{i18n.Newswire_BASKET_TAGS}">
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
 
                                     <h:panelGrid columns="3">
                                         <h:inputText id="txtNewTag" styleClass="text mediumInput" value="#{newswire.basketTag}" />
-                                        <a4j:commandButton id="btnAdd" value="#{i18n.administrator_Outlets_EDITION_ACTION_PROPERTY_ADD}" actionListener="#{newswire.onAddTagSuggestion}" reRender="dtBasketTags,txtNewTag,sbNewTag" styleClass="button dynamicButton" />
-                                        <rich:suggestionbox id="sbNewTag" for="txtNewTag" var="result" suggestionAction="#{newswire.onTagSuggestion}" ajaxSingle="true" fetchValue="#{result.tag}" minChars="2" nothingLabel="No match">
+                                        <a4j:commandButton id="btnAdd" value="#{i18n.Generic_ADD}" actionListener="#{newswire.onAddTagSuggestion}" reRender="dtBasketTags,txtNewTag,sbNewTag" styleClass="button dynamicButton" />
+                                        <rich:suggestionbox id="sbNewTag" for="txtNewTag" var="result" suggestionAction="#{newswire.onTagSuggestion}" ajaxSingle="true" fetchValue="#{result.tag}" minChars="2" nothingLabel="#{i18n.Newswire_BASKET_TAG_NO_MATCH}">
                                             <h:column>
                                                 <h:outputText value="#{result.tag}" />
                                             </h:column>
@@ -439,47 +445,49 @@
                             </rich:tab>
 
 
-                            <rich:tab label="Services">
+                            <rich:tab label="#{i18n.Newswire_BASKET_SERVICES}">
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:panelGrid styleClass="pluginPropertiesList">
-                                        <rich:pickList value="#{newswire.selectedBasket.appliesTo}" converter="#{converters.newswireServiceConverter}" listsHeight="280" sourceListWidth="200" targetListWidth="200" copyAllControlLabel="Add all" copyControlLabel="Add" removeAllControlLabel="Remove all" removeControlLabel="Remove">
+                                        <rich:pickList value="#{newswire.selectedBasket.appliesTo}" 
+                                                       converter="#{converters.newswireServiceConverter}" 
+                                                       listsHeight="280" sourceListWidth="200" targetListWidth="200" 
+                                                       copyAllControlLabel="#{i18n.pickList_ADD_ALL}" copyControlLabel="#{i18n.pickList_ADD}" removeAllControlLabel="#{i18n.pickList_REMOVE_ALL}" removeControlLabel="#{i18n.pickList_REMOVE}">
                                             <f:selectItems value="#{newswire.availableServices}" />
                                         </rich:pickList>
                                     </h:panelGrid>
                                 </h:panelGrid>
                             </rich:tab>
 
-                            <rich:tab label="E-mail Delivery">
+                            <rich:tab label="#{i18n.Newswire_BASKET_EMAIL_DELIVERY}">
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
-                                    <h:outputText value="Deliver results via e-mail" />
+                                    <h:outputText value="#{i18n.Newswire_BASKET_DELIVER_RESULTS_VIA_EMAIL}" />
                                     <h:selectBooleanCheckbox value="#{newswire.selectedBasket.mailDelivery}">
                                         <a4j:support event="onchange" ajaxSingle="true" reRender="mailFrequency,startHour" />
                                     </h:selectBooleanCheckbox>
 
-                                    <h:outputText value="Delivered to" />
+                                    <h:outputText value="#{i18n.Newswire_BASKET_DELIVERED_TO}" />
                                     <h:outputText value="#{userSession.user.email}" />
 
-
-                                    <h:outputText value="Frequency (every x hours)" />
+                                    <h:outputText value="#{i18n.Newswire_BASKET_EMAIL_DELIVERY_FREQUENCY}" />
                                     <rich:inputNumberSpinner id="mailFrequency" value="#{newswire.selectedBasket.mailFrequency}" minValue="1" maxValue="1000" enableManualInput="true" disabled="#{!newswire.selectedBasket.mailDelivery}"  />
 
-                                    <h:outputText value="Starting hour (0 - 23)" />
+                                    <h:outputText value="#{i18n.Newswire_BASKET_EMAIL_DELIVERY_START}" />
                                     <rich:inputNumberSpinner id="startHour" value="#{newswire.selectedBasket.hourFirstDelivery}" minValue="0" maxValue="23" enableManualInput="true" disabled="#{!newswire.selectedBasket.mailDelivery}"  />
 
-                                    <h:outputText value="Last delivery" />
-                                    <h:outputText value="Not yet delivered" rendered="#{newswire.selectedBasket.lastDelivery == null}" styleClass="italic" />
+                                    <h:outputText value="#{i18n.Newswire_BASKET_EMAIL_DELIVERY_LAST_DELIVERY}" />
+                                    <h:outputText value="#{i18n.Newswire_BASKET_EMAIL_DELIVERY_LAST_DELIVERY_NOT_YET_DELIVERED}" rendered="#{newswire.selectedBasket.lastDelivery == null}" styleClass="italic" />
 
                                     <h:outputText value="#{newswire.selectedBasket.lastDelivery}" rendered="#{newswire.selectedBasket.lastDelivery != null}">
                                         <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                                     </h:outputText>
 
-                                    <h:outputText value="Next delivery" />
-                                    <h:outputText value="Delivery not enabled" rendered="#{newswire.selectedBasket.nextDelivery == null}" styleClass="italic" />
+                                    <h:outputText value="#{i18n.Newswire_BASKET_EMAIL_DELIVERY_NEXT_DELIVERY}" />
+                                    <h:outputText value="#{i18n.Newswire_BASKET_EMAIL_DELIVERY_NEXT_DELIVERY_NOT_ENABLED}" rendered="#{newswire.selectedBasket.nextDelivery == null}" styleClass="italic" />
 
                                     <h:outputText value="#{newswire.selectedBasket.nextDelivery}" rendered="#{newswire.selectedBasket.nextDelivery != null}">
                                         <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                                     </h:outputText>
-                                    
+
                                 </h:panelGrid>
                             </rich:tab>
                         </rich:tabPanel>
