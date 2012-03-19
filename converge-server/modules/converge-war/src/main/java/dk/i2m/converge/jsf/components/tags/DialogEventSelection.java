@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
  */
 package dk.i2m.converge.jsf.components.tags;
 
-import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.calendar.Event;
+import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.ejb.facades.CalendarFacadeLocal;
+import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.converge.utils.CalendarUtils;
 import dk.i2m.jsf.JsfUtils;
-import java.text.MessageFormat;
 import java.util.Calendar;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.DataModel;
@@ -70,8 +70,10 @@ public class DialogEventSelection {
         }
 
         if (assignment.getTitle() == null || assignment.getTitle().isEmpty()) {
-            String msg = JsfUtils.getResourceBundle().getString("planning_COVER_X_EVENT");
-            String title = MessageFormat.format(msg, event.getSummary());
+            
+            String title = JsfUtils.getMessage(Bundle.i18n.name(), 
+                    "DialogEventSelection_COVER_X_EVENT", 
+                    new Object[]{event.getSummary()});
 
             assignment.setTitle(title);
         }
