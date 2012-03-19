@@ -377,13 +377,14 @@ public class Inbox {
 
     /**
      * Event handler for handling selection of outlet and catalogue folders.
-     * <p/>
-     * @param event Event that invoked the handler
+     *
+     * @param event 
+     *          Event that invoked the handler
      */
     public void onOutletFolderSelect(NodeSelectedEvent event) {
         this.catalogueEditor = false;
-        HtmlTree tree = (HtmlTree) event.getComponent();
 
+        HtmlTree tree = (HtmlTree) event.getComponent();
         OutletNode node = (OutletNode) tree.getRowData();
 
         if (node.getData() instanceof Outlet) {
@@ -428,10 +429,12 @@ public class Inbox {
             }
             MediaItemStatus status = (MediaItemStatus) node.getData();
 
-            String catalogueStatus = JsfUtils.getMessage("18n", "Generic_MEDIA_ITEM_STATUS_"
+            String catalogueStatus = JsfUtils.getMessage(Bundle.i18n.name(),
+                    "Generic_MEDIA_ITEM_STATUS_"
                     + status.name(), new Object[]{});
-            inboxTitle = JsfUtils.getMessage("i18n", "Inbox_CATALOGUE_STATUS",
-                    new Object[]{catalogue.getName(), catalogueStatus});
+            inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
+                    "Inbox_CATALOGUE_STATUS", new Object[]{catalogue.getName(),
+                        catalogueStatus});
             mediaItems =
                     new ListDataModel(catalogueFacade.findCurrentMediaItems(
                     getUser(), status, catalogue.getId()));
