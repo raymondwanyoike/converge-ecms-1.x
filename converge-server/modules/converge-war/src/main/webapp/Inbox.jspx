@@ -14,14 +14,16 @@
                 <converge:moduleHeader moduleTitle="#{inbox.inboxTitle}" />
                 <div class="moduleContent">
 
-                    <rich:dataTable id="dtInbox" value="#{inbox.newsItems}" var="item" styleClass="table" headerClass="tableHeader" rowClasses="odd, even" rendered="#{inbox.showNewsItem}" rows="20">
+                    <rich:dataTable id="dtInbox" value="#{inbox.newsItems}" var="item" styleClass="table" headerClass="tableHeader" 
+                                    rowClasses="odd, even" rendered="#{inbox.showNewsItem}" rows="20">
                         <rich:column styleClass="center columnIcon">
                             <f:facet name="header">
                                 <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                             </f:facet>
                             <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
                                 <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" rendered="#{!item.locked}" title="#{item.status}" alt="#{item.status}"  />
-                                <h:graphicImage value="#{i18n.resource_ICON_LOCK}" rendered="#{item.locked}" title="#{converge:messagePattern('i18n', 'Inbox_ITEM_LOCKED', item.checkedOutBy, item.checkedOut, null, null, null)}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_LOCK}" rendered="#{item.locked}" 
+                                                title="#{converge:messagePattern('i18n', 'Inbox_ITEM_LOCKED', item.checkedOutBy, item.checkedOut, null, null, null)}" />
                             </h:outputLink>
                         </rich:column>
 
@@ -43,8 +45,18 @@
                             <h:panelGrid>
                                 <h:outputText value="#{item.slugline}" title="" rendered="#{item.slugline != null || item.slugline != ''}" />
                                 <h:outputText value="#{item.title}" title="" />
-                                <h:outputText value="#{i18n.Inbox_ARTICLE_WORD_COUNT}: #{item.wordCount}" rendered="#{item.targetWordCount &lt;= 0}" styleClass="small" />
-                                <h:outputText value="#{i18n.Inbox_ARTICLE_WORD_COUNT}: #{item.wordCount} (#{item.targetWordCount})" rendered="#{item.targetWordCount &gt; 0}" styleClass="small" />
+                                
+                                <h:outputFormat value="#{i18n.Inbox_NEWS_ITEM_WORD_COUNT_X}" styleClass="small"
+                                                rendered="#{item.targetWordCount &lt;= 0}">
+                                    <f:param value="#{item.wordCount}" />
+                                </h:outputFormat>
+                                
+                                <h:outputFormat value="#{i18n.Inbox_NEWS_ITEM_WORD_COUNT_X_TARGET_WORD_COUNT_Y}" styleClass="small"
+                                                rendered="#{item.targetWordCount &gt; 0}">
+                                    <f:param value="#{item.wordCount}" />
+                                    <f:param value="#{item.targetWordCount}" />
+                                </h:outputFormat>
+                                
                             </h:panelGrid>
                         </rich:column>
 
@@ -94,7 +106,9 @@
 
 
 
-                    <rich:dataTable id="dtInboxMedia" value="#{inbox.mediaItems}" var="item" styleClass="table" headerClass="tableHeader" rowClasses="odd, even" rendered="#{inbox.showMediaItem}" rows="20">
+                    <rich:dataTable id="dtInboxMedia" value="#{inbox.mediaItems}" var="item" rows="20"
+                                    styleClass="table" headerClass="tableHeader" rowClasses="odd, even" 
+                                    rendered="#{inbox.showMediaItem}">
                         <rich:column styleClass="center columnThumbnail">
                             <f:facet name="header">
                                 <a4j:status id="staMediaItems" forceId="true">
@@ -164,7 +178,6 @@
                             </h:panelGroup>
                         </rich:column>
 
-
                     </rich:dataTable>
                     <rich:datascroller id="scInboxMedia" for="dtInboxMedia" align="center" maxPages="99" renderIfSinglePage="false" reRender="scInboxMedia" rendered="#{inbox.showMediaItem}"  />
 
@@ -195,13 +208,18 @@
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:outputText value="#{i18n.Inbox_ASSIGNMENT_TITLE}" />
-                                    <h:inputText id="txtStoryTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" required="true" requiredMessage="#{i18n.Inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
+                                    <h:inputText id="txtStoryTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" 
+                                                 required="true" requiredMessage="#{i18n.Inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
 
                                     <h:outputText value="#{i18n.Inbox_ASSIGNMENT_DEADLINE}" />
-                                    <rich:calendar popup="true" required="true" requiredMessage="#{i18n.Inbox_NEWS_ITEM_DEADLINE_REQUIRED}" value="#{inbox.newAssignment.assignment.deadline.time}" datePattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" firstWeekDay="1" timeZone="#{userSession.user.timeZone}"/>
+                                    <rich:calendar popup="true" required="true" requiredMessage="#{i18n.Inbox_NEWS_ITEM_DEADLINE_REQUIRED}" 
+                                                   value="#{inbox.newAssignment.assignment.deadline.time}" 
+                                                   datePattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" 
+                                                   firstWeekDay="1" timeZone="#{userSession.user.timeZone}"/>
 
                                     <h:outputText value="#{i18n.Inbox_ASSIGNMENT_OUTLET}" />
-                                    <h:selectOneMenu id="somOutlet" styleClass="text mediumInput" value="#{inbox.newAssignment.newsItem.outlet}" converter="#{converters.outletConverter}">
+                                    <h:selectOneMenu id="somOutlet" styleClass="text mediumInput" value="#{inbox.newAssignment.newsItem.outlet}" 
+                                                     converter="#{converters.outletConverter}">
                                         <f:selectItem itemLabel="" />
                                         <f:selectItems value="#{inbox.privilegedOutlets}" />
                                     </h:selectOneMenu>
@@ -215,10 +233,13 @@
 
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:outputText value="#{i18n.Inbox_ASSIGNMENT_TITLE}" />
-                                    <h:inputText id="txtMediaTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" required="true" requiredMessage="#{i18n.Inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
+                                    <h:inputText id="txtMediaTitle" styleClass="text mediumInput" value="#{inbox.newAssignment.title}" 
+                                                 required="true" requiredMessage="#{i18n.Inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
 
                                     <h:outputText value="#{i18n.Inbox_ASSIGNMENT_MEDIA_REPOSITORY}" />
-                                    <h:selectOneMenu id="somMediaRepository" styleClass="text mediumInput" value="#{inbox.newAssignment.mediaItem.catalogue}" converter="#{converters.mediaRepositoryConverter}">
+                                    <h:selectOneMenu id="somMediaRepository" styleClass="text mediumInput" 
+                                                     value="#{inbox.newAssignment.mediaItem.catalogue}" 
+                                                     converter="#{converters.mediaRepositoryConverter}">
                                         <f:selectItem itemLabel="" />
                                         <f:selectItems value="#{userSession.myCatalogues}" />
                                     </h:selectOneMenu>

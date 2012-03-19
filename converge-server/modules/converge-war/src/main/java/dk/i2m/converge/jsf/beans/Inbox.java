@@ -140,7 +140,7 @@ public class Inbox {
      * Action listeners for preparing the creation of a new assignment.
      *
      * @param event
-* {@link ActionEvent} that invoked the listener.
+     * {@link ActionEvent} that invoked the listener.
      */
     public void onNewAssignment(ActionEvent event) {
         try {
@@ -240,23 +240,23 @@ public class Inbox {
                     }
 
                     JsfUtils.createMessage("frmInbox",
-                            FacesMessage.SEVERITY_INFO,
-                            "inbox_ASSIGNMENT_CREATED");
+                            FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                            "Inbox_ASSIGNMENT_CREATED");
                 } catch (DuplicateExecutionException ex) {
                     // Double click prevention - stamp in log
                     LOG.log(Level.INFO, ex.getMessage());
                 } catch (WorkflowStateTransitionException ex) {
                     JsfUtils.createMessage("frmInbox",
-                            FacesMessage.SEVERITY_ERROR,
-                            "inbox_ASSIGNMENT_CREATION_ERROR");
+                            FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                            "Inbox_ASSIGNMENT_CREATION_ERROR");
                     LOG.log(Level.SEVERE, ex.getMessage(), ex);
                 }
                 break;
             case MEDIA_ITEM:
                 if (newAssignment.getMediaItem().getCatalogue() == null) {
                     JsfUtils.createMessage("frmInbox",
-                            FacesMessage.SEVERITY_ERROR,
-                            "inbox_MEDIA_ITEM_MEDIA_REPOSITORY_REQUIRED");
+                            FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                            "Inbox_MEDIA_ITEM_CATELOGUE_REQUIRED");
                     return;
                 }
 
@@ -270,7 +270,7 @@ public class Inbox {
                 this.createdItemLink = "MediaItemDetails.xhtml?id=" + newItem.
                         getId();
                 JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_INFO,
-                        "inbox_ASSIGNMENT_CREATED");
+                        Bundle.i18n.name(), "Inbox_ASSIGNMENT_CREATED");
                 showNewsItem = false;
                 break;
         }
@@ -284,14 +284,15 @@ public class Inbox {
      * Action Listener for removing articles marked as deleted.
      *
      * @param event
-* {@link ActionEvent} that invoked the listener
+     * {@link ActionEvent} that invoked the listener
      */
     public void onEmptyTrash(ActionEvent event) {
         int deleted = newsItemFacade.emptyTrash(getUser().getUsername());
         onShowMyAssignments(event);
 
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                "ARTICLES_DELETED", new Object[]{deleted});
+                Bundle.i18n.name(), "Inbox_X_ITEMS_DELETED", new Object[]{
+                    deleted});
     }
 
     /**
@@ -301,8 +302,7 @@ public class Inbox {
      */
     public void onShowMyAssignments(ActionEvent event) {
         showNewsItem = true;
-        inboxTitle = JsfUtils.getResourceBundle().getString(
-                "inbox_MY_ASSIGNMENTS");
+        this.inboxTitle = bundle.getString("Inbox_MY_ASSIGNMENTS");
         List<InboxView> inboxView = newsItemFacade.findInbox(getUser().
                 getUsername());
         this.newsItems = new ListDataModel(inboxView);
