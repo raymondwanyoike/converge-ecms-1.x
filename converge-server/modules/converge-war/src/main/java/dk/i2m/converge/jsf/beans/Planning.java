@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 - 2011 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.converge.core.DataNotFoundException;
-import dk.i2m.converge.core.logging.LogEntry;
 import dk.i2m.converge.core.calendar.Event;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.dto.EditionAssignmentView;
 import dk.i2m.converge.core.dto.EditionView;
 import dk.i2m.converge.core.dto.OutletActionView;
+import dk.i2m.converge.core.logging.LogEntry;
 import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.workflow.*;
@@ -35,8 +35,8 @@ import dk.i2m.converge.jsf.components.tags.UIEventListener;
 import dk.i2m.converge.utils.CalendarUtils;
 import dk.i2m.jsf.JsfUtils;
 import java.text.MessageFormat;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -47,13 +47,13 @@ import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 
 /**
- * Managed backing bean for the planning view.
+ * Backing bean for the planning view.
  *
  * @author Allan Lykke Christensen
  */
 public class Planning implements UIEventListener {
 
-    private static final Logger log = Logger.getLogger(Planning.class.getName());
+    private static final Logger LOG = Logger.getLogger(Planning.class.getName());
 
     @EJB private OutletFacadeLocal outletFacade;
 
@@ -108,6 +108,8 @@ public class Planning implements UIEventListener {
     private DataModel openAssignments = null;
 
     private DataModel logEntries = new ListDataModel();
+    
+    private ResourceBundle bundle = JsfUtils.getResourceBundle(Bundle.i18n.name());
 
     /**
      * Creates a new instance of {@link Planning}.
@@ -191,10 +193,10 @@ public class Planning implements UIEventListener {
                     edition.isOpen(), edition.getPublicationDate(), edition.
                     getExpirationDate(), edition.getCloseDate());
             fetchEditions();
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "planning_EDITION_SAVED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "Planning_EDITION_SAVED");
         } else {
-            log.warning("Selected edition already exist in the database");
+            LOG.warning("Selected edition already exist in the database");
         }
     }
 
@@ -202,8 +204,8 @@ public class Planning implements UIEventListener {
         if (id != null) {
             newsItemFacade.deletePlacementById(id);
             fetchEditions();
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "planning_PLACEMENT_REMOVED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "Planning_PLACEMENT_REMOVED");
         }
     }
 
@@ -219,8 +221,8 @@ public class Planning implements UIEventListener {
                     getPublicationDate(),
                     selectedEditionView.getExpirationDate(),
                     selectedEditionView.getCloseDate());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "planning_EDITION_SAVED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "Planning_EDITION_SAVED");
         } else {
             try {
                 selectedEdition =
@@ -228,11 +230,11 @@ public class Planning implements UIEventListener {
                         selectedEditionView.isOpen(), selectedEditionView.
                         getPublicationDate(), selectedEditionView.
                         getExpirationDate(), selectedEditionView.getCloseDate());
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                        "planning_EDITION_UPDATED");
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                        "Planning_EDITION_UPDATED");
             } catch (DataNotFoundException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                        "planning_EDITION_NO_LONGER_EXIST");
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                        "Planning_EDITION_NO_LONGER_EXIST");
             }
         }
 
@@ -248,8 +250,8 @@ public class Planning implements UIEventListener {
     public void onExecuteAllActions(ActionEvent event) {
         if (selectedEditionView != null) {
             outletFacade.scheduleActions(selectedEditionView.getId());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "planning_EDITION_ACTIONS_SCHEDULED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "Planning_EDITION_ACTIONS_SCHEDULED");
         }
     }
 
@@ -263,7 +265,7 @@ public class Planning implements UIEventListener {
         if (selectedNewsItemPlacement != null) {
             outletFacade.scheduleNewsItemPlacementActions(selectedNewsItemPlacement.
                     getEdition().getId(), selectedNewsItemPlacement.getId());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
                     "Editions_ACTIONS_SCHEDULED_FOR_NEWS_ITEM", null);
         }
     }
@@ -279,7 +281,7 @@ public class Planning implements UIEventListener {
             outletFacade.scheduleNewsItemPlacementAction(
                     selectedNewsItemPlacement.getEdition().
                     getId(), id, selectedNewsItemPlacement.getId());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
                     "Editions_ACTION_SCHEDULED_FOR_NEWS_ITEM", null);
         }
     }
@@ -287,13 +289,14 @@ public class Planning implements UIEventListener {
     /**
      * Schedules the execution of the given edition action.
      *
-     * @param action * {@link OutletEditionAction} to execute
+     * @param id
+     *          Unique identifier of the {@link OutletEditionAction} to execute
      */
     public void setExecuteAction(Long id) {
         if (selectedEditionView != null && id != null) {
             outletFacade.scheduleAction(selectedEditionView.getId(), id);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "planning_EDITION_ACTION_SCHEDULED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "Planning_EDITION_ACTION_SCHEDULED");
         }
     }
 
@@ -308,20 +311,19 @@ public class Planning implements UIEventListener {
         if (isAssignmentAddMode()) {
             try {
                 selectedAssignment = newsItemFacade.start(selectedAssignment);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                        "planning_EDITION_PLACEMENT_CREATED");
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                        "Planning_EDITION_PLACEMENT_CREATED");
             } catch (WorkflowStateTransitionException ex) {
-                Logger.getLogger(Planning.class.getName()).log(Level.SEVERE,
-                        null, ex);
+                LOG.log(Level.SEVERE, null, ex);
             }
         } else {
             try {
                 selectedAssignment = newsItemFacade.checkin(selectedAssignment);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                        "planning_EDITION_PLACEMENT_UPDATED");
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                        "Planning_EDITION_PLACEMENT_UPDATED");
             } catch (LockingException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                        false, ex.getMessage(), null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
             }
         }
         fetchEditions();
@@ -340,13 +342,13 @@ public class Planning implements UIEventListener {
             try {
                 selectedAssignment = newsItemFacade.checkin(selectedAssignment);
             } catch (LockingException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                        false, ex.getMessage(), null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
             }
         }
 
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                "planning_EDITION_PLACEMENT_DELETED");
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                "Planning_EDITION_PLACEMENT_DELETED");
         fetchEditions();
     }
 
@@ -521,17 +523,10 @@ public class Planning implements UIEventListener {
      * @return formatted title for the Edition bar
      */
     public String getEditionTitle() {
-        String pattern;
-
         if (selectedDate != null) {
-            pattern = JsfUtils.getResourceBundle().getString(
-                    "planning_EDITION_TITLE");
-            return MessageFormat.format(pattern, selectedOutlet.getTitle(),
-                    selectedDate);
+            return JsfUtils.getMessage(Bundle.i18n.name(), "Planning_EDITION_TITLE", new Object[]{selectedOutlet.getTitle(), selectedDate});
         } else {
-            pattern = JsfUtils.getResourceBundle().getString(
-                    "planning_EDITION_TITLE_NO_DATE");
-            return MessageFormat.format(pattern, selectedOutlet.getTitle());
+            return JsfUtils.getMessage(Bundle.i18n.name(), "Planning_EDITION_TITLE_NO_DATE", new Object[]{selectedOutlet.getTitle()});
         }
     }
 
@@ -551,7 +546,7 @@ public class Planning implements UIEventListener {
     /**
      * Updates the changes of a {@link NewsItemPlacement}.
      *
-     * @param placement * Placement to update
+     * @param assignment Placement to update
      */
     public void setUpdatePlacement(EditionAssignmentView assignment) {
         newsItemFacade.updatePlacement(assignment.getPlacementId(), assignment.
@@ -560,7 +555,7 @@ public class Planning implements UIEventListener {
 
     private void fetchEditions() {
         if (!(isOutletSelected() && isDateSelected())) {
-            log.log(Level.FINEST, "Outlet [{0}] or date [{1}] is not selected",
+            LOG.log(Level.FINEST, "Outlet [{0}] or date [{1}] is not selected",
                     new Object[]{selectedOutlet, selectedDate});
             return;
         }
@@ -574,7 +569,7 @@ public class Planning implements UIEventListener {
             this.selectedPlacementActions = outletFacade.
                     findOutletPlacementActions(selectedOutlet.getId());
         } catch (DataNotFoundException ex) {
-            log.log(Level.WARNING, "Unknown Outlet");
+            LOG.log(Level.WARNING, "Unknown Outlet");
             this.selectedOutletActions = new ArrayList<OutletActionView>();
             this.selectedPlacementActions = new ArrayList<OutletActionView>();
         }
@@ -607,10 +602,7 @@ public class Planning implements UIEventListener {
             return;
         }
 
-        String msg = JsfUtils.getResourceBundle().getString(
-                "planning_COVER_X_EVENT");
-        String title = MessageFormat.format(msg, selectedEventFromCalendar.
-                getSummary());
+        String title = JsfUtils.getMessage(Bundle.i18n.name(), "Planning_COVER_X_EVENT", new Object[]{ selectedEventFromCalendar.getSummary()});
 
         this.selectedAssignment.setTitle(title);
         this.selectedAssignment.setEvent(selectedEventFromCalendar);
@@ -706,11 +698,9 @@ public class Planning implements UIEventListener {
 
     public void onDeleteAssignment(ActionEvent event) {
         if (newsItemFacade.deleteNewsItem(selectedAssignment.getId())) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "planning_ASSIGNMENT_DELETED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(), "Planning_ASSIGNMENT_DELETED");
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    "planning_ASSIGNMENT_COULD_NOT_BE_DELETED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(), "Planning_ASSIGNMENT_COULD_NOT_BE_DELETED");
         }
         onRefreshOpenAssignments(event);
         onRefreshPipeline(event);
@@ -736,8 +726,7 @@ public class Planning implements UIEventListener {
             dialogEventSelection = new DialogEventSelection(calendarFacade);
             dialogEventSelection.setAssignment(dialogAssignment.getAssignment());
         } catch (DataNotFoundException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(), "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
         }
     }
 
@@ -814,11 +803,11 @@ public class Planning implements UIEventListener {
 
     public void onRefreshPipeline(ActionEvent event) {
         if (selectedOutlet == null) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    "planning_SELECT_OUTLET_ERROR");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                    "Planning_SELECT_OUTLET_ERROR");
         } else if (selectedState == null) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    "planning_SELECT_STATE_ERROR");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                    "Planning_SELECT_STATE_ERROR");
         } else {
             List<NewsItem> items = newsItemFacade.findByStateAndOutlet(
                     selectedState, selectedOutlet);
@@ -910,7 +899,7 @@ public class Planning implements UIEventListener {
             onRefreshNewsItemLogEntries(null);
         } catch (DataNotFoundException ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    "i18n", "Editions_NEWS_ITEM_COULD_NOT_BE_FOUND");
+                    Bundle.i18n.name(), "Editions_NEWS_ITEM_COULD_NOT_BE_FOUND");
         }
     }
 
