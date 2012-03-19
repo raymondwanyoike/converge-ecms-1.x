@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@ import dk.i2m.converge.ejb.services.ConfigurationServiceLocal;
 import dk.i2m.converge.ejb.services.PeriodicTimer;
 import dk.i2m.converge.ejb.services.TimerException;
 import dk.i2m.converge.ejb.services.TimerServiceLocal;
+import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.jsf.JsfUtils;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -42,7 +42,8 @@ import javax.faces.model.ListDataModel;
  */
 public class SearchEngine {
 
-    private static final Logger logger = Logger.getLogger(SearchEngine.class.getName());
+    private static final Logger LOG = Logger.getLogger(SearchEngine.class.
+            getName());
 
     @EJB private SearchEngineLocal searchEngine;
 
@@ -57,10 +58,11 @@ public class SearchEngine {
 
     public Date getNextProcess() {
         try {
-            SystemTimer timer = timerService.getTimer(PeriodicTimer.SEARCH_ENGINE_INDEXING);
+            SystemTimer timer = timerService.getTimer(
+                    PeriodicTimer.SEARCH_ENGINE_INDEXING);
             return timer.getNextTimeout();
         } catch (TimerException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
         }
         return null;
     }
@@ -72,10 +74,13 @@ public class SearchEngine {
     public void onOptimize(ActionEvent event) {
         try {
             searchEngine.optimizeIndex();
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "SEARCH_ENGINE_OPTIMIZED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(), "administrator_SearchEngine_OPTIMISED");
         } catch (SearchEngineIndexingException ex) {
-            logger.log(Level.SEVERE, ex.getMessage());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_WARN, "SEARCH_ENGINE_OPTIMIZE_ERROR");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_WARN,
+                    Bundle.i18n.name(),
+                    "administrator_SearchEngine_OPTIMISE_ERROR",
+                    new Object[]{ex.getMessage()});
         }
     }
 
