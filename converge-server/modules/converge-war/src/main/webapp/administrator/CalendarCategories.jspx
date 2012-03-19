@@ -13,7 +13,7 @@
           xmlns:converge="http://com.interactivemediamanagement.converge/tags">
 
     <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
-        <ui:define name="title">#{i18n.CalendarCategories_CATEGORIES_TITLE}</ui:define>
+        <ui:define name="title">#{i18n.administrator_CalendarCategories_PAGE_TITLE}</ui:define>
 
         <ui:define name="body">
             <a4j:keepAlive beanName="administrator_CalendarCategories" />
@@ -21,14 +21,14 @@
                 <v:message />
             </a4j:outputPanel>
             <h:form id="frmCalendarCategories">
-                <converge:moduleHeader moduleTitle="#{i18n.CalendarCategories_CATEGORY}" />
+                <converge:moduleHeader moduleTitle="#{i18n.administrator_CalendarCategories_CATEGORY}" />
                 <div class="moduleContent">
 
                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                         <h:outputText value="" />
                         <a4j:commandButton id="btnNewCategory"
                                            styleClass="button mediumButton"
-                                           value="#{i18n.CalendarCategories_CATEGORY_NAME}"
+                                           value="#{i18n.administrator_CalendarCategories_CATEGORY_NEW}"
                                            actionListener="#{administrator_CalendarCategories.onNew}"
                                            reRender="frmEventCategoryDetails">
                             <rich:componentControl for="mpEventCategoryDetails"
@@ -61,14 +61,14 @@
                                 <rich:componentControl for="mpEventCategoryDetails"
                                                        operation="show"
                                                        event="oncomplete" />
-                                <h:graphicImage alt="#{i18n.CalendarCategories_CATEGORY}"
-                                                title="#{i18n.CalendarCategories_CATEGORY}"
-                                                value="#{res.EVENT_CATEGORY_ICON}" />
+                                <h:graphicImage alt="#{i18n.administrator_CalendarCategories_CATEGORY}"
+                                                title="#{i18n.administrator_CalendarCategories_CATEGORY}"
+                                                value="#{i18n.resource_ICON_EVENT_CATEGORY}" />
                             </a4j:commandLink>
                         </rich:column>
                         <rich:column sortBy="#{category.name}" sortOrder="ASCENDING">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.CalendarCategories_CATEGORY}" />
+                                <h:outputText value="#{i18n.administrator_CalendarCategories_CATEGORY}" />
                             </f:facet>
                             <a4j:commandLink reRender="frmEventCategoryDetails">
                                 <f:setPropertyActionListener value="#{category}"
@@ -81,7 +81,7 @@
                         </rich:column>
                         <rich:column sortBy="#{category.description}">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.CalendarCategories_CATEGORY_DESCRIPTION}" />
+                                <h:outputText value="#{i18n.administrator_CalendarCategories_CATEGORY_DESCRIPTION}" />
                             </f:facet>
                             <h:outputText value="#{category.description}" />
                         </rich:column>
@@ -93,7 +93,7 @@
                 <rich:modalPanel id="mpEventCategoryDetails" autosized="true" domElementAttachment="parent">
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="#{i18n.CalendarCategories_CATEGORY}"></h:outputText>
+                            <h:outputText value="#{i18n.administrator_CalendarCategories_CATEGORY}"></h:outputText>
                         </h:panelGroup>
                     </f:facet>
                     <f:facet name="controls">
@@ -115,12 +115,12 @@
                                        activeTabClass="tabActive"
                                        inactiveTabClass="tabInactive">
 
-                            <rich:tab label="#{i18n.CalendarCategories_CATEGORY}">
+                            <rich:tab label="#{i18n.administrator_CalendarCategories_CATEGORY}">
                                 <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
-                                    <h:outputText value="#{i18n.CalendarCategories_CATEGORY_NEW}" />
-                                    <h:inputText value="#{administrator_CalendarCategories.selectedCategory.name}" required="true" requiredMessage="#{i18n.calendar_CATEGORY_NAME_REQUIRED}" styleClass="text" />
+                                    <h:outputText value="#{i18n.administrator_CalendarCategories_CATEGORY_NAME}" />
+                                    <h:inputText value="#{administrator_CalendarCategories.selectedCategory.name}" required="true" requiredMessage="#{i18n.administrator_CalendarCategories_CATEGORY_NAME_REQUIRED}" styleClass="text" />
 
-                                    <h:outputText value="#{i18n.CalendarCategories_CATEGORY_DESCRIPTION}" />
+                                    <h:outputText value="#{i18n.administrator_CalendarCategories_CATEGORY_DESCRIPTION}" />
                                     <h:inputTextarea value="#{administrator_CalendarCategories.selectedCategory.description}" styleClass="text mediumTextArea"/>
                                 </h:panelGrid>
                             </rich:tab>
@@ -142,7 +142,7 @@
 
                             <a4j:commandLink id="lnkDeleteEventCategoryDetails"
                                              rendered="#{administrator_CalendarCategories.editMode}"
-                                             onclick="if (confirm('#{i18n.CalendarCategories_CATEGORY_PROMPT_DELETE}') != true){ return false; };"
+                                             onclick="if (confirm('#{i18n.administrator_CalendarCategories_CATEGORY_PROMPT_DELETE}') != true){ return false; };"
                                              actionListener="#{administrator_CalendarCategories.onDelete}"
                                              styleClass="dialogButton"
                                              value="#{i18n.Generic_DELETE}"

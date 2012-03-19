@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@ package dk.i2m.converge.jsf.beans.administrator;
 
 import dk.i2m.converge.core.calendar.EventCategory;
 import dk.i2m.converge.ejb.facades.CalendarFacadeLocal;
+import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.jsf.JsfUtils;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -26,7 +27,7 @@ import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 
 /**
- * Backing bean for <code>/administrator/CalendarCategories.jspx</code>.
+ * Backing bean for {@code /administrator/CalendarCategories.jspx}.
  *
  * @author Allan Lykke Christensen
  */
@@ -40,11 +41,15 @@ public class CalendarCategories {
 
     public void onSave(ActionEvent event) {
         if (event.getComponent().getId().equalsIgnoreCase("lnkSaveEventCategoryDetails")) {
-            calendarFacade.create(selectedCategory);
-            JsfUtils.createMessage("frmEventCategories", FacesMessage.SEVERITY_INFO, "calendar_EVENT_CATEGORY_CREATED");
+            selectedCategory = calendarFacade.create(selectedCategory);
+            JsfUtils.createMessage("frmEventCategories", 
+                    FacesMessage.SEVERITY_INFO, Bundle.i18n.name(), 
+                    "administrator_CalendarCategories_EVENT_CATEGORY_CREATED");
         } else {
-            calendarFacade.update(selectedCategory);
-            JsfUtils.createMessage("frmEventCategories", FacesMessage.SEVERITY_INFO, "calendar_EVENT_CATEGORY_UPDATED");
+            selectedCategory = calendarFacade.update(selectedCategory);
+            JsfUtils.createMessage("frmEventCategories", 
+                    FacesMessage.SEVERITY_INFO, Bundle.i18n.name(), 
+                    "administrator_CalendarCategories_EVENT_CATEGORY_UPDATED");
         }
         categories = null;
     }
