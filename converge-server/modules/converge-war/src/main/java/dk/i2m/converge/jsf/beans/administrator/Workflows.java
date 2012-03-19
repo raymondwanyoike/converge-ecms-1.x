@@ -1,28 +1,27 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later 
+ * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.jsf.beans.administrator;
 
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.NewsItemField;
-import dk.i2m.converge.core.workflow.NewsItemFieldVisible;
+import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.facades.WorkflowFacadeLocal;
 import dk.i2m.converge.jsf.beans.BaseBean;
-import dk.i2m.converge.core.workflow.Workflow;
-import dk.i2m.converge.core.workflow.WorkflowState;
-import dk.i2m.converge.core.workflow.WorkflowStatePermission;
-import dk.i2m.converge.core.workflow.WorkflowStateType;
-import dk.i2m.converge.core.workflow.WorkflowStep;
-import dk.i2m.converge.core.workflow.WorkflowStepAction;
-import dk.i2m.converge.core.workflow.WorkflowStepActionProperty;
-import dk.i2m.converge.core.workflow.WorkflowStepValidator;
-import dk.i2m.converge.core.workflow.WorkflowStepValidatorProperty;
+import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.jsf.JsfUtils;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -36,8 +35,7 @@ import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 
 /**
- * Managed backing bean for
- * <code>/administrator/Workflows.jspx</code>.
+ * Backing bean for {@code /administrator/Workflows.jspx}.
  *
  * @author Allan Lykke Christensen
  */
@@ -67,9 +65,11 @@ public class Workflows extends BaseBean {
 
     private WorkflowStepAction selectedWorkflowStepAction;
 
-    private WorkflowStepActionProperty selectedWorkflowStepActionProperty = new WorkflowStepActionProperty();
+    private WorkflowStepActionProperty selectedWorkflowStepActionProperty =
+            new WorkflowStepActionProperty();
 
-    private WorkflowStepValidatorProperty selectedWorkflowStepValidatorProperty = new WorkflowStepValidatorProperty();
+    private WorkflowStepValidatorProperty selectedWorkflowStepValidatorProperty =
+            new WorkflowStepValidatorProperty();
 
     private List<NewsItemField> workflowStateVisibleFields;
 
@@ -105,7 +105,8 @@ public class Workflows extends BaseBean {
 
         if (selectedWorkflowState.getVisibleFields() != null) {
             workflowStateVisibleFields = new ArrayList<NewsItemField>();
-            for (NewsItemFieldVisible nifv : selectedWorkflowState.getVisibleFields()) {
+            for (NewsItemFieldVisible nifv : selectedWorkflowState.
+                    getVisibleFields()) {
                 workflowStateVisibleFields.add(nifv.getField());
             }
         }
@@ -116,7 +117,8 @@ public class Workflows extends BaseBean {
         return selectedWorkflowStateType;
     }
 
-    public void setSelectedWorkflowStateType(WorkflowStateType selectedWorkflowStateType) {
+    public void setSelectedWorkflowStateType(
+            WorkflowStateType selectedWorkflowStateType) {
         this.selectedWorkflowStateType = selectedWorkflowStateType;
     }
 
@@ -203,7 +205,8 @@ public class Workflows extends BaseBean {
      *         mode and <code>false</code> if in <em>add</em> mode
      */
     public boolean isWorkflowStateEditMode() {
-        if (selectedWorkflowState == null || selectedWorkflowState.getId() == null) {
+        if (selectedWorkflowState == null || selectedWorkflowState.getId()
+                == null) {
             return false;
         } else {
             return true;
@@ -230,10 +233,14 @@ public class Workflows extends BaseBean {
     public void onApplyWorkflow(ActionEvent event) {
         if (isAddMode()) {
             selected = workflowFacade.createWorkflow(selected);
-            JsfUtils.createMessage("frmWorkflowDetails", FacesMessage.SEVERITY_INFO, "WORKFLOW_CREATED");
+            JsfUtils.createMessage("frmWorkflowDetails",
+                    FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "administrator_Workflows_WORKFLOW_CREATED");
         } else {
             workflowFacade.updateWorkflow(selected);
-            JsfUtils.createMessage("frmWorkflowDetails", FacesMessage.SEVERITY_INFO, "WORKFLOW_UPDATED");
+            JsfUtils.createMessage("frmWorkflowDetails",
+                    FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "administrator_Workflows_WORKFLOW_UPDATED");
         }
 
         this.workflows = null;
@@ -248,10 +255,14 @@ public class Workflows extends BaseBean {
     public void onSaveWorkflow(ActionEvent event) {
         if (isAddMode()) {
             selected = workflowFacade.createWorkflow(selected);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "WORKFLOW_CREATED");
+            JsfUtils.createMessage("frmWorkflowDetails",
+                    FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "administrator_Workflows_WORKFLOW_CREATED");
         } else {
             workflowFacade.updateWorkflow(selected);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "WORKFLOW_UPDATED");
+            JsfUtils.createMessage("frmWorkflowDetails",
+                    FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "administrator_Workflows_WORKFLOW_UPDATED");
         }
 
         this.workflows = null;
@@ -266,7 +277,9 @@ public class Workflows extends BaseBean {
     public void onDeleteWorkflow(ActionEvent event) {
         if (!isAddMode()) {
             workflowFacade.deleteWorkflowById(selected.getId());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "WORKFLOW_DELETED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Workflows_WORKFLOW_DELETED");
         }
 
         this.workflows = null;
@@ -312,14 +325,16 @@ public class Workflows extends BaseBean {
         selectedWorkflowStepAction = new WorkflowStepAction();
         selectedWorkflowStepAction.setWorkflowStep(selectedWorkflowStep);
         // A default action class is required to avoid NullPointerException from JSF
-        selectedWorkflowStepAction.setActionClass(dk.i2m.converge.plugins.alertaction.AlertAction.class.getName());
+        selectedWorkflowStepAction.setActionClass(dk.i2m.converge.plugins.alertaction.AlertAction.class.
+                getName());
     }
 
     public void onNewWorkflowStepValidator(ActionEvent event) {
         selectedWorkflowStepValidator = new WorkflowStepValidator();
         selectedWorkflowStepValidator.setStep(selectedWorkflowStep);
         // A default action class is required to avoid NullPointerException from JSF
-        selectedWorkflowStepValidator.setValidatorClass(dk.i2m.converge.plugins.validators.lengthvalidator.LengthValidator.class.getName());
+        selectedWorkflowStepValidator.setValidatorClass(dk.i2m.converge.plugins.validators.lengthvalidator.LengthValidator.class.
+                getName());
     }
 
     /**
@@ -338,8 +353,11 @@ public class Workflows extends BaseBean {
                 selectedWorkflowState.getVisibleFields().add(nifv);
             }
 
-            selectedWorkflowState = workflowFacade.createWorkflowState(selectedWorkflowState);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "WORKFLOW_STATE_CREATED");
+            selectedWorkflowState = workflowFacade.createWorkflowState(
+                    selectedWorkflowState);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Workflows_WORKFLOW_STATE_CREATED");
         } else {
             selectedWorkflowState.getVisibleFields().clear();
 
@@ -350,34 +368,37 @@ public class Workflows extends BaseBean {
                 selectedWorkflowState.getVisibleFields().add(nifv);
             }
 
-            selectedWorkflowState = workflowFacade.updateWorkflowState(selectedWorkflowState);
+            selectedWorkflowState = workflowFacade.updateWorkflowState(
+                    selectedWorkflowState);
 
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "WORKFLOW_STATE_UPDATED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Workflows_WORKFLOW_STATE_UPDATED");
         }
 
         try {
             selected = workflowFacade.findWorkflowById(selected.getId());
 
-            if (selected.getStartState() != null && selected.getStartState().equals(selectedWorkflowState)) {
+            if (selected.getStartState() != null && selected.getStartState().
+                    equals(selectedWorkflowState)) {
                 selected.setStartState(null);
             }
 
-            if (selected.getEndState() != null && selected.getEndState().equals(selectedWorkflowState)) {
+            if (selected.getEndState() != null && selected.getEndState().equals(
+                    selectedWorkflowState)) {
                 selected.setEndState(null);
             }
 
-            if (selected.getTrashState() != null && selected.getTrashState().equals(selectedWorkflowState)) {
+            if (selected.getTrashState() != null && selected.getTrashState().
+                    equals(selectedWorkflowState)) {
                 selected.setTrashState(null);
             }
 
             if (selectedWorkflowStateType.equals(WorkflowStateType.START)) {
-                logger.log(Level.FINE, "Setting the start state of the workflow");
                 selected.setStartState(selectedWorkflowState);
             } else if (selectedWorkflowStateType.equals(WorkflowStateType.END)) {
-                logger.finest("Setting the end state of the workflow");
                 selected.setEndState(selectedWorkflowState);
             } else if (selectedWorkflowStateType.equals(WorkflowStateType.TRASH)) {
-                logger.finest("Setting the trash state of the workflow");
                 selected.setTrashState(selectedWorkflowState);
             }
             workflowFacade.updateWorkflow(selected);
@@ -408,9 +429,12 @@ public class Workflows extends BaseBean {
      *          Event that invoked the handler
      */
     public void onDeleteWorkflowStepAction(ActionEvent event) {
-        workflowFacade.deleteWorkflowStepActionById(selectedWorkflowStepAction.getId());
+        workflowFacade.deleteWorkflowStepActionById(selectedWorkflowStepAction.
+                getId());
         selectedWorkflowStep.getActions().remove(selectedWorkflowStepAction);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "The action was deleted", null);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                Bundle.i18n.name(),
+                "administrator_Workflows_WORKFLOW_STEP_ACTION_DELETED");
     }
 
     /**
@@ -428,8 +452,11 @@ public class Workflows extends BaseBean {
 //                selectedWorkflowStep.getValidation().add(validation);
 //            }
 
-            selectedWorkflowStep = workflowFacade.createWorkflowStep(selectedWorkflowStep);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "WORKFLOW_STEP_CREATED");
+            selectedWorkflowStep = workflowFacade.createWorkflowStep(
+                    selectedWorkflowStep);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Workflows_WORKFLOW_STEP_CREATED");
         } else {
 //            // Remove existing validation
 //            selectedWorkflowStep.getValidation().clear();
@@ -442,14 +469,19 @@ public class Workflows extends BaseBean {
 //                selectedWorkflowStep.getValidation().add(validation);
 //            }
 
-            selectedWorkflowStep = workflowFacade.updateWorkflowStep(selectedWorkflowStep);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "WORKFLOW_STEP_UPDATED");
+            selectedWorkflowStep = workflowFacade.updateWorkflowStep(
+                    selectedWorkflowStep);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Workflows_WORKFLOW_STEP_UPDATED");
         }
 
 
         // Update the workflow state (as it will not have different steps)
         try {
-            selectedWorkflowState = workflowFacade.findWorkflowStateById(selectedWorkflowState.getId());
+            selectedWorkflowState =
+                    workflowFacade.findWorkflowStateById(selectedWorkflowState.
+                    getId());
         } catch (DataNotFoundException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
@@ -462,7 +494,9 @@ public class Workflows extends BaseBean {
     public void onDeleteWorkflowStep(ActionEvent event) {
         try {
             workflowFacade.deleteWorkflowStepById(selectedWorkflowStep.getId());
-            selectedWorkflowState = workflowFacade.findWorkflowStateById(selectedWorkflowState.getId());
+            selectedWorkflowState =
+                    workflowFacade.findWorkflowStateById(selectedWorkflowState.
+                    getId());
         } catch (DataNotFoundException ex) {
             logger.log(Level.WARNING, "Workflow does not exist", ex);
         }
@@ -474,13 +508,20 @@ public class Workflows extends BaseBean {
      * @return {@link Map} of {@link WorkflowState}s
      */
     public Map<String, WorkflowState> getWorkflowStates() {
-        Map<String, WorkflowState> states = new LinkedHashMap<String, WorkflowState>();
-        for (WorkflowState state : selectedWorkflowStep.getFromState().getWorkflow().getStates()) {
+        Map<String, WorkflowState> states =
+                new LinkedHashMap<String, WorkflowState>();
+        for (WorkflowState state : selectedWorkflowStep.getFromState().
+                getWorkflow().getStates()) {
+            String lbl;
             if (state.isGroupPermission()) {
-                states.put(state.getName() + " (group " + state.getActorRole().getName() + ")", state);
+                lbl = "administrator_Workflows_WORKFLOW_STATE_ROLE";
             } else {
-                states.put(state.getName() + " (user " + state.getActorRole().getName() + ")", state);
+                lbl = "administrator_Workflows_WORKFLOW_STATE_USER";
             }
+            String stateLbl =
+                    JsfUtils.getMessage(Bundle.i18n.name(), lbl,
+                    new Object[]{state.getName(), state.getActorRole().getName()});
+            states.put(stateLbl, state);
         }
 
         return states;
@@ -512,18 +553,12 @@ public class Workflows extends BaseBean {
         return !isWorkflowStepEditMode();
     }
 
-//    public List<NewsItemField> getWorkflowStepRequiredFields() {
-//        return workflowStepRequiredFields;
-//    }
-//
-//    public void setWorkflowStepRequiredFields(List<NewsItemField> workflowStepRequiredFields) {
-//        this.workflowStepRequiredFields = workflowStepRequiredFields;
-//    }
     public List<NewsItemField> getWorkflowStateVisibleFields() {
         return workflowStateVisibleFields;
     }
 
-    public void setWorkflowStateVisibleFields(List<NewsItemField> workflowStateVisibleFields) {
+    public void setWorkflowStateVisibleFields(
+            List<NewsItemField> workflowStateVisibleFields) {
         this.workflowStateVisibleFields = workflowStateVisibleFields;
     }
 
@@ -531,7 +566,8 @@ public class Workflows extends BaseBean {
         return selectedWorkflowStepAction;
     }
 
-    public void setSelectedWorkflowStepAction(WorkflowStepAction selectedWorkflowStepAction) {
+    public void setSelectedWorkflowStepAction(
+            WorkflowStepAction selectedWorkflowStepAction) {
         this.selectedWorkflowStepAction = selectedWorkflowStepAction;
     }
 
@@ -539,7 +575,8 @@ public class Workflows extends BaseBean {
         return selectedWorkflowStepActionTab;
     }
 
-    public void setSelectedWorkflowStepActionTab(String selectedWorkflowStepActionTab) {
+    public void setSelectedWorkflowStepActionTab(
+            String selectedWorkflowStepActionTab) {
         this.selectedWorkflowStepActionTab = selectedWorkflowStepActionTab;
     }
 
@@ -551,7 +588,8 @@ public class Workflows extends BaseBean {
      *         mode and <code>false</code> if in <em>add</em> mode
      */
     public boolean isWorkflowStepActionEditMode() {
-        if (selectedWorkflowStepAction == null || selectedWorkflowStepAction.getId() == null) {
+        if (selectedWorkflowStepAction == null || selectedWorkflowStepAction.
+                getId() == null) {
             return false;
         } else {
             return true;
@@ -564,7 +602,8 @@ public class Workflows extends BaseBean {
     }
 
     public boolean isWorkflowStepValidatorEditMode() {
-        if (selectedWorkflowStepValidator == null || selectedWorkflowStepValidator.getId() == null) {
+        if (selectedWorkflowStepValidator == null
+                || selectedWorkflowStepValidator.getId() == null) {
             return false;
         } else {
             return true;
@@ -579,7 +618,8 @@ public class Workflows extends BaseBean {
         selectedWorkflowStepAction.getProperties().remove(property);
     }
 
-    public void setDeleteValidatorProperty(WorkflowStepValidatorProperty property) {
+    public void setDeleteValidatorProperty(
+            WorkflowStepValidatorProperty property) {
         selectedWorkflowStepValidator.getProperties().remove(property);
     }
 
@@ -587,23 +627,31 @@ public class Workflows extends BaseBean {
         return selectedWorkflowStepActionProperty;
     }
 
-    public void setSelectedWorkflowStepActionProperty(WorkflowStepActionProperty selectedWorkflowStepActionProperty) {
-        this.selectedWorkflowStepActionProperty = selectedWorkflowStepActionProperty;
+    public void setSelectedWorkflowStepActionProperty(
+            WorkflowStepActionProperty selectedWorkflowStepActionProperty) {
+        this.selectedWorkflowStepActionProperty =
+                selectedWorkflowStepActionProperty;
     }
 
     public void onAddWorkflowStepActionProperty(ActionEvent event) {
         if (selectedWorkflowStepActionProperty.getKey() != null) {
-            selectedWorkflowStepActionProperty.setWorkflowStepAction(selectedWorkflowStepAction);
-            selectedWorkflowStepAction.getProperties().add(selectedWorkflowStepActionProperty);
-            selectedWorkflowStepActionProperty = new WorkflowStepActionProperty();
+            selectedWorkflowStepActionProperty.setWorkflowStepAction(
+                    selectedWorkflowStepAction);
+            selectedWorkflowStepAction.getProperties().add(
+                    selectedWorkflowStepActionProperty);
+            selectedWorkflowStepActionProperty =
+                    new WorkflowStepActionProperty();
         }
     }
 
     public void onAddWorkflowStepValidatorProperty(ActionEvent event) {
         if (selectedWorkflowStepValidatorProperty.getKey() != null) {
-            selectedWorkflowStepValidatorProperty.setWorkflowStepValidator(selectedWorkflowStepValidator);
-            selectedWorkflowStepValidator.getProperties().add(selectedWorkflowStepValidatorProperty);
-            selectedWorkflowStepValidatorProperty = new WorkflowStepValidatorProperty();
+            selectedWorkflowStepValidatorProperty.setWorkflowStepValidator(
+                    selectedWorkflowStepValidator);
+            selectedWorkflowStepValidator.getProperties().add(
+                    selectedWorkflowStepValidatorProperty);
+            selectedWorkflowStepValidatorProperty =
+                    new WorkflowStepValidatorProperty();
         }
     }
 
@@ -611,16 +659,26 @@ public class Workflows extends BaseBean {
 
         if (isWorkflowStepActionAddMode()) {
             selectedWorkflowStepAction.setWorkflowStep(selectedWorkflowStep);
-            selectedWorkflowStepAction = workflowFacade.createWorkflowStepAction(selectedWorkflowStepAction);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "WORKFLOW_STEP_ACTION_CREATED");
+            selectedWorkflowStepAction =
+                    workflowFacade.createWorkflowStepAction(
+                    selectedWorkflowStepAction);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Workflows_WORKFLOW_STEP_ACTION_CREATED");
         } else {
-            selectedWorkflowStepAction = workflowFacade.updateWorkflowStepAction(selectedWorkflowStepAction);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "WORKFLOW_STEP_ACTION_UPDATED");
+            selectedWorkflowStepAction =
+                    workflowFacade.updateWorkflowStepAction(
+                    selectedWorkflowStepAction);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Workflows_WORKFLOW_STEP_ACTION_UPDATED");
         }
 
         // Update the workflow state (as it will not have different steps)
         try {
-            selectedWorkflowStep = workflowFacade.findWorkflowStepById(selectedWorkflowStep.getId());
+            selectedWorkflowStep =
+                    workflowFacade.findWorkflowStepById(selectedWorkflowStep.
+                    getId());
         } catch (DataNotFoundException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
@@ -631,16 +689,24 @@ public class Workflows extends BaseBean {
 
         if (isWorkflowStepValidatorAddMode()) {
             selectedWorkflowStepValidator.setStep(selectedWorkflowStep);
-            selectedWorkflowStepValidator = workflowFacade.createWorkflowStepValidator(selectedWorkflowStepValidator);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "WORKFLOW_STEP_VALIDATOR_CREATED");
+            selectedWorkflowStepValidator = workflowFacade.
+                    createWorkflowStepValidator(selectedWorkflowStepValidator);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Workflows_WORKFLOW_STEP_VALIDATOR_CREATED");
         } else {
-            selectedWorkflowStepValidator = workflowFacade.updateWorkflowStepValidator(selectedWorkflowStepValidator);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "WORKFLOW_STEP_VALIDATOR_UPDATED");
+            selectedWorkflowStepValidator = workflowFacade.
+                    updateWorkflowStepValidator(selectedWorkflowStepValidator);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Workflows_WORKFLOW_STEP_VALIDATOR_UPDATED");
         }
 
         // Update the workflow state (as it will not have different steps)
         try {
-            selectedWorkflowStep = workflowFacade.findWorkflowStepById(selectedWorkflowStep.getId());
+            selectedWorkflowStep =
+                    workflowFacade.findWorkflowStepById(selectedWorkflowStep.
+                    getId());
         } catch (DataNotFoundException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
@@ -648,16 +714,21 @@ public class Workflows extends BaseBean {
     }
 
     public void onDeleteWorkflowStepValidator(ActionEvent event) {
-        workflowFacade.deleteWorkflowStepValidatorById(selectedWorkflowStepValidator.getId());
-        selectedWorkflowStep.getValidators().remove(selectedWorkflowStepValidator);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "The validation rule was deleted", null);
+        workflowFacade.deleteWorkflowStepValidatorById(selectedWorkflowStepValidator.
+                getId());
+        selectedWorkflowStep.getValidators().remove(
+                selectedWorkflowStepValidator);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                Bundle.i18n.name(),
+                "administrator_Workflows_WORKFLOW_STEP_VALIDATOR_DELETED");
     }
 
     public WorkflowStepValidator getSelectedWorkflowStepValidator() {
         return selectedWorkflowStepValidator;
     }
 
-    public void setSelectedWorkflowStepValidator(WorkflowStepValidator selectedWorkflowStepValidator) {
+    public void setSelectedWorkflowStepValidator(
+            WorkflowStepValidator selectedWorkflowStepValidator) {
         this.selectedWorkflowStepValidator = selectedWorkflowStepValidator;
     }
 
@@ -665,7 +736,8 @@ public class Workflows extends BaseBean {
         return selectedWorkflowStepValidatorTab;
     }
 
-    public void setSelectedWorkflowStepValidatorTab(String selectedWorkflowStepValidatorTab) {
+    public void setSelectedWorkflowStepValidatorTab(
+            String selectedWorkflowStepValidatorTab) {
         this.selectedWorkflowStepValidatorTab = selectedWorkflowStepValidatorTab;
     }
 
@@ -673,7 +745,9 @@ public class Workflows extends BaseBean {
         return selectedWorkflowStepValidatorProperty;
     }
 
-    public void setSelectedWorkflowStepValidatorProperty(WorkflowStepValidatorProperty selectedWorkflowStepValidatorProperty) {
-        this.selectedWorkflowStepValidatorProperty = selectedWorkflowStepValidatorProperty;
+    public void setSelectedWorkflowStepValidatorProperty(
+            WorkflowStepValidatorProperty selectedWorkflowStepValidatorProperty) {
+        this.selectedWorkflowStepValidatorProperty =
+                selectedWorkflowStepValidatorProperty;
     }
 }
