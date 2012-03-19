@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.facades.*;
+import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.jsf.JsfUtils;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -43,7 +44,8 @@ import javax.faces.event.ValueChangeEvent;
  */
 public class DialogAssignment {
 
-    private static final Logger log = Logger.getLogger(DialogAssignment.class.getName());
+    private static final Logger log = Logger.getLogger(DialogAssignment.class.
+            getName());
 
     private OutletFacadeLocal outletFacade;
 
@@ -69,9 +71,11 @@ public class DialogAssignment {
 
     private Map<String, Outlet> outlets = new LinkedHashMap<String, Outlet>();
 
-    private Map<String, UserRole> outletRoles = new LinkedHashMap<String, UserRole>();
+    private Map<String, UserRole> outletRoles =
+            new LinkedHashMap<String, UserRole>();
 
-    private Map<String, UserAccount> usersInRole = new LinkedHashMap<String, UserAccount>();
+    private Map<String, UserAccount> usersInRole =
+            new LinkedHashMap<String, UserAccount>();
 
     private List<UIEventListener> listeners = new ArrayList<UIEventListener>();
 
@@ -81,7 +85,8 @@ public class DialogAssignment {
 
     private NewsItemPlacement selectedNewsItemPlacement;
 
-    private Map<String, EditionCandidate> editionCandidates = new LinkedHashMap<String, EditionCandidate>();
+    private Map<String, EditionCandidate> editionCandidates =
+            new LinkedHashMap<String, EditionCandidate>();
 
     private EditionCandidate editionCandidate;
 
@@ -90,7 +95,10 @@ public class DialogAssignment {
     /**
      * Creates a new instance of {@link DialogAssignment}.
      */
-    public DialogAssignment(OutletFacadeLocal outletFacade, WorkflowFacadeLocal workflowFacade, UserFacadeLocal userFacade, NewsItemFacadeLocal newsItemFacade, CalendarFacadeLocal calendarFacade, List<Outlet> outlets) {
+    public DialogAssignment(OutletFacadeLocal outletFacade,
+            WorkflowFacadeLocal workflowFacade, UserFacadeLocal userFacade,
+            NewsItemFacadeLocal newsItemFacade,
+            CalendarFacadeLocal calendarFacade, List<Outlet> outlets) {
         this.outletFacade = outletFacade;
         this.workflowFacade = workflowFacade;
         this.userFacade = userFacade;
@@ -141,14 +149,16 @@ public class DialogAssignment {
     public void onAddActor(ActionEvent event) {
         // Ensure that role and user has been selected.
         if (selectedOutletRole == null || selectedUser == null) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "planning_SELECT_ROLE_AND_USER");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(), "DialogAssignment_SELECT_ROLE_AND_USER");
             return;
         }
 
         // Check that the actor is not already there
         boolean duplicate = false;
         for (NewsItemActor nia : assignment.getActors()) {
-            if (nia.getRole().equals(selectedOutletRole) && nia.getUser().equals(selectedUser)) {
+            if (nia.getRole().equals(selectedOutletRole) && nia.getUser().equals(
+                    selectedUser)) {
                 duplicate = true;
                 break;
             }
@@ -163,44 +173,50 @@ public class DialogAssignment {
             if (isEditMode()) {
                 newsItemFacade.addActorToNewsItem(actor);
             }
-            log.fine("Actor added to assignment");
-        } else {
-            log.fine("Actor was a duplicate");
         }
     }
 
     /**
-     * Event handler invoked when an existing actor is removed from an assignment.
+     * Event handler invoked when an existing actor is removed from an 
+     * assignment.
      *
      * @param event
      *          Event that invoked the handler
      */
     public void onRemoveActor(ActionEvent event) {
-        if (assignment.getActors().remove(selectedActor)) {
-            log.fine("Actor removed from assignment");
-        } else {
-            log.warning("Assign was not removed from assigment (was unknown)");
-        }
+        assignment.getActors().remove(selectedActor);
     }
 
     public void onSaveAssignment(ActionEvent event) {
         if (isAddMode()) {
             try {
                 assignment = newsItemFacade.start(assignment);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "planning_ASSIGNMENT_CREATED", new Object[]{assignment.getId()});
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                        Bundle.i18n.name(),
+                        "DialogAssignment_ASSIGNMENT_CREATED_WITH_ID_X",
+                        new Object[]{assignment.getId()});
             } catch (MissingActorException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "planning_ASSIGNMENT_ACTOR_MISSING", new Object[]{ex.getRole().getName()});
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        Bundle.i18n.name(),
+                        "DialogAssignment_ASSIGNMENT_ACTOR_X_MISSING",
+                        new Object[]{ex.getRole().getName()});
             } catch (WorkflowStateTransitionException ex) {
-                log.log(Level.SEVERE, "Could not save assignment", ex);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "planning_ASSIGNMENT_CREATION_ERROR");
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        Bundle.i18n.name(),
+                        "DialogAssignment_ASSIGNMENT_CREATION_ERROR");
             }
         } else {
             try {
                 // TODO: OptimisticLockException seems to occur when updating
                 assignment = newsItemFacade.checkin(assignment);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "planning_ASSIGNMENT_UPDATED");
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                        Bundle.i18n.name(),
+                        "DialogAssignment_ASSIGNMENT_UPDATED");
             } catch (LockingException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        Bundle.i18n.name(),
+                        "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.
+                            getMessage()});
             }
         }
 
@@ -223,22 +239,35 @@ public class DialogAssignment {
                 NewsItemHolder nih = newsItemFacade.checkout(assignment.getId());
                 setNewsItemHolder(nih);
 
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "planning_ASSIGNMENT_CREATED", new Object[]{assignment.getId()});
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                        Bundle.i18n.name(),
+                        "DialogAssignment_ASSIGNMENT_CREATED_WITH_ID_X",
+                        new Object[]{assignment.getId()});
             } catch (DataNotFoundException ex) {
-                log.log(Level.SEVERE, "Could not checkout assignment after save", ex);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "planning_ASSIGNMENT_CREATION_ERROR");
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        Bundle.i18n.name(),
+                        "DialogAssignment_ASSIGNMENT_CREATION_ERROR");
             } catch (MissingActorException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "planning_ASSIGNMENT_ACTOR_MISSING", new Object[]{ex.getRole().getName()});
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        Bundle.i18n.name(),
+                        "The assignment must have an actor with the role {0}",
+                        new Object[]{ex.getRole().getName()});
             } catch (WorkflowStateTransitionException ex) {
-                log.log(Level.SEVERE, "Could not save assignment", ex);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "planning_ASSIGNMENT_CREATION_ERROR");
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        Bundle.i18n.name(),
+                        "DialogAssignment_ASSIGNMENT_CREATION_ERROR");
             }
         } else {
             try {
                 assignment = newsItemFacade.save(assignment);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "planning_ASSIGNMENT_UPDATED");
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                        Bundle.i18n.name(),
+                        "DialogAssignment_ASSIGNMENT_UPDATED");
             } catch (LockingException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        Bundle.i18n.name(),
+                        "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.
+                            getMessage()});
             }
         }
 
@@ -249,11 +278,14 @@ public class DialogAssignment {
                 assignmentEvent.getNewsItem().add(assignment);
                 assignmentEvent = calendarFacade.update(assignmentEvent);
                 try {
-                    NewsItemHolder nih = newsItemFacade.checkout(assignment.getId());
+                    NewsItemHolder nih = newsItemFacade.checkout(assignment.
+                            getId());
                     setNewsItemHolder(nih);
                 } catch (DataNotFoundException ex) {
-                    log.log(Level.SEVERE, "Could not checkout assignment after save", ex);
-                    JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, "planning_ASSIGNMENT_CREATION_ERROR");
+                    JsfUtils.createMessage("frmPage",
+                            FacesMessage.SEVERITY_ERROR,
+                            Bundle.i18n.name(),
+                            "DialogAssignment_ASSIGNMENT_CREATION_ERROR");
                 }
             }
         }
@@ -270,15 +302,19 @@ public class DialogAssignment {
 
     public void onDeleteAssignment(ActionEvent event) {
         if (newsItemFacade.deleteNewsItem(assignment.getId())) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "planning_ASSIGNMENT_DELETED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(), "DialogAssignment_ASSIGNMENT_DELETED");
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "planning_ASSIGNMENT_COULD_NOT_BE_DELETED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "DialogAssignment_ASSIGNMENT_COULD_NOT_BE_DELETED");
         }
     }
 
     public void onRemoveEventFromAssignment(ActionEvent event) {
         assignment.setEvent(null);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "planning_ASSIGNMENT_EVENT_REMOVED");
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                Bundle.i18n.name(), "DialogAssignment_ASSIGNMENT_EVENT_REMOVED");
     }
 
     public void onNewPlacement(ActionEvent event) {
@@ -319,7 +355,8 @@ public class DialogAssignment {
     public Map<String, Edition> getEditions() {
         Map<String, Edition> editions = new LinkedHashMap<String, Edition>();
         if (assignment.getOutlet() != null) {
-            for (Edition edition : outletFacade.findEditionsByStatus(true, assignment.getOutlet())) {
+            for (Edition edition : outletFacade.findEditionsByStatus(true,
+                    assignment.getOutlet())) {
                 editions.put(edition.getFriendlyName(), edition);
             }
         }
@@ -359,7 +396,8 @@ public class DialogAssignment {
         this.selectedOutletRole = selectedOutletRole;
         usersInRole.clear();
         if (selectedOutletRole != null) {
-            for (UserAccount userAccount : userFacade.getMembers(selectedOutletRole)) {
+            for (UserAccount userAccount : userFacade.getMembers(
+                    selectedOutletRole)) {
                 usersInRole.put(userAccount.getFullName(), userAccount);
             }
         }
@@ -459,7 +497,6 @@ public class DialogAssignment {
     }
 
     public void setNewsItemHolder(NewsItemHolder newsItemHolder) {
-        log.log(Level.INFO, "Setting news items holder for {0}", newsItemHolder.getNewsItem());
         this.newsItemHolder = newsItemHolder;
         this.assignment = this.newsItemHolder.getNewsItem();
         this.readOnly = this.newsItemHolder.isReadOnly();
@@ -501,7 +538,9 @@ public class DialogAssignment {
             }
             editionCal.setTime(editionDate);
 
-            List<EditionCandidate> editions = outletFacade.findEditionCandidatesByDate(getSelectedNewsItemPlacement().getOutlet(), editionCal, false);
+            List<EditionCandidate> editions = outletFacade.
+                    findEditionCandidatesByDate(getSelectedNewsItemPlacement().
+                    getOutlet(), editionCal, false);
             Collections.sort(editions, new BeanComparator("publicationDate"));
             for (EditionCandidate e : editions) {
                 String label = "";
@@ -521,7 +560,8 @@ public class DialogAssignment {
      */
     public Map<String, Section> getSections() {
         Map<String, Section> sections = new LinkedHashMap<String, Section>();
-        for (Section section : selectedNewsItemPlacement.getOutlet().getActiveSections()) {
+        for (Section section : selectedNewsItemPlacement.getOutlet().
+                getActiveSections()) {
             sections.put(section.getFullName(), section);
         }
         return sections;
@@ -531,17 +571,22 @@ public class DialogAssignment {
         if (getEditionCandidate() != null) {
             if (getEditionCandidate().isExist()) {
                 try {
-                    selectedNewsItemPlacement.setEdition(outletFacade.findEditionById(getEditionCandidate().getEditionId()));
+                    selectedNewsItemPlacement.setEdition(
+                            outletFacade.findEditionById(getEditionCandidate().
+                            getEditionId()));
                 } catch (DataNotFoundException ex) {
-                    log.log(Level.INFO, "Edition {0} does not exist", getEditionCandidate().getEditionId());
+                    log.log(Level.INFO, "Edition {0} does not exist",
+                            getEditionCandidate().getEditionId());
                 }
             } else {
-                selectedNewsItemPlacement.setEdition(outletFacade.createEdition(getEditionCandidate()));
+                selectedNewsItemPlacement.setEdition(outletFacade.createEdition(
+                        getEditionCandidate()));
             }
 
 
             if (isEditMode()) {
-                selectedNewsItemPlacement = newsItemFacade.createPlacement(selectedNewsItemPlacement);
+                selectedNewsItemPlacement = newsItemFacade.createPlacement(
+                        selectedNewsItemPlacement);
             }
 
             if (!assignment.getPlacements().contains(selectedNewsItemPlacement)) {
@@ -553,16 +598,20 @@ public class DialogAssignment {
     public void onUpdatePlacement(ActionEvent event) {
         if (getEditionCandidate().isExist()) {
             try {
-                selectedNewsItemPlacement.setEdition(outletFacade.findEditionById(getEditionCandidate().getEditionId()));
+                selectedNewsItemPlacement.setEdition(outletFacade.
+                        findEditionById(getEditionCandidate().getEditionId()));
             } catch (DataNotFoundException ex) {
-                log.log(Level.INFO, "Edition {0} does not exist", getEditionCandidate().getEditionId());
+                log.log(Level.INFO, "Edition {0} does not exist",
+                        getEditionCandidate().getEditionId());
             }
         } else {
-            selectedNewsItemPlacement.setEdition(outletFacade.createEdition(getEditionCandidate()));
+            selectedNewsItemPlacement.setEdition(outletFacade.createEdition(
+                    getEditionCandidate()));
         }
 
         if (isEditMode()) {
-            selectedNewsItemPlacement = newsItemFacade.updatePlacement(selectedNewsItemPlacement);
+            selectedNewsItemPlacement = newsItemFacade.updatePlacement(
+                    selectedNewsItemPlacement);
         }
 
         if (!assignment.getPlacements().contains(selectedNewsItemPlacement)) {
@@ -583,11 +632,13 @@ public class DialogAssignment {
         return selectedNewsItemPlacement;
     }
 
-    public void setSelectedNewsItemPlacement(NewsItemPlacement selectedNewsItemPlacement) {
+    public void setSelectedNewsItemPlacement(
+            NewsItemPlacement selectedNewsItemPlacement) {
         this.selectedNewsItemPlacement = selectedNewsItemPlacement;
     }
 
     private UserAccount getUser() {
-        return (UserAccount) JsfUtils.getValueOfValueExpression("#{userSession.user}");
+        return (UserAccount) JsfUtils.getValueOfValueExpression(
+                "#{userSession.user}");
     }
 }
