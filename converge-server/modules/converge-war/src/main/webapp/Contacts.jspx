@@ -93,7 +93,7 @@
                             <a4j:commandLink onclick="if (confirm('#{i18n.Contacts_PROMPT_DELETE}') != true){ return false; };">
                                 <f:setPropertyActionListener value="#{contact}" target="#{contacts.selectedContact}" />
                                 <a4j:support event="oncomplete" actionListener="#{contacts.onDelete}" reRender="frmPage" limitToList="true" />
-                                <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{res.DELETE_ICON}"/>
+                                <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{i18n.resource_ICON_DELETE}"/>
                             </a4j:commandLink>
                         </rich:column>
 
@@ -195,7 +195,7 @@
                                             <a4j:commandLink onclick="if (confirm('#{i18n.Contacts_PROMPT_DELETE_PHONE}') != true){ return false; };">
                                                 <f:setPropertyActionListener value="#{phone}" target="#{contacts.selectedContactPhone}" />
                                                 <a4j:support event="oncomplete" actionListener="#{contacts.onDeleteContactPhone}" reRender="dtContactPhones" />
-                                                <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{res.DELETE_ICON}"/>
+                                                <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{i18n.resource_ICON_DELETE}"/>
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -230,7 +230,7 @@
                                             <a4j:commandLink onclick="if (confirm('#{i18n.Contacts_PROMPT_DELETE_EMAIL}') != true){ return false; };">
                                                 <f:setPropertyActionListener value="#{email}" target="#{contacts.selectedContactEmail}" />
                                                 <a4j:support event="oncomplete" actionListener="#{contacts.onDeleteContactEmail}" reRender="dtContactEmails" />
-                                                <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{res.DELETE_ICON}"/>
+                                                <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{i18n.resource_ICON_DELETE}"/>
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -283,7 +283,7 @@
                                             <a4j:commandLink onclick="if (confirm('#{i18n.Contacts_PROMPT_DELETE_ADDRESS}') != true){ return false; };">
                                                 <f:setPropertyActionListener value="#{address}" target="#{contacts.selectedContactAddress}" />
                                                 <a4j:support event="oncomplete" actionListener="#{contacts.onDeleteContactAddress}" reRender="dtContactAddresses, pgAddressTab" />
-                                                <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{res.DELETE_ICON}"/>
+                                                <h:graphicImage alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" value="#{i18n.resource_ICON_DELETE}"/>
                                             </a4j:commandLink>
                                         </rich:column>
 

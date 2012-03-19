@@ -38,7 +38,7 @@
                             <a4j:commandLink reRender="frmAnnouncementDetails">
                                 <f:setPropertyActionListener value="#{announcement}" target="#{administrator_Announcements.selectedAnnouncement}" />
                                 <rich:componentControl for="mpAnnouncementDetails" operation="show" event="oncomplete" />
-                                <h:graphicImage alt="#{i18n.Announcements_ANNOUNCEMENT_LABEL}" title="#{i18n.Announcements_ANNOUNCEMENT_LABEL}" value="#{res.ALERT_ICON}" />
+                                <h:graphicImage alt="#{i18n.Announcements_ANNOUNCEMENT_LABEL}" title="#{i18n.Announcements_ANNOUNCEMENT_LABEL}" value="#{i18n.resource_ICON_ALERT}" />
                             </a4j:commandLink>
                         </rich:column>
 
@@ -66,8 +66,8 @@
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Announcements_PUBLISHED}" />
                             </f:facet>
-                            <h:graphicImage alt="#{i18n.Announcements_PUBLISHED}" title="#{i18n.Announcements_PUBLISHED}" value="#{res.PUBLISHED_ICON}" rendered="#{announcement.published}" />
-                            <h:graphicImage alt="#{i18n.Announcements_UNPUBLISHED}" title="#{i18n.Announcements_UNPUBLISHED}" value="#{res.UNPUBLISHED_ICON}" rendered="#{!announcement.published}" />
+                            <h:graphicImage alt="#{i18n.Announcements_PUBLISHED}" title="#{i18n.Announcements_PUBLISHED}" value="#{i18n.resource_ICON_PUBLISHED}" rendered="#{announcement.published}" />
+                            <h:graphicImage alt="#{i18n.Announcements_UNPUBLISHED}" title="#{i18n.Announcements_UNPUBLISHED}" value="#{i18n.resource_ICON_UNPUBLISHED}" rendered="#{!announcement.published}" />
                         </rich:column>
                     </rich:dataTable>
                 </div>

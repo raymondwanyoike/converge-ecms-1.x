@@ -67,7 +67,7 @@
                                             <a4j:commandLink onclick="if (confirm('#{msgs.planning_REMOVE_ACTOR_PROMPT}') != true){ return false; };" rendered="#{!bean.editable}">
                                                 <f:setPropertyActionListener value="#{actor}" target="#{bean.selectedActor}" />
                                                 <a4j:support event="oncomplete" actionListener="#{bean.onRemoveActor}" reRender="dtActors" />
-                                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{msgs.planning_REMOVE_ACTOR}" title="#{msgs.planning_REMOVE_ACTOR}" />
+                                                <h:graphicImage value="#{i18n.resource_ICON_DELETE}" alt="#{msgs.planning_REMOVE_ACTOR}" title="#{msgs.planning_REMOVE_ACTOR}" />
                                             </a4j:commandLink>
                                         </rich:column>
                                     </rich:dataTable>

@@ -55,7 +55,7 @@
                             <a4j:commandLink id="lnkDismissNotification" ajaxSingle="true">
                                 <f:setPropertyActionListener value="#{notification}" target="#{userSession.selectedNotification}" />
                                 <a4j:support event="oncomplete" actionListener="#{userSession.onDismissNotification}" reRender="frmPage, notificationCount" />
-                                <h:graphicImage alt="#{i18n.Notifications_DISMISS}" title="#{i18n.Notifications_DISMISS}" value="#{res.DELETE_ICON}"/>
+                                <h:graphicImage alt="#{i18n.Notifications_DISMISS}" title="#{i18n.Notifications_DISMISS}" value="#{i18n.resource_ICON_DELETE}"/>
                             </a4j:commandLink>
                         </rich:column>
 

@@ -664,7 +664,7 @@
                                         <rich:column styleClass="center columnIcon">
                                             <a4j:commandLink id="lnkRemoveActionProperty" reRender="pgActionProperties" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{administrator_Workflows.deleteProperty}" value="#{property}" />
-                                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
+                                                <h:graphicImage value="#{i18n.resource_ICON_DELETE}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -767,7 +767,7 @@
                                         <rich:column styleClass="center columnIcon">
                                             <a4j:commandLink id="lnkRemoveValidatorProperty" reRender="pgValidatorProperties" ajaxSingle="true">
                                                 <f:setPropertyActionListener target="#{administrator_Workflows.deleteValidatorProperty}" value="#{property}" />
-                                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
+                                                <h:graphicImage value="#{i18n.resource_ICON_DELETE}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
                                             </a4j:commandLink>
                                         </rich:column>
 

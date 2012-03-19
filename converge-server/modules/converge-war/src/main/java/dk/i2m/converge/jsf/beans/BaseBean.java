@@ -39,7 +39,7 @@ public abstract class BaseBean {
     private UserAccount currentUserAccount;
 
     /**
-     * Gets the current user, or <code>null</code> if the user is not logged in.
+     * Gets the current user, or {@code null} if the user is not logged in.
      *
      * @return Current user logged in.
      */

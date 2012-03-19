@@ -350,7 +350,7 @@
                                 <a4j:commandLink ajaxSingle="true">
                                     <f:setPropertyActionListener value="#{relatedConcept}" target="#{concepts.selectedMetaDataConcept}" />
                                     <a4j:support event="oncomplete" actionListener="#{concepts.onRemoveSameAsFromConcept}" reRender="dtConceptSameAsConcepts" />
-                                    <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_DELETE}" alt="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
                                 </a4j:commandLink>
                             </h:column>
                         </h:dataTable>
@@ -373,7 +373,7 @@
                                 <a4j:commandLink ajaxSingle="true" >
                                     <a4j:support event="oncomplete" actionListener="#{concepts.onRemoveRelatedFromConcept}" reRender="dtConceptRelatedConcepts" />
                                     <f:setPropertyActionListener value="#{relatedConcept}" target="#{concepts.selectedMetaDataConcept}" />
-                                    <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_DELETE}" alt="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
                                 </a4j:commandLink>
                             </h:column>
 
@@ -397,7 +397,7 @@
                                 <a4j:commandLink ajaxSingle="true">
                                     <a4j:support event="oncomplete" actionListener="#{concepts.onRemoveBroaderFromConcept}" reRender="dtConceptBroaderConcepts" />
                                     <f:setPropertyActionListener value="#{relatedConcept}" target="#{concepts.selectedMetaDataConcept}" />
-                                    <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_DELETE}" alt="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
                                 </a4j:commandLink>
                             </h:column>
                         </h:dataTable>
@@ -420,7 +420,7 @@
                                 <a4j:commandLink ajaxSingle="true">
                                     <a4j:support event="oncomplete" actionListener="#{concepts.onRemoveNarrowerFromConcept}" reRender="dtConceptNarrowerConcepts" />
                                     <f:setPropertyActionListener value="#{relatedConcept}" target="#{concepts.selectedMetaDataConcept}" />
-                                    <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_DELETE}" alt="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" title="#{i18n.Concepts_REMOVE_META_DATA_FROM_CONCEPT}" />
                                 </a4j:commandLink>
                             </h:column>
                         </h:dataTable>

@@ -31,8 +31,8 @@
                                 <a4j:commandLink ajaxSingle="true" reRender="frmAssignmentDetails">
                                     <f:setPropertyActionListener target="#{planning.selectedAssignment}" value="#{ni}" />
                                     <rich:componentControl for="mpAssignmentDetails" operation="show" event="oncomplete" />
-                                    <h:graphicImage value="#{res.NEWS_ITEM_ICON}" rendered="#{!ni.locked}" title="#{ni.currentState.name}" alt="#{ni.currentState.name}"  />
-                                    <h:graphicImage value="#{res.LOCK_ICON}" rendered="#{ni.locked}" title="This item was checked-out by #{ni.checkedOutBy.fullName} on #{ni.checkedOut.time}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" rendered="#{!ni.locked}" title="#{ni.currentState.name}" alt="#{ni.currentState.name}"  />
+                                    <h:graphicImage value="#{i18n.resource_ICON_LOCK}" rendered="#{ni.locked}" title="This item was checked-out by #{ni.checkedOutBy.fullName} on #{ni.checkedOut.time}" />
                                 </a4j:commandLink>
                                 
                             </rich:column>
@@ -102,8 +102,8 @@
                                         <rich:componentControl for="mpAssignmentDetails" operation="show" event="oncomplete" />
                                     </a4j:support>
 
-                                    <h:graphicImage value="#{res.BRIEFING_EXIST_ICON}" alt="#{i18n.Assignments_BRIEFING_EXIST}" title="#{i18n.Assignments_BRIEFING_EXIST}" rendered="#{ni.assignmentBriefing != ''}" />
-                                    <h:graphicImage value="#{res.BRIEFING_NOT_EXIST_ICON}" alt="#{i18n.Assignments_BRIEFING_NOT_EXIST}" title="#{i18n.Assignments_BRIEFING_NOT_EXIST}" rendered="#{ni.assignmentBriefing == ''}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_BRIEFING_EXIST}" alt="#{i18n.Assignments_BRIEFING_EXIST}" title="#{i18n.Assignments_BRIEFING_EXIST}" rendered="#{ni.assignmentBriefing != ''}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_BRIEFING_NOT_EXIST}" alt="#{i18n.Assignments_BRIEFING_NOT_EXIST}" title="#{i18n.Assignments_BRIEFING_NOT_EXIST}" rendered="#{ni.assignmentBriefing == ''}" />
                                 </a4j:commandLink>
                             </rich:column>
 
@@ -112,7 +112,7 @@
                                 <a4j:commandLink id="lnkUpdateAssignment" ajaxSingle="true" reRender="frmAssignmentDetails">
                                     <f:setPropertyActionListener value="#{ni}" target="#{planning.selectedAssignment}" />
                                     <rich:componentControl for="mpAssignmentDetails" operation="show" event="oncomplete" />
-                                    <h:graphicImage value="#{res.UPDATE_ICON}" alt="#{i18n.Generic_UPDATE}" title="#{i18n.Generic_UPDATE}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_EDIT}" alt="#{i18n.Generic_UPDATE}" title="#{i18n.Generic_UPDATE}" />
                                 </a4j:commandLink>
                             </rich:column>
 
@@ -121,7 +121,7 @@
                                 <a4j:commandLink onclick="if (confirm('#{i18n.Assignments_PROMPT_DELETE}') != true){ return false; };" ajaxSingle="true" rendered="#{!ni.locked}">
                                     <f:setPropertyActionListener value="#{ni}" target="#{planning.selectedAssignment}" />
                                     <a4j:support event="oncomplete" actionListener="#{planning.onDeleteAssignment}" reRender="frmPage" />
-                                    <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_DELETE}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
                                 </a4j:commandLink>
                             </rich:column>
                         </rich:dataTable>

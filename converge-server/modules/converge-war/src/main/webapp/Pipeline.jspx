@@ -139,7 +139,7 @@
                             <a4j:commandLink onclick="if (confirm('#{i18n.Pipeline_PROMPT_DELETE}') != true){ return false; };">
                                 <f:setPropertyActionListener value="#{ni}" target="#{planning.selectedAssignment}" />
                                 <a4j:support event="oncomplete" actionListener="#{planning.onDeleteAssignment}" reRender="frmPage" />
-                                <h:graphicImage value="#{res.DELETE_ICON}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_DELETE}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
                             </a4j:commandLink>
                         </rich:column>
                     </rich:dataTable>
