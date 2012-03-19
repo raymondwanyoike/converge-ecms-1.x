@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.jsf.components.message;
 
+import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.jsf.JsfUtils;
 import java.io.IOException;
 import java.util.Iterator;
@@ -94,7 +95,8 @@ public class MessageRenderer extends Renderer {
                 }
 
                 String title = StringEscapeUtils.escapeJavaScript(JsfUtils.
-                        getResourceBundle().getString("dk.i2m.converge.jsf.components.message."
+                        getResourceBundle(Bundle.i18n.name()).getString(
+                        "Generic_dk.i2m.converge.jsf.components.message."
                         + severity));
 
                 message.append(title);
