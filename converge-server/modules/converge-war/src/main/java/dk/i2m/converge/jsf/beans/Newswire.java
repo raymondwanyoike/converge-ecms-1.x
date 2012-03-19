@@ -334,8 +334,8 @@ public class Newswire {
         try {
             setSelectedItem(newswireService.findNewswireItemById(searchResult.getId()));
         } catch (DataNotFoundException ex) {
-            LOG.log(Level.INFO, "Couldn''t find NewswireItem #{0}", searchResult.getId());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(), "Newswire_STORY_NOT_FOUND");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, 
+                    Bundle.i18n.name(), "Newswire_STORY_NOT_FOUND");
         }
     }
     
@@ -358,7 +358,8 @@ public class Newswire {
         // Refresh todays news
         onShowTodaysNews(event);
         
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(), "Newswire_MY_NEWSWIRE_SUBSCRIPTIONS_UPDATED");
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                Bundle.i18n.name(), "Newswire_MY_NEWSWIRE_SUBSCRIPTIONS_UPDATED");
     }
 
     public void onAssign(ActionEvent event) {
@@ -530,7 +531,9 @@ public class Newswire {
         if (results.getNumberOfResults() == 0) {
             showResults = false;
             searchResults = new ListDataModel(new ArrayList());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(), "Newswire_NO_RESULTS_FOUND_FOR_X", new Object[]{getKeyword()});
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                    Bundle.i18n.name(), "Newswire_NO_RESULTS_FOUND_FOR_X", 
+                    new Object[]{getKeyword()});
         } else {
 
             for (SearchResult hit : results.getHits()) {
