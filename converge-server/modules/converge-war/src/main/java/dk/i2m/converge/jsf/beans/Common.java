@@ -73,10 +73,8 @@ public class Common {
     @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @EJB private ListingFacadeLocal listingFacade;
-
-    private ResourceBundle msgs = JsfUtils.getResourceBundle();
     
-    private ResourceBundle i18n = JsfUtils.getResourceBundle(FacesContext.getCurrentInstance(), "i18n");
+    private ResourceBundle i18n = JsfUtils.getResourceBundle(Bundle.i18n.name());
 
     /**
      * Get the local time on the server.
@@ -167,7 +165,7 @@ public class Common {
         Map<String, WorkflowStateType> types = new LinkedHashMap<String, WorkflowStateType>();
 
         for (WorkflowStateType type : WorkflowStateType.values()) {
-            types.put(JsfUtils.getResourceBundle().getString("WORKFLOW_STATE_TYPE_" + type.name()), type);
+            types.put(i18n.getString("Generic_WORKFLOW_STATE_TYPE_" + type.name()), type);
         }
 
         return types;
@@ -182,7 +180,7 @@ public class Common {
         Map<String, NewsItemField> fields = new LinkedHashMap<String, NewsItemField>();
 
         for (NewsItemField field : NewsItemField.values()) {
-            fields.put(msgs.getString("NEWS_ITEM_FIELD_" + field.name()), field);
+            fields.put(i18n.getString("Generic_NEWS_ITEM_FIELD_" + field.name()), field);
         }
 
         return fields;
@@ -228,7 +226,7 @@ public class Common {
         Map<String, FeeType> types = new LinkedHashMap<String, FeeType>();
 
         for (FeeType type : FeeType.values()) {
-            types.put(JsfUtils.getResourceBundle().getString("FEE_TYPE_" + type.name()), type);
+            types.put(i18n.getString("Generic_FEE_TYPE_" + type.name()), type);
         }
 
         return types;
@@ -244,7 +242,7 @@ public class Common {
                 new LinkedHashMap<String, EmploymentType>();
 
         for (EmploymentType type : EmploymentType.values()) {
-            types.put(JsfUtils.getResourceBundle().getString("EMPLOYMENT_TYPE_" + type.name()), type);
+            types.put(i18n.getString("Generic_EMPLOYMENT_TYPE_" + type.name()), type);
         }
 
         return types;
@@ -259,7 +257,7 @@ public class Common {
         Map<String, WorkflowStatePermission> types = new LinkedHashMap<String, WorkflowStatePermission>();
 
         for (WorkflowStatePermission permission : WorkflowStatePermission.values()) {
-            types.put(JsfUtils.getResourceBundle().getString("WORKFLOW_STATE_PERMISSION_" + permission.name()), permission);
+            types.put(i18n.getString("Generic_WORKFLOW_STATE_PERMISSION_" + permission.name()), permission);
         }
 
         return types;
@@ -331,21 +329,20 @@ public class Common {
     public Map<String, Class> getMetadataTypes() {
 
         Map<String, Class> map = new LinkedHashMap<String, Class>();
-        ResourceBundle lbls = JsfUtils.getResourceBundle();
 
-        String label = lbls.getString(Subject.class.getName() + "_NAME");
+        String label = i18n.getString("Generic_" + Subject.class.getName() + "_NAME");
         map.put(label, Subject.class);
 
-        label = lbls.getString(Person.class.getName() + "_NAME");
+        label = i18n.getString("Generic_" + Person.class.getName() + "_NAME");
         map.put(label, Person.class);
 
-        label = lbls.getString(Organisation.class.getName() + "_NAME");
+        label = i18n.getString("Generic_" + Organisation.class.getName() + "_NAME");
         map.put(label, Organisation.class);
 
-        label = lbls.getString(GeoArea.class.getName() + "_NAME");
+        label = i18n.getString("Generic_" + GeoArea.class.getName() + "_NAME");
         map.put(label, GeoArea.class);
 
-        label = lbls.getString(PointOfInterest.class.getName() + "_NAME");
+        label = i18n.getString("Generic_" + PointOfInterest.class.getName() + "_NAME");
         map.put(label, PointOfInterest.class);
 
         return map;
@@ -557,7 +554,7 @@ public class Common {
         Map<String, AssignmentType> types = new LinkedHashMap<String, AssignmentType>();
 
         for (AssignmentType type : AssignmentType.values()) {
-            types.put(JsfUtils.getResourceBundle().getString("ASSIGNMENT_TYPE_" + type.name()), type);
+            types.put(i18n.getString("MyProfile_ASSIGNMENT_TYPE_" + type.name()), type);
         }
 
         return types;
@@ -584,7 +581,7 @@ public class Common {
         Map<String, MediaItemStatus> statuses = new LinkedHashMap<String, MediaItemStatus>();
 
         for (MediaItemStatus status : MediaItemStatus.values()) {
-            String lbl = msgs.getString("MEDIA_ITEM_STATUS_" + status.name());
+            String lbl = i18n.getString("Generic_MEDIA_ITEM_STATUS_" + status.name());
             statuses.put(lbl, status);
         }
 
@@ -594,8 +591,8 @@ public class Common {
     public Map<String, MediaItemStatus> getMediaItemOwnerStatuses() {
         Map<String, MediaItemStatus> statuses = new LinkedHashMap<String, MediaItemStatus>();
 
-        statuses.put(msgs.getString("MEDIA_ITEM_STATUS_OWNER_" + MediaItemStatus.SUBMITTED.name()), MediaItemStatus.SUBMITTED);
-        statuses.put(msgs.getString("MEDIA_ITEM_STATUS_OWNER_" + MediaItemStatus.UNSUBMITTED.name()), MediaItemStatus.UNSUBMITTED);
+        statuses.put(i18n.getString("Generic_MEDIA_ITEM_STATUS_OWNER_" + MediaItemStatus.SUBMITTED.name()), MediaItemStatus.SUBMITTED);
+        statuses.put(i18n.getString("Generic_MEDIA_ITEM_STATUS_OWNER_" + MediaItemStatus.UNSUBMITTED.name()), MediaItemStatus.UNSUBMITTED);
 
         return statuses;
     }
