@@ -18,6 +18,7 @@ package dk.i2m.converge.jsf.beans.administrator;
 
 import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
+import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.jsf.JsfUtils;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -46,10 +47,14 @@ public class Renditions {
         this.labels = null;
         if (isEditMode()) {
             selectedLabel = mediaDatabaseFacade.update(selectedLabel);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "mediaitem_RENDITION_UPDATED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Renditions_RENDITION_UPDATED");
         } else {
             selectedLabel = mediaDatabaseFacade.create(selectedLabel);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "mediaitem_RENDITION_CREATED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Renditions_RENDITION_CREATED");
         }
     }
 
@@ -57,7 +62,9 @@ public class Renditions {
         if (isEditMode()) {
             mediaDatabaseFacade.deleteRendition(selectedLabel.getId());
             this.labels = null;
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "mediaitem_RENDITION_DELETED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Renditions_RENDITION_DELETED");
         }
     }
 
@@ -79,7 +86,8 @@ public class Renditions {
 
     public DataModel getLabels() {
         if (this.labels == null) {
-            this.labels = new ListDataModel(mediaDatabaseFacade.findRenditions());
+            this.labels =
+                    new ListDataModel(mediaDatabaseFacade.findRenditions());
         }
         return this.labels;
     }
