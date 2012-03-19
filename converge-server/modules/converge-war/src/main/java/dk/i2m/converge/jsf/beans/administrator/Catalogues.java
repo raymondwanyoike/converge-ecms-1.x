@@ -1,11 +1,18 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later 
+ * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with 
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.jsf.beans.administrator;
 
@@ -17,6 +24,7 @@ import dk.i2m.converge.core.plugin.CatalogueHook;
 import dk.i2m.converge.core.plugin.Plugin;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
+import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.jsf.JsfUtils;
 import java.util.ArrayList;
 import java.util.Map;
@@ -34,7 +42,8 @@ import javax.faces.model.ListDataModel;
  */
 public class Catalogues {
 
-    protected static final Logger LOG = Logger.getLogger(Catalogues.class.getName());
+    protected static final Logger LOG = Logger.getLogger(Catalogues.class.
+            getName());
 
     @EJB private CatalogueFacadeLocal catalogueFacade;
 
@@ -48,7 +57,8 @@ public class Catalogues {
 
     private CatalogueHookInstance selectedCatalogueAction;
 
-    private CatalogueHookInstanceProperty selectedCatalogueActionProperty = new CatalogueHookInstanceProperty();
+    private CatalogueHookInstanceProperty selectedCatalogueActionProperty =
+            new CatalogueHookInstanceProperty();
 
     private DataModel catalogueActionProperties = null;
 
@@ -58,9 +68,13 @@ public class Catalogues {
     public void onIndex(ActionEvent event) {
         try {
             catalogueFacade.indexCatalogues();
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "Indexing complete", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Catalogues_INDEXING_COMPLETE");
         } catch (Exception ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(), "Generic_AN_ERROR_OCCURED_X",
+                    new Object[]{ex.getMessage()});
         }
     }
 
@@ -71,11 +85,17 @@ public class Catalogues {
     public void onSave(ActionEvent event) {
         repositories = null;
         if (isEditMode()) {
-            selectedMediaRepository = catalogueFacade.update(selectedMediaRepository);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "mediaitem_MEDIA_REPOSITORY_UPDATED");
+            selectedMediaRepository = catalogueFacade.update(
+                    selectedMediaRepository);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Catalogues_CATALOGUE_UPDATED");
         } else {
-            selectedMediaRepository = catalogueFacade.create(selectedMediaRepository);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "mediaitem_MEDIA_REPOSITORY_CREATED");
+            selectedMediaRepository = catalogueFacade.create(
+                    selectedMediaRepository);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Catalogues_CATALOGUE_CREATED");
         }
     }
 
@@ -88,9 +108,13 @@ public class Catalogues {
     public void onDelete(ActionEvent event) {
         try {
             catalogueFacade.deleteCatalogueById(selectedMediaRepository.getId());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "mediaitem_MEDIA_REPOSITORY_DELETED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Catalogues_CATALOGUE_DELETED");
         } catch (DataNotFoundException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "mediaitem_MEDIA_REPOSITORY_DELETED_FAILED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Catalogues_CATALOGUE_DELETED_FAILED");
         }
         this.repositories = null;
     }
@@ -98,7 +122,8 @@ public class Catalogues {
     public void onActionBatchAll(ActionEvent event) {
         for (CatalogueHookInstance instance : selectedMediaRepository.getHooks()) {
             try {
-                catalogueFacade.executeBatchHook(instance, selectedMediaRepository.getId());
+                catalogueFacade.executeBatchHook(instance,
+                        selectedMediaRepository.getId());
             } catch (DataNotFoundException ex) {
                 return;
             }
@@ -107,7 +132,8 @@ public class Catalogues {
 
     public void setActionBatch(CatalogueHookInstance instance) {
         try {
-            catalogueFacade.executeBatchHook(instance, selectedMediaRepository.getId());
+            catalogueFacade.executeBatchHook(instance, selectedMediaRepository.
+                    getId());
         } catch (DataNotFoundException ex) {
             return;
         }
@@ -115,7 +141,8 @@ public class Catalogues {
 
     public DataModel getRepositories() {
         if (repositories == null) {
-            repositories = new ListDataModel(catalogueFacade.findAllCatalogues());
+            repositories =
+                    new ListDataModel(catalogueFacade.findAllCatalogues());
         }
         return repositories;
     }
@@ -129,7 +156,8 @@ public class Catalogues {
     }
 
     public boolean isEditMode() {
-        if (selectedMediaRepository == null || selectedMediaRepository.getId() == null) {
+        if (selectedMediaRepository == null || selectedMediaRepository.getId()
+                == null) {
             return false;
         } else {
             return true;
@@ -151,8 +179,10 @@ public class Catalogues {
      * @param selectedCatalogueActionDetailsTab 
      *          ID of the selected tab
      */
-    public void setSelectedCatalogueActionDetailsTab(String selectedCatalogueActionDetailsTab) {
-        this.selectedCatalogueActionDetailsTab = selectedCatalogueActionDetailsTab;
+    public void setSelectedCatalogueActionDetailsTab(
+            String selectedCatalogueActionDetailsTab) {
+        this.selectedCatalogueActionDetailsTab =
+                selectedCatalogueActionDetailsTab;
     }
 
     /**
@@ -170,7 +200,8 @@ public class Catalogues {
      * @param selectedCatalogueAction 
      *          Instance of {@link CatalogueHook} to be created or edited
      */
-    public void setSelectedCatalogueAction(CatalogueHookInstance selectedCatalogueAction) {
+    public void setSelectedCatalogueAction(
+            CatalogueHookInstance selectedCatalogueAction) {
         this.selectedCatalogueAction = selectedCatalogueAction;
     }
 
@@ -189,7 +220,8 @@ public class Catalogues {
      * @param selectedCatalogueActionProperty 
      *          Action property being created
      */
-    public void setSelectedCatalogueActionProperty(CatalogueHookInstanceProperty selectedCatalogueActionProperty) {
+    public void setSelectedCatalogueActionProperty(
+            CatalogueHookInstanceProperty selectedCatalogueActionProperty) {
         this.selectedCatalogueActionProperty = selectedCatalogueActionProperty;
     }
 
@@ -205,16 +237,20 @@ public class Catalogues {
     public DataModel getCatalogueActionProperties() {
         if (this.catalogueActionProperties == null) {
             if (this.selectedCatalogueAction != null) {
-                this.catalogueActionProperties = new ListDataModel(this.selectedCatalogueAction.getProperties());
+                this.catalogueActionProperties =
+                        new ListDataModel(this.selectedCatalogueAction.
+                        getProperties());
             } else {
-                this.catalogueActionProperties = new ListDataModel(new ArrayList());
+                this.catalogueActionProperties =
+                        new ListDataModel(new ArrayList());
             }
         }
         return this.catalogueActionProperties;
     }
 
     public boolean isActionEditMode() {
-        if (selectedCatalogueAction == null || selectedCatalogueAction.getId() == null) {
+        if (selectedCatalogueAction == null || selectedCatalogueAction.getId()
+                == null) {
             return false;
         } else {
             return true;
@@ -244,31 +280,33 @@ public class Catalogues {
 
     public void onDeleteCatalogueAction(ActionEvent event) {
         selectedMediaRepository.getHooks().remove(selectedCatalogueAction);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "media_item_CATALOGUE_ACTION_DELETED");
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                Bundle.i18n.name(),
+                "administrator_Catalogues_CATALOGUE_ACTION_DELETED");
     }
 
     public void onSaveCatalogueAction(ActionEvent event) {
         if (isActionAddMode()) {
             selectedCatalogueAction.setCatalogue(selectedMediaRepository);
-            selectedCatalogueAction = catalogueFacade.createCatalogueAction(selectedCatalogueAction);
+            selectedCatalogueAction = catalogueFacade.createCatalogueAction(
+                    selectedCatalogueAction);
             selectedMediaRepository.getHooks().add(selectedCatalogueAction);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "media_item_CATALOGUE_ACTION_CREATED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Catalogues_CATALOGUE_ACTION_CREATED");
         } else {
-            selectedCatalogueAction = catalogueFacade.updateCatalogueAction(selectedCatalogueAction);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "media_item_CATALOGUE_ACTION_UPDATED");
+            selectedCatalogueAction = catalogueFacade.updateCatalogueAction(
+                    selectedCatalogueAction);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "administrator_Catalogues_CATALOGUE_ACTION_UPDATED");
         }
-
-        // Update the catalogue (as it will now have more actions)
-//        try {
-//            selectedMediaRepository = catalogueFacade.findCatalogueById(selectedMediaRepository.getId());
-//        } catch (DataNotFoundException ex) {
-//            LOG.log(Level.SEVERE, ex.getMessage(), ex);
-//        }
     }
 
     public void onAddActionProperty(ActionEvent event) {
         selectedCatalogueActionProperty.setCatalogueHook(selectedCatalogueAction);
-        selectedCatalogueAction.getProperties().add(selectedCatalogueActionProperty);
+        selectedCatalogueAction.getProperties().add(
+                selectedCatalogueActionProperty);
         selectedCatalogueActionProperty = new CatalogueHookInstanceProperty();
 
         // Refresh list of properties
