@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,22 +16,12 @@
  */
 package dk.i2m.converge.jsf.beans;
 
-import dk.i2m.converge.core.metadata.ConceptOutput;
 import dk.i2m.converge.core.DataNotFoundException;
-import dk.i2m.converge.core.metadata.Subject;
-import dk.i2m.converge.core.metadata.Concept;
-import dk.i2m.converge.core.metadata.GeoArea;
-import dk.i2m.converge.core.metadata.Organisation;
-import dk.i2m.converge.core.metadata.Person;
-import dk.i2m.converge.core.metadata.PointOfInterest;
+import dk.i2m.converge.core.metadata.*;
 import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
 import dk.i2m.jsf.JsfUtils;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -45,7 +35,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.LocaleUtils;
-import org.richfaces.component.UITree;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
 
@@ -299,8 +288,8 @@ public class Concepts {
             }
         }
 
-        JsfUtils.createMessage("frmSubjects", FacesMessage.SEVERITY_INFO,
-                "concepts_SUBJECTS_IMPORTED", imported);
+        JsfUtils.createMessage("frmSubjects", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                "Concepts_X_SUBJECTS_IMPORTED", new Object[]{imported});
     }
 
     public void onDeleteConcept(ActionEvent event) {
@@ -311,8 +300,8 @@ public class Concepts {
         updatingConcept = false;
         show = "OVERVIEW";
         mostRecent = null;
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                "concepts_CONCEPT_DELETED");
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                "Concepts_CONCEPT_DELETED");
     }
 
     public void onNewConcept(ActionEvent event) {
@@ -467,8 +456,8 @@ public class Concepts {
         if (conceptAddType.equalsIgnoreCase("RELATED")) {
             selectedConcept.getRelated().add(selectedMetaDataConcept);
             selectedConcept = metaDataFacade.update(selectedConcept);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "concepts_META_DATA_X_SELECTED_RELATED",
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "Concepts_META_DATA_X_SELECTED_RELATED",
                     new Object[]{getSelectedMetaDataConcept().getName(),
                         getSelectedConcept().getName()});
         } else if (conceptAddType.equalsIgnoreCase("SAME_AS")) {
@@ -485,20 +474,20 @@ public class Concepts {
                 selectedConcept =
                         metaDataFacade.findConceptById(selectedConcept.getId());
             } catch (Exception ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                        false, ex.getMessage(), null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
             }
 
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "concepts_META_DATA_X_SELECTED_SAME_AS",
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "Concepts_META_DATA_X_SELECTED_SAME_AS",
                     new Object[]{getSelectedMetaDataConcept().getName(),
                         getSelectedConcept().getName()});
         } else if (conceptAddType.equalsIgnoreCase("BROADER")) {
             selectedConcept.getBroader().add(selectedMetaDataConcept);
             selectedConcept = metaDataFacade.update(selectedConcept);
 
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "concepts_META_DATA_X_SELECTED_BROADER",
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "Concepts_META_DATA_X_SELECTED_BROADER",
                     new Object[]{getSelectedMetaDataConcept().getName(),
                         getSelectedConcept().getName()});
         } else if (conceptAddType.equalsIgnoreCase("NARROWER")) {
@@ -515,17 +504,17 @@ public class Concepts {
                 selectedConcept =
                         metaDataFacade.findConceptById(selectedConcept.getId());
             } catch (Exception ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                        false, ex.getMessage(), null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
             }
 
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "concepts_META_DATA_X_SELECTED_NARROWER",
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "Concepts_META_DATA_X_SELECTED_NARROWER",
                     new Object[]{getSelectedMetaDataConcept().getName(),
                         getSelectedConcept().getName()});
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "concepts_META_DATA_SELECTED_ERROR", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "Concepts_META_DATA_SELECTED_ERROR");
         }
 
     }
@@ -566,8 +555,8 @@ public class Concepts {
             selectedConcept = metaDataFacade.findConceptById(selectedConcept.
                     getId());
         } catch (DataNotFoundException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
         }
     }
 
@@ -578,8 +567,8 @@ public class Concepts {
             selectedConcept.getBroader().remove(selectedMetaDataConcept);
             selectedConcept = metaDataFacade.update(selectedConcept);
         } catch (DataNotFoundException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
         }
     }
 
@@ -590,8 +579,8 @@ public class Concepts {
             selectedConcept.getRelated().remove(selectedMetaDataConcept);
             selectedConcept = metaDataFacade.update(selectedConcept);
         } catch (DataNotFoundException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
         }
     }
 
@@ -606,8 +595,8 @@ public class Concepts {
             selectedConcept.getSameAs().remove(selectedMetaDataConcept);
             selectedConcept = metaDataFacade.update(selectedConcept);
         } catch (DataNotFoundException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
         }
     }
 
