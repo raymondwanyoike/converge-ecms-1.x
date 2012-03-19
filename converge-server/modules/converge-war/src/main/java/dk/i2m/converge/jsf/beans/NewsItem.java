@@ -44,7 +44,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.DataModel;
@@ -191,8 +190,10 @@ public class NewsItem {
             if (!this.selectedNewsItem.getConcepts().contains(concept)) {
                 this.selectedNewsItem.getConcepts().add(concept);
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                        false, concept.getFullTitle() + " has been added to "
-                        + selectedNewsItem.getTitle(), null);
+                        Bundle.i18n.name(),
+                        "NewsItem_CONCEPT_X_ADDED_TO_NEWS_ITEM_Y",
+                        new Object[]{concept.getFullTitle(), selectedNewsItem.
+                            getTitle()});
             }
             this.newConcept = "";
             conceptAdded = true;
@@ -215,8 +216,8 @@ public class NewsItem {
         } else if ("POI".equalsIgnoreCase(conceptType)) {
             c = new PointOfInterest(newConceptName, newConceptDescription);
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    "Please select concept type", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(), "NewsItem_CONCEPT_TYPE_MISSING");
         }
 
         if (c != null) {
@@ -224,8 +225,10 @@ public class NewsItem {
             if (!this.selectedNewsItem.getConcepts().contains(c)) {
                 this.selectedNewsItem.getConcepts().add(c);
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                        false, c.getFullTitle() + " has been added to "
-                        + selectedNewsItem.getTitle(), null);
+                        Bundle.i18n.name(),
+                        "NewsItem_CONCEPT_X_ADDED_TO_NEWS_ITEM_Y",
+                        new Object[]{c.getFullTitle(),
+                            selectedNewsItem.getTitle()});
                 onAutoSave(event);
             }
             this.newConcept = "";
@@ -236,9 +239,10 @@ public class NewsItem {
         HtmlTree tree = (HtmlTree) event.getComponent();
         Subject subj = (Subject) tree.getRowData();
         this.selectedNewsItem.getConcepts().add(subj);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false,
-                subj.getFullTitle() + " has been added to " + selectedNewsItem.
-                getTitle(), null);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                Bundle.i18n.name(),
+                "NewsItem_CONCEPT_X_ADDED_TO_NEWS_ITEM_Y",
+                new Object[]{subj.getFullTitle(), selectedNewsItem.getTitle()});
     }
 
     /**
@@ -310,8 +314,8 @@ public class NewsItem {
                         == ContentItemPermission.USER || this.permission
                         == ContentItemPermission.ROLE)) {
                     JsfUtils.createMessage("frmPage",
-                            FacesMessage.SEVERITY_ERROR,
-                            "newsitem_MSG_OPEN_READ_ONLY",
+                            FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                            "NewsItem_OPEN_READ_ONLY",
                             new Object[]{selectedNewsItem.getCheckedOutBy().
                                 getFullName()});
                 }
@@ -365,9 +369,7 @@ public class NewsItem {
                 selectedNewsItem = newsItemFacade.checkin(selectedNewsItem);
             } catch (LockingException ex) {
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                        false,
-                        "Could not save story. The story was locked by another user",
-                        null);
+                        Bundle.i18n.name(), "NewsItem_COULD_NOT_SAVE_LOCKED");
                 return null;
             }
             return "/inbox";
@@ -378,8 +380,9 @@ public class NewsItem {
                 comment = "";
                 return "/inbox";
             } catch (WorkflowStateTransitionException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                        false, ex.getMessage(), null);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
+                        new Object[]{ex.getMessage()});
                 return null;
             }
         }
@@ -388,15 +391,13 @@ public class NewsItem {
     public void onApply(ActionEvent event) {
         try {
             selectedNewsItem = newsItemFacade.save(selectedNewsItem);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false,
-                    "Your changes were saved. If you want to pass on the assignment to the next person in the workflow, select the appropriate option and click 'Submit'",
-                    null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(), "NewsItem_CHANGES_SAVED");
         } catch (LockingException ex) {
             LOG.log(Level.INFO, ex.getMessage());
             LOG.log(Level.FINE, "", ex);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    "Could not save story. The story was locked by another user",
-                    null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(), "NewsItem_COULD_NOT_SAVE_LOCKED");
         }
     }
 
@@ -404,29 +405,29 @@ public class NewsItem {
      * Event handler invoked upon executing the periodic auto-save
      * poller.
      *
-     * @param event * Event that invoked the auto-save
+     * @param event
+     *          Event that invoked the auto-save
      */
     public void onAutoSave(ActionEvent event) {
         try {
             selectedNewsItem = newsItemFacade.save(selectedNewsItem);
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    "Could not auto-save story. The story was locked by another user",
-                    null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(), "NewsItem_COULD_NOT_SAVE_LOCKED");
         }
     }
 
     public String onSave() {
         try {
             selectedNewsItem = newsItemFacade.checkin(selectedNewsItem);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false,
-                    "The assignment was saved", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(), "NewsItem_STORY_SAVED", null);
+            return "/inbox";
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    "Could not save story. The story was locked by another user",
-                    null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(), "NewsItem_COULD_NOT_SAVE_LOCKED");
+            return null;
         }
-        return "/inbox";
     }
 
     public String onClose() {
@@ -441,13 +442,13 @@ public class NewsItem {
             selectedNewsItem = null;
             setId(theId);
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    "Could not pullback story. The story was locked by another user",
-                    null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(), "NewsItem_COULD_NOT_PULLBACK");
         } catch (WorkflowStateTransitionException ex) {
             LOG.log(Level.SEVERE, "", ex);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    "Could not pullback story. Contact IT department", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(), "NewsItem_COULD_NOT_PULLBACK_X",
+                    new Object[]{ex.getMessage()});
         }
     }
 
@@ -461,18 +462,19 @@ public class NewsItem {
                 selectedNewsItem.getActors().remove(actor);
                 selectedNewsItem = newsItemFacade.save(selectedNewsItem);
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                        false, "The actor has been removed", null);
+                        Bundle.i18n.name(), "NewsItem_ACTOR_REMOVED");
             } catch (LockingException ex) {
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                        false, ex.getMessage(), null);
+                        Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
+                        new Object[]{ex.getMessage()});
             }
         }
     }
 
     public void setUpdateAttachment(NewsItemMediaAttachment attachment) {
         attachment = newsItemFacade.update(attachment);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false,
-                "The attachment was updated", null);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                Bundle.i18n.name(), "NewsItem_MEDIA_ATTACHMENT_UPDATED");
     }
 
     public void onDeleteSelectedActor(ActionEvent event) {
@@ -499,8 +501,8 @@ public class NewsItem {
                         && nia.getUser().equals(this.newActor.getUser())) {
                     dup = true;
                     JsfUtils.createMessage("frmPage",
-                            FacesMessage.SEVERITY_ERROR,
-                            "newsitem_DUPLICATE_USER_ROLE",
+                            FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                            "NewsItem_DUPLICATE_USER_ROLE",
                             new Object[]{this.newActor.getUser().getFullName(),
                                 this.newActor.getRole().getName()});
                 }
@@ -516,15 +518,16 @@ public class NewsItem {
                             getId());
                 } catch (DataNotFoundException ex) {
                     JsfUtils.createMessage("frmPage",
-                            FacesMessage.SEVERITY_ERROR, false, ex.getMessage(),
-                            null);
+                            FacesMessage.SEVERITY_ERROR,
+                            Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
+                            new Object[]{ex.getMessage()});
                 }
             }
             this.newActor = new NewsItemActor();
 
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    "Please select a role and user before clicking 'Add'", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(), "NewsItem_SELECT_USER_AND_ROLE");
         }
     }
 
@@ -535,11 +538,13 @@ public class NewsItem {
             selectedNewsItem = newsItemFacade.save(selectedNewsItem);
 
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "newsitem_META_DATA_X_ADDED_TO_ASSIGNMENT",
+                    Bundle.i18n.name(),
+                    "NewsItem_META_DATA_X_ADDED_TO_ASSIGNMENT",
                     new Object[]{getSelectedMetaDataConcept().getName()});
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
+                    new Object[]{ex.getMessage()});
         }
     }
 
@@ -550,11 +555,13 @@ public class NewsItem {
             selectedNewsItem = newsItemFacade.save(selectedNewsItem);
 
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "newsitem_META_DATA_X_REMOVED_FROM_ASSIGNMENT",
+                    Bundle.i18n.name(),
+                    "NewsItem_META_DATA_X_REMOVED_FROM_ASSIGNMENT",
                     new Object[]{getSelectedMetaDataConcept().getName()});
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
+                    new Object[]{ex.getMessage()});
         }
     }
 
@@ -584,7 +591,7 @@ public class NewsItem {
         if (selectedStep == null) {
             this.validWorkflowStep = false;
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    "newsitem_VALIDATE_SELECT_OPTION");
+                    Bundle.i18n.name(), "NewsItem_VALIDATE_SELECT_OPTION");
         }
 
         boolean isRoleValidated = false;
@@ -606,9 +613,10 @@ public class NewsItem {
         if (!isRoleValidated) {
             this.validWorkflowStep = false;
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    "newsitem_VALIDATE_MISSING_ROLE", requiredRole.getName());
+                    Bundle.i18n.name(),
+                    "NewsItem_VALIDATE_MISSING_ROLE", new Object[]{requiredRole.
+                        getName()});
         }
-
 
         for (WorkflowStepValidator validator : selectedStep.getValidators()) {
             try {
@@ -618,7 +626,8 @@ public class NewsItem {
                         validator);
             } catch (WorkflowValidatorException ex) {
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                        false, ex.getMessage(), new Object[]{});
+                        Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
+                        new Object[]{ex.getMessage()});
                 this.validWorkflowStep = false;
             }
         }
@@ -908,8 +917,9 @@ public class NewsItem {
             if (realResults.isEmpty()) {
                 searchResults = new ListDataModel(new ArrayList());
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                        false, "No results found with the query: {0}",
-                        getKeyword());
+                        Bundle.i18n.name(),
+                        "NewsItem_NO_MEDIA_ITEM_MATCHING_X",
+                        new Object[]{getKeyword()});
             } else {
 
                 for (SearchResult hit : realResults) {
@@ -923,7 +933,7 @@ public class NewsItem {
             }
         }
     }
-    
+
     public void setUploadedMediaItem(String id) {
         id = id.replaceAll("SUCCESS" + System.getProperty("line.separator"), "");
         this.uploadedMediaItem = Long.valueOf(id.trim());
@@ -942,7 +952,8 @@ public class NewsItem {
             this.selectedAttachment.setNewsItem(selectedNewsItem);
 
             try {
-                MediaItem mi = catalogueFacade.findMediaItemById(this.selectedMediaItemId);
+                MediaItem mi = catalogueFacade.findMediaItemById(
+                        this.selectedMediaItemId);
                 this.selectedAttachment.setMediaItem(mi);
                 this.selectedAttachment.setCaption(this.selectedAttachment.
                         getMediaItem().getDescription());
@@ -960,26 +971,32 @@ public class NewsItem {
      * @param event Event that invoked the handler
      */
     public void onUseAttachment(ActionEvent event) {
-        boolean isNewUpload = this.uploadedMediaItem.longValue() == this.selectedAttachment.getMediaItem().getId().longValue();
+        boolean isNewUpload = this.uploadedMediaItem.longValue()
+                == this.selectedAttachment.getMediaItem().getId().longValue();
 
         if (isNewUpload) {
             try {
-                MediaItem mediaItem = catalogueFacade.findMediaItemById(this.uploadedMediaItem);
+                MediaItem mediaItem = catalogueFacade.findMediaItemById(
+                        this.uploadedMediaItem);
                 mediaItem.setDescription(selectedAttachment.getCaption());
-                mediaItem.setByLine(selectedAttachment.getMediaItem().getByLine());
+                mediaItem.setByLine(
+                        selectedAttachment.getMediaItem().getByLine());
                 mediaItem = catalogueFacade.update(mediaItem);
                 selectedAttachment.setMediaItem(mediaItem);
             } catch (DataNotFoundException ex) {
                 LOG.warning(ex.getMessage());
             }
         }
-        
-        this.selectedAttachment.setDisplayOrder(this.selectedNewsItem.getNextAssetAttachmentDisplayOrder());
+
+        this.selectedAttachment.setDisplayOrder(this.selectedNewsItem.
+                getNextAssetAttachmentDisplayOrder());
         this.selectedAttachment = newsItemFacade.create(selectedAttachment);
         this.selectedNewsItem.getMediaAttachments().add(selectedAttachment);
 
         onPreAttachMediaFile(event);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n", "NewsItem_MEDIA_ITEM_ATTACHED_TO_NEWS_ITEM", null);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                Bundle.i18n.name(),
+                "NewsItem_MEDIA_ITEM_ATTACHED_TO_NEWS_ITEM");
     }
 
     public void onPreAttachMediaFile(ActionEvent event) {
@@ -1166,7 +1183,8 @@ public class NewsItem {
 
         if (getEditionCandidate() == null) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    "OUTLET_PLACEMENT_SELECT_EDITION");
+                    Bundle.i18n.name(),
+                    "NewsItem_OUTLET_PLACEMENT_SELECT_EDITION");
             return;
         }
 
@@ -1195,7 +1213,8 @@ public class NewsItem {
     public void onUpdatePlacement(ActionEvent event) {
         if (getEditionCandidate() == null) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    "OUTLET_PLACEMENT_SELECT_EDITION");
+                    Bundle.i18n.name(),
+                    "NewsItem_OUTLET_PLACEMENT_SELECT_EDITION");
             return;
         }
 
@@ -1277,7 +1296,7 @@ public class NewsItem {
     public void onSuggestConcepts(ActionEvent event) {
         if (getSelectedNewsItem().getStory().trim().isEmpty()) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    "i18n", "NewsItem_CONCEPTS_SUGGEST_FAILED_NO_STORY", null);
+                    Bundle.i18n.name(), "NewsItem_CONCEPTS_SUGGEST_FAILED_NO_STORY");
             return;
         }
 
@@ -1286,8 +1305,7 @@ public class NewsItem {
                     stripHtml(getSelectedNewsItem().getStory()));
             suggestedConcepts = new LinkedHashMap<String, Concept>();
             this.selectedConcepts = new ArrayList<Concept>();
-            ResourceBundle bundle = JsfUtils.getResourceBundle(FacesContext.
-                    getCurrentInstance(), "i18n");
+            ResourceBundle bundle = JsfUtils.getResourceBundle(Bundle.i18n.name());
             for (Concept concept : concepts) {
                 String type = bundle.getString("Generic_" + concept.getType()
                         + "_NAME");
@@ -1297,7 +1315,7 @@ public class NewsItem {
 
             if (suggestedConcepts.isEmpty()) {
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                        "i18n", "NewsItem_CONCEPTS_SUGGEST_NO_RESULTS", null);
+                        Bundle.i18n.name(), "NewsItem_CONCEPTS_SUGGEST_NO_RESULTS");
             }
 
         } catch (EnrichException ex) {
