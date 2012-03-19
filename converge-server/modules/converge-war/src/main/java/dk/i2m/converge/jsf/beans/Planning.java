@@ -323,7 +323,7 @@ public class Planning implements UIEventListener {
                         "Planning_EDITION_PLACEMENT_UPDATED");
             } catch (LockingException ex) {
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
-                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
+                        "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
             }
         }
         fetchEditions();
@@ -343,7 +343,7 @@ public class Planning implements UIEventListener {
                 selectedAssignment = newsItemFacade.checkin(selectedAssignment);
             } catch (LockingException ex) {
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
-                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
+                        "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
             }
         }
 
@@ -726,7 +726,7 @@ public class Planning implements UIEventListener {
             dialogEventSelection = new DialogEventSelection(calendarFacade);
             dialogEventSelection.setAssignment(dialogAssignment.getAssignment());
         } catch (DataNotFoundException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(), "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
         }
     }
 

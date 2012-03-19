@@ -73,7 +73,7 @@ public class Catalogues {
                     "administrator_Catalogues_INDEXING_COMPLETE");
         } catch (Exception ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    Bundle.i18n.name(), "Generic_AN_ERROR_OCCURED_X",
+                    Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
                     new Object[]{ex.getMessage()});
         }
     }

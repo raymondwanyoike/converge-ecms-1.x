@@ -509,7 +509,7 @@ public class UserSession {
             fetchUser();
         } catch (UserSessionException ex) {
             LOG.log(Level.SEVERE, null, ex);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(), "Generic_AN_ERROR_OCCURED_X",
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
                     new Object[]{ex.getMessage()});
         }
 

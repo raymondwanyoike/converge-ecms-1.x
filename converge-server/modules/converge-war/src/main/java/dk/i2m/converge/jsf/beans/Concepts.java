@@ -475,7 +475,7 @@ public class Concepts {
                         metaDataFacade.findConceptById(selectedConcept.getId());
             } catch (Exception ex) {
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
-                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
+                        "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
             }
 
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
@@ -505,7 +505,7 @@ public class Concepts {
                         metaDataFacade.findConceptById(selectedConcept.getId());
             } catch (Exception ex) {
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
-                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
+                        "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
             }
 
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
@@ -556,7 +556,7 @@ public class Concepts {
                     getId());
         } catch (DataNotFoundException ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
-                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
+                        "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
         }
     }
 
@@ -568,7 +568,7 @@ public class Concepts {
             selectedConcept = metaDataFacade.update(selectedConcept);
         } catch (DataNotFoundException ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
-                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
+                        "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
         }
     }
 
@@ -580,7 +580,7 @@ public class Concepts {
             selectedConcept = metaDataFacade.update(selectedConcept);
         } catch (DataNotFoundException ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
-                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
+                        "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
         }
     }
 
@@ -596,7 +596,7 @@ public class Concepts {
             selectedConcept = metaDataFacade.update(selectedConcept);
         } catch (DataNotFoundException ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
-                        "Generic_AN_ERROR_OCCURED_X", new Object[]{ex.getMessage()});
+                        "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
         }
     }
 
