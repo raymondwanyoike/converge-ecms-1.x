@@ -17,18 +17,18 @@
                         <div class="moduleContent">
                             <h:panelGrid columns="2">
                                 <c:if test="#{userSession.privilegedToCreateNewAssignments}">
-                                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{msgs.inbox_NEW_ASSIGNMENT}" title="#{msgs.inbox_NEW_ASSIGNMENT}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{i18n.Inbox_NEW_ASSIGNMENT}" title="#{i18n.Inbox_NEW_ASSIGNMENT}" />
                                     <a4j:commandLink reRender="frmNewAssignment" actionListener="#{inbox.onNewAssignment}" oncomplete="#{rich:component('mpNewAssignment')}.show();#{rich:element('frmNewAssignment:txtStoryTitle')}.focus()">
                                         <h:outputText value="#{i18n.Inbox_NEW_ASSIGNMENT}" />
                                     </a4j:commandLink>
                                 </c:if>
 
-                                <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{msgs.inbox_MY_ASSIGNMENTS}" title="#{msgs.inbox_MY_ASSIGNMENTS}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{i18n.Inbox_MY_ASSIGNMENTS}" title="#{i18n.Inbox_MY_ASSIGNMENTS}" />
                                 <a4j:commandLink reRender="frmInbox" actionListener="#{inbox.onShowMyAssignments}">
                                     <h:outputText value="#{i18n.Inbox_MY_ASSIGNMENTS}" />
                                 </a4j:commandLink>
 
-                                <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{msgs.inbox_EMPTY_TRASH}" title="#{msgs.inbox_EMPTY_TRASH}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_BULLET}" alt="#{i18n.Inbox_EMPTY_TRASH}" title="#{i18n.Inbox_EMPTY_TRASH}" />
                                 <a4j:commandLink reRender="frmInbox" actionListener="#{inbox.onEmptyTrash}" ajaxSingle="true">
                                     <h:outputText value="#{i18n.Inbox_EMPTY_TRASH}" />
                                 </a4j:commandLink>
@@ -42,21 +42,21 @@
 
                             <rich:tree reRender="frmInbox" ajaxSubmitSelection="true"  switchType="client" value="#{inbox.outletsNode}" var="item" nodeFace="#{item.type}" nodeSelectListener="#{inbox.onOutletFolderSelect}">
 
-                                <rich:treeNode type="dk.i2m.converge.core.workflow.Outlet" iconLeaf="#{res.INBOX_OUTLET_ICON}" icon="#{res.INBOX_OUTLET_ICON}" >
+                                <rich:treeNode type="dk.i2m.converge.core.workflow.Outlet" iconLeaf="#{i18n.resource_ICON_INBOX_OUTLET}" icon="#{i18n.resource_ICON_INBOX_OUTLET}" >
                                     <h:outputText value="#{item.data.title}" />
                                 </rich:treeNode>
 
-                                <rich:treeNode type="dk.i2m.converge.core.workflow.WorkflowState" iconLeaf="#{res.INBOX_WORKFLOW_STATE_ICON}" icon="#{res.INBOX_WORKFLOW_STATE_ICON}">
+                                <rich:treeNode type="dk.i2m.converge.core.workflow.WorkflowState" iconLeaf="#{i18n.resource_ICON_INBOX_WORKFLOW_STATE}" icon="#{i18n.resource_ICON_INBOX_WORKFLOW_STATE}">
                                     <h:outputText value="#{item.data.name}" />
                                 </rich:treeNode>
 
-                                <rich:treeNode type="dk.i2m.converge.core.content.catalogue.Catalogue" iconLeaf="#{res.INBOX_MEDIA_REPOSITORY_ICON}" icon="#{res.INBOX_MEDIA_REPOSITORY_ICON}" >
+                                <rich:treeNode type="dk.i2m.converge.core.content.catalogue.Catalogue" iconLeaf="#{i18n.resource_ICON_INBOX_CATALOGUE}" icon="#{i18n.resource_ICON_INBOX_CATALOGUE}" >
                                     <h:outputText value="#{item.data.name}" />
                                 </rich:treeNode>
 
-                                <rich:treeNode type="dk.i2m.converge.core.content.catalogue.MediaItemStatus" iconLeaf="#{res.INBOX_MEDIA_REPOSITORY_ICON}" icon="#{res.INBOX_MEDIA_REPOSITORY_ICON}" >
-                                    <c:set var="key" value="MEDIA_ITEM_STATUS_#{item.data}" />
-                                    <h:outputText value="#{msgs[key]}" />
+                                <rich:treeNode type="dk.i2m.converge.core.content.catalogue.MediaItemStatus" iconLeaf="#{i18n.resource_ICON_INBOX_CATALOGUE}" icon="#{i18n.resource_ICON_INBOX_CATALOGUE}" >
+                                    <c:set var="key" value="Generic_MEDIA_ITEM_STATUS_#{item.data}" />
+                                    <h:outputText value="#{i18n[key]}" />
                                 </rich:treeNode>
 
                             </rich:tree>
