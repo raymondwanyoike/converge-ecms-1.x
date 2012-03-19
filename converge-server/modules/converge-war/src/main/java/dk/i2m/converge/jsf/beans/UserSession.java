@@ -509,12 +509,12 @@ public class UserSession {
             fetchUser();
         } catch (UserSessionException ex) {
             LOG.log(Level.SEVERE, null, ex);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false,
-                    ex.getMessage(), null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(), "Generic_AN_ERROR_OCCURED_X",
+                    new Object[]{ex.getMessage()});
         }
 
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                "profile_PROFILE_UPDATED_MSG");
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                "MyProfile_PROFILE_UPDATED");
     }
 
     /**
