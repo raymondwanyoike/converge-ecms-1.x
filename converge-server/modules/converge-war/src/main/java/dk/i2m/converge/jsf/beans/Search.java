@@ -168,8 +168,7 @@ public class Search {
         conductSearch(getKeyword(), 0, 1000);
         byte[] output = searchEngine.generateReport(this.results);
 
-        String filename = JsfUtils.getResourceBundle(FacesContext.
-                getCurrentInstance(), "i18n").getString(
+        String filename = JsfUtils.getResourceBundle(Bundle.i18n.name()).getString(
                 "Search_OVERVIEW_REPORT_FILENAME");
 
         HttpServletResponse response = (HttpServletResponse) FacesContext.
@@ -184,9 +183,8 @@ public class Search {
             out.close();
         } catch (IOException ex) {
 
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    "i18n", "Search_COULD_NOT_OVERVIEW_GENERATE_REPORT", ex.
-                    getMessage());
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(), "Search_COULD_NOT_OVERVIEW_GENERATE_REPORT", new Object[]{ex.
+                    getMessage()});
         }
 
         FacesContext faces = FacesContext.getCurrentInstance();
@@ -254,8 +252,8 @@ public class Search {
         if (results.getNumberOfResults() == 0) {
             showResults = false;
             searchResults = new ListDataModel(new ArrayList());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
-                    "Search_NO_RESULTS_FOUND", getKeyword());
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                    "Search_NO_RESULTS_FOUND", new Object[]{getKeyword()});
         } else {
 
             for (SearchResult hit : results.getHits()) {
