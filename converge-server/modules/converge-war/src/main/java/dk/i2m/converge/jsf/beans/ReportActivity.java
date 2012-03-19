@@ -65,7 +65,7 @@ public class ReportActivity {
         java.util.Calendar lastDay = CalendarUtils.getLastDayOfMonth();
         this.startDate = firstDay.getTime();
         this.endDate = lastDay.getTime();
-        this.bundle = JsfUtils.getResourceBundle(FacesContext.getCurrentInstance(), "i18n");
+        this.bundle = JsfUtils.getResourceBundle(Bundle.i18n.name());
     }
 
     public Date getEndDate() {
@@ -158,7 +158,7 @@ public class ReportActivity {
                 out.flush();
                 out.close();
             } catch (IOException ex) {
-                JsfUtils.createMessage("frmReporting", FacesMessage.SEVERITY_ERROR, "118n", "ReportActivity_REPORT_GENERATION_ERROR_X", ex.getMessage());
+                JsfUtils.createMessage("frmReporting", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(), "ReportActivity_REPORT_GENERATION_ERROR_X", new Object[]{ex.getMessage()});
             }
 
             FacesContext faces = FacesContext.getCurrentInstance();
