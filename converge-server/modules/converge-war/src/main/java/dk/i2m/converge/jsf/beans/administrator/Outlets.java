@@ -23,6 +23,7 @@ import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.facades.EntityReferenceException;
 import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
 import dk.i2m.converge.jsf.beans.BaseBean;
+import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.jsf.JsfUtils;
 import java.util.*;
 import java.util.logging.Level;
@@ -221,8 +222,8 @@ public class Outlets extends BaseBean {
         if (selectedOutlet.getId() != null) {
             outletFacade.scheduleActionsOnOutlet(selectedOutlet.getId());
         }
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                "EDITIONS_RECLOSED");
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                Bundle.i18n.name(), "administrator_Outlets_EDITIONS_RECLOSED");
     }
 
     /**
@@ -235,8 +236,9 @@ public class Outlets extends BaseBean {
         if (selectedOutlet != null && action != null) {
             outletFacade.scheduleActionOnOutlet(selectedOutlet.getId(), action.
                     getId());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
-                    "administrator_Outlets_EXECUTE_ACTION_ON_EDITIONS", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                    Bundle.i18n.name(),
+                    "administrator_Outlets_EXECUTE_ACTION_ON_EDITIONS");
         }
     }
 
@@ -248,17 +250,19 @@ public class Outlets extends BaseBean {
     public void onSaveOutlet(ActionEvent event) {
         if (isOutletAddMode()) {
             selectedOutlet = outletFacade.createOutlet(selectedOutlet);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
-                    "administrator_Outlets_OUTLET_CREATED", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                    Bundle.i18n.name(),
+                    "administrator_Outlets_OUTLET_CREATED");
         } else {
             selectedOutlet = outletFacade.updateOutlet(selectedOutlet);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
-                    "administrator_Outlets_OUTLET_UPDATED", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                    Bundle.i18n.name(),
+                    "administrator_Outlets_OUTLET_UPDATED");
         }
 
         if (!selectedOutlet.isValid()) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    "i18n", "administrator_Outlets_INVALID_OUTLET", null);
+                    Bundle.i18n.name(), "administrator_Outlets_INVALID_OUTLET");
         }
 
         this.outlets = null;
@@ -272,41 +276,13 @@ public class Outlets extends BaseBean {
     public void onDeleteOutlet(ActionEvent event) {
         outletFacade.deleteOutletById(selectedOutlet.getId());
         this.outlets = null;
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                "OUTLET_DELETED");
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                Bundle.i18n.name(), "administrator_Outlets_OUTLET_DELETED");
     }
 
     public void onNewDepartment(ActionEvent event) {
         selectedDepartment = new Department();
         selectedDepartment.setOutlet(selectedOutlet);
-    }
-
-    public void onSaveOutletDepartment(ActionEvent event) {
-
-        String frmAttach = "frmOutletDetails";
-        if (event.getComponent().getId().equalsIgnoreCase(
-                "lnkApplyOutletDepartment")) {
-            frmAttach = "frmOutletDepartmentDetails";
-        }
-
-        if (isDepartmentAddMode()) {
-            selectedDepartment = outletFacade.createDepartment(
-                    selectedDepartment);
-            JsfUtils.createMessage(frmAttach, FacesMessage.SEVERITY_INFO,
-                    "DEPARTMENT_MSG_CREATED");
-        } else {
-            outletFacade.updateDepartment(selectedDepartment);
-            JsfUtils.createMessage(frmAttach, FacesMessage.SEVERITY_INFO,
-                    "DEPARTMENT_MSG_UPDATED");
-        }
-        reloadSelectedOutlet();
-    }
-
-    public void onDeleteOutletDepartment(ActionEvent event) {
-        outletFacade.deleteDepartment(selectedDepartment.getId());
-        JsfUtils.createMessage("frmOutletDetails", FacesMessage.SEVERITY_INFO,
-                "DEPARTMENT_MSG_DELETED");
-        reloadSelectedOutlet();
     }
 
     public void onNewSection(ActionEvent event) {
@@ -317,14 +293,12 @@ public class Outlets extends BaseBean {
     public void onSaveSection(ActionEvent event) {
         if (isSectionAddMode()) {
             selectedSection = outletFacade.createSection(selectedSection);
-            // TODO: i18n
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "outlets_SECTION_CREATED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                    Bundle.i18n.name(), "administrator_Outlets_SECTION_CREATED");
         } else {
             selectedSection = outletFacade.updateSection(selectedSection);
-            // TODO: i18n
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "outlets_SECTION_UPDATED");
+                    Bundle.i18n.name(), "administrator_Outlets_SECTION_UPDATED");
         }
         reloadSelectedOutlet();
     }
@@ -332,13 +306,12 @@ public class Outlets extends BaseBean {
     public void onDeleteSection(ActionEvent event) {
         try {
             outletFacade.deleteSection(selectedSection.getId());
-            // TODO: i18n
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "outlets_SECTION_DELETED");
+                    Bundle.i18n.name(), "administrator_Outlets_SECTION_DELETED");
         } catch (EntityReferenceException ex) {
-            // TODO: i18n
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "outlets_SECTION_CANNOT_BE_DELETED_ENTITY_REFERENCE");
+                    Bundle.i18n.name(),
+                    "administrator_Outlets_SECTION_CANNOT_BE_DELETED_ENTITY_REFERENCE");
         }
 
         reloadSelectedOutlet();
@@ -365,21 +338,24 @@ public class Outlets extends BaseBean {
             
             selectedOutletSubscriber = outletFacade.createSubscriber(
                     selectedOutletSubscriber);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
-                    "administrator_Outlets_OUTLET_SUBSCRIBER_CREATED", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                    Bundle.i18n.name(),
+                    "administrator_Outlets_OUTLET_SUBSCRIBER_CREATED");
         } else {
             selectedOutletSubscriber = outletFacade.updateSubscriber(
                     selectedOutletSubscriber);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
-                    "administrator_Outlets_OUTLET_SUBSCRIBER_UPDATED", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                    Bundle.i18n.name(),
+                    "administrator_Outlets_OUTLET_SUBSCRIBER_UPDATED");
         }
         onLoadSelectedOutletSubscribers(event);
     }
 
     public void onDeleteOutletSubscriber(ActionEvent event) {
         outletFacade.deleteSubscriberById(selectedOutletSubscriber.getId());
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
-                "administrator_Outlets_OUTLET_SUBSCRIBER_DELETED", null);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                Bundle.i18n.name(),
+                "administrator_Outlets_OUTLET_SUBSCRIBER_DELETED");
         onLoadSelectedOutletSubscribers(event);
     }
 
@@ -517,8 +493,9 @@ public class Outlets extends BaseBean {
      */
     public void onDeleteOutletAction(ActionEvent event) {
         selectedOutlet.getEditionActions().remove(selectedOutletEditionAction);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
-                "administrator_Outlets_OUTLET_ACTION_REMOVE", null);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                Bundle.i18n.name(),
+                "administrator_Outlets_OUTLET_ACTION_REMOVE");
 
     }
 
@@ -532,13 +509,15 @@ public class Outlets extends BaseBean {
             selectedOutletEditionAction.setOutlet(selectedOutlet);
             selectedOutletEditionAction = outletFacade.createOutletAction(
                     selectedOutletEditionAction);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
-                    "administrator_Outlets_OUTLET_ACTION_CREATED", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                    Bundle.i18n.name(),
+                    "administrator_Outlets_OUTLET_ACTION_CREATED");
         } else {
             selectedOutletEditionAction = outletFacade.updateOutletAction(
                     selectedOutletEditionAction);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
-                    "administrator_Outlets_OUTLET_ACTION_UPDATED", null);
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                    Bundle.i18n.name(),
+                    "administrator_Outlets_OUTLET_ACTION_UPDATED");
         }
 
         // Update the outlet (as it will now have different actions)
@@ -574,7 +553,8 @@ public class Outlets extends BaseBean {
     public void onDeleteEditionPattern(ActionEvent event) {
         selectedOutlet.getEditionPatterns().remove(selectedEditionPattern);
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                "outlet_EDITION_PATTERN_DELETED");
+                Bundle.i18n.name(),
+                "administrator_Outlets_EDITION_PATTERN_DELETED");
     }
 
     public void onSaveEditionPattern(ActionEvent event) {
@@ -583,14 +563,16 @@ public class Outlets extends BaseBean {
             selectedEditionPattern = outletFacade.updateEditionPattern(
                     selectedEditionPattern);
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "outlet_EDITION_PATTERN_UPDATED");
+                    Bundle.i18n.name(),
+                    "administrator_Outlets_EDITION_PATTERN_UPDATED");
 
         } else {
             selectedEditionPattern.setOutlet(selectedOutlet);
             selectedEditionPattern = outletFacade.createEditionPattern(
                     selectedEditionPattern);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    "outlet_EDITION_PATTERN_CREATED");
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                    Bundle.i18n.name(),
+                    "administrator_Outlets_EDITION_PATTERN_CREATED");
         }
 
         // Update the outlet (as it will now have different patterns)
