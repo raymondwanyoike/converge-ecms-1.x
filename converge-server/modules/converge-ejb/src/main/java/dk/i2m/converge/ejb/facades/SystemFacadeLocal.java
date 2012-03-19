@@ -43,7 +43,7 @@ public interface SystemFacadeLocal {
      * Updates a {@link List} of system properties.
      *
      * @param properties
-* {@link List} of system properties
+     *          {@link List} of system properties
      */
     void updateSystemProperties(List<Property> properties);
 
@@ -65,8 +65,8 @@ public interface SystemFacadeLocal {
      * Gets the {@link String} value of a given {@link ConfigurationKey}.
      *
      * @param key
-* {@link ConfigurationKey} for which to obtain the {@link String}
-     * value
+     *          {@link ConfigurationKey} for which to obtain the {@link String}
+     *          value
      * @return {@link String} value of the {@link ConfigurationKey}
      */
     String getProperty(ConfigurationKey key);
@@ -90,7 +90,7 @@ public interface SystemFacadeLocal {
      * Updates an existing {@link Announcement}.
      *
      * @param announcement
-* {@link Announcement} to update
+     *          {@link Announcement} to update
      * @return Updated {@link Announcement}
      */
     Announcement updateAnnouncement(Announcement announcement);
@@ -99,7 +99,7 @@ public interface SystemFacadeLocal {
      * Creates a new {@link Announcement}.
      *
      * @param announcement
-* {@link Announcement} to create
+     *          {@link Announcement} to create
      * @return Created {@link Announcement}
      */
     Announcement createAnnouncement(Announcement announcement);
@@ -108,7 +108,7 @@ public interface SystemFacadeLocal {
      * Delete an existing {@link Announcement}.
      *
      * @param id
-* Unique identifier of the {@link Announcement}
+     *          Unique identifier of the {@link Announcement}
      */
     void deleteAnnouncement(Long id);
 
@@ -116,10 +116,10 @@ public interface SystemFacadeLocal {
      * Find existing {@link Announcement} in the database.
      *
      * @param id
-* Unique identifier of the {@link Announcement}
+     *          Unique identifier of the {@link Announcement}
      * @return {@link Announcement} matching the {@code id}
      * @throws DataNotFoundException
-* If no {@link Announcement} could be matched to the {@code id}
+     *          If no {@link Announcement} could be matched to the {@code id}
      */
     Announcement findAnnouncementById(Long id) throws DataNotFoundException;
 
@@ -132,10 +132,6 @@ public interface SystemFacadeLocal {
     void deleteLanguage(Long id) throws ReferentialIntegrityException;
 
     Language findLanguageById(Long id) throws DataNotFoundException;
-
-    boolean upgrade(dk.i2m.converge.core.AppVersion version);
-
-    java.util.List<dk.i2m.converge.core.AppVersion> getVersionsForMigration();
 
     Long createBackgroundTask(String name);
 
