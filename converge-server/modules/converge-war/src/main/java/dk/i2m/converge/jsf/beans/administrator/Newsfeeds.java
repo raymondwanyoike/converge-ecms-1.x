@@ -22,6 +22,7 @@ import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.newswire.NewswireServiceProperty;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import dk.i2m.converge.ejb.services.NewswireServiceLocal;
+import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.converge.plugins.decoders.rss.RssDecoder;
 import dk.i2m.jsf.JsfUtils;
 import static dk.i2m.jsf.JsfUtils.createMessage;
@@ -140,43 +141,48 @@ public class Newsfeeds {
 
     /**
      * Event handler for emptying the selected {@link NewswireService}.
-     * <p/>
-     * @param event Event that invoked the handler
+     *
+     * @param event 
+     *          Event that invoked the handler
      */
     public void onEmptyNewswireService(ActionEvent event) {
         int deleted = newswire.emptyNewswireService(selectedNewsfeed.getId());
-        createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                "i18n", "administrator_Newsfeeds_NEWSWIRE_SERVICE_EMPTIED", deleted);
+        createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+                "administrator_Newsfeeds_NEWSWIRE_SERVICE_EMPTIED",
+                new Object[]{deleted});
         this.newswires = null;
     }
 
     /**
      * Event handler for emptying all the {@link NewswireService}s.
-     * <p/>
-     * @param event Event that invoked the handler
+     * 
+     * @param event 
+     *          Event that invoked the handler
      */
     public void onEmptyNewswireServices(ActionEvent event) {
         for (NewswireService service : newswire.getNewswireServices()) {
             newswire.emptyNewswireService(service.getId());
         }
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
-                "administrator_Newsfeeds_NEWSWIRE_SERVICES_EMPTIED", null);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                Bundle.i18n.name(),
+                "administrator_Newsfeeds_NEWSWIRE_SERVICES_EMPTIED");
 
         this.newswires = null;
     }
 
     /**
      * Event handler for updating the status of a {@link NewswireService}.
-     * <p/>
-     * @param event Event that invoked the handler
+     *
+     * @param event 
+     *          Event that invoked the handler
      */
     public void onUpdateStatus(ActionEvent event) {
         selectedNewsfeed.setActive(!selectedNewsfeed.isActive());
         newswire.update(selectedNewsfeed);
 
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                "i18n", "administrator_Newsfeeds_NEWSWIRE_STATUS_TOGGLED",
-                new Object[]{});
+                Bundle.i18n.name(), 
+                "administrator_Newsfeeds_NEWSWIRE_STATUS_TOGGLED");
         this.newswires = null;
     }
 
