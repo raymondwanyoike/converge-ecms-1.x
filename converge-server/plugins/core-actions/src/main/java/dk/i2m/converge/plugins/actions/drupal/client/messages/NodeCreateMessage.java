@@ -19,7 +19,7 @@ package dk.i2m.converge.plugins.actions.drupal.client.messages;
 /**
  * Holds Drupal response from a create method.
  *
- * @author Raymond Wanyoike <raymond.wanyoike@i2m.dk>
+ * @author Raymond Wanyoike
  */
 public class NodeCreateMessage {
 
