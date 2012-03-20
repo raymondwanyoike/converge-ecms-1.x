@@ -19,6 +19,9 @@ package dk.i2m.converge.plugins.actions.drupal.client.modules;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *
+ */
 public class NodeModule {
 
     private Long nid;

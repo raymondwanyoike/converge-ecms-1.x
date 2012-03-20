@@ -33,6 +33,9 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.jactiveresource.URLBuilder;
 
+/**
+ * The core that allows content to be submitted to the site.
+ */
 public class NodeResource {
 
     private static final Logger LOG = Logger.getLogger(NodeResource.class.
@@ -44,19 +47,39 @@ public class NodeResource {
 
     private UserResource userResource;
 
+    /**
+     * Create an empty Node resource.
+     */
     public NodeResource() {
     }
 
+    /**
+     * Constructs a Node resource from the given components.
+     *
+     * @param drupalConnector A {@link DrupalConnector} instance to use
+     */
     public NodeResource(DrupalConnector drupalConnector) {
         this.drupalConnector = drupalConnector;
     }
 
+    /**
+     * Constructs a Node resource from the given components.
+     *
+     * @param drupalConnector Connector instance to use
+     * @param userResource User to perform actions as
+     */
     public NodeResource(DrupalConnector drupalConnector,
             UserResource userResource) {
         this.drupalConnector = drupalConnector;
         this.userResource = userResource;
     }
 
+    /**
+     * Creates a new node based on submitted values.
+     *
+     * @param message Instance representing the attributes a node edit form would submit
+     * @return A populated {@link NodeModule} instance
+     */
     public NodeModule createNode(DrupalMessage message) {
         try {
             JSONObject json = new JSONObject();
@@ -103,18 +126,38 @@ public class NodeResource {
         return null;
     }
 
+    /**
+     * Returns the Drupal connector in use by this class.
+     *
+     * @return The connector in use
+     */
     public DrupalConnector getDrupalConnector() {
         return drupalConnector;
     }
 
+    /**
+     * Set the Drupal connector to be used by this class.
+     *
+     * @param drupalConnector The connector to use
+     */
     public void setDrupalConnector(DrupalConnector drupalConnector) {
         this.drupalConnector = drupalConnector;
     }
 
+    /**
+     * Returns the User resource in use by this class.
+     *
+     * @return The User resource in use
+     */
     public UserResource getUserResource() {
         return userResource;
     }
 
+    /**
+     * Set the User resource to be used by this class.
+     *
+     * @param userResource The User resource to use
+     */
     public void setUserResource(UserResource userResource) {
         this.userResource = userResource;
     }

@@ -16,7 +16,6 @@
  */
 package dk.i2m.converge.plugins.actions.drupal.client.resources;
 
-import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.plugins.actions.drupal.client.DrupalConnector;
 import dk.i2m.converge.plugins.actions.drupal.client.messages.DrupalMessage;
 import java.io.IOException;
@@ -48,13 +47,28 @@ public class UserResource {
 
     private String password;
 
+    /**
+     * Create an empty User resource.
+     */
     public UserResource() {
     }
 
+    /**
+     * Constructs a User resource from the given components.
+     *
+     * @param drupalConnector Connector instance
+     */
     public UserResource(DrupalConnector drupalConnector) {
         this.drupalConnector = drupalConnector;
     }
 
+    /**
+     * Constructs a User resource from the given components.
+     *
+     * @param drupalConnector Connector instance
+     * @param username Username to be logged in
+     * @param password Password, must be plain text and not hashed
+     */
     public UserResource(DrupalConnector drupalConnector, String username,
             String password) {
         this.drupalConnector = drupalConnector;
@@ -62,6 +76,14 @@ public class UserResource {
         this.password = password;
     }
 
+    /**
+     * Constructs a User resource from the given components.
+     *
+     * @param drupalConnector Connector instance
+     * @param username Username to be logged in
+     * @param password Password, must be plain text and not hashed
+     * @param connect Should {@code connect()} be called?
+     */
     public UserResource(DrupalConnector drupalConnector, String username,
             String password, Boolean connect) {
         this.drupalConnector = drupalConnector;
@@ -74,6 +96,9 @@ public class UserResource {
         }
     }
 
+    /**
+     * Login a user using the specified credentials.<br /><br />Note this will transfer a plaintext password.
+     */
     public void connect() {
         try {
             JSONObject json = new JSONObject();
@@ -116,6 +141,9 @@ public class UserResource {
         }
     }
 
+    /**
+     * Logout the current user.
+     */
     public void disconnect() {
         try {
             JSONObject json = new JSONObject();
@@ -151,26 +179,56 @@ public class UserResource {
         }
     }
 
+    /**
+     * Returns the Drupal connector in use by this class.
+     *
+     * @return The connector in use
+     */
     public DrupalConnector getDrupalConnector() {
         return drupalConnector;
     }
 
+    /**
+     * Set the Drupal connector to be used by this class.
+     *
+     * @param drupalConnector The connector to use
+     */
     public void setDrupalConnector(DrupalConnector drupalConnector) {
         this.drupalConnector = drupalConnector;
     }
 
+    /**
+     * Returns the password to login with.
+     *
+     * @return The plain text password
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * Set the password to login with.
+     *
+     * @param password Password, must be plain text and not hashed
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
+    /**
+     * Returns the username set to login as.
+     *
+     * @return The username
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * Set the username to login as.
+     *
+     * @param username Username to be logged in
+     */
     public void setUsername(String username) {
         this.username = username;
     }
