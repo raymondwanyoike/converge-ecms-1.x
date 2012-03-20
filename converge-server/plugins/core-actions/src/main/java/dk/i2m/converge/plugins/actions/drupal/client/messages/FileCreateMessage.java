@@ -14,31 +14,57 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.plugins.actions.drupal.client.modules;
+package dk.i2m.converge.plugins.actions.drupal.client.messages;
 
 /**
+ * Holds Drupal response from a create method.
  *
+ * @author Raymond Wanyoike <raymond.wanyoike@i2m.dk>
  */
-public class FileModule {
+public class FileCreateMessage {
 
     private Long fid;
+
     private String uri;
 
-    public FileModule() {
+    /**
+     * Create an empty message.
+     */
+    public FileCreateMessage() {
     }
 
+    /**
+     * Return created item ID.
+     *
+     * @return Item ID
+     */
     public Long getFid() {
         return fid;
     }
 
+    /**
+     * Set created item ID.
+     *
+     * @param fid Item ID
+     */
     public void setFid(Long fid) {
         this.fid = fid;
     }
 
+    /**
+     * Return created item URI.
+     *
+     * @return Drupal compliant URI
+     */
     public String getUri() {
         return uri;
     }
 
+    /**
+     * Set created item URI.
+     *
+     * @param uri Drupal compliant URI
+     */
     public void setUri(String uri) {
         this.uri = uri;
     }

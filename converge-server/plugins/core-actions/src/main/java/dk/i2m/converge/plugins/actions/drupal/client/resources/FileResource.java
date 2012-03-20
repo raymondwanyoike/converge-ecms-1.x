@@ -18,7 +18,7 @@ package dk.i2m.converge.plugins.actions.drupal.client.resources;
 
 import dk.i2m.converge.plugins.actions.drupal.client.DrupalConnector;
 import dk.i2m.converge.plugins.actions.drupal.client.messages.DrupalMessage;
-import dk.i2m.converge.plugins.actions.drupal.client.modules.FileModule;
+import dk.i2m.converge.plugins.actions.drupal.client.messages.FileCreateMessage;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -80,7 +80,7 @@ public class FileResource {
      * @param message An object representing the file with a base64 encoded value
      * @return Populated {@link FileModule} instance
      */
-    public FileModule createFile(DrupalMessage message) {
+    public FileCreateMessage createFile(DrupalMessage message) {
         try {
             JSONObject json = new JSONObject();
 
@@ -105,8 +105,8 @@ public class FileResource {
                     responce);
 
             post.abort();
-            return (FileModule) JSONObject.toBean(
-                    JSONObject.fromObject(responce), FileModule.class);
+            return (FileCreateMessage) JSONObject.toBean(
+                    JSONObject.fromObject(responce), FileCreateMessage.class);
         } catch (HttpResponseException ex) {
             // TODO: Handle exception
             Logger.getLogger(NodeResource.class.getName()).log(Level.SEVERE,
