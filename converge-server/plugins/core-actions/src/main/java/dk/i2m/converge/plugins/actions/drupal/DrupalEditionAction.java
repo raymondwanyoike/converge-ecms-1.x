@@ -18,6 +18,7 @@ package dk.i2m.converge.plugins.actions.drupal;
 
 import dk.i2m.converge.core.annotations.OutletAction;
 import dk.i2m.converge.core.content.NewsItem;
+import dk.i2m.converge.core.content.NewsItemEditionState;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.metadata.Concept;
@@ -30,17 +31,40 @@ import dk.i2m.converge.core.workflow.OutletEditionActionProperty;
 import dk.i2m.converge.plugins.actions.drupal.client.DrupalConnector;
 import dk.i2m.converge.plugins.actions.drupal.client.fields.TextField;
 import dk.i2m.converge.plugins.actions.drupal.client.messages.DrupalMessage;
+import dk.i2m.converge.plugins.actions.drupal.client.messages.NodeCreateMessage;
 import dk.i2m.converge.plugins.actions.drupal.client.modules.FieldModule;
 import dk.i2m.converge.plugins.actions.drupal.client.resources.NodeResource;
 import dk.i2m.converge.plugins.actions.drupal.client.resources.UserResource;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.http.client.HttpResponseException;
 
 /**
- * Plug-in {@link EditionAction} for uploading
+ * Plug-in {@link EditionAction} for uploading {@link NewsItem}s to a Drupal instance.
+ *
+ * @author Raymond Wanyoike
  */
 @OutletAction
 public class DrupalEditionAction implements EditionAction {
+
+    private static final String NID = "nid";
+
+    private static final String URI = "uri";
+
+    private static final String STATUS = "status";
+
+    private static final String SUBMITTED = "submitted";
+
+    private static final Integer UPLOADING = 0;
+
+    private static final Integer UPLOADED = 1;
+
+    private static final Integer FAILED = -1;
 
     private enum Property {
 
@@ -63,6 +87,7 @@ public class DrupalEditionAction implements EditionAction {
 
     private Map<Long, Long> mappings = new HashMap<Long, Long>();
 
+    /** {@inheritDoc} */
     @Override
     public void execute(PluginContext ctx, Edition edition,
             OutletEditionAction action) {
@@ -96,11 +121,11 @@ public class DrupalEditionAction implements EditionAction {
                 "Executing Drupal Client action for Outlet #{0}",
                 new Object[]{action.getOutlet().getId()}, action, action.getId());
 
-        DrupalConnector dc = new DrupalConnector(server, endPoint,
+        DrupalConnector connector = new DrupalConnector(server, endPoint,
                 Integer.parseInt(connectionTimeout), Integer.parseInt(
                 socketTimeout));
-        UserResource ur = new UserResource(dc, username, password, true);
-        NodeResource nr = new NodeResource(dc, ur);
+        UserResource ur = new UserResource(connector, username, password, true);
+        NodeResource nr = new NodeResource(connector);
 
         for (NewsItemPlacement nip : edition.getPlacements()) {
             int x = 0;
@@ -110,9 +135,9 @@ public class DrupalEditionAction implements EditionAction {
             Map<String, Object> body = new HashMap<String, Object>();
             Map<String, Object> categories = new HashMap<String, Object>();
 
-            nodeMessage.getFields().put("title", newsItem.getTitle());
             nodeMessage.getFields().put("type", type);
             nodeMessage.getFields().put("language", language);
+            nodeMessage.getFields().put("title", newsItem.getTitle());
 
             body.put("0", new TextField(newsItem.getBrief(), newsItem.getStory(),
                     "html"));
@@ -134,11 +159,35 @@ public class DrupalEditionAction implements EditionAction {
             ctx.log(LogSeverity.INFO,
                     "Creating new Drupal node for News Item #{0}",
                     new Object[]{newsItem.getId()}, action, action.getId());
-            nr.createNode(nodeMessage);
+
+            NewsItemEditionState status = ctx.addNewsItemEditionState(edition.
+                    getId(), newsItem.getId(), STATUS, UPLOADING.toString());
+
+            try {
+                NodeCreateMessage createdNode = nr.createNode(nodeMessage);
+                ctx.addNewsItemEditionState(edition.getId(), newsItem.getId(),
+                        NID, createdNode.getNid().toString());
+                ctx.addNewsItemEditionState(edition.getId(), newsItem.getId(),
+                        URI, createdNode.getUri().toString());
+                ctx.addNewsItemEditionState(edition.getId(), newsItem.getId(),
+                        SUBMITTED, new Date().toString());
+                status.setValue(UPLOADED.toString());
+            } catch (HttpResponseException ex) {
+                status.setValue(FAILED.toString());
+
+                Logger.getLogger(DrupalEditionAction.class.getName()).
+                        log(Level.SEVERE, null, ex);
+
+                ctx.log(LogSeverity.INFO,
+                    "HttpResponseException for News Item #{0}, with the message: {1} - {2} ",
+                    new Object[]{newsItem.getId(), ex.getStatusCode(), ex.getMessage()}, action, action.getId());
+            }
+
+            ctx.updateNewsItemEditionState(status);
         }
 
         ur.disconnect();
-        dc.shutdown();
+        connector.shutdown();
 
         ctx.log(LogSeverity.WARNING,
                 "Finished Drupal Client action for Outlet #{0}",
