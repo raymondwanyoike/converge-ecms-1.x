@@ -16,6 +16,9 @@
  */
 package dk.i2m.converge.plugins.actions.drupal.client.modules;
 
+/**
+ *
+ */
 public class FileModule {
 
     private Long fid;

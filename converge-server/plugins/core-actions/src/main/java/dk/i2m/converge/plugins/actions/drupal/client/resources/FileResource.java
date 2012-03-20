@@ -33,6 +33,9 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.jactiveresource.URLBuilder;
 
+/**
+ * API for handling file uploads and server file management.
+ */
 public class FileResource {
 
     private static final Logger LOG = Logger.getLogger(FileResource.class.
@@ -44,19 +47,39 @@ public class FileResource {
 
     private UserResource userResource;
 
+    /**
+     * Create an empty File resource.
+     */
     public FileResource() {
     }
 
+    /**
+     * Constructs a File resource from the given components.
+     *
+     * @param drupalConnector Connector instance
+     */
     public FileResource(DrupalConnector drupalConnector) {
         this.drupalConnector = drupalConnector;
     }
 
+    /**
+     * Constructs a File resource from the given components.
+     *
+     * @param drupalConnector Connector instance
+     * @param userResource User to perform actions as
+     */
     public FileResource(DrupalConnector drupalConnector,
             UserResource userResource) {
         this.drupalConnector = drupalConnector;
         this.userResource = userResource;
     }
 
+    /**
+     * Adds a new file.
+     *
+     * @param message An object representing the file with a base64 encoded value
+     * @return Populated {@link FileModule} instance
+     */
     public FileModule createFile(DrupalMessage message) {
         try {
             JSONObject json = new JSONObject();
@@ -105,18 +128,38 @@ public class FileResource {
         return null;
     }
 
+    /**
+     * Returns the Drupal connector in use by this class.
+     *
+     * @return The connector in use
+     */
     public DrupalConnector getDrupalConnector() {
         return drupalConnector;
     }
 
+    /**
+     * Set the Drupal connector to be used by this class.
+     *
+     * @param drupalConnector The connector to use
+     */
     public void setDrupalConnector(DrupalConnector drupalConnector) {
         this.drupalConnector = drupalConnector;
     }
 
+    /**
+     * Returns the User resource in use by this class.
+     *
+     * @return The User resource in use
+     */
     public UserResource getUserResource() {
         return userResource;
     }
 
+    /**
+     * Set the User resource to be used by this class.
+     *
+     * @param userResource The User resource to use
+     */
     public void setUserResource(UserResource userResource) {
         this.userResource = userResource;
     }

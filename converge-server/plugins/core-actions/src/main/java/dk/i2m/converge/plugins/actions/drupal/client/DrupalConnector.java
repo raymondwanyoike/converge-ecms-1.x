@@ -16,8 +16,6 @@
  */
 package dk.i2m.converge.plugins.actions.drupal.client;
 
-import dk.i2m.converge.core.plugin.PluginContext;
-import dk.i2m.converge.core.workflow.OutletEditionAction;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -36,9 +34,12 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.jactiveresource.URLBuilder;
 
+/**
+ * Provides a generic but powerful API for Drupal's Services module REST server.
+ */
 public class DrupalConnector {
 
-    public static final String CONTENT_TYPE = "application/json";
+    private static final String CONTENT_TYPE = "application/json";
 
     private List<Header> headers = new ArrayList<Header>();
 
@@ -54,9 +55,20 @@ public class DrupalConnector {
 
     private String server;
 
+    /**
+     * Create an empty Drupal connector.
+     */
     public DrupalConnector() {
     }
 
+    /**
+     * Constructs a Drupal connector from the given components.
+     *
+     * @param server URL to the host
+     * @param endPoint Endpoint defined in the Services module
+     * @param connectionTimeout Duration to wait before timing out when connecting, 0 is infinite
+     * @param socketTimeout Duration to wait before timing out for a response, 0 is infinite
+     */
     public DrupalConnector(String server, String endPoint, int connectionTimeout,
             int socketTimeout) {
         this.params.setParameter(AllClientPNames.CONNECTION_TIMEOUT,
@@ -79,80 +91,156 @@ public class DrupalConnector {
         this.server = server;
     }
 
+    /**
+     * Return the full path to the host endpoint.
+     *
+     * @return A URI equivalent of the host endpoint URL
+     */
     public URI getUri() {
         try {
-            URLBuilder ub = new URLBuilder();
             URI base = new URI(server);
-            ub.setBase(base);
-            ub.add(endPoint);
+            URLBuilder ub = new URLBuilder(base).add(endPoint);
             return URI.create(ub.toString());
         } catch (MalformedURLException ex) {
-            Logger.getLogger(DrupalConnector.class.getName()).log(Level.SEVERE,
-                    null, ex);
+            Logger.getLogger(DrupalConnector.class.getName()).
+                    log(Level.SEVERE, null, ex);
         } catch (URISyntaxException ex) {
-            Logger.getLogger(DrupalConnector.class.getName()).log(Level.SEVERE,
-                    null, ex);
+            Logger.getLogger(DrupalConnector.class.getName()).
+                    log(Level.SEVERE, null, ex);
         }
 
         return null;
     }
 
+    /**
+     * Shutdown the httpclient and release all resources.
+     */
     public void shutdown() {
         this.httpClient.getConnectionManager().shutdown();
     }
 
+    /**
+     * Return the connection timeout.
+     *
+     * @return The connection timeout in ms
+     */
     public int getConnectionTimeout() {
         return connectionTimeout;
     }
 
+    /**
+     * Set the duration to wait before timing out when connecting, 0 is infinite.
+     *
+     * @param connectionTimeout The duration in ms
+     */
     public void setConnectionTimeout(int connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
     }
 
+    /**
+     * Return the endpoint.
+     *
+     * @return The endpoint
+     */
     public String getEndPoint() {
         return endPoint;
     }
 
+    /**
+     * Set the endpoint defined in the Services module.
+     *
+     * @param endPoint The path to endpoint
+     */
     public void setEndPoint(String endPoint) {
         this.endPoint = endPoint;
     }
 
+    /**
+     * Return the list of set headers.
+     * @return A list of headers
+     */
     public List<Header> getHeaders() {
         return headers;
     }
 
+    /**
+     * Set the headers
+     *
+     * @param headers
+     */
     public void setHeaders(List<Header> headers) {
         this.headers = headers;
+        this.headers.add(new BasicHeader("Content-Type", CONTENT_TYPE));
     }
 
+    /**
+     * Return the httpclient in use.
+     *
+     * @return The httpclient
+     */
     public DefaultHttpClient getHttpClient() {
         return httpClient;
     }
 
+    /**
+     * Set the httpclient to use.
+     *
+     * @param httpClient The httpclient
+     */
     public void setHttpClient(DefaultHttpClient httpClient) {
         this.httpClient = httpClient;
     }
 
+    /**
+     * Return the httpclient parameters.
+     *
+     * @return The httpclient parameters
+     */
     public HttpParams getParams() {
         return params;
     }
 
+    /**
+     * Set the httpclient parameters.
+     *
+     * @param params The httpclient parameters
+     */
     public void setParams(HttpParams params) {
         this.params = params;
     }
 
+    /**
+     * Return the host URL.
+     *
+     * @return The host URL
+     */
     public String getServer() {
         return server;
     }
 
+    /**
+     * Set the URL to the host.
+     *
+     * @param server The host URL
+     */
     public void setServer(String server) {
         this.server = server;
     }
 
+    /**
+     * Return the socket timeout.
+     *
+     * @return The socket timeout in ms
+     */
     public int getSocketTimeout() {
         return socketTimeout;
     }
 
+    /**
+     * Set the duration to wait before timing out for a response, 0 is infinite
+     *
+     * @param socketTimeout The duration in ms
+     */
     public void setSocketTimeout(int socketTimeout) {
         this.socketTimeout = socketTimeout;
     }

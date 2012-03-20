@@ -18,6 +18,9 @@ package dk.i2m.converge.plugins.actions.drupal.client.modules;
 
 import java.util.Map;
 
+/**
+ *
+ */
 public class FieldModule {
 
     private Map<String, Object> und;

@@ -19,6 +19,9 @@ package dk.i2m.converge.plugins.actions.drupal.client.messages;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *
+ */
 public class DrupalMessage {
 
     private Map<String, Object> fields = new HashMap<String, Object>();

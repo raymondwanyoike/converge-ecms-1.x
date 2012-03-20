@@ -36,6 +36,9 @@ import dk.i2m.converge.plugins.actions.drupal.client.resources.UserResource;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * Plug-in {@link EditionAction} for uploading
+ */
 @OutletAction
 public class DrupalEditionAction implements EditionAction {
 
