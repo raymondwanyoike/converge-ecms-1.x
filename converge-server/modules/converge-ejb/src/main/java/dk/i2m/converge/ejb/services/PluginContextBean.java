@@ -3,12 +3,12 @@
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later 
+ * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
@@ -22,6 +22,7 @@ import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.content.ContentTag;
 import dk.i2m.converge.core.content.NewsItem;
+import dk.i2m.converge.core.content.NewsItemEditionState;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
@@ -47,6 +48,8 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
@@ -54,6 +57,7 @@ import javax.ejb.Stateless;
  * Implementation of the {@link dk.i2m.converge.core.plugin.PluginContext}.
  *
  * @author Allan Lykke Christensen
+ * @author Raymond Wanyoike
  */
 @Stateless
 public class PluginContextBean implements PluginContextBeanLocal {
@@ -305,10 +309,38 @@ public class PluginContextBean implements PluginContextBeanLocal {
     public Edition createEdition(Edition edition) {
         return outletFacade.createEdition(edition);
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public NewsItemPlacement createPlacement(NewsItemPlacement placement) {
         return newsItemFacade.createPlacement(placement);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NewsItemEditionState addNewsItemEditionState(Long editionId,
+            Long newsItemId,
+            String property, String value) {
+        try {
+            Edition edition = outletFacade.findEditionById(editionId);
+            NewsItem newsitem = newsItemFacade.findNewsItemById(newsItemId);
+
+            NewsItemEditionState editionState = new NewsItemEditionState(edition,
+                    newsitem, "", property, value, false);
+
+            return daoService.create(editionState);
+        } catch (DataNotFoundException ex) {
+            Logger.getLogger(PluginContextBean.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
+
+        return new NewsItemEditionState();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NewsItemEditionState updateNewsItemEditionState(
+            NewsItemEditionState newsItemEditionState) {
+        return daoService.update(newsItemEditionState);
     }
 }
