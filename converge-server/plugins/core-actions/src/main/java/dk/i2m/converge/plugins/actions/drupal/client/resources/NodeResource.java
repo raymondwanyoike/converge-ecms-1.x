@@ -18,23 +18,29 @@ package dk.i2m.converge.plugins.actions.drupal.client.resources;
 
 import dk.i2m.converge.plugins.actions.drupal.client.DrupalConnector;
 import dk.i2m.converge.plugins.actions.drupal.client.messages.DrupalMessage;
-import dk.i2m.converge.plugins.actions.drupal.client.modules.NodeModule;
+import dk.i2m.converge.plugins.actions.drupal.client.messages.NodeCreateMessage;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sf.json.JSONObject;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.jactiveresource.URLBuilder;
 
 /**
- * The core that allows content to be submitted to the site.
+ * The core that allows node content to be submitted to the site.
+ *
+ * @author Raymond Wanyoike
  */
 public class NodeResource {
 
@@ -43,9 +49,9 @@ public class NodeResource {
 
     private static final String NODE = "node";
 
-    private DrupalConnector drupalConnector;
+    private DefaultHttpClient httpClient;
 
-    private UserResource userResource;
+    private URI uri;
 
     /**
      * Create an empty Node resource.
@@ -56,109 +62,71 @@ public class NodeResource {
     /**
      * Constructs a Node resource from the given components.
      *
-     * @param drupalConnector A {@link DrupalConnector} instance to use
+     * @param connector Connector instance
      */
-    public NodeResource(DrupalConnector drupalConnector) {
-        this.drupalConnector = drupalConnector;
-    }
-
-    /**
-     * Constructs a Node resource from the given components.
-     *
-     * @param drupalConnector Connector instance to use
-     * @param userResource User to perform actions as
-     */
-    public NodeResource(DrupalConnector drupalConnector,
-            UserResource userResource) {
-        this.drupalConnector = drupalConnector;
-        this.userResource = userResource;
+    public NodeResource(DrupalConnector connector) {
+        this.uri = connector.getUri();
+        this.httpClient = connector.getHttpClient();
     }
 
     /**
      * Creates a new node based on submitted values.
      *
      * @param message Instance representing the attributes a node edit form would submit
-     * @return A populated {@link NodeModule} instance
+     * @return A populated {@link NodeCreateMessage} instance
      */
-    public NodeModule createNode(DrupalMessage message) {
+    public NodeCreateMessage createNode(DrupalMessage message) throws
+            HttpResponseException {
+        NodeCreateMessage nodeCreateMessage = new NodeCreateMessage();
+
+        JSONObject json = new JSONObject();
+
+        for (String fieldName : message.getFields().keySet()) {
+            json.put(fieldName, message.getFields().get(fieldName));
+        }
+
         try {
-            JSONObject json = new JSONObject();
-
-            for (String fieldName : message.getFields().keySet()) {
-                json.put(fieldName, message.getFields().get(fieldName));
-            }
-
             StringEntity input = new StringEntity(json.toString());
-            String url = new URLBuilder(drupalConnector.getUri()).add(NODE).
-                    toString();
+            String url = new URLBuilder(uri).add(NODE).toString();
             HttpPost post = new HttpPost(url);
             post.setEntity(input);
 
-            LOG.log(Level.INFO, "Sending create node request to Drupal: {0}",
-                    json.toString());
-
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
-            String responce = drupalConnector.getHttpClient().execute(post,
-                    responseHandler);
+            HttpResponse responce = httpClient.execute(post);
 
-            LOG.log(Level.INFO, "Recieved create node responce from Drupal: {0}",
-                    responce);
+            String handledResponse = responseHandler.handleResponse(responce);
 
-            post.abort();
+            nodeCreateMessage =
+                    (NodeCreateMessage) JSONObject.toBean(JSONObject.fromObject(
+                    handledResponse), NodeCreateMessage.class);
+
+            EntityUtils.consume(responce.getEntity());
         } catch (HttpResponseException ex) {
-            // TODO: Handle exception
-            Logger.getLogger(NodeResource.class.getName()).log(Level.SEVERE,
-                    null, ex);
+            throw ex;
         } catch (ClientProtocolException ex) {
-            Logger.getLogger(NodeResource.class.getName()).log(Level.SEVERE,
-                    null, ex);
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(NodeResource.class.getName()).log(Level.SEVERE,
-                    null, ex);
+            Logger.getLogger(NodeResource.class.getName()).
+                    log(Level.SEVERE, null, ex);
         } catch (MalformedURLException ex) {
-            Logger.getLogger(NodeResource.class.getName()).log(Level.SEVERE,
-                    null, ex);
+            Logger.getLogger(NodeResource.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(NodeResource.class.getName()).
+                    log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(NodeResource.class.getName()).log(Level.SEVERE,
-                    null, ex);
+            Logger.getLogger(NodeResource.class.getName()).
+                    log(Level.SEVERE, null, ex);
         }
 
-        return null;
+        return nodeCreateMessage;
     }
 
     /**
-     * Returns the Drupal connector in use by this class.
+     * Set the connector to be used by this class.
      *
-     * @return The connector in use
+     * @param connector Connector to use
      */
-    public DrupalConnector getDrupalConnector() {
-        return drupalConnector;
-    }
-
-    /**
-     * Set the Drupal connector to be used by this class.
-     *
-     * @param drupalConnector The connector to use
-     */
-    public void setDrupalConnector(DrupalConnector drupalConnector) {
-        this.drupalConnector = drupalConnector;
-    }
-
-    /**
-     * Returns the User resource in use by this class.
-     *
-     * @return The User resource in use
-     */
-    public UserResource getUserResource() {
-        return userResource;
-    }
-
-    /**
-     * Set the User resource to be used by this class.
-     *
-     * @param userResource The User resource to use
-     */
-    public void setUserResource(UserResource userResource) {
-        this.userResource = userResource;
+    public void setDrupalConnector(DrupalConnector connector) {
+        this.uri = connector.getUri();
+        this.httpClient = connector.getHttpClient();
     }
 }
