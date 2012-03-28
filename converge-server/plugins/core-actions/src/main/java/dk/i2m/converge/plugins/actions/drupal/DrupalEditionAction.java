@@ -99,25 +99,23 @@ public class DrupalEditionAction implements EditionAction {
         String password = properties.get(Property.PASSWORD.name());
         String type = properties.get(Property.CONTENT_TYPE.name());
         String language = properties.get(Property.LANGUAGE.name());
+        String mapping = properties.get(Property.DRUPAL_MAPPING.name());
         String socketTimeout = properties.get(Property.SOCKET_TIMEOUT.name());
         String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT.
                 name());
-        String drupalMappingField =
-                properties.get(Property.DRUPAL_MAPPING_FIELD.name());
+        String mappingField = properties.get(
+                Property.DRUPAL_MAPPING_FIELD.name());
 
-        for (OutletEditionActionProperty p : action.getProperties()) {
-            if (Property.DRUPAL_MAPPING.name().equals(p.getKey())) {
-                String[] mapValues = p.getValue().split(";");
-                if (mapValues.length != 2) {
-                    continue;
-                } else {
-                    mappings.put(Long.valueOf(mapValues[0].trim()),
-                            Long.valueOf(mapValues[1].trim()));
-                }
-            }
+        String[] mapValues = mapping.split(";");
+
+        for (int i = 0; i < mapValues.length; i++) {
+            System.out.println(mapValues[i]);
+            String[] mapValue = mapValues[i].split(":");
+            mappings.put(Long.valueOf(mapValue[0].trim()),
+                    Long.valueOf(mapValue[1].trim()));
         }
 
-        ctx.log(LogSeverity.WARNING,
+        ctx.log(LogSeverity.INFO,
                 "Executing Drupal Client action for Outlet #{0}",
                 new Object[]{action.getOutlet().getId()}, action, action.getId());
 
@@ -153,7 +151,7 @@ public class DrupalEditionAction implements EditionAction {
             }
 
             nodeMessage.getFields().put("body", new FieldModule(body));
-            nodeMessage.getFields().put("category", new FieldModule(
+            nodeMessage.getFields().put(mappingField, new FieldModule(
                     categories));
 
             ctx.log(LogSeverity.INFO,
@@ -162,15 +160,22 @@ public class DrupalEditionAction implements EditionAction {
 
             NewsItemEditionState status = ctx.addNewsItemEditionState(edition.
                     getId(), newsItem.getId(), STATUS, UPLOADING.toString());
+            NewsItemEditionState nid =
+                    ctx.addNewsItemEditionState(edition.getId(),
+                    newsItem.getId(), NID, null);
+            NewsItemEditionState uri =
+                    ctx.addNewsItemEditionState(edition.getId(),
+                    newsItem.getId(), URI, null);
+            NewsItemEditionState submitted =
+                    ctx.addNewsItemEditionState(edition.getId(),
+                    newsItem.getId(), SUBMITTED, null);
 
             try {
                 NodeCreateMessage createdNode = nr.createNode(nodeMessage);
-                ctx.addNewsItemEditionState(edition.getId(), newsItem.getId(),
-                        NID, createdNode.getNid().toString());
-                ctx.addNewsItemEditionState(edition.getId(), newsItem.getId(),
-                        URI, createdNode.getUri().toString());
-                ctx.addNewsItemEditionState(edition.getId(), newsItem.getId(),
-                        SUBMITTED, new Date().toString());
+
+                nid.setValue(createdNode.getNid().toString());
+                uri.setValue(createdNode.getUri().toString());
+                submitted.setValue(new Date().toString());
                 status.setValue(UPLOADED.toString());
             } catch (HttpResponseException ex) {
                 status.setValue(FAILED.toString());
@@ -178,12 +183,16 @@ public class DrupalEditionAction implements EditionAction {
                 Logger.getLogger(DrupalEditionAction.class.getName()).
                         log(Level.SEVERE, null, ex);
 
-                ctx.log(LogSeverity.INFO,
-                    "HttpResponseException for News Item #{0}, with the message: {1} - {2} ",
-                    new Object[]{newsItem.getId(), ex.getStatusCode(), ex.getMessage()}, action, action.getId());
+                ctx.log(LogSeverity.SEVERE,
+                        "HttpResponseException for News Item #{0}, with the message: {1} - {2} ",
+                        new Object[]{newsItem.getId(), ex.getStatusCode(), ex.
+                            getMessage()}, action, action.getId());
             }
 
             ctx.updateNewsItemEditionState(status);
+            ctx.updateNewsItemEditionState(nid);
+            ctx.updateNewsItemEditionState(uri);
+            ctx.updateNewsItemEditionState(submitted);
         }
 
         ur.disconnect();
