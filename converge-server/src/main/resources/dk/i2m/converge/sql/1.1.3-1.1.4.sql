@@ -14,3 +14,15 @@ CREATE TABLE `wiki_page` (
 ALTER TABLE `newswire_service` ADD COLUMN `copyright` TEXT DEFAULT '';
 
 ALTER TABLE `catalogue_hook` ADD COLUMN `asynchronous` TINYINT(1) DEFAULT '0';
+
+-- Drupal Client
+CREATE TABLE `news_item_edition_state` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `eid` int(11) DEFAULT NULL,
+  `nid` int(11) DEFAULT NULL,
+  `label` TEXT,
+  `property` TEXT,
+  `value` TEXT,
+  `visible` tinyint(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
