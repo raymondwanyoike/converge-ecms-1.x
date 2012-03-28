@@ -109,7 +109,6 @@ public class DrupalEditionAction implements EditionAction {
         String[] mapValues = mapping.split(";");
 
         for (int i = 0; i < mapValues.length; i++) {
-            System.out.println(mapValues[i]);
             String[] mapValue = mapValues[i].split(":");
             mappings.put(Long.valueOf(mapValue[0].trim()),
                     Long.valueOf(mapValue[1].trim()));
