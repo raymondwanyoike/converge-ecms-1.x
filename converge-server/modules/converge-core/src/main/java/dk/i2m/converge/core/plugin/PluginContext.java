@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010 - 2012 Interactive Media Management
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -21,6 +21,7 @@ import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.content.NewsItem;
+import dk.i2m.converge.core.content.NewsItemEditionState;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
@@ -43,6 +44,7 @@ import java.util.List;
  * Context of which a plug-in is being executed.
  *
  * @author Allan Lykke Christensen
+ * @author Raymond Wanyoike
  */
 public interface PluginContext {
 
@@ -266,19 +268,19 @@ public interface PluginContext {
      * Empty string if nothing was detected
      */
     String extractContent(MediaItemRendition mediaItemRendition);
-    
+
     /**
      * Finds an {@link Outlet} by its unique identifier.
-     * 
+     *
      * @param id Unique identifier of the {@link Outlet}
      * @return {@link Outlet} matching the unique identifier
      * @throws DataNotFoundException If an {@link Outlet} with the given {@code id} could not be found
      */
     Outlet findOutletById(Long id) throws DataNotFoundException;
-    
+
     /**
      * Finds the next {@link Edition} of a given {@link Outlet}.
-     * 
+     *
      * @param id Unique identifier of the {@link Outlet}
      * @return Next {@link Edition} for the given {@link Outlet}
      * @throws DataNotFoundException If the {@link Outlet} does not have any future {@link Edition}s
@@ -287,7 +289,7 @@ public interface PluginContext {
 
     /**
      * Update an existing {@link Edition}.
-     * 
+     *
      * @param edition {@link Edition} to update
      * @return Updated {@link Edition}
      */
@@ -295,18 +297,37 @@ public interface PluginContext {
 
     /**
      * Creates a new {@link Edition}.
-     * 
+     *
      * @param edition {@link Edition} to create
      * @return Created {@link Edition}
      */
     Edition createEdition(Edition edition);
-    
+
     /**
      * Creates a new {@link NewsItemPlacement} for a {@link NewsItem}.
-     * 
+     *
      * @param placement {@link NewsItemPlacement} to create
      * @return Created {@link NewsItemPlacement}
      */
     NewsItemPlacement createPlacement(NewsItemPlacement placement);
-    
+
+    /**
+     * Create a new {@link NewsItemEditionState} for a {@link NewsItem}.
+     *
+     * @param edition {@link Edition} id the {@link NewsItem} belongs to
+     * @param newsItem {@link NewsItem} id that will have a new state created
+     * @param property State property
+     * @param value Property value
+     */
+    NewsItemEditionState addNewsItemEditionState(Long editionId, Long newsItemId,
+            String property, String value);
+
+    /**
+     * Update an existing {@link NewsItemEditionState}
+     *
+     * @param newsItemEditionState {@link NewsItemEditionState} to update
+     * @return Updated {@link NewsItemEditionState}
+     */
+    NewsItemEditionState updateNewsItemEditionState(
+            NewsItemEditionState newsItemEditionState);
 }

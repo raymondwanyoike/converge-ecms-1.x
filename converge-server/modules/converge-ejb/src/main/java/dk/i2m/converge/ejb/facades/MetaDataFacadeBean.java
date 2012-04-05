@@ -504,10 +504,12 @@ public class MetaDataFacadeBean implements MetaDataFacadeLocal {
         footer.setRight(footerRight);
 
         Row row = overviewSheet.createRow(0);
-        row.createCell(0).setCellValue(lblRowHeaderName);
+        row.createCell(0).setCellValue(""); // Id
         row.getCell(0).setCellStyle(style);
-        row.createCell(1).setCellValue(lblRowHeaderDefinition);
-        row.getCell(0).setCellStyle(style);
+        row.createCell(1).setCellValue(lblRowHeaderName);
+        row.getCell(1).setCellStyle(style);
+        row.createCell(2).setCellValue(lblRowHeaderDefinition);
+        row.getCell(2).setCellStyle(style);
 
         // Freeze the header row
         overviewSheet.createFreezePane(0, 1, 0, 1);
@@ -521,8 +523,9 @@ public class MetaDataFacadeBean implements MetaDataFacadeLocal {
 
         for (dk.i2m.converge.core.metadata.Concept concept : concepts) {
             row = overviewSheet.createRow(overviewSheetRow++);
-            row.createCell(0).setCellValue(concept.getFullTitle());
-            row.createCell(1).setCellValue(concept.getDefinition());
+            row.createCell(0).setCellValue(concept.getId());
+            row.createCell(1).setCellValue(concept.getFullTitle());
+            row.createCell(2).setCellValue(concept.getDefinition());
         }
 
         // Auto-size

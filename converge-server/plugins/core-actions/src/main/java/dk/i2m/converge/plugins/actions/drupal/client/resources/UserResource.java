@@ -117,16 +117,12 @@ public class UserResource {
             HttpPost post = new HttpPost(url);
             post.setEntity(input);
 
-            LOG.log(Level.INFO, "Sending login user request to Drupal: {0}",
-                    json.toString());
+            LOG.log(Level.INFO, "Sending login user request to Drupal");
 
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
             String responce =
                     drupalConnector.getHttpClient().execute(post,
                     responseHandler);
-
-            LOG.log(Level.INFO, "Recieved login user responce from Drupal: {0}",
-                    responce);
 
             post.abort();
         } catch (ClientProtocolException ex) {
@@ -154,16 +150,12 @@ public class UserResource {
             // Create an empty string HttpEntity to fill the request body
             post.setEntity(new StringEntity(json.toString()));
 
-            LOG.log(Level.INFO, "Sending logout user request to Drupal: {0}",
-                    json.toString());
+            LOG.log(Level.INFO, "Sending logout user request to Drupal");
 
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
             String responce =
                     drupalConnector.getHttpClient().execute(post,
                     responseHandler);
-
-            LOG.log(Level.INFO, "Recieved logout user responce from Drupal: {0}",
-                    responce);
 
             post.abort();
 
