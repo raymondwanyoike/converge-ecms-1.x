@@ -34,6 +34,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.jactiveresource.URLBuilder;
 
@@ -52,6 +53,8 @@ public class NodeResource {
     private DefaultHttpClient httpClient;
 
     private URI uri;
+
+    private HttpResponse responce;
 
     /**
      * Create an empty Node resource.
@@ -76,7 +79,7 @@ public class NodeResource {
      * @return A populated {@link NodeCreateMessage} instance
      */
     public NodeCreateMessage createNode(DrupalMessage message) throws
-            HttpResponseException {
+            HttpResponseException, IOException {
         NodeCreateMessage nodeCreateMessage = new NodeCreateMessage();
 
         JSONObject json = new JSONObject();
@@ -92,7 +95,7 @@ public class NodeResource {
             post.setEntity(input);
 
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
-            HttpResponse responce = httpClient.execute(post);
+            responce = httpClient.execute(post);
 
             String handledResponse = responseHandler.handleResponse(responce);
 
@@ -100,7 +103,6 @@ public class NodeResource {
                     (NodeCreateMessage) JSONObject.toBean(JSONObject.fromObject(
                     handledResponse), NodeCreateMessage.class);
 
-            EntityUtils.consume(responce.getEntity());
         } catch (HttpResponseException ex) {
             throw ex;
         } catch (ClientProtocolException ex) {
@@ -112,9 +114,8 @@ public class NodeResource {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(NodeResource.class.getName()).
                     log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(NodeResource.class.getName()).
-                    log(Level.SEVERE, null, ex);
+        } finally {
+            EntityUtils.consume(responce.getEntity());
         }
 
         return nodeCreateMessage;
