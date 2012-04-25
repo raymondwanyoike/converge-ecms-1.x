@@ -27,7 +27,9 @@ Converge for their organisation.
 
 {{include document="app-mobile-subscriber-server.wiki" /}}
 
+= Developers Guide =
 
+{{include document="developers.wiki" /}}
 
 
 
