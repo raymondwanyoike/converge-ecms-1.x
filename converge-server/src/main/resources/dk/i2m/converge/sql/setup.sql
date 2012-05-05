@@ -1282,6 +1282,17 @@ CREATE TABLE `wiki_page` (
     PRIMARY KEY (`id`)
 );
 
+CREATE TABLE `news_item_edition_state` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `eid` int(11) DEFAULT NULL,
+  `nid` int(11) DEFAULT NULL,
+  `label` TEXT,
+  `property` TEXT,
+  `value` TEXT,
+  `visible` tinyint(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
 INSERT INTO `app_version` (`id`, `from_version`, `to_version`, `migrated`, `migrated_date`) VALUES (1,'','1.1.4',1,'2012-03-08 23:40:00');
 INSERT INTO `SEQUENCE` (`SEQ_NAME`, `SEQ_COUNT`) VALUES ('SEQ_GEN', 0);
 

@@ -27,7 +27,6 @@ import dk.i2m.converge.core.plugin.EditionAction;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.OutletEditionAction;
-import dk.i2m.converge.core.workflow.OutletEditionActionProperty;
 import dk.i2m.converge.plugins.actions.drupal.client.DrupalConnector;
 import dk.i2m.converge.plugins.actions.drupal.client.fields.TextField;
 import dk.i2m.converge.plugins.actions.drupal.client.messages.DrupalMessage;
@@ -36,8 +35,6 @@ import dk.i2m.converge.plugins.actions.drupal.client.modules.FieldModule;
 import dk.i2m.converge.plugins.actions.drupal.client.resources.NodeResource;
 import dk.i2m.converge.plugins.actions.drupal.client.resources.UserResource;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -60,11 +57,11 @@ public class DrupalEditionAction implements EditionAction {
 
     private static final String SUBMITTED = "submitted";
 
-    private static final Integer UPLOADING = 0;
+    private static final String UPLOADING = "uploading";
 
-    private static final Integer UPLOADED = 1;
+    private static final String UPLOADED = "uploaded";
 
-    private static final Integer FAILED = -1;
+    private static final String FAILED = "failed";
 
     private enum Property {
 
@@ -176,16 +173,20 @@ public class DrupalEditionAction implements EditionAction {
                 uri.setValue(createdNode.getUri().toString());
                 submitted.setValue(new Date().toString());
                 status.setValue(UPLOADED.toString());
+
             } catch (HttpResponseException ex) {
                 status.setValue(FAILED.toString());
 
                 Logger.getLogger(DrupalEditionAction.class.getName()).
-                        log(Level.SEVERE, null, ex);
+                        log(Level.SEVERE, ex.getMessage());
 
                 ctx.log(LogSeverity.SEVERE,
                         "HttpResponseException for News Item #{0}, with the message: {1} - {2} ",
                         new Object[]{newsItem.getId(), ex.getStatusCode(), ex.
                             getMessage()}, action, action.getId());
+            } catch (IOException ex) {
+                Logger.getLogger(DrupalEditionAction.class.getName()).
+                        log(Level.SEVERE, null, ex);
             }
 
             ctx.updateNewsItemEditionState(status);
