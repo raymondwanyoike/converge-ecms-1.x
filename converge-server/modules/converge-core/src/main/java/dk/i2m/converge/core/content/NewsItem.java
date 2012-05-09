@@ -37,50 +37,96 @@ import org.eclipse.persistence.annotations.PrivateOwned;
 @Entity
 @Table(name = "news_item")
 @NamedQueries({
-    @NamedQuery(name = NewsItem.FIND_BY_OUTLET, query = "SELECT n FROM NewsItem AS n WHERE n.outlet = :outlet ORDER BY n.created DESC"),
-    @NamedQuery(name = NewsItem.FIND_CURRENT_ASSIGNMENTS, query = "SELECT DISTINCT n FROM NewsItem n JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
-    @NamedQuery(name = NewsItem.VIEW_CURRENT_ASSIGNMENTS, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.CurrentAssignment(n.id, n.title, n.targetWordCount, n.deadline, n.assignmentBriefing, n.checkedOut, cob.fullName) FROM NewsItem n LEFT JOIN n.checkedOutBy cob JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
-    @NamedQuery(name = NewsItem.VIEW_INBOX, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing) FROM NewsItem n LEFT JOIN n.checkedOutBy cob JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
-    @NamedQuery(name = NewsItem.VIEW_OUTLET_BOX, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing) FROM NewsItemActor a JOIN a.newsItem n LEFT JOIN n.checkedOutBy cob WHERE (( a.user = :user) OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF n.currentState.actorRole.userAccounts)) AND n.currentState.workflow.endState <> n.currentState AND n.outlet = :outlet ORDER BY n.updated DESC"),
-    @NamedQuery(name = NewsItem.VIEW_OUTLET_BOX_STATE, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing) FROM NewsItem AS n JOIN n.actors AS a LEFT JOIN n.checkedOutBy cob WHERE n.outlet = :outlet AND n.currentState = :state AND (( a.user = :user) OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.updated DESC"),
-    @NamedQuery(name = NewsItem.FIND_CHECKED_IN_NEWS_ITEM, query = "SELECT n FROM NewsItem AS n WHERE n.id = :id AND n.checkedOut IS NULL"),
-    @NamedQuery(name = NewsItem.FIND_ASSIGNMENTS_BY_OUTLET, query = "SELECT n FROM NewsItem AS n WHERE n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND n.outlet = :outlet AND n.assigned = true ORDER BY n.created DESC"),
-    @NamedQuery(name = NewsItem.FIND_BY_OUTLET_AND_STATE, query = "SELECT n FROM NewsItem AS n WHERE n.currentState = :state AND n.outlet = :outlet ORDER BY n.updated DESC"),
-    @NamedQuery(name = NewsItem.FIND_BY_OUTLET_AND_STATE_NAME, query = "SELECT n FROM NewsItem AS n WHERE n.currentState.name = :stateName AND n.outlet = :outlet"),
-    @NamedQuery(name = NewsItem.FIND_BY_OUTLET_STATE_AND_USER, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS n WHERE ni.outlet = :outlet AND ni.currentState = :state AND (( n.user = :user) OR (ni.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF ni.currentState.actorRole.userAccounts)) ORDER BY ni.updated DESC"),
-    @NamedQuery(name = NewsItem.FIND_VERSIONS, query = "SELECT n FROM NewsItem AS n WHERE n.versionOf = :newsItem ORDER BY n.updated DESC"),
-    @NamedQuery(name = NewsItem.FIND_TRASH, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS n WHERE ni.currentState.workflow.trashState = ni.currentState AND (( n.user = :user) OR (ni.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF ni.currentState.actorRole.userAccounts)) ORDER BY ni.updated DESC"),
-    @NamedQuery(name = NewsItem.REVOKE_LOCK, query = "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.id = :id"),
-    @NamedQuery(name = NewsItem.REVOKE_LOCKS, query = "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.checkedOutBy = :user"),
-    @NamedQuery(name = NewsItem.REVOKE_ALL_LOCKS, query = "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.checkedOutBy IS NOT NULL"),
-    @NamedQuery(name = NewsItem.FIND_BY_USER_USER_ROLE_AND_DATE, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.user = :user AND a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.state = :state) ORDER BY ni.updated DESC"),
-    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (h.user = :user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC"),
-    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_PASSIVE_USER, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.user = :user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC"),    
-    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER_ROLE, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC")
+    @NamedQuery(name = NewsItem.FIND_BY_OUTLET,
+    query =
+    "SELECT n FROM NewsItem AS n WHERE n.outlet = :outlet ORDER BY n.created DESC"),
+    @NamedQuery(name = NewsItem.FIND_CURRENT_ASSIGNMENTS,
+    query =
+    "SELECT DISTINCT n FROM NewsItem n JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
+    @NamedQuery(name = NewsItem.VIEW_CURRENT_ASSIGNMENTS,
+    query =
+    "SELECT DISTINCT NEW dk.i2m.converge.core.views.CurrentAssignment(n.id, n.title, n.targetWordCount, n.deadline, n.assignmentBriefing, n.checkedOut, cob.fullName) FROM NewsItem n LEFT JOIN n.checkedOutBy cob JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
+    @NamedQuery(name = NewsItem.VIEW_INBOX,
+    query =
+    "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing) FROM NewsItem n LEFT JOIN n.checkedOutBy cob JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
+    @NamedQuery(name = NewsItem.VIEW_OUTLET_BOX,
+    query =
+    "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing) FROM NewsItemActor a JOIN a.newsItem n LEFT JOIN n.checkedOutBy cob WHERE (( a.user = :user) OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF n.currentState.actorRole.userAccounts)) AND n.currentState.workflow.endState <> n.currentState AND n.outlet = :outlet ORDER BY n.updated DESC"),
+    @NamedQuery(name = NewsItem.VIEW_OUTLET_BOX_STATE,
+    query =
+    "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing) FROM NewsItem AS n JOIN n.actors AS a LEFT JOIN n.checkedOutBy cob WHERE n.outlet = :outlet AND n.currentState = :state AND (( a.user = :user) OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_CHECKED_IN_NEWS_ITEM, query =
+    "SELECT n FROM NewsItem AS n WHERE n.id = :id AND n.checkedOut IS NULL"),
+    @NamedQuery(name = NewsItem.FIND_ASSIGNMENTS_BY_OUTLET,
+    query =
+    "SELECT n FROM NewsItem AS n WHERE n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND n.outlet = :outlet AND n.assigned = true ORDER BY n.created DESC"),
+    @NamedQuery(name = NewsItem.FIND_BY_OUTLET_AND_STATE,
+    query =
+    "SELECT n FROM NewsItem AS n WHERE n.currentState = :state AND n.outlet = :outlet ORDER BY n.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_BY_OUTLET_AND_STATE_NAME,
+    query =
+    "SELECT n FROM NewsItem AS n WHERE n.currentState.name = :stateName AND n.outlet = :outlet"),
+    @NamedQuery(name = NewsItem.FIND_BY_OUTLET_STATE_AND_USER,
+    query =
+    "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS n WHERE ni.outlet = :outlet AND ni.currentState = :state AND (( n.user = :user) OR (ni.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF ni.currentState.actorRole.userAccounts)) ORDER BY ni.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_VERSIONS,
+    query =
+    "SELECT n FROM NewsItem AS n WHERE n.versionOf = :newsItem ORDER BY n.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_TRASH,
+    query =
+    "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS n WHERE ni.currentState.workflow.trashState = ni.currentState AND (( n.user = :user) OR (ni.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF ni.currentState.actorRole.userAccounts)) ORDER BY ni.updated DESC"),
+    @NamedQuery(name = NewsItem.REVOKE_LOCK,
+    query =
+    "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.id = :id"),
+    @NamedQuery(name = NewsItem.REVOKE_LOCKS,
+    query =
+    "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.checkedOutBy = :user"),
+    @NamedQuery(name = NewsItem.REVOKE_ALL_LOCKS,
+    query =
+    "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.checkedOutBy IS NOT NULL"),
+    @NamedQuery(name = NewsItem.FIND_BY_USER_USER_ROLE_AND_DATE,
+    query =
+    "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.user = :user AND a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.state = :state) ORDER BY ni.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER,
+    query =
+    "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (h.user = :user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_PASSIVE_USER,
+    query =
+    "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.user = :user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER_ROLE,
+    query =
+    "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC")
 })
 public class NewsItem implements Serializable {
 
     private static final long serialVersionUID = 2L;
 
-    public static final String VIEW_CURRENT_ASSIGNMENTS = "NewsItem.view.currentAssignments";
+    public static final String VIEW_CURRENT_ASSIGNMENTS =
+            "NewsItem.view.currentAssignments";
 
     public static final String VIEW_INBOX = "NewsItem.view.inbox";
 
     public static final String VIEW_OUTLET_BOX = "NewsItem.view.outlet.inbox";
 
-    public static final String VIEW_OUTLET_BOX_STATE = "NewsItem.view.outlet.inbox.state";
+    public static final String VIEW_OUTLET_BOX_STATE =
+            "NewsItem.view.outlet.inbox.state";
 
-    public static final String FIND_CURRENT_ASSIGNMENTS = "NewsItem.findCurrentAssignments";
+    public static final String FIND_CURRENT_ASSIGNMENTS =
+            "NewsItem.findCurrentAssignments";
 
     public static final String FIND_BY_OUTLET = "NewsItem.findByOutlet";
 
-    public static final String FIND_ASSIGNMENTS_BY_OUTLET = "NewsItem.findAssignmentsByOutlet";
+    public static final String FIND_ASSIGNMENTS_BY_OUTLET =
+            "NewsItem.findAssignmentsByOutlet";
 
-    public static final String FIND_BY_OUTLET_AND_STATE = "NewsItem.findByOutletAndState";
+    public static final String FIND_BY_OUTLET_AND_STATE =
+            "NewsItem.findByOutletAndState";
 
-    public static final String FIND_BY_OUTLET_AND_STATE_NAME = "NewsItem.findByOutletAndStateName";
+    public static final String FIND_BY_OUTLET_AND_STATE_NAME =
+            "NewsItem.findByOutletAndStateName";
 
-    public static final String FIND_BY_OUTLET_STATE_AND_USER = "NewsItem.findByOutletStateAndUser";
+    public static final String FIND_BY_OUTLET_STATE_AND_USER =
+            "NewsItem.findByOutletStateAndUser";
 
     /** Query for finding all the versions of a given news item arranged by the date they were updated. */
     public static final String FIND_VERSIONS = "NewsItem.findVersions";
@@ -89,15 +135,20 @@ public class NewsItem implements Serializable {
     public static final String FIND_TRASH = "NewsItem.findTrash";
 
     /** Query for finding a news item that is checked-in by its unique identifier. */
-    public static final String FIND_CHECKED_IN_NEWS_ITEM = "NewsItem.findCheckedInNewsItem";
+    public static final String FIND_CHECKED_IN_NEWS_ITEM =
+            "NewsItem.findCheckedInNewsItem";
 
-    public static final String FIND_BY_USER_USER_ROLE_AND_DATE = "NewsItem.findByUserUserRoleAndDate";
+    public static final String FIND_BY_USER_USER_ROLE_AND_DATE =
+            "NewsItem.findByUserUserRoleAndDate";
 
-    public static final String FIND_SUBMITTED_BY_USER = "NewsItem.findBySubmittedUser";
-    
-    public static final String FIND_SUBMITTED_BY_PASSIVE_USER = "NewsItem.findBySubmittedPassveUser";
-    
-    public static final String FIND_SUBMITTED_BY_USER_ROLE = "NewsItem.findBySubmittedAndUserRole";
+    public static final String FIND_SUBMITTED_BY_USER =
+            "NewsItem.findBySubmittedUser";
+
+    public static final String FIND_SUBMITTED_BY_PASSIVE_USER =
+            "NewsItem.findBySubmittedPassveUser";
+
+    public static final String FIND_SUBMITTED_BY_USER_ROLE =
+            "NewsItem.findBySubmittedAndUserRole";
 
     /** Query for revoking the lock of a news item. */
     public static final String REVOKE_LOCK = "NewsItem.revokeLock";
@@ -171,22 +222,28 @@ public class NewsItem implements Serializable {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "news_item_related",
-    joinColumns = {@JoinColumn(referencedColumnName = "id", name = "news_item_id", nullable = false)},
-    inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "related_news_item_id", nullable = false)})
+    joinColumns = {@JoinColumn(referencedColumnName = "id", name =
+        "news_item_id", nullable = false)},
+    inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name =
+        "related_news_item_id", nullable = false)})
     private List<NewsItem> related = new ArrayList<NewsItem>();
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "current_state_id")
     private WorkflowState currentState;
 
-    @OneToMany(mappedBy = "newsItem", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "newsItem", cascade = CascadeType.ALL, fetch =
+    FetchType.EAGER)
     @OrderBy("timestamp DESC")
-    private List<WorkflowStateTransition> history = new ArrayList<WorkflowStateTransition>();
+    private List<WorkflowStateTransition> history =
+            new ArrayList<WorkflowStateTransition>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "news_item_concept",
-    joinColumns = {@JoinColumn(referencedColumnName = "id", name = "news_item_id", nullable = false)},
-    inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "concept_id", nullable = false)})
+    joinColumns = {@JoinColumn(referencedColumnName = "id", name =
+        "news_item_id", nullable = false)},
+    inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name =
+        "concept_id", nullable = false)})
     private List<Concept> concepts = new ArrayList<Concept>();
 
     @Column(name = "deadline")
@@ -197,7 +254,8 @@ public class NewsItem implements Serializable {
     @JoinColumn(name = "event_id")
     private Event event;
 
-    @OneToMany(mappedBy = "newsItem", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "newsItem", cascade = CascadeType.ALL, fetch =
+    FetchType.EAGER)
     @PrivateOwned
     private List<NewsItemActor> actors = new ArrayList<NewsItemActor>();
 
@@ -223,11 +281,19 @@ public class NewsItem implements Serializable {
     private int versionIdentifier;
 
     @OneToMany(mappedBy = "newsItem", fetch = FetchType.LAZY)
-    private List<NewsItemMediaAttachment> mediaAttachments = new ArrayList<NewsItemMediaAttachment>();
+    private List<NewsItemMediaAttachment> mediaAttachments =
+            new ArrayList<NewsItemMediaAttachment>();
 
-    @OneToMany(mappedBy = "newsItem", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<NewsItemPlacement> placements = new ArrayList<NewsItemPlacement>();
-    
+    @OneToMany(mappedBy = "newsItem", fetch = FetchType.EAGER, cascade =
+    CascadeType.ALL)
+    private List<NewsItemPlacement> placements =
+            new ArrayList<NewsItemPlacement>();
+
+    /** Contains properties of the {@link NewsItem} that may be system or user-related. */
+    @OneToMany(mappedBy = "newsItem")
+    private List<NewsItemProperty> properties =
+            new ArrayList<NewsItemProperty>();
+
     /**
      * Creates a new instance of {@link NewsItem}.
      */
@@ -731,7 +797,8 @@ public class NewsItem implements Serializable {
         return mediaAttachments;
     }
 
-    public void setMediaAttachments(List<NewsItemMediaAttachment> mediaAttachments) {
+    public void setMediaAttachments(
+            List<NewsItemMediaAttachment> mediaAttachments) {
         this.mediaAttachments = mediaAttachments;
     }
 
@@ -793,6 +860,26 @@ public class NewsItem implements Serializable {
     }
 
     /**
+     * Gets a {@link List} of properties that has been stored for this 
+     * {@link NewsItem}.
+     * 
+     * @return {@link List} of related properties
+     */
+    public List<NewsItemProperty> getProperties() {
+        return properties;
+    }
+
+    /**
+     * Sets the properties of the {@link NewsItem}.
+     * 
+     * @param properties
+     *          {@link List} of properties related to the {@link NewsItem}
+     */
+    public void setProperties(List<NewsItemProperty> properties) {
+        this.properties = properties;
+    }
+
+    /**
      * Gets the version identifier of the entity. The purpose of the identifier
      * is to implement optimistic locking of the entity.
      *
@@ -841,7 +928,9 @@ public class NewsItem implements Serializable {
      */
     public boolean isEndState() {
         // NullPointer check
-        if (getCurrentState() == null || getOutlet() == null || getOutlet().getWorkflow() == null || getOutlet().getWorkflow().getEndState() == null) {
+        if (getCurrentState() == null || getOutlet() == null || getOutlet().
+                getWorkflow() == null || getOutlet().getWorkflow().getEndState()
+                == null) {
             return false;
         }
 
@@ -862,7 +951,9 @@ public class NewsItem implements Serializable {
      */
     public boolean isStartState() {
         // NullPointer check
-        if (getCurrentState() == null || getOutlet() == null || getOutlet().getWorkflow() == null || getOutlet().getWorkflow().getStartState() == null) {
+        if (getCurrentState() == null || getOutlet() == null || getOutlet().
+                getWorkflow() == null || getOutlet().getWorkflow().getStartState()
+                == null) {
             return false;
         }
 
@@ -882,7 +973,9 @@ public class NewsItem implements Serializable {
      */
     public boolean isTrashState() {
         // NullPointer check
-        if (getCurrentState() == null || getOutlet() == null || getOutlet().getWorkflow() == null || getOutlet().getWorkflow().getTrashState() == null) {
+        if (getCurrentState() == null || getOutlet() == null || getOutlet().
+                getWorkflow() == null || getOutlet().getWorkflow().getTrashState()
+                == null) {
             return false;
         }
 

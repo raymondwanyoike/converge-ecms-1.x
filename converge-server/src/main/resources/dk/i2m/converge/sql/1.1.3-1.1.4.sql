@@ -26,3 +26,14 @@ CREATE TABLE `news_item_edition_state` (
   `visible` tinyint(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 );
+
+-- Job Queue
+
+CREATE TABLE `news_item_property` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `news_item_id` int(11) DEFAULT NULL,
+  `property_name` VARCHAR(255) DEFAULT '',
+  `property_value` TEXT,
+  `property_visibility` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
