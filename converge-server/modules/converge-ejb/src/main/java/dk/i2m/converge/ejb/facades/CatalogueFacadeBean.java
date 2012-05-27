@@ -682,6 +682,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         return daoService.findWithNamedQuery(MediaItem.FIND_BY_OWNER, params);
     }
 
+    /** {@inheritDoc } */
     @Override
     public List<MediaItem> findCurrentMediaItems(UserAccount user,
             Long catalogueId) {

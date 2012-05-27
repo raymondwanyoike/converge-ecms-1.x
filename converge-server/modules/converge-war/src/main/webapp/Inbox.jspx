@@ -102,7 +102,7 @@
                         </rich:column>
 
                     </rich:dataTable>
-                    <rich:datascroller id="scNewsItems" for="dtInbox" align="center" maxPages="99" renderIfSinglePage="false" reRender="scNewsItems" rendered="#{inbox.showNewsItem}"  />
+                    <rich:datascroller id="scNewsItems" for="dtInbox" align="center" maxPages="30" renderIfSinglePage="false" reRender="scNewsItems" rendered="#{inbox.showNewsItem}"  />
 
 
 
@@ -179,7 +179,7 @@
                         </rich:column>
 
                     </rich:dataTable>
-                    <rich:datascroller id="scInboxMedia" for="dtInboxMedia" align="center" maxPages="99" renderIfSinglePage="false" reRender="scInboxMedia" rendered="#{inbox.showMediaItem}"  />
+                    <rich:datascroller id="scInboxMedia" for="dtInboxMedia" align="center" maxPages="30" renderIfSinglePage="false" reRender="scInboxMedia" rendered="#{inbox.showMediaItem}"  />
 
                 </div>
             </h:form>

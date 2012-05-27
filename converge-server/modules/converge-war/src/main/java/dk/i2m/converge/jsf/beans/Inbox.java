@@ -58,9 +58,6 @@ public class Inbox {
 
     private static final Logger LOG = Logger.getLogger(Inbox.class.getName());
 
-    /** ResourceBundle containing internationalised messages. */
-    private ResourceBundle bundle = JsfUtils.getResourceBundle("i18n");
-
     @EJB private NewsItemFacadeLocal newsItemFacade;
 
     @EJB private CatalogueFacadeLocal catalogueFacade;
@@ -72,6 +69,8 @@ public class Inbox {
     private DataModel mediaItems = null;
 
     private TreeNode outletsNode = null;
+
+    private TreeNode cataloguesNode = null;
 
     private String inboxTitle = "";
 
@@ -302,10 +301,13 @@ public class Inbox {
      */
     public void onShowMyAssignments(ActionEvent event) {
         showNewsItem = true;
-        this.inboxTitle = bundle.getString("Inbox_MY_ASSIGNMENTS");
+
         List<InboxView> inboxView = newsItemFacade.findInbox(getUser().
                 getUsername());
         this.newsItems = new ListDataModel(inboxView);
+        this.inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
+                "Inbox_MY_ASSIGNMENTS_X_ITEMS", new Object[]{newsItems.
+                    getRowCount()});
     }
 
     public NewsItem getSelectedNewsItem() {
@@ -327,6 +329,12 @@ public class Inbox {
         return outlets;
     }
 
+    /**
+     * Gets a {@link TreeNode} containing the {@link Outlet}s privileged to the
+     * current {@link UserAccount}.
+     * 
+     * @return {@link TreeNode} of privileged {@link Outlet}s
+     */
     public TreeNode getOutletsNode() {
         if (outletsNode == null) {
             outletsNode = new TreeNodeImpl();
@@ -352,92 +360,138 @@ public class Inbox {
                     outletsNode.addChild("O" + outlet.getId(), node);
                 }
             }
-
-            List<Catalogue> myCatalogues = catalogueFacade.findCataloguesByUser(
-                    getUser().getUsername());
-
-            for (Catalogue myCatalogue : myCatalogues) {
-                TreeNode node = new TreeNodeImpl();
-                node.setData(new OutletNode(myCatalogue, null, myCatalogue.
-                        getClass().getName()));
-
-                for (MediaItemStatus status : MediaItemStatus.values()) {
-                    TreeNode subNode = new TreeNodeImpl();
-                    subNode.setData(new OutletNode(status, myCatalogue,
-                            MediaItemStatus.class.getName()));
-                    node.addChild(status.name(), subNode);
-                }
-
-                outletsNode.addChild("M" + myCatalogue.getId(), node);
-            }
         }
 
         return outletsNode;
     }
 
     /**
-     * Event handler for handling selection of outlet and catalogue folders.
+     * Gets a {@link TreeNode} containing the {@link Catalogue}s privileged to 
+     * the current {@link UserAccount}.
+     * 
+     * @return {@link TreeNode} of privileged {@link Catalogue}s
+     */
+    public TreeNode getCataloguesNode() {
+        if (this.cataloguesNode == null) {
+            this.cataloguesNode = new TreeNodeImpl();
+
+            List<Catalogue> myCatalogues = catalogueFacade.findCataloguesByUser(
+                    getUser().getUsername());
+
+            for (Catalogue myCatalogue : myCatalogues) {
+
+                TreeNode node = new TreeNodeImpl();
+                node.setData(new OutletNode(myCatalogue, null,
+                        myCatalogue.getClass().getName()));
+
+                // Generate child nodes (status nodes)
+                for (MediaItemStatus status : MediaItemStatus.values()) {
+                    TreeNode childNode = new TreeNodeImpl();
+                    childNode.setData(new OutletNode(status, myCatalogue,
+                            MediaItemStatus.class.getName()));
+                    node.addChild(status.name(), childNode);
+                }
+
+                this.cataloguesNode.addChild("M" + myCatalogue.getId(), node);
+            }
+        }
+
+        return this.cataloguesNode;
+    }
+
+    /**
+     * Event handler for handling selection of an {@link Outlet} or 
+     * {@link Catalogue} folder.
      *
      * @param event 
      *          Event that invoked the handler
      */
     public void onOutletFolderSelect(NodeSelectedEvent event) {
-        this.catalogueEditor = false;
+        final int MAX_STATE_ITEMS = 100;
+        showNewsItem = true;
+        mediaItems = new ListDataModel();
 
         HtmlTree tree = (HtmlTree) event.getComponent();
         OutletNode node = (OutletNode) tree.getRowData();
 
         if (node.getData() instanceof Outlet) {
-            showNewsItem = true;
-            mediaItems = new ListDataModel();
+
             Outlet outlet = (Outlet) node.getData();
-            inboxTitle = outlet.getTitle();
             newsItems = new ListDataModel(newsItemFacade.findOutletBox(getUser().
                     getUsername(), outlet));
+
+            inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
+                    "Inbox_OUTLET_STATUS_CURRENT", new Object[]{
+                        outlet.getTitle(),
+                        newsItems.getRowCount()});
         } else if (node.getData() instanceof WorkflowState) {
             showNewsItem = true;
             mediaItems = new ListDataModel();
             WorkflowState state = (WorkflowState) node.getData();
             Outlet outlet = (Outlet) node.getParentData();
-            inboxTitle = outlet.getTitle() + " - " + state.getName();
+
             if (state.equals(outlet.getWorkflow().getEndState())) {
                 newsItems =
                         new ListDataModel(newsItemFacade.findOutletBox(getUser().
-                        getUsername(), outlet, state, 0, 100));
+                        getUsername(), outlet, state, 0, MAX_STATE_ITEMS));
             } else {
                 newsItems =
                         new ListDataModel(newsItemFacade.findOutletBox(getUser().
                         getUsername(), outlet, state));
             }
-        } else if (node.getData() instanceof Catalogue) {
-            showNewsItem = false;
-            newsItems = new ListDataModel();
-            Catalogue repository = (Catalogue) node.getData();
-            if (getUser().getUserRoles().contains(repository.getEditorRole())) {
-                this.catalogueEditor = true;
-            }
-            inboxTitle = repository.getName();
-            mediaItems =
-                    new ListDataModel(catalogueFacade.findCurrentMediaItems(
-                    getUser(), repository.getId()));
-        } else if (node.getData() instanceof MediaItemStatus) {
-            showNewsItem = false;
-            newsItems = new ListDataModel();
-            Catalogue catalogue = (Catalogue) node.getParentData();
+
+            inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
+                    "Inbox_OUTLET_STATUS", new Object[]{outlet.getTitle(),
+                        state.getName(), newsItems.getRowCount()});
+        }
+    }
+
+    /**
+     * Event handler for handling selection of a {@link Catalogue} folder.
+     *
+     * @param event 
+     *          Event that invoked the handler
+     */
+    public void onCatalogueFolderSelect(NodeSelectedEvent event) {
+        this.catalogueEditor = false;
+        this.showNewsItem = false;
+        this.newsItems = new ListDataModel();
+
+        HtmlTree tree = (HtmlTree) event.getComponent();
+        OutletNode node = (OutletNode) tree.getRowData();
+
+        if (node.getData() instanceof Catalogue) {
+            // User selected a Catalogue Node    
+            Catalogue catalogue = (Catalogue) node.getData();
             if (getUser().getUserRoles().contains(catalogue.getEditorRole())) {
                 this.catalogueEditor = true;
             }
+            mediaItems =
+                    new ListDataModel(catalogueFacade.findCurrentMediaItems(
+                    getUser(), catalogue.getId()));
+            inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
+                    "Inbox_CATALOGUE_STATUS_CURRENT", new Object[]{catalogue.
+                        getName(), mediaItems.getRowCount()});
+        } else if (node.getData() instanceof MediaItemStatus) {
+            // User selected a Catalogue Status Node
+            Catalogue catalogue = (Catalogue) node.getParentData();
             MediaItemStatus status = (MediaItemStatus) node.getData();
+
+            if (getUser().getUserRoles().contains(catalogue.getEditorRole())) {
+                this.catalogueEditor = true;
+            }
 
             String catalogueStatus = JsfUtils.getMessage(Bundle.i18n.name(),
                     "Generic_MEDIA_ITEM_STATUS_"
                     + status.name(), new Object[]{});
-            inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
-                    "Inbox_CATALOGUE_STATUS", new Object[]{catalogue.getName(),
-                        catalogueStatus});
+
             mediaItems =
                     new ListDataModel(catalogueFacade.findCurrentMediaItems(
                     getUser(), status, catalogue.getId()));
+
+            inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
+                    "Inbox_CATALOGUE_STATUS", new Object[]{catalogue.getName(),
+                        catalogueStatus, mediaItems.getRowCount()});
         }
     }
 

@@ -118,6 +118,17 @@ public interface CatalogueFacadeLocal {
 
     List<MediaItem> findMediaItemsByOwner(UserAccount owner);
 
+    /**
+     * Finds all the {@link MediaItem}s assigned to the given {@code user} and
+     * {@link Catalogue}.
+     * 
+     * @param user
+     *          Unique identifier of the {@link UserAccount}
+     * @param catalogueId
+     *          Unique identifier of the {@link Catalogue}
+     * @return {@link List} of {@link MediaItem}s assigned to the given 
+     *         {@link UserAccount} in the given {@link Catalogue}
+     */
     List<MediaItem> findCurrentMediaItems(UserAccount user, Long catalogueId);
 
     /**

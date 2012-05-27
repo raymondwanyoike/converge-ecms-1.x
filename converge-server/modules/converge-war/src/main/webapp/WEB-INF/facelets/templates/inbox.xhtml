@@ -40,7 +40,7 @@
                         <converge:moduleHeader moduleTitle="#{i18n.Inbox_OUTLETS}" />
                         <div class="moduleContent">
 
-                            <rich:tree reRender="frmInbox" ajaxSubmitSelection="true"  switchType="client" value="#{inbox.outletsNode}" var="item" nodeFace="#{item.type}" nodeSelectListener="#{inbox.onOutletFolderSelect}">
+                            <rich:tree reRender="frmInbox" ajaxSubmitSelection="true" switchType="client" value="#{inbox.outletsNode}" var="item" nodeFace="#{item.type}" nodeSelectListener="#{inbox.onOutletFolderSelect}">
 
                                 <rich:treeNode type="dk.i2m.converge.core.workflow.Outlet" iconLeaf="#{i18n.resource_ICON_INBOX_OUTLET}" icon="#{i18n.resource_ICON_INBOX_OUTLET}" >
                                     <h:outputText value="#{item.data.title}" />
@@ -49,12 +49,21 @@
                                 <rich:treeNode type="dk.i2m.converge.core.workflow.WorkflowState" iconLeaf="#{i18n.resource_ICON_INBOX_WORKFLOW_STATE}" icon="#{i18n.resource_ICON_INBOX_WORKFLOW_STATE}">
                                     <h:outputText value="#{item.data.name}" />
                                 </rich:treeNode>
+                            </rich:tree>
+                        </div>
+                        
+                        <converge:moduleSpacer />
+
+                        <converge:moduleHeader moduleTitle="#{i18n.Inbox_CATALOGUES}" />
+                        <div class="moduleContent">
+
+                            <rich:tree reRender="frmInbox" ajaxSubmitSelection="true"  switchType="client" value="#{inbox.cataloguesNode}" var="item" nodeFace="#{item.type}" nodeSelectListener="#{inbox.onCatalogueFolderSelect}">
 
                                 <rich:treeNode type="dk.i2m.converge.core.content.catalogue.Catalogue" iconLeaf="#{i18n.resource_ICON_INBOX_CATALOGUE}" icon="#{i18n.resource_ICON_INBOX_CATALOGUE}" >
                                     <h:outputText value="#{item.data.name}" />
                                 </rich:treeNode>
 
-                                <rich:treeNode type="dk.i2m.converge.core.content.catalogue.MediaItemStatus" iconLeaf="#{i18n.resource_ICON_INBOX_CATALOGUE}" icon="#{i18n.resource_ICON_INBOX_CATALOGUE}" >
+                                <rich:treeNode type="dk.i2m.converge.core.content.catalogue.MediaItemStatus" iconLeaf="#{i18n.resource_ICON_INBOX_CATALOGUE}" icon="#{i18n.resource_ICON_INBOX_CATALOGUE}">
                                     <c:set var="key" value="Generic_MEDIA_ITEM_STATUS_#{item.data}" />
                                     <h:outputText value="#{i18n[key]}" />
                                 </rich:treeNode>
