@@ -32,9 +32,6 @@ import org.jactiveresource.URLBuilder;
 
 public class UserResource {
 
-    private static final Logger LOG = Logger.getLogger(UserResource.class.
-            getName());
-
     private static final String USER = "user";
 
     private static final String LOGIN = "login";
@@ -100,28 +97,27 @@ public class UserResource {
      * Login a user using the specified credentials.<br /><br />Note this will transfer a plaintext password.
      */
     public void connect() {
+
+        DrupalMessage drupalMessage = new DrupalMessage();
+
+        drupalMessage.getFields().put("username", this.username);
+        drupalMessage.getFields().put("password", this.password);
+
+        JSONObject json = new JSONObject();
+
+        for (String fieldName : drupalMessage.getFields().keySet()) {
+            json.put(fieldName, drupalMessage.getFields().get(fieldName));
+        }
+
         try {
-            JSONObject json = new JSONObject();
-            DrupalMessage drupalMessage = new DrupalMessage();
-
-            drupalMessage.getFields().put("username", this.username);
-            drupalMessage.getFields().put("password", this.password);
-
-            for (String fieldName : drupalMessage.getFields().keySet()) {
-                json.put(fieldName, drupalMessage.getFields().get(fieldName));
-            }
-
             StringEntity input = new StringEntity(json.toString());
             String url = new URLBuilder(drupalConnector.getUri()).add(USER).add(
                     LOGIN).toString();
             HttpPost post = new HttpPost(url);
             post.setEntity(input);
 
-            LOG.log(Level.INFO, "Sending login user request to Drupal");
-
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
-            String responce =
-                    drupalConnector.getHttpClient().execute(post,
+            String responce = drupalConnector.getHttpClient().execute(post,
                     responseHandler);
 
             post.abort();
@@ -141,20 +137,19 @@ public class UserResource {
      * Logout the current user.
      */
     public void disconnect() {
+        JSONObject json = new JSONObject();
+
         try {
-            JSONObject json = new JSONObject();
             String url = new URLBuilder(drupalConnector.getUri()).add(USER).add(
                     LOGOUT).toString();
+
             HttpPost post = new HttpPost(url);
 
             // Create an empty string HttpEntity to fill the request body
             post.setEntity(new StringEntity(json.toString()));
 
-            LOG.log(Level.INFO, "Sending logout user request to Drupal");
-
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
-            String responce =
-                    drupalConnector.getHttpClient().execute(post,
+            String responce = drupalConnector.getHttpClient().execute(post,
                     responseHandler);
 
             post.abort();
