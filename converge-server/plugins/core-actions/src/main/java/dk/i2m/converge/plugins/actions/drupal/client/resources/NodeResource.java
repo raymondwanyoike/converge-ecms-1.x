@@ -19,22 +19,14 @@ package dk.i2m.converge.plugins.actions.drupal.client.resources;
 import dk.i2m.converge.plugins.actions.drupal.client.DrupalConnector;
 import dk.i2m.converge.plugins.actions.drupal.client.messages.DrupalMessage;
 import dk.i2m.converge.plugins.actions.drupal.client.messages.NodeCreateMessage;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.jactiveresource.URLBuilder;
 
@@ -44,9 +36,6 @@ import org.jactiveresource.URLBuilder;
  * @author Raymond Wanyoike
  */
 public class NodeResource {
-
-    private static final Logger LOG = Logger.getLogger(NodeResource.class.
-            getName());
 
     private static final String NODE = "node";
 
@@ -78,8 +67,7 @@ public class NodeResource {
      * @param message Instance representing the attributes a node edit form would submit
      * @return A populated {@link NodeCreateMessage} instance
      */
-    public NodeCreateMessage createNode(DrupalMessage message) throws
-            HttpResponseException, IOException {
+    public NodeCreateMessage create(DrupalMessage message) throws Exception {
         NodeCreateMessage nodeCreateMessage = new NodeCreateMessage();
 
         JSONObject json = new JSONObject();
@@ -103,17 +91,6 @@ public class NodeResource {
                     (NodeCreateMessage) JSONObject.toBean(JSONObject.fromObject(
                     handledResponse), NodeCreateMessage.class);
 
-        } catch (HttpResponseException ex) {
-            throw ex;
-        } catch (ClientProtocolException ex) {
-            Logger.getLogger(NodeResource.class.getName()).
-                    log(Level.SEVERE, null, ex);
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(NodeResource.class.getName()).
-                    log(Level.SEVERE, null, ex);
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(NodeResource.class.getName()).
-                    log(Level.SEVERE, null, ex);
         } finally {
             EntityUtils.consume(responce.getEntity());
         }
