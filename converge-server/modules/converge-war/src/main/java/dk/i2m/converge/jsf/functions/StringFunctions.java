@@ -1,11 +1,18 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later 
+ * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with 
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.jsf.functions;
 
@@ -63,20 +70,22 @@ public class StringFunctions {
      *          Parameters to merge into the message
      * @return {@link String} containing the message
      */
-    public static String message(String bundleId, String key, Object param1, Object param2, Object param3, Object param4, Object param5) {
+    public static String message(String bundleId, String key, Object param1,
+            Object param2, Object param3, Object param4, Object param5) {
         FacesContext ctx = FacesContext.getCurrentInstance();
         Application application = ctx.getApplication();
-        String msg = key;
+        String msg;
         try {
             ResourceBundle bundle = application.getResourceBundle(ctx, bundleId);
             String msgPattern = bundle.getString(key);
             msg = msgPattern;
 
-            Object[] params = new Object[]{param1, param2, param3, param4, param5};
+            Object[] params = new Object[]{param1, param2, param3, param4,
+                param5};
             msg = MessageFormat.format(msg, params);
             return msg;
         } catch (Exception ex) {
-            return "";
+            return key;
         }
     }
 }
