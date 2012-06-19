@@ -35,7 +35,10 @@ import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
 import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
 import dk.i2m.converge.jsf.components.tags.DialogSelfAssignment;
 import dk.i2m.jsf.JsfUtils;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -63,6 +66,8 @@ public class Inbox {
     @EJB private CatalogueFacadeLocal catalogueFacade;
 
     private NewsItem selectedNewsItem;
+
+    private MediaItem selectedMediaItem;
 
     private DataModel newsItems = null;
 
@@ -95,44 +100,6 @@ public class Inbox {
     @PostConstruct
     public void onInit() {
         onShowMyAssignments(null);
-    }
-
-    /**
-     * Gets the title of the Inbox. The title changes depending on the selected
-     * folder/state.
-     *
-     * @return Title of the inbox
-     */
-    public String getInboxTitle() {
-        return JsfUtils.getMessage("i18n", "Inbox_INBOX_X", new Object[]{
-                    inboxTitle});
-    }
-
-    public String getNewAssignmentType() {
-        return newAssignmentType;
-    }
-
-    public void setNewAssignmentType(String newAssignmentType) {
-        this.newAssignmentType = newAssignmentType;
-    }
-
-    /**
-     * Gets a {@link DataModel} containing the user's {@link NewsItem}s.
-     *
-     * @return {@link DataModel} containing the user's {@link NewsItem}s
-     */
-    public DataModel getNewsItems() {
-        if (newsItems == null) {
-            newsItems = new ListDataModel(new ArrayList());
-        }
-        return newsItems;
-    }
-
-    public DataModel getMediaItems() {
-        if (mediaItems == null) {
-            mediaItems = new ListDataModel(new ArrayList());
-        }
-        return mediaItems;
     }
 
     /**
@@ -275,15 +242,10 @@ public class Inbox {
         }
     }
 
-    public String getCreatedItemLink() {
-        return this.createdItemLink;
-    }
-
     /**
      * Action Listener for removing articles marked as deleted.
      *
-     * @param event
-     * {@link ActionEvent} that invoked the listener
+     * @param event {@link ActionEvent} that invoked the listener
      */
     public void onEmptyTrash(ActionEvent event) {
         int deleted = newsItemFacade.emptyTrash(getUser().getUsername());
@@ -308,6 +270,69 @@ public class Inbox {
         this.inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
                 "Inbox_MY_ASSIGNMENTS_X_ITEMS", new Object[]{newsItems.
                     getRowCount()});
+    }
+
+    /**
+     * Gets the title of the Inbox. The title changes depending on the selected
+     * folder/state.
+     *
+     * @return Title of the inbox
+     */
+    public String getInboxTitle() {
+        return JsfUtils.getMessage("i18n", "Inbox_INBOX_X", new Object[]{
+                    inboxTitle});
+    }
+
+    public String getNewAssignmentType() {
+        return newAssignmentType;
+    }
+
+    public void setNewAssignmentType(String newAssignmentType) {
+        this.newAssignmentType = newAssignmentType;
+    }
+
+    /**
+     * Gets a {@link DataModel} containing the user's {@link NewsItem}s.
+     *
+     * @return {@link DataModel} containing the user's {@link NewsItem}s
+     */
+    public DataModel getNewsItems() {
+        if (newsItems == null) {
+            newsItems = new ListDataModel(new ArrayList());
+        }
+        return newsItems;
+    }
+
+    public DataModel getMediaItems() {
+        if (mediaItems == null) {
+            mediaItems = new ListDataModel(new ArrayList());
+        }
+        return mediaItems;
+    }
+
+    public String getCreatedItemLink() {
+        return this.createdItemLink;
+    }
+
+    /**
+     * Property containing the selected {@link MediaItem}.
+     * 
+     * @return Selected {@link MediaItem} or {@code null} if no item was
+     *         selected
+     */
+    public MediaItem getSelectedMediaItem() {
+        return selectedMediaItem;
+    }
+
+    /**
+     * Property containing the selected {@link MediaItem}.
+     * 
+     * @param selectedMediaItem
+     *          Selected {@link MediaItem} or {@code null} if no item was
+     *          selected
+     */
+    public void setSelectedMediaItem(MediaItem selectedMediaItem) {
+        this.selectedMediaItem = selectedMediaItem;
     }
 
     public NewsItem getSelectedNewsItem() {

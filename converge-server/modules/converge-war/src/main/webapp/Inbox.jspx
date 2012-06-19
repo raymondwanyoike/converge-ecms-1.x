@@ -45,18 +45,18 @@
                             <h:panelGrid>
                                 <h:outputText value="#{item.slugline}" title="" rendered="#{item.slugline != null || item.slugline != ''}" />
                                 <h:outputText value="#{item.title}" title="" />
-                                
+
                                 <h:outputFormat value="#{i18n.Inbox_NEWS_ITEM_WORD_COUNT_X}" styleClass="small"
                                                 rendered="#{item.targetWordCount &lt;= 0}">
                                     <f:param value="#{item.wordCount}" />
                                 </h:outputFormat>
-                                
+
                                 <h:outputFormat value="#{i18n.Inbox_NEWS_ITEM_WORD_COUNT_X_TARGET_WORD_COUNT_Y}" styleClass="small"
                                                 rendered="#{item.targetWordCount &gt; 0}">
                                     <f:param value="#{item.wordCount}" />
                                     <f:param value="#{item.targetWordCount}" />
                                 </h:outputFormat>
-                                
+
                             </h:panelGrid>
                         </rich:column>
 
@@ -163,20 +163,26 @@
                             </h:panelGrid>
                         </rich:column>
 
+                        <rich:column sortBy="#{item.updated.time}" styleClass="columnDateTime">
+                            <f:facet name="header">
+                                <h:outputText value="#{i18n.Inbox_UPDATED}" />
+                            </f:facet>
+                            <h:outputText value="#{item.updated.time}">
+                                <f:convertDateTime type="both" pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                            </h:outputText>
+                        </rich:column>
+
                         <rich:column sortBy="#{item.status}">
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Inbox_STATUS}" />
                             </f:facet>
-                            <h:outputText value="#{item.status}" rendered="#{!inbox.catalogueEditor}" />
-                            <h:panelGroup layout="block" rendered="#{inbox.catalogueEditor}">
-                                <rich:inplaceSelect value="#{item.status}" defaultLabel="#{item.status}" converter="#{converters.enumTypeConverter}">
-                                    <f:selectItems value="#{common.mediaItemStatuses}" />
-                                    <a4j:support ajaxSingle="true" event="onviewactivated" reRender="dtInboxMedia">
-                                        <f:setPropertyActionListener target="#{inbox.updateMediaItem}" value="#{item}" />
-                                    </a4j:support>
-                                </rich:inplaceSelect>
-                            </h:panelGroup>
+
+                            <a4j:commandLink reRender="frmUpdateItem" oncomplete="#{rich:component('mpUpdateItem')}.show();">
+                                <f:setPropertyActionListener target="#{inbox.selectedMediaItem}" value="#{item}" />
+                                <h:outputText value="#{item.status}" />
+                            </a4j:commandLink>
                         </rich:column>
+
 
                     </rich:dataTable>
                     <rich:datascroller id="scInboxMedia" for="dtInboxMedia" align="center" maxPages="30" renderIfSinglePage="false" reRender="scInboxMedia" rendered="#{inbox.showMediaItem}"  />
@@ -264,6 +270,49 @@
 
                 </rich:modalPanel>
             </h:form>
+
+            <h:form id="frmUpdateItem">
+                <a4j:queue name="queUpdateItem" />
+                <rich:modalPanel id="mpUpdateItem" autosized="true" domElementAttachment="parent" >
+                    <f:facet name="header">
+                        <h:panelGroup>
+                            <h:outputText value="#{converge:abbreviate(inbox.selectedMediaItem.title, 25)}" />
+                        </h:panelGroup>
+                    </f:facet>
+                    <f:facet name="controls">
+                        <h:panelGroup>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" >
+                                <rich:componentControl for="mpUpdateItem" operation="hide" event="onclick"/>
+                            </h:graphicImage>
+                        </h:panelGroup>
+                    </f:facet>
+                    <h:panelGrid style="width: 480px;">
+
+                        <rich:tabPanel id="tpUpdateItem" switchType="ajax" immediate="true" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+
+                            <rich:tab id="tabItem" label="Details">
+                                <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                    <h:outputText value="Title:" />
+                                    <h:inputText id="txtItemTitle" styleClass="text mediumInput" value="#{inbox.selectedMediaItem.title}" required="true" requiredMessage="#{i18n.Inbox_NEWS_ITEM_TITLE_REQUIRED}"/>
+                                </h:panelGrid>
+                            </rich:tab>
+
+                        </rich:tabPanel>
+                    </h:panelGrid>
+
+                    <h:panelGroup styleClass="dialogueButtons">
+
+                        <a4j:commandLink id="lnkSaveItem"
+                                         eventsQueue="queUpdateItem"
+                                         styleClass="dialogButton"
+                                         value="#{i18n.Generic_UPDATE}"
+                                         reRender="frmInbox"
+                                         oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpUpdateItem')}.hide();" />
+                        <h:commandLink id="lnkCancelItem" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpUpdateItem')}.hide(); return false;" />
+                    </h:panelGroup>
+                </rich:modalPanel>
+            </h:form>
+
 
 
             <h:form id="frmDuplicateAssignment">
