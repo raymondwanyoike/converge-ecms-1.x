@@ -14,24 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.plugins.actions.drupal.client.fields;
+package dk.i2m.converge.plugins.actions.drupal.client;
 
-public class FileField {
+import java.util.Map;
 
-    private Long fid;
+/**
+ * 
+ * @author Raymond Wanyoike
+ */
+public class FieldModule {
 
-    public FileField() {
+    private Map<String, Object> und;
+
+    public FieldModule(Map<String, Object> und) {
+        this.und = und;
     }
 
-    public FileField(Long fid) {
-        this.fid = fid;
+    /**
+     * @return the und
+     */
+    public Map<String, Object> getUnd() {
+        return und;
     }
 
-    public Long getFid() {
-        return fid;
-    }
-
-    public void setFid(Long fid) {
-        this.fid = fid;
+    /**
+     * @param und the und to set
+     */
+    public void setUnd(Map<String, Object> und) {
+        this.und = und;
     }
 }
