@@ -14,29 +14,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.plugins.actions.drupal.client.modules;
-
-import java.util.Map;
+package dk.i2m.converge.plugins.actions.drupal.client;
 
 /**
- *
+ * 
+ * @author Raymond Wanyoike
  */
-public class FieldModule {
+public class NodeCreateMessage {
 
-    private Map<String, Object> und;
+    private Long id;
 
-    public FieldModule() {
+    private String uri;
+
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
     }
 
-    public FieldModule(Map<String, Object> und) {
-        this.und = und;
+    /**
+     * @param id the id to set
+     */
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Map<String, Object> getUnd() {
-        return und;
+    /**
+     * @return the uri
+     */
+    public String getUri() {
+        return uri;
     }
 
-    public void setUnd(Map<String, Object> und) {
-        this.und = und;
+    /**
+     * @param uri the uri to set
+     */
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 }

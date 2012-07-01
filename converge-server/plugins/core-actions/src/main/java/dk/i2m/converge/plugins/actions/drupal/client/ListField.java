@@ -14,26 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.plugins.actions.drupal.client.messages;
-
-import java.util.HashMap;
-import java.util.Map;
+package dk.i2m.converge.plugins.actions.drupal.client;
 
 /**
- *
+ * 
+ * @author Raymond Wanyoike
  */
-public class DrupalMessage {
+public class ListField {
 
-    private Map<String, Object> fields = new HashMap<String, Object>();
+    private Long id;
 
-    public DrupalMessage() {
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
     }
 
-    public Map<String, Object> getFields() {
-        return fields;
-    }
-
-    public void setFields(Map<String, Object> fields) {
-        this.fields = fields;
+    /**
+     * @param id the id to set
+     */
+    public void setId(Long id) {
+        this.id = id;
     }
 }

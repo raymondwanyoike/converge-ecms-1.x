@@ -14,27 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.plugins.actions.drupal.client.fields;
+package dk.i2m.converge.plugins.actions.drupal.client;
 
 /**
- *
+ * 
+ * @author Raymond Wanyoike
  */
-public class ListField {
+public class FileField {
 
-    private Long tid;
+    private Long id;
 
-    public ListField() {
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
     }
 
-    public ListField(Long tid) {
-        this.tid = tid;
-    }
-
-    public Long getTid() {
-        return tid;
-    }
-
-    public void setTid(Long tid) {
-        this.tid = tid;
+    /**
+     * @param id the id to set
+     */
+    public void setId(Long id) {
+        this.id = id;
     }
 }
