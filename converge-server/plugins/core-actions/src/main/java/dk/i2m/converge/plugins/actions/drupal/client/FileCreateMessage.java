@@ -17,27 +17,28 @@
 package dk.i2m.converge.plugins.actions.drupal.client;
 
 /**
+ * Default response from the file create resource.
  * 
  * @author Raymond Wanyoike
  */
 public class FileCreateMessage {
 
-    private Long id;
+    private Long fid;
 
     private String uri;
 
     /**
-     * @return the id
+     * @return the fid
      */
-    public Long getId() {
-        return id;
+    public Long getFid() {
+        return fid;
     }
 
     /**
-     * @param id the id to set
+     * @param fid the fid to set
      */
-    public void setId(Long id) {
-        this.id = id;
+    public void setFid(Long fid) {
+        this.fid = fid;
     }
 
     /**

@@ -19,6 +19,7 @@ package dk.i2m.converge.plugins.actions.drupal.client;
 import java.util.Map;
 
 /**
+ * Field wrapper for basic Drupal fields.
  * 
  * @author Raymond Wanyoike
  */

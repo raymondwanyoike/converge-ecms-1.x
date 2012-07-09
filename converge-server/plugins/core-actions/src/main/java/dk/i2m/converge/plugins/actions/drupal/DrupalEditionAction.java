@@ -148,7 +148,7 @@ public class DrupalEditionAction implements EditionAction {
                 try {
                     NodeCreateMessage ncm = nr.create(nodeMessage);
 
-                    nid.setValue(ncm.getId().toString());
+                    nid.setValue(ncm.getNid().toString());
                     uri.setValue(ncm.getUri().toString());
                     submitted.setValue(new Date().toString());
                     status.setValue(UPLOADED.toString());

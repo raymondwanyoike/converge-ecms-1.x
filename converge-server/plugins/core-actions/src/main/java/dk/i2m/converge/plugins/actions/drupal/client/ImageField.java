@@ -17,7 +17,7 @@
 package dk.i2m.converge.plugins.actions.drupal.client;
 
 /**
- * Defines an image field type.
+ * Basic image field.
  * 
  * @author Raymond Wanyoike
  */
@@ -30,15 +30,15 @@ public class ImageField {
     private String title;
 
     /**
-     * Construct an image field type.
+     * Construct an image field.
      */
     public ImageField() {
     }
 
     /**
-     * Construct an image field type.
+     * Construct an image field.
      * 
-     * @param id fid (file id) of the image
+     * @param id file id of the image
      * @param alt alternate text
      * @param title title
      */
