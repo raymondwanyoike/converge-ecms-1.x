@@ -29,9 +29,19 @@ public class TextField {
 
     private String format;
 
+    /**
+     * Construct a text field type.
+     */
     public TextField() {
     }
-    
+
+    /**
+     * Construct a text field type.
+     * 
+     * @param summary summary
+     * @param value body
+     * @param format text format
+     */
     public TextField(String summary, String value, String format) {
         this.summary = summary;
         this.value = value;
