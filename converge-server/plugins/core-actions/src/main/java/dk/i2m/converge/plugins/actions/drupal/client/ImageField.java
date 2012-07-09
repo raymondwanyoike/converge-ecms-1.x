@@ -17,12 +17,36 @@
 package dk.i2m.converge.plugins.actions.drupal.client;
 
 /**
+ * Defines an image field type.
  * 
  * @author Raymond Wanyoike
  */
-public class FileField {
+public class ImageField {
 
     private Long id;
+
+    private String alt;
+
+    private String title;
+
+    /**
+     * Construct an image field type.
+     */
+    public ImageField() {
+    }
+
+    /**
+     * Construct an image field type.
+     * 
+     * @param id fid (file id) of the image
+     * @param alt alternate text
+     * @param title title
+     */
+    public ImageField(Long id, String alt, String title) {
+        this.id = id;
+        this.alt = alt;
+        this.title = title;
+    }
 
     /**
      * @return the id
@@ -36,5 +60,33 @@ public class FileField {
      */
     public void setId(Long id) {
         this.id = id;
+    }
+
+    /**
+     * @return the alt
+     */
+    public String getAlt() {
+        return alt;
+    }
+
+    /**
+     * @param alt the alt to set
+     */
+    public void setAlt(String alt) {
+        this.alt = alt;
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(String title) {
+        this.title = title;
     }
 }
