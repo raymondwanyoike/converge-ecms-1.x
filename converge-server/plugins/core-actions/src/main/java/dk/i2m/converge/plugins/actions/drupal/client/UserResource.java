@@ -82,8 +82,10 @@ public class UserResource {
         try {
             StringEntity input = new StringEntity(json.toString());
             String url = new URLBuilder(uri).add(USER).add(LOGIN).toString();
+            
             HttpPost post = new HttpPost(url);
             post.setEntity(input);
+            post.addHeader(DrupalClient.JSON_HEADER);
 
             ResponseHandler<String> handler = new BasicResponseHandler();
             httpClient.execute(post, handler);
@@ -104,9 +106,11 @@ public class UserResource {
 
         try {
             String url = new URLBuilder(uri).add(USER).add(LOGOUT).toString();
+            
             HttpPost post = new HttpPost(url);
-            // Create an empty string HttpEntity to fill the request body
+            // Create an empty string HttpEntity for the request body
             post.setEntity(new StringEntity(json.toString()));
+            post.addHeader(DrupalClient.JSON_HEADER);
 
             ResponseHandler<String> handler = new BasicResponseHandler();
             httpClient.execute(post, handler);

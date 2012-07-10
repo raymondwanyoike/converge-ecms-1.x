@@ -19,8 +19,6 @@ package dk.i2m.converge.plugins.actions.drupal.client;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.http.Header;
@@ -37,16 +35,14 @@ import org.apache.http.protocol.HTTP;
  * @author Raymond Wanyoike
  */
 public class DrupalClient {
+    
+    public static final Header JSON_HEADER = new BasicHeader("Content-Type", "application/json");
 
     private static final Logger LOG = Logger.getLogger("DrupalClient");
-
-    private static final String CONTENT_TYPE = "application/json";
 
     private BasicHttpParams params = new BasicHttpParams();
 
     private DefaultHttpClient httpClient;
-
-    private List<Header> headers = new ArrayList<Header>();
 
     private String hostname;
 
@@ -68,7 +64,7 @@ public class DrupalClient {
         this.endPoint = endPoint;
         this.hostname = hostname;
     }
-    
+
     /**
      * Setup the Http client.
      */
@@ -77,9 +73,6 @@ public class DrupalClient {
         params.setParameter(AllClientPNames.SO_TIMEOUT, socketTimeout);
         params.setParameter(AllClientPNames.HTTP_CONTENT_CHARSET, HTTP.UTF_8);
         params.setParameter(AllClientPNames.COOKIE_POLICY, CookiePolicy.BEST_MATCH);
-        params.setParameter(AllClientPNames.DEFAULT_HEADERS, headers);
-        
-        headers.add(new BasicHeader("Content-Type", CONTENT_TYPE));
 
         httpClient = new DefaultHttpClient(new BasicClientConnectionManager(), params);
     }
@@ -101,7 +94,7 @@ public class DrupalClient {
 
         return null;
     }
-    
+
     /**
      * Shutdown the Http client and release all resources.
      */
@@ -135,20 +128,6 @@ public class DrupalClient {
      */
     public void setHttpClient(DefaultHttpClient httpClient) {
         this.httpClient = httpClient;
-    }
-
-    /**
-     * @return the headers
-     */
-    public List<Header> getHeaders() {
-        return headers;
-    }
-
-    /**
-     * @param headers the headers to set
-     */
-    public void setHeaders(List<Header> headers) {
-        this.headers = headers;
     }
 
     /**
