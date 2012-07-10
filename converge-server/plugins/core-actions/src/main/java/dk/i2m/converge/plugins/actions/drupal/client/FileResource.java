@@ -16,17 +16,24 @@
  */
 package dk.i2m.converge.plugins.actions.drupal.client;
 
+import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
@@ -40,6 +47,8 @@ public class FileResource {
     private static final Logger LOG = Logger.getLogger("FileResource");
 
     private static final String FILE = "file";
+    
+    private static final String CREATE_RAW = "create_raw";
 
     private DefaultHttpClient httpClient;
 
@@ -62,26 +71,39 @@ public class FileResource {
      * @return Populated {@link FileModule} instance
      * @throws IOException 
      */
-    public FileCreateMessage create(DrupalMessage message) throws IOException {
-        JSONObject json = new JSONObject();
-
-        for (String fieldName : message.getFields().keySet()) {
-            json.put(fieldName, message.getFields().get(fieldName));
-        }
-
+    public ArrayList<FileCreateMessage> create(List<MediaItemRendition> renditions) throws IOException {
+        ArrayList<FileCreateMessage> messages = new ArrayList<FileCreateMessage>();
+        
         try {
-            StringEntity input = new StringEntity(json.toString());
-            String url = new URLBuilder(uri).add(FILE).toString();
+            String url = new URLBuilder(uri).add(FILE).add(CREATE_RAW).toString();
+            MultipartEntity mpEntity = new MultipartEntity();
+            
+            for (int i = 0; i < renditions.size(); i++) {
+                MediaItemRendition rendition = renditions.get(i);
+                File file = new File(rendition.getFileLocation());
+                ContentBody contentBody = new FileBody(file, rendition.getContentType());
+                mpEntity.addPart("files[" + i + "]", contentBody);
+            }
+            
             HttpPost post = new HttpPost(url);
-            post.setEntity(input);
+            post.setEntity(mpEntity);
 
             ResponseHandler<String> handler = new BasicResponseHandler();
             String response = httpClient.execute(post, handler);
 
-            JSONObject object = JSONObject.fromObject(response);
-            Object toBean = JSONObject.toBean(object, FileCreateMessage.class);
+            JSONArray jsonArray = JSONArray.fromObject(response);
 
-            return (FileCreateMessage) toBean;
+            if (jsonArray != null) {
+                int len = jsonArray.size();
+
+                for (int i = 0; i < len; i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    Object message = JSONObject.toBean(jsonObject, FileCreateMessage.class);
+                    messages.add((FileCreateMessage) message);
+                }
+            }
+            
+            return messages;
         } catch (MalformedURLException ex) {
             LOG.log(Level.SEVERE, null, ex);
         } catch (ClientProtocolException ex) {
@@ -90,6 +112,6 @@ public class FileResource {
             LOG.log(Level.SEVERE, null, ex);
         }
 
-        return null;
+        return messages;
     }
 }
