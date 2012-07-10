@@ -25,6 +25,8 @@ public class ImageField {
 
     private Long fid;
 
+    private Integer display;
+
     private String alt;
 
     private String title;
@@ -39,11 +41,13 @@ public class ImageField {
      * Construct an image field.
      * 
      * @param fid file id of the image
+     * @param display display field' checkbox (0 or 1)
      * @param alt alternate text
      * @param title title
      */
-    public ImageField(Long fid, String alt, String title) {
+    public ImageField(Long fid, Integer display, String alt, String title) {
         this.fid = fid;
+        this.display = display;
         this.alt = alt;
         this.title = title;
     }
@@ -60,6 +64,20 @@ public class ImageField {
      */
     public void setFid(Long fid) {
         this.fid = fid;
+    }
+
+    /**
+     * @return the display
+     */
+    public Integer getDisplay() {
+        return display;
+    }
+
+    /**
+     * @param display the display to set
+     */
+    public void setDisplay(Integer display) {
+        this.display = display;
     }
 
     /**
