@@ -287,10 +287,22 @@ public class DrupalEditionAction implements EditionAction {
         return value;
     }
 
+    /**
+     * Get safe HTML from untrusted input HTML.
+     * 
+     * @param content input untrusted HTML
+     * @return safe HTML
+     */
     private String cleanString(String content) {
         return Jsoup.clean(content, Whitelist.relaxed());
     }
 
+    /**
+     * Get <b>Title</b> text value.
+     * 
+     * @param newsItem NewsItem
+     * @return (< 254 in length) title
+     */
     private String getTitle(NewsItem newsItem) {
         return truncateString(newsItem.getTitle(), 254);
     }
