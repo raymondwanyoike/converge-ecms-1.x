@@ -23,16 +23,11 @@ import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.content.catalogue.RenditionNotFoundException;
 import dk.i2m.converge.core.plugin.EditionAction;
 import dk.i2m.converge.core.plugin.PluginContext;
-import dk.i2m.converge.core.utils.FileUtils;
 import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.OutletEditionAction;
 import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.converge.plugins.actions.drupal.client.*;
-import dk.i2m.converge.plugins.joomla.UploadedMediaFile;
-import dk.i2m.converge.plugins.joomla.client.JoomlaException;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -48,6 +43,25 @@ import org.jsoup.safety.Whitelist;
  */
 @OutletAction
 public class DrupalEditionAction implements EditionAction {
+
+    private enum Property {
+
+        FRONT_PAGE_PAGE,
+        PUBLISH_IMMEDIATELY,
+        PUBLISH_DELAY,
+        CONNECTION_TIMEOUT,
+        UNDISCLOSED_AUTHOR_LABEL,
+        CONTENT_TYPE,
+        SECTION_MAPPING,
+        ENDPOINT,
+        LANGUAGE,
+        PASSWORD,
+        HOSTNAME,
+        SOCKET_TIMEOUT,
+        USERNAME,
+        RENDITION_NAME,
+        EXCLUDE_MEDIA_CONTENT_TYPES
+    }
 
     private static final Logger LOG = Logger.getLogger("DrupalEditionAction");
 
@@ -70,40 +84,82 @@ public class DrupalEditionAction implements EditionAction {
 
     private Map<String, String> availableProperties;
 
-    private Map<Long, Long> sectionMap = new HashMap<Long, Long>();
+    private String undisclosedAuthor;
 
-    private enum Property {
+    private String frontPagePage;
 
-        CONNECTION_TIMEOUT,
-        UNDISCLOSED_AUTHOR_LABEL,
-        CONTENT_TYPE,
-        SECTION_MAPPING,
-        ENDPOINT,
-        LANGUAGE,
-        PASSWORD,
-        HOSTNAME,
-        SOCKET_TIMEOUT,
-        USERNAME
-    }
+    private String publishImmediately;
+
+    private String publishDelay;
+    
+    private String renditionName;
+    
+    private String[] excludeMediaContentTypes;
+    
+    private Map<Long, Long> sectionMapping = new HashMap<Long, Long>();
 
     @Override
-    public void execute(PluginContext ctx, Edition edition,
-            OutletEditionAction action) {
+    public void execute(PluginContext ctx, Edition edition, OutletEditionAction action) {
         Map<String, String> properties = action.getPropertiesAsMap();
 
         String hostname = properties.get(Property.HOSTNAME.name());
         String endPoint = properties.get(Property.ENDPOINT.name());
         String username = properties.get(Property.USERNAME.name());
         String password = properties.get(Property.PASSWORD.name());
-        String type = properties.get(Property.CONTENT_TYPE.name());
+        String contentType = properties.get(Property.CONTENT_TYPE.name());
         String language = properties.get(Property.LANGUAGE.name());
         String socketTimeout = properties.get(Property.SOCKET_TIMEOUT.name());
-        String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT.
-                name());
+        String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT.name());
         String sectionMapping = properties.get(Property.SECTION_MAPPING.name());
-        String undisclosedAuthorLabel = properties.get(Property.UNDISCLOSED_AUTHOR_LABEL.name());
+        String excludeMediaContentTypes = properties.get(Property.EXCLUDE_MEDIA_CONTENT_TYPES.name());
+        
+        undisclosedAuthor = properties.get(Property.UNDISCLOSED_AUTHOR_LABEL.name());
+        frontPagePage = properties.get(Property.FRONT_PAGE_PAGE.name());
+        publishImmediately = properties.get(Property.PUBLISH_IMMEDIATELY.name());
+        publishDelay = properties.get(Property.PUBLISH_DELAY.name());
+        renditionName = properties.get(Property.RENDITION_NAME.name());
+        
+        if (hostname == null) {
+            throw new NullPointerException("Host name is not set");
+        }
+        
+        if (endPoint == null) {
+            throw new NullPointerException("Service endpoint is not set");
+        }
+        
+        if (username == null) {
+            throw new NullPointerException("Username is not set");
+        }
+        
+        if (password == null) {
+            throw new NullPointerException("Password is not set");
+        }
+        
+        if (contentType == null) {
+            throw new NullPointerException("Content type is not set");
+        }
+        
+        if (language == null) {
+            // Fallback to the default
+            language = "und";
+        }
+        
+        if (socketTimeout == null) {
+            // Fallback to a default
+            socketTimeout = "30000";
+        }
+        
+        if (connectionTimeout == null) {
+            // Fallback to a default
+            connectionTimeout = "30000";
+        }
+        
+        if (sectionMapping == null) {
+            throw new NullPointerException("Section mapping is not set");
+        }
 
-        setMapping(sectionMapping);
+        setSectionMapping(sectionMapping);
+        setExcludeMediaContentTypes(excludeMediaContentTypes);
 
         DrupalClient client = new DrupalClient(hostname, endPoint);
         client.setSocketTimeout(Integer.parseInt(socketTimeout));
@@ -129,13 +185,14 @@ public class DrupalEditionAction implements EditionAction {
 
                 body.put("0", new TextField(newsItem.getBrief(),
                         cleanString(newsItem.getStory()), "html"));
-                actor.put("0", new TextField(null, getActor(newsItem,
-                        undisclosedAuthorLabel), null));
+                actor.put("0", new TextField(null, getActor(newsItem), null));
 
                 DrupalMessage nodeMessage = new DrupalMessage();
-                // nodeMessage.getFields().put("date", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(newsItem.getUpdated().getTime()));
+                nodeMessage.getFields().put("status", getStatus());
+                nodeMessage.getFields().put("publish_on", getPublishOn());
+                nodeMessage.getFields().put("sticky", getPromote(nip));
                 nodeMessage.getFields().put("title", getTitle(newsItem));
-                nodeMessage.getFields().put("type", type);
+                nodeMessage.getFields().put("type", contentType);
                 nodeMessage.getFields().put("language", language);
                 nodeMessage.getFields().put("body", new FieldModule(body));
                 nodeMessage.getFields().put("actor", new FieldModule(actor));
@@ -153,13 +210,14 @@ public class DrupalEditionAction implements EditionAction {
                         getId(), SUBMITTED, null);
 
                 try {
-                    List<MediaItemRendition> renditions = getMedia(newsItem,"", new String[]{});
+                    List<MediaItemRendition> renditions = getMedia(newsItem);
                     ArrayList<FileCreateMessage> fcms = fr.create(renditions);
-                    
+
                     for (int i = 0; i < fcms.size(); i++) {
-                        image.put(String.valueOf(i), new ImageField(fcms.get(i).getFid(), 1, NID, type));
+                        image.put(String.valueOf(i), new ImageField(fcms.get(i).
+                                getFid(), 1, NID, contentType));
                     }
-                    
+
                     NodeCreateMessage ncm = nr.create(nodeMessage);
 
                     nid.setValue(ncm.getNid().toString());
@@ -250,7 +308,7 @@ public class DrupalEditionAction implements EditionAction {
         return bundle.getString("PLUGIN_ABOUT");
     }
 
-    private void setMapping(String mapping) {
+    private void setSectionMapping(String mapping) {
         String[] values = mapping.split(";");
 
         for (int i = 0; i < values.length; i++) {
@@ -258,16 +316,20 @@ public class DrupalEditionAction implements EditionAction {
 
             Long convergeId =Long.valueOf(value[0].trim());
             Long drupalId = Long.valueOf(value[1].trim());
-            sectionMap.put(convergeId, drupalId);
+            sectionMapping.put(convergeId, drupalId);
         }
+    }
+    
+    private void setExcludeMediaContentTypes(String mapping) {
+        excludeMediaContentTypes = mapping.split(";");
     }
 
     private Map<String, Object> mapSection(NewsItemPlacement placement) {
         Map<String, Object> map = new HashMap<String, Object>();
         Section section = placement.getSection();
 
-        if (sectionMap.containsKey(section.getId())) {
-            map.put("0", sectionMap.get(section.getId()));
+        if (sectionMapping.containsKey(section.getId())) {
+            map.put("0", sectionMapping.get(section.getId()));
         }
 
         return map;
@@ -308,16 +370,25 @@ public class DrupalEditionAction implements EditionAction {
         return truncateString(newsItem.getTitle(), 254);
     }
 
-    private String getActor(NewsItem newsItem, String undisclosedAuthorLabel) {
+    /**
+     * Get <b>Actor</b> text value.
+     * 
+     * @param newsItem NewsItem
+     * @return actor, or actors (separated by ', ')
+     */
+    private String getActor(NewsItem newsItem) {
         if (newsItem.isUndisclosedAuthor()) {
-            return undisclosedAuthorLabel;
+            // Return the UNDISCLOSED_AUTHOR_LABEL property value
+            return undisclosedAuthor;
         } else {
             if (newsItem.getByLine().trim().isEmpty()) {
                 StringBuilder by = new StringBuilder();
 
+                // Iterate over all the actors
                 for (NewsItemActor actor : newsItem.getActors()) {
                     boolean firstActor = true;
 
+                    // TODO: Document
                     if (actor.getRole().equals(newsItem.getOutlet().getWorkflow().
                             getStartState().getActorRole())) {
                         if (!firstActor) {
@@ -331,12 +402,79 @@ public class DrupalEditionAction implements EditionAction {
                 }
                 return by.toString();
             } else {
+                // Return the "by-line" of the NewsItem
                 return newsItem.getByLine();
             }
         }
     }
+    
+        
+    /**
+     * Get <b>Published</b> checkbox value.
+     * 
+     * @return 1 = checked, 0 otherwise
+     */
+    private String getStatus() {
+        if (publishImmediately != null) {
+            // 1 == true
+            if (publishImmediately.equals("1")) {
+                // Default 
+                return "1";
+            }
+        }
 
-    private List<MediaItemRendition> getMedia(NewsItem newsItem, String renditionName, String[] excludeContentTypes) {
+        // Set to unpublished, see getPublishOn()
+        return "0";
+    }
+
+    /**
+     * Get <b>Publish on</b> text value.
+     * 
+     * @return "YYYY-MM-DD HH:MM:SS", or ""
+     */
+    private String getPublishOn() {
+        if (publishImmediately != null) {
+            // 1 == true
+            if (publishImmediately.equals("1")) {
+                return "";
+            }
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        // Get the post delay property
+        Integer amount = Integer.valueOf(publishDelay);
+        Calendar calendar = Calendar.getInstance();
+        // Add post delay to current time
+        calendar.add(Calendar.HOUR_OF_DAY, amount);
+
+        // Return future time
+        return sdf.format(calendar.getTime());
+    }
+
+    
+    /**
+     * Get <b>Promoted to front page</b> checkbox value.
+     * 
+     * @param placement placement of the {@link NewsItem}
+     * @return 1 = checked, 0 otherwise
+     */
+    private String getPromote(NewsItemPlacement placement) {
+        if (frontPagePage != null) {
+            // Get the NewsItemPlacement's' start page
+            String start = String.valueOf(placement.getStart());
+
+            // Check if the start page matches the FRONT_PAGE_MAPPING
+            if (frontPagePage.equalsIgnoreCase(start)) {
+                return "1";
+            }
+        }
+
+        // Default
+        return "0";
+    }
+    
+    private List<MediaItemRendition> getMedia(NewsItem newsItem) {
         List<MediaItemRendition> renditions = new ArrayList<MediaItemRendition>();
 
         for (NewsItemMediaAttachment attachment : newsItem.getMediaAttachments()) {
@@ -347,28 +485,22 @@ public class DrupalEditionAction implements EditionAction {
                 continue;
             }
 
-//            // Check if there is a category setting for this media item
-//            if (this.categoryImageMapping.containsKey(joomlaCategoryId)) {
-//                LOG.log(Level.FINE, "Special settings for Joomla Category {0}",
-//                        new Object[]{joomlaCategoryId});
-//                String imgCat = this.categoryImageMapping.get(joomlaCategoryId);
-//                String[] imgCatSettings = imgCat.split(";");
-//                renditionName = imgCatSettings[1];
-//            }
-            
             try {
-                MediaItemRendition rendition =  item.findRendition(renditionName);
+                MediaItemRendition rendition = item.findRendition(renditionName);
 
                 // Check if the file should be excluded
-                if (ArrayUtils.contains(excludeContentTypes, rendition.getContentType())) {
+                if (ArrayUtils.contains(excludeMediaContentTypes, rendition.getContentType())) {
                     continue;
                 }
 
-                String filename = newsItem.getId() + "-" + rendition.getId()+ "." + rendition.getExtension();
-                
+                String filename = newsItem.getId() + "-" + rendition.getId()
+                        + "." + rendition.getExtension();
+
                 renditions.add(rendition);
             } catch (RenditionNotFoundException ex) {
-                LOG.log(Level.WARNING, "Rendition ({0}) missing for Media Item #{1}. Ignoring Media Item.", new Object[]{renditionName, item.getId()});
+                LOG.log(Level.WARNING,
+                        "Rendition ({0}) missing for Media Item #{1}. Ignoring Media Item.",
+                        new Object[]{renditionName, item.getId()});
             }
         }
 
