@@ -272,9 +272,16 @@ public class DrupalEditionAction implements EditionAction {
         return map;
     }
 
+    /**
+     * Truncate text.
+     * 
+     * @param value text
+     * @param length length to truncate
+     * @return truncated text
+     */
     private String truncateString(String value, int length) {
         if (value != null && value.length() > length) {
-            value = value.substring(0, length);
+            value = value.trim().substring(0, length);
         }
 
         return value;
