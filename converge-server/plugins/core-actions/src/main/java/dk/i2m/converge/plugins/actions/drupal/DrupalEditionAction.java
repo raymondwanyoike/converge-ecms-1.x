@@ -17,24 +17,27 @@
 package dk.i2m.converge.plugins.actions.drupal;
 
 import dk.i2m.converge.core.annotations.OutletAction;
-import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.content.NewsItemActor;
-import dk.i2m.converge.core.content.NewsItemEditionState;
-import dk.i2m.converge.core.content.NewsItemPlacement;
-import dk.i2m.converge.core.metadata.Concept;
-import dk.i2m.converge.core.metadata.Subject;
+import dk.i2m.converge.core.content.*;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
+import dk.i2m.converge.core.content.catalogue.RenditionNotFoundException;
 import dk.i2m.converge.core.plugin.EditionAction;
 import dk.i2m.converge.core.plugin.PluginContext;
+import dk.i2m.converge.core.utils.FileUtils;
 import dk.i2m.converge.core.workflow.Edition;
-import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.OutletEditionAction;
 import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.converge.plugins.actions.drupal.client.*;
+import dk.i2m.converge.plugins.joomla.UploadedMediaFile;
+import dk.i2m.converge.plugins.joomla.client.JoomlaException;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.ArrayUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
@@ -109,11 +112,12 @@ public class DrupalEditionAction implements EditionAction {
 
         try {
             UserResource ur = new UserResource(client);
+            NodeResource nr = new NodeResource(client);
+            FileResource fr = new FileResource(client);
+
             ur.setUsername(username);
             ur.setPassword(password);
             ur.connect();
-
-            NodeResource nr = new NodeResource(client);
 
             for (NewsItemPlacement nip : edition.getPlacements()) {
                 NewsItem newsItem = nip.getNewsItem();
@@ -121,9 +125,12 @@ public class DrupalEditionAction implements EditionAction {
                 Map<String, Object> body = new HashMap<String, Object>();
                 Map<String, Object> actor = new HashMap<String, Object>();
                 Map<String, Object> section = mapSection(nip);
-                 
-                body.put("0", new TextField(newsItem.getBrief(), cleanString(newsItem.getStory()), "html"));
-                actor.put("0", new TextField(null, getActor(newsItem, undisclosedAuthorLabel), null));
+                Map<String, Object> image = new HashMap<String, Object>();
+
+                body.put("0", new TextField(newsItem.getBrief(),
+                        cleanString(newsItem.getStory()), "html"));
+                actor.put("0", new TextField(null, getActor(newsItem,
+                        undisclosedAuthorLabel), null));
 
                 DrupalMessage nodeMessage = new DrupalMessage();
                 // nodeMessage.getFields().put("date", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(newsItem.getUpdated().getTime()));
@@ -146,6 +153,13 @@ public class DrupalEditionAction implements EditionAction {
                         getId(), SUBMITTED, null);
 
                 try {
+                    List<MediaItemRendition> renditions = getMedia(newsItem,"", new String[]{});
+                    ArrayList<FileCreateMessage> fcms = fr.create(renditions);
+                    
+                    for (int i = 0; i < fcms.size(); i++) {
+                        image.put(String.valueOf(i), new ImageField(fcms.get(i).getFid(), 1, NID, type));
+                    }
+                    
                     NodeCreateMessage ncm = nr.create(nodeMessage);
 
                     nid.setValue(ncm.getNid().toString());
@@ -300,5 +314,44 @@ public class DrupalEditionAction implements EditionAction {
                 return newsItem.getByLine();
             }
         }
+    }
+
+    private List<MediaItemRendition> getMedia(NewsItem newsItem, String renditionName, String[] excludeContentTypes) {
+        List<MediaItemRendition> renditions = new ArrayList<MediaItemRendition>();
+
+        for (NewsItemMediaAttachment attachment : newsItem.getMediaAttachments()) {
+            MediaItem item = attachment.getMediaItem();
+
+            // Verify that the item exist and renditions are attached
+            if (item == null || !item.isRenditionsAttached()) {
+                continue;
+            }
+
+//            // Check if there is a category setting for this media item
+//            if (this.categoryImageMapping.containsKey(joomlaCategoryId)) {
+//                LOG.log(Level.FINE, "Special settings for Joomla Category {0}",
+//                        new Object[]{joomlaCategoryId});
+//                String imgCat = this.categoryImageMapping.get(joomlaCategoryId);
+//                String[] imgCatSettings = imgCat.split(";");
+//                renditionName = imgCatSettings[1];
+//            }
+            
+            try {
+                MediaItemRendition rendition =  item.findRendition(renditionName);
+
+                // Check if the file should be excluded
+                if (ArrayUtils.contains(excludeContentTypes, rendition.getContentType())) {
+                    continue;
+                }
+
+                String filename = newsItem.getId() + "-" + rendition.getId()+ "." + rendition.getExtension();
+                
+                renditions.add(rendition);
+            } catch (RenditionNotFoundException ex) {
+                LOG.log(Level.WARNING, "Rendition ({0}) missing for Media Item #{1}. Ignoring Media Item.", new Object[]{renditionName, item.getId()});
+            }
+        }
+
+        return renditions;
     }
 }
