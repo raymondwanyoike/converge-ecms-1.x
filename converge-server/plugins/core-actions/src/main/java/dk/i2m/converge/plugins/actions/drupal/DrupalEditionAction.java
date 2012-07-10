@@ -17,22 +17,27 @@
 package dk.i2m.converge.plugins.actions.drupal;
 
 import dk.i2m.converge.core.annotations.OutletAction;
-import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.content.NewsItemEditionState;
-import dk.i2m.converge.core.content.NewsItemPlacement;
-import dk.i2m.converge.core.metadata.Concept;
-import dk.i2m.converge.core.metadata.Subject;
+import dk.i2m.converge.core.content.*;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
+import dk.i2m.converge.core.content.catalogue.RenditionNotFoundException;
 import dk.i2m.converge.core.plugin.EditionAction;
 import dk.i2m.converge.core.plugin.PluginContext;
+import dk.i2m.converge.core.utils.FileUtils;
 import dk.i2m.converge.core.workflow.Edition;
-import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.OutletEditionAction;
+import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.converge.plugins.actions.drupal.client.*;
+import dk.i2m.converge.plugins.joomla.UploadedMediaFile;
+import dk.i2m.converge.plugins.joomla.client.JoomlaException;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.ArrayUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
@@ -55,27 +60,24 @@ public class DrupalEditionAction implements EditionAction {
     private static final String FAILED = "FAILED";
 
     private static final String UPLOADING = "UPLOADING";
-    
+
     private static final String NID = "nid";
 
     private static final String URI = "uri";
 
-    private ResourceBundle bundle = ResourceBundle.getBundle("dk.i2m.converge.plugins.actions.drupal.Messages");
+    private ResourceBundle bundle = ResourceBundle.getBundle(
+            "dk.i2m.converge.plugins.actions.drupal.Messages");
 
     private Map<String, String> availableProperties;
 
-    private Map<Long, Long> pressMappings = new HashMap<Long, Long>();
-    
-    private Map<Long, Long> groupMappings = new HashMap<Long, Long>();
+    private Map<Long, Long> sectionMap = new HashMap<Long, Long>();
 
     private enum Property {
 
         CONNECTION_TIMEOUT,
+        UNDISCLOSED_AUTHOR_LABEL,
         CONTENT_TYPE,
-        PRESS_MAPPING,
-        PRESS_MAPPING_FIELD,
-        GROUP_MAPPING,
-        GROUP_MAPPING_FIELD,
+        SECTION_MAPPING,
         ENDPOINT,
         LANGUAGE,
         PASSWORD,
@@ -85,7 +87,8 @@ public class DrupalEditionAction implements EditionAction {
     }
 
     @Override
-    public void execute(PluginContext ctx, Edition edition, OutletEditionAction action) {
+    public void execute(PluginContext ctx, Edition edition,
+            OutletEditionAction action) {
         Map<String, String> properties = action.getPropertiesAsMap();
 
         String hostname = properties.get(Property.HOSTNAME.name());
@@ -95,58 +98,71 @@ public class DrupalEditionAction implements EditionAction {
         String type = properties.get(Property.CONTENT_TYPE.name());
         String language = properties.get(Property.LANGUAGE.name());
         String socketTimeout = properties.get(Property.SOCKET_TIMEOUT.name());
-        String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT.name());
-        
-        String pressMapping = properties.get(Property.PRESS_MAPPING.name());
-        String pressMappingField = properties.get(Property.PRESS_MAPPING_FIELD.name());
-        String groupMapping = properties.get(Property.GROUP_MAPPING.name());
-        String groupMappingField = properties.get(Property.GROUP_MAPPING_FIELD.name());
-        
-        setMapping(1, pressMapping);
-        setMapping(0, groupMapping);
-        
-        Map<String, Object> press = mapPress(edition.getOutlet());
-        
+        String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT.
+                name());
+        String sectionMapping = properties.get(Property.SECTION_MAPPING.name());
+        String undisclosedAuthorLabel = properties.get(Property.UNDISCLOSED_AUTHOR_LABEL.name());
+
+        setMapping(sectionMapping);
+
         DrupalClient client = new DrupalClient(hostname, endPoint);
         client.setSocketTimeout(Integer.parseInt(socketTimeout));
         client.setConnectionTimeout(Integer.parseInt(connectionTimeout));
         client.setup();
-        
+
         try {
             UserResource ur = new UserResource(client);
+            NodeResource nr = new NodeResource(client);
+            FileResource fr = new FileResource(client);
+
             ur.setUsername(username);
             ur.setPassword(password);
             ur.connect();
-            
-            NodeResource nr = new NodeResource(client);
 
             for (NewsItemPlacement nip : edition.getPlacements()) {
                 NewsItem newsItem = nip.getNewsItem();
 
+                Map<String, Object> body = new HashMap<String, Object>();
+                Map<String, Object> actor = new HashMap<String, Object>();
+                Map<String, Object> section = mapSection(nip);
+                Map<String, Object> image = new HashMap<String, Object>();
+
+                body.put("0", new TextField(newsItem.getBrief(),
+                        cleanString(newsItem.getStory()), "html"));
+                actor.put("0", new TextField(null, getActor(newsItem,
+                        undisclosedAuthorLabel), null));
+
                 DrupalMessage nodeMessage = new DrupalMessage();
-                nodeMessage.getFields().put("title", truncateString(newsItem.getTitle(), 254));
+                // nodeMessage.getFields().put("date", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(newsItem.getUpdated().getTime()));
+                nodeMessage.getFields().put("title", getTitle(newsItem));
                 nodeMessage.getFields().put("type", type);
                 nodeMessage.getFields().put("language", language);
-                nodeMessage.getFields().put("date", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(newsItem.getUpdated().getTime()));
-
-                Map<String, Object> body = new HashMap<String, Object>();
-                body.put("0", new TextField(newsItem.getBrief(), cleanString(newsItem.getStory()), "html"));
-            
-                Map<String, Object> group = mapGroup(newsItem);
-                
                 nodeMessage.getFields().put("body", new FieldModule(body));
-                nodeMessage.getFields().put(pressMappingField, new FieldModule(press));
-                nodeMessage.getFields().put(groupMappingField, new FieldModule(group));
-         
-                NewsItemEditionState status = ctx.addNewsItemEditionState(edition.getId(), newsItem.getId(), STATUS, UPLOADING.toString());
-                NewsItemEditionState nid = ctx.addNewsItemEditionState(edition.getId(), newsItem.getId(), NID, null);
-                NewsItemEditionState uri = ctx.addNewsItemEditionState(edition.getId(), newsItem.getId(), URI, null);
-                NewsItemEditionState submitted = ctx.addNewsItemEditionState(edition.getId(), newsItem.getId(), SUBMITTED, null);
-            
+                nodeMessage.getFields().put("actor", new FieldModule(actor));
+                nodeMessage.getFields().put("section", new FieldModule(section));
+
+                NewsItemEditionState status =
+                        ctx.addNewsItemEditionState(edition.getId(), newsItem.
+                        getId(), STATUS, UPLOADING.toString());
+                NewsItemEditionState nid = ctx.addNewsItemEditionState(edition.
+                        getId(), newsItem.getId(), NID, null);
+                NewsItemEditionState uri = ctx.addNewsItemEditionState(edition.
+                        getId(), newsItem.getId(), URI, null);
+                NewsItemEditionState submitted =
+                        ctx.addNewsItemEditionState(edition.getId(), newsItem.
+                        getId(), SUBMITTED, null);
+
                 try {
-                    NodeCreateMessage ncm = nr.create(nodeMessage);
+                    List<MediaItemRendition> renditions = getMedia(newsItem,"", new String[]{});
+                    ArrayList<FileCreateMessage> fcms = fr.create(renditions);
                     
-                    nid.setValue(ncm.getId().toString());
+                    for (int i = 0; i < fcms.size(); i++) {
+                        image.put(String.valueOf(i), new ImageField(fcms.get(i).getFid(), 1, NID, type));
+                    }
+                    
+                    NodeCreateMessage ncm = nr.create(nodeMessage);
+
+                    nid.setValue(ncm.getNid().toString());
                     uri.setValue(ncm.getUri().toString());
                     submitted.setValue(new Date().toString());
                     status.setValue(UPLOADED.toString());
@@ -154,7 +170,7 @@ public class DrupalEditionAction implements EditionAction {
                     status.setValue(FAILED.toString());
                     LOG.log(Level.SEVERE, null, ex);
                 }
-                
+
                 ctx.updateNewsItemEditionState(status);
                 ctx.updateNewsItemEditionState(nid);
                 ctx.updateNewsItemEditionState(uri);
@@ -165,210 +181,13 @@ public class DrupalEditionAction implements EditionAction {
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
-        
+
         client.close();
     }
-    
-//    /** {@inheritDoc} */
-//    @Override
-//    public void execute(PluginContext ctx, Edition edition,
-//            OutletEditionAction action) {
-//        // Get the action properties as a Map
-//        Map<String, String> properties = action.getPropertiesAsMap();
-//
-//        // Assign the action properties
-//        String server = properties.get(Property.SERVER.name());
-//        String endPoint = properties.get(Property.ENDPOINT.name());
-//        String username = properties.get(Property.USERNAME.name());
-//        String password = properties.get(Property.PASSWORD.name());
-//        String type = properties.get(Property.CONTENT_TYPE.name());
-//        String language = properties.get(Property.LANGUAGE.name());
-//        String socketTimeout = properties.get(Property.SOCKET_TIMEOUT.name());
-//        String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT.
-//                name());
-//        // The convergeId:drupalId mapping
-//        String mapping = properties.get(Property.DRUPAL_MAPPING.name());
-//        // The field that is being mapped (e.g. categories)
-//        String mappingField = properties.get(
-//                Property.DRUPAL_MAPPING_FIELD.name());
-//
-//        // Split the mapping into mappings with each occurrence of ";"
-//        String[] mapValues = mapping.split(";");
-//
-//        /// Loop through the mappings adding them to a Map<Long,Long>
-//        for (int i = 0; i < mapValues.length; i++) {
-//            String[] mapValue = mapValues[i].split(":");
-//            groupMappings.put(Long.valueOf(mapValue[0].trim()),
-//                    Long.valueOf(mapValue[1].trim()));
-//        }
-//
-//        LOG.log(Level.INFO, "Executing Drupal Client action for Outlet #{0}",
-//                action.getOutlet().getId());
-//        LOG.log(Level.INFO, "Discovered {0} mappings", groupMappings.size());
-//        ctx.log(LogSeverity.INFO,
-//                "Executing Drupal Client action for Outlet #{0}",
-//                new Object[]{action.getOutlet().getId()}, action, action.getId());
-//
-//        if (socketTimeout == null) {
-//            // TODO: Set a default
-//            // socketTimeout = 0;
-//        }
-//
-//        if (connectionTimeout == null) {
-//            // TODO: Set a default
-//            // connectionTimeout = 0;
-//        }
-//
-//        DrupalConnector connector = new DrupalConnector(server, endPoint,
-//                Integer.parseInt(connectionTimeout), Integer.parseInt(
-//                socketTimeout));
-//        UserResource user =
-//                new UserResource(connector, username, password, true);
-//        NodeResource node = new NodeResource(connector);
-//
-//        // Loop through the NewsItems in the Edition acting on each
-//        for (NewsItemPlacement nip : edition.getPlacements()) {
-//            NewsItem newsItem = nip.getNewsItem();
-//
-//            Map<String, Object> body = new HashMap<String, Object>();
-//            // Add the NewsItem content, brief (as summary) and story
-//            System.out.println(newsItem);
-//            body.put("0", new TextField(newsItem.getBrief(), clean(newsItem.
-//                    getStory()), "filtered_html"));
-//
-//            // TODO: This part of the code (categories and concepts) is hard coded
-//            Map<String, Object> categories = new HashMap<String, Object>();
-//
-//            // Counter for the nth Concept that has been processed
-//            int x = 0;
-//
-//            // Loop through the Concepts building our request
-//            for (Concept c : newsItem.getConcepts()) {
-//                if (c instanceof Subject) {
-//
-//                    // Check if the mappings contain the Concept
-//                    if (groupMappings.containsKey(c.getId())) {
-//                        categories.put(String.valueOf(x),
-//                                groupMappings.get(c.getId()));
-//                    } else {
-//                        // Fallback to the parent Concept, and keep at it until 
-//                        // a Concept is found in the Concept parent hierarchy or
-//                        // nothing is found.
-//
-//                        LOG.log(Level.WARNING,
-//                                "News Item #{0}- Mapping not found for concept: {1} {2}. Trying parent",
-//                                new Object[]{newsItem.getId(), c.getId(), c.
-//                                    getName()});
-//
-//                        Concept child = c;
-//
-//                        if (!child.getBroader().isEmpty()) {
-//                            while (!child.getBroader().isEmpty()) {
-//                                Concept parent = child.getBroader().get(0);
-//
-//                                if (groupMappings.containsKey(parent.getId())) {
-//                                    LOG.log(Level.INFO,
-//                                            "News Item #{0}- Mapping ({1}) found for parent. Concept: {2} {3}",
-//                                            new Object[]{newsItem.getId(), c.
-//                                                getId(), parent.getId(), parent.
-//                                                getName()});
-//
-//                                    categories.put(String.valueOf(x), groupMappings.
-//                                            get(parent.getId()));
-//                                    break;
-//                                }
-//
-//                                LOG.log(Level.WARNING,
-//                                        "News Item #{0}- Mapping ({1}) not found for parent. Trying next parent",
-//                                        new Object[]{newsItem.getId(), c.getId()});
-//
-//                                child = parent;
-//                            }
-//                        } else {
-//                            LOG.log(Level.SEVERE,
-//                                    "News Item #{0}- Mapping ({1}) has no parent.",
-//                                    new Object[]{newsItem.getId(), c.getId()});
-//                        }
-//
-//                        x++;
-//                    }
-//                }
-//            }
-//
-//            DrupalMessage nodeMessage = new DrupalMessage();
-//            nodeMessage.getFields().put("title", newsItem.getTitle());
-//            nodeMessage.getFields().put("type", type);
-//            nodeMessage.getFields().put("language", language);
-//            nodeMessage.getFields().put("date", new SimpleDateFormat(
-//                    "yyyy-MM-dd hh:mm:ss").format(
-//                    newsItem.getUpdated().getTime()));
-//            nodeMessage.getFields().put("body", new FieldModule(body));
-//            nodeMessage.getFields().put(mappingField,
-//                    new FieldModule(categories));
-//
-//            Map<String, Object> press = new HashMap<String, Object>();
-//            press.put("0", edition.getOutlet().getTitle());
-//
-//            nodeMessage.getFields().put("press", new FieldModule(press));
-//
-//            ctx.log(LogSeverity.INFO,
-//                    "Creating new Drupal node for News Item #{0}",
-//                    new Object[]{newsItem.getId()}, action, action.getId());
-//
-//            // Record the progress in the db
-//            NewsItemEditionState status = ctx.addNewsItemEditionState(edition.
-//                    getId(), newsItem.getId(), STATUS, UPLOADING.toString());
-//            NewsItemEditionState nid =
-//                    ctx.addNewsItemEditionState(edition.getId(),
-//                    newsItem.getId(), NID, null);
-//            NewsItemEditionState uri =
-//                    ctx.addNewsItemEditionState(edition.getId(),
-//                    newsItem.getId(), URI, null);
-//            NewsItemEditionState submitted =
-//                    ctx.addNewsItemEditionState(edition.getId(),
-//                    newsItem.getId(), SUBMITTED, null);
-//
-//            try {
-//                // Create the Drupal node
-//                NodeCreateMessage createdNode = node.create(nodeMessage);
-//
-//                nid.setValue(createdNode.getNid().toString());
-//                uri.setValue(createdNode.getUri().toString());
-//                submitted.setValue(new Date().toString());
-//                status.setValue(UPLOADED.toString());
-//            } catch (HttpResponseException ex) {
-//                status.setValue(FAILED.toString());
-//
-//                LOG.log(Level.SEVERE, "{0} - {1}",
-//                        new Object[]{ex.getStatusCode(), ex.getMessage()});
-//                ctx.log(LogSeverity.SEVERE,
-//                        "HttpResponseException for News Item #{0}, with the message: {1} - {2} ",
-//                        new Object[]{newsItem.getId(), ex.getStatusCode(), ex.
-//                            getMessage()}, action, action.getId());
-//            } catch (Exception ex) {
-//                status.setValue(FAILED.toString());
-//
-//                LOG.log(Level.SEVERE, null, ex);
-//            }
-//
-//            // Update the progress in the db
-//            ctx.updateNewsItemEditionState(status);
-//            ctx.updateNewsItemEditionState(nid);
-//            ctx.updateNewsItemEditionState(uri);
-//            ctx.updateNewsItemEditionState(submitted);
-//        }
-//
-//        // Clean up
-//        user.disconnect();
-//        connector.shutdown();
-//
-//        ctx.log(LogSeverity.INFO,
-//                "Finished Drupal Client action for Outlet #{0}",
-//                new Object[]{action.getOutlet().getId()}, action, action.getId());
-//    }
 
     @Override
-    public void executePlacement(PluginContext ctx, NewsItemPlacement placement, Edition edition, OutletEditionAction action) {
+    public void executePlacement(PluginContext ctx, NewsItemPlacement placement,
+            Edition edition, OutletEditionAction action) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -386,7 +205,7 @@ public class DrupalEditionAction implements EditionAction {
     public Map<String, String> getAvailableProperties() {
         if (availableProperties == null) {
             availableProperties = new LinkedHashMap<String, String>();
-            
+
             for (Property p : Property.values()) {
                 availableProperties.put(bundle.getString(p.name()), p.name());
             }
@@ -430,75 +249,30 @@ public class DrupalEditionAction implements EditionAction {
     public String getAbout() {
         return bundle.getString("PLUGIN_ABOUT");
     }
-    
-    private void setMapping(int map, String mapping) {
+
+    private void setMapping(String mapping) {
         String[] values = mapping.split(";");
 
         for (int i = 0; i < values.length; i++) {
             String[] value = values[i].split(":");
-            
-            if (map == 1) {
-                pressMappings.put(Long.valueOf(value[0].trim()), Long.valueOf(value[1].trim()));
-            } else {
-                groupMappings.put(Long.valueOf(value[0].trim()), Long.valueOf(value[1].trim()));
-            }
+
+            sectionMap.put(Long.valueOf(value[0].trim()), Long.valueOf(value[1].
+                    trim()));
         }
     }
-    
-    private Map<String, Object> mapPress(Outlet outlet) {
-        Map<String, Object> press = new HashMap<String, Object>();
-        
-        if (pressMappings.containsKey(outlet.getId())) {
-            press.put("0", pressMappings.get(outlet.getId()));
-        } 
-        
-        return press;
-    }
-    
-    private Map<String, Object> mapGroup(NewsItem newsItem) {
-        Map<String, Object> categories = new HashMap<String, Object>();
 
-        // Counter for the nth processed Concept
-        int x = 0; 
+    private Map<String, Object> mapSection(NewsItemPlacement placement) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        Section section = placement.getSection();
 
-        for (Concept c : newsItem.getConcepts()) {
-            if (c instanceof Subject) {
-                // Check if the mappings contain the Concept
-                if (groupMappings.containsKey(c.getId())) {
-                    categories.put(String.valueOf(x), groupMappings.get(c.getId()));
-                } else {
-                    // Fallback to the parent Concept, and keep at it until 
-                    // a Concept is found in the Concept hierarchy or until
-                    // nothing is found.
-                    Concept child = c;
-
-                    if (!child.getBroader().isEmpty()) {
-                        while (!child.getBroader().isEmpty()) {
-                            Concept parent = child.getBroader().get(0);
-
-                            if (groupMappings.containsKey(parent.getId())) {
-                                // Found a Concept, assign it and break
-                                categories.put(String.valueOf(x), groupMappings.get(parent.getId()));
-                                break;
-                            }
-
-                            // Nothing found here, try the parent
-                            child = parent;
-                        }
-                    } else {
-                        // At the top of the tree with nothing found
-                    }
-
-                    // Next!
-                    x++;
-                }
-            }
+        if (sectionMap.containsKey(section.getId())) {
+            map.put("0", sectionMap.get(section.getId()));
         }
-        
-        return categories;
+
+        return map;
     }
 
-    private static String truncateString(String value, int length) {
+    private String truncateString(String value, int length) {
         if (value != null && value.length() > length) {
             value = value.substring(0, length);
         }
@@ -506,7 +280,78 @@ public class DrupalEditionAction implements EditionAction {
         return value;
     }
 
-    private static String cleanString(String content) {
+    private String cleanString(String content) {
         return Jsoup.clean(content, Whitelist.relaxed());
+    }
+
+    private String getTitle(NewsItem newsItem) {
+        return truncateString(newsItem.getTitle(), 254);
+    }
+
+    private String getActor(NewsItem newsItem, String undisclosedAuthorLabel) {
+        if (newsItem.isUndisclosedAuthor()) {
+            return undisclosedAuthorLabel;
+        } else {
+            if (newsItem.getByLine().trim().isEmpty()) {
+                StringBuilder by = new StringBuilder();
+
+                for (NewsItemActor actor : newsItem.getActors()) {
+                    boolean firstActor = true;
+
+                    if (actor.getRole().equals(newsItem.getOutlet().getWorkflow().
+                            getStartState().getActorRole())) {
+                        if (!firstActor) {
+                            by.append(", ");
+                        } else {
+                            firstActor = false;
+                        }
+
+                        by.append(actor.getUser().getFullName());
+                    }
+                }
+                return by.toString();
+            } else {
+                return newsItem.getByLine();
+            }
+        }
+    }
+
+    private List<MediaItemRendition> getMedia(NewsItem newsItem, String renditionName, String[] excludeContentTypes) {
+        List<MediaItemRendition> renditions = new ArrayList<MediaItemRendition>();
+
+        for (NewsItemMediaAttachment attachment : newsItem.getMediaAttachments()) {
+            MediaItem item = attachment.getMediaItem();
+
+            // Verify that the item exist and renditions are attached
+            if (item == null || !item.isRenditionsAttached()) {
+                continue;
+            }
+
+//            // Check if there is a category setting for this media item
+//            if (this.categoryImageMapping.containsKey(joomlaCategoryId)) {
+//                LOG.log(Level.FINE, "Special settings for Joomla Category {0}",
+//                        new Object[]{joomlaCategoryId});
+//                String imgCat = this.categoryImageMapping.get(joomlaCategoryId);
+//                String[] imgCatSettings = imgCat.split(";");
+//                renditionName = imgCatSettings[1];
+//            }
+            
+            try {
+                MediaItemRendition rendition =  item.findRendition(renditionName);
+
+                // Check if the file should be excluded
+                if (ArrayUtils.contains(excludeContentTypes, rendition.getContentType())) {
+                    continue;
+                }
+
+                String filename = newsItem.getId() + "-" + rendition.getId()+ "." + rendition.getExtension();
+                
+                renditions.add(rendition);
+            } catch (RenditionNotFoundException ex) {
+                LOG.log(Level.WARNING, "Rendition ({0}) missing for Media Item #{1}. Ignoring Media Item.", new Object[]{renditionName, item.getId()});
+            }
+        }
+
+        return renditions;
     }
 }

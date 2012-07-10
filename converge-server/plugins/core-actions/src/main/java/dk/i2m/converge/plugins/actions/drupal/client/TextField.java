@@ -17,7 +17,7 @@
 package dk.i2m.converge.plugins.actions.drupal.client;
 
 /**
- * Defines a simple text field type.
+ * Basic text field.
  * 
  * @author Raymond Wanyoike
  */
@@ -29,9 +29,19 @@ public class TextField {
 
     private String format;
 
+    /**
+     * Construct a text field.
+     */
     public TextField() {
     }
-    
+
+    /**
+     * Construct a text field.
+     * 
+     * @param summary summary
+     * @param value body
+     * @param format text format
+     */
     public TextField(String summary, String value, String format) {
         this.summary = summary;
         this.value = value;

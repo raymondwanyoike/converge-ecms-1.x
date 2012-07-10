@@ -72,8 +72,10 @@ public class NodeResource {
         try {
             StringEntity input = new StringEntity(json.toString());
             String url = new URLBuilder(uri).add(NODE).toString();
+            
             HttpPost post = new HttpPost(url);
             post.setEntity(input);
+            post.addHeader(DrupalClient.JSON_HEADER);
 
             ResponseHandler<String> handler = new BasicResponseHandler();
             String response = httpClient.execute(post, handler);

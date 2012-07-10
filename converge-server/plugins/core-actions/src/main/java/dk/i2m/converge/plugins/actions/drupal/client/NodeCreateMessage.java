@@ -17,27 +17,28 @@
 package dk.i2m.converge.plugins.actions.drupal.client;
 
 /**
+ * Default response from the node create resource.
  * 
  * @author Raymond Wanyoike
  */
 public class NodeCreateMessage {
 
-    private Long id;
+    private Long nid;
 
     private String uri;
 
     /**
-     * @return the id
+     * @return the nid
      */
-    public Long getId() {
-        return id;
+    public Long getNid() {
+        return nid;
     }
 
     /**
-     * @param id the id to set
+     * @param nid the nid to set
      */
-    public void setId(Long id) {
-        this.id = id;
+    public void setNid(Long nid) {
+        this.nid = nid;
     }
 
     /**
