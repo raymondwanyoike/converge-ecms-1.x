@@ -256,8 +256,9 @@ public class DrupalEditionAction implements EditionAction {
         for (int i = 0; i < values.length; i++) {
             String[] value = values[i].split(":");
 
-            sectionMap.put(Long.valueOf(value[0].trim()), Long.valueOf(value[1].
-                    trim()));
+            Long convergeId =Long.valueOf(value[0].trim());
+            Long drupalId = Long.valueOf(value[1].trim());
+            sectionMap.put(convergeId, drupalId);
         }
     }
 
