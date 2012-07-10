@@ -46,36 +46,36 @@ public class DrupalEditionAction implements EditionAction {
 
     private enum Property {
 
-        FRONT_PAGE_PAGE,
-        PUBLISH_IMMEDIATELY,
-        PUBLISH_DELAY,
         CONNECTION_TIMEOUT,
-        UNDISCLOSED_AUTHOR_LABEL,
-        CONTENT_TYPE,
-        SECTION_MAPPING,
-        ENDPOINT,
-        LANGUAGE,
+        EXCLUDE_MEDIA_CONTENT_TYPES,
+        IMAGE_RENDITION,
+        NODE_CONTENT_TYPE,
+        NODE_LANGUAGE,
         PASSWORD,
-        HOSTNAME,
+        PROMOTE_TO_FRONT_PAGE,
+        PUBLISH_DELAY,
+        PUBLISH_IMMEDIATELY,
+        SECTION_MAPPING,
+        SERVICE_ENDPOINT,
         SOCKET_TIMEOUT,
-        USERNAME,
-        RENDITION_NAME,
-        EXCLUDE_MEDIA_CONTENT_TYPES
+        UNDISCLOSED_AUTHOR,
+        URL,
+        USERNAME
     }
 
     private static final Logger LOG = Logger.getLogger("DrupalEditionAction");
 
-    private static final String STATUS = "status";
+    private static final String FAILED = "FAILED";
 
     private static final String SUBMITTED = "SUBMITTED";
 
     private static final String UPLOADED = "UPLOADED";
 
-    private static final String FAILED = "FAILED";
-
     private static final String UPLOADING = "UPLOADING";
 
     private static final String NID = "nid";
+
+    private static final String STATUS = "status";
 
     private static final String URI = "uri";
 
@@ -84,84 +84,81 @@ public class DrupalEditionAction implements EditionAction {
 
     private Map<String, String> availableProperties;
 
-    private String undisclosedAuthor;
+    private String promoteToFrontPage;
 
-    private String frontPagePage;
+    private String publishDelay;
 
     private String publishImmediately;
 
-    private String publishDelay;
-    
     private String renditionName;
-    
+
+    private String undisclosedAuthor;
+
     private String[] excludeMediaContentTypes;
-    
+
     private Map<Long, Long> sectionMapping = new HashMap<Long, Long>();
 
     @Override
     public void execute(PluginContext ctx, Edition edition, OutletEditionAction action) {
         Map<String, String> properties = action.getPropertiesAsMap();
 
-        String hostname = properties.get(Property.HOSTNAME.name());
-        String endPoint = properties.get(Property.ENDPOINT.name());
-        String username = properties.get(Property.USERNAME.name());
-        String password = properties.get(Property.PASSWORD.name());
-        String contentType = properties.get(Property.CONTENT_TYPE.name());
-        String language = properties.get(Property.LANGUAGE.name());
-        String socketTimeout = properties.get(Property.SOCKET_TIMEOUT.name());
         String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT.name());
-        String sectionMapping = properties.get(Property.SECTION_MAPPING.name());
-        String excludeMediaContentTypes = properties.get(Property.EXCLUDE_MEDIA_CONTENT_TYPES.name());
-        
-        undisclosedAuthor = properties.get(Property.UNDISCLOSED_AUTHOR_LABEL.name());
-        frontPagePage = properties.get(Property.FRONT_PAGE_PAGE.name());
-        publishImmediately = properties.get(Property.PUBLISH_IMMEDIATELY.name());
+        String excludeContentTypes = properties.get(Property.EXCLUDE_MEDIA_CONTENT_TYPES.name());
+        String mappings = properties.get(Property.SECTION_MAPPING.name());
+        String nodeContentType = properties.get(Property.NODE_CONTENT_TYPE.name());
+        String nodeLanguage = properties.get(Property.NODE_LANGUAGE.name());
+        String password = properties.get(Property.PASSWORD.name());
+        String serviceEndpoint = properties.get(Property.SERVICE_ENDPOINT.name());
+        String socketTimeout = properties.get(Property.SOCKET_TIMEOUT.name());
+        String url = properties.get(Property.URL.name());
+        String username = properties.get(Property.USERNAME.name());
+
+        promoteToFrontPage = properties.get(Property.PROMOTE_TO_FRONT_PAGE.name());
         publishDelay = properties.get(Property.PUBLISH_DELAY.name());
-        renditionName = properties.get(Property.RENDITION_NAME.name());
-        
-        if (hostname == null) {
-            throw new NullPointerException("Host name is not set");
+        publishImmediately = properties.get(Property.PUBLISH_IMMEDIATELY.name());
+        renditionName = properties.get(Property.IMAGE_RENDITION.name());
+        undisclosedAuthor = properties.get(Property.UNDISCLOSED_AUTHOR.name());
+
+        if (url == null) {
+            throw new NullPointerException("Url");
         }
-        
-        if (endPoint == null) {
-            throw new NullPointerException("Service endpoint is not set");
+
+        if (serviceEndpoint == null) {
+            throw new NullPointerException("Service Endpoint");
         }
-        
+
         if (username == null) {
-            throw new NullPointerException("Username is not set");
+            throw new NullPointerException("Username");
         }
-        
+
         if (password == null) {
-            throw new NullPointerException("Password is not set");
+            throw new NullPointerException("Password");
+        }
+
+        if (nodeContentType == null) {
+            throw new NullPointerException("Node Content Type");
+        }
+
+        if (mappings == null) {
+            throw new NullPointerException("Section Mapping");
         }
         
-        if (contentType == null) {
-            throw new NullPointerException("Content type is not set");
+        if (nodeLanguage == null) {
+            nodeLanguage = "und";
         }
-        
-        if (language == null) {
-            // Fallback to the default
-            language = "und";
-        }
-        
+
         if (socketTimeout == null) {
-            // Fallback to a default
-            socketTimeout = "30000";
+            socketTimeout = "30000"; // 30 sec
         }
-        
+
         if (connectionTimeout == null) {
-            // Fallback to a default
-            connectionTimeout = "30000";
-        }
-        
-        if (sectionMapping == null) {
-            throw new NullPointerException("Section mapping is not set");
+            connectionTimeout = "30000"; // 30 sec
         }
 
-        setSectionMapping(sectionMapping);
-        setExcludeMediaContentTypes(excludeMediaContentTypes);
+        setSectionMapping(mappings);
+        setExcludeMediaContentTypes(excludeContentTypes);
 
-        DrupalClient client = new DrupalClient(hostname, endPoint);
+        DrupalClient client = new DrupalClient(url, serviceEndpoint);
         client.setSocketTimeout(Integer.parseInt(socketTimeout));
         client.setConnectionTimeout(Integer.parseInt(connectionTimeout));
         client.setup();
@@ -178,25 +175,24 @@ public class DrupalEditionAction implements EditionAction {
             for (NewsItemPlacement nip : edition.getPlacements()) {
                 NewsItem newsItem = nip.getNewsItem();
 
-                Map<String, Object> body = new HashMap<String, Object>();
                 Map<String, Object> actor = new HashMap<String, Object>();
-                Map<String, Object> section = mapSection(nip);
+                Map<String, Object> body = new HashMap<String, Object>();
                 Map<String, Object> image = new HashMap<String, Object>();
+                Map<String, Object> section = mapSection(nip);
 
-                body.put("0", new TextField(newsItem.getBrief(),
-                        cleanString(newsItem.getStory()), "html"));
                 actor.put("0", new TextField(null, getActor(newsItem), null));
+                body.put("0", new TextField(newsItem.getBrief(), cleanString(newsItem.getStory()), "html"));
 
                 DrupalMessage nodeMessage = new DrupalMessage();
-                nodeMessage.getFields().put("status", getStatus());
+                nodeMessage.getFields().put("actor", new FieldModule(actor));
+                nodeMessage.getFields().put("body", new FieldModule(body));
+                nodeMessage.getFields().put("language", nodeLanguage);
                 nodeMessage.getFields().put("publish_on", getPublishOn());
+                nodeMessage.getFields().put("section", new FieldModule(section));
+                nodeMessage.getFields().put("status", getStatus());
                 nodeMessage.getFields().put("sticky", getPromote(nip));
                 nodeMessage.getFields().put("title", getTitle(newsItem));
-                nodeMessage.getFields().put("type", contentType);
-                nodeMessage.getFields().put("language", language);
-                nodeMessage.getFields().put("body", new FieldModule(body));
-                nodeMessage.getFields().put("actor", new FieldModule(actor));
-                nodeMessage.getFields().put("section", new FieldModule(section));
+                nodeMessage.getFields().put("type", nodeContentType);
 
                 NewsItemEditionState status =
                         ctx.addNewsItemEditionState(edition.getId(), newsItem.
@@ -215,7 +211,7 @@ public class DrupalEditionAction implements EditionAction {
 
                     for (int i = 0; i < fcms.size(); i++) {
                         image.put(String.valueOf(i), new ImageField(fcms.get(i).
-                                getFid(), 1, NID, contentType));
+                                getFid(), 1, NID, nodeContentType));
                     }
 
                     NodeCreateMessage ncm = nr.create(nodeMessage);
@@ -314,12 +310,12 @@ public class DrupalEditionAction implements EditionAction {
         for (int i = 0; i < values.length; i++) {
             String[] value = values[i].split(":");
 
-            Long convergeId =Long.valueOf(value[0].trim());
+            Long convergeId = Long.valueOf(value[0].trim());
             Long drupalId = Long.valueOf(value[1].trim());
             sectionMapping.put(convergeId, drupalId);
         }
     }
-    
+
     private void setExcludeMediaContentTypes(String mapping) {
         excludeMediaContentTypes = mapping.split(";");
     }
@@ -407,8 +403,7 @@ public class DrupalEditionAction implements EditionAction {
             }
         }
     }
-    
-        
+
     /**
      * Get <b>Published</b> checkbox value.
      * 
@@ -452,7 +447,6 @@ public class DrupalEditionAction implements EditionAction {
         return sdf.format(calendar.getTime());
     }
 
-    
     /**
      * Get <b>Promoted to front page</b> checkbox value.
      * 
@@ -460,12 +454,12 @@ public class DrupalEditionAction implements EditionAction {
      * @return 1 = checked, 0 otherwise
      */
     private String getPromote(NewsItemPlacement placement) {
-        if (frontPagePage != null) {
+        if (promoteToFrontPage != null) {
             // Get the NewsItemPlacement's' start page
             String start = String.valueOf(placement.getStart());
 
             // Check if the start page matches the FRONT_PAGE_MAPPING
-            if (frontPagePage.equalsIgnoreCase(start)) {
+            if (promoteToFrontPage.equalsIgnoreCase(start)) {
                 return "1";
             }
         }
@@ -473,9 +467,10 @@ public class DrupalEditionAction implements EditionAction {
         // Default
         return "0";
     }
-    
+
     private List<MediaItemRendition> getMedia(NewsItem newsItem) {
-        List<MediaItemRendition> renditions = new ArrayList<MediaItemRendition>();
+        List<MediaItemRendition> renditions =
+                new ArrayList<MediaItemRendition>();
 
         for (NewsItemMediaAttachment attachment : newsItem.getMediaAttachments()) {
             MediaItem item = attachment.getMediaItem();
@@ -489,7 +484,8 @@ public class DrupalEditionAction implements EditionAction {
                 MediaItemRendition rendition = item.findRendition(renditionName);
 
                 // Check if the file should be excluded
-                if (ArrayUtils.contains(excludeMediaContentTypes, rendition.getContentType())) {
+                if (ArrayUtils.contains(excludeMediaContentTypes, rendition.
+                        getContentType())) {
                     continue;
                 }
 
