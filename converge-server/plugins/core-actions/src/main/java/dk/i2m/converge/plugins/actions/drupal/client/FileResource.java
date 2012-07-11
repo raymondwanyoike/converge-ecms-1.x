@@ -72,6 +72,10 @@ public class FileResource {
      * @throws IOException 
      */
     public ArrayList<FileCreateMessage> create(List<MediaItemRendition> renditions) throws IOException {
+        if (renditions.isEmpty()) {
+            return new ArrayList<FileCreateMessage>();
+        }
+        
         ArrayList<FileCreateMessage> messages = new ArrayList<FileCreateMessage>();
         
         try {
