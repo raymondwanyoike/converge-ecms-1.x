@@ -47,9 +47,9 @@ public class DrupalEditionAction implements EditionAction {
     private enum Property {
 
         CONNECTION_TIMEOUT,
-        EXCLUDE_MEDIA_CONTENT_TYPES,
+        EXCLUDE_MEDIA_TYPES,
         IMAGE_RENDITION,
-        NODE_CONTENT_TYPE,
+        NODE_TYPE,
         NODE_LANGUAGE,
         PASSWORD,
         PROMOTE_TO_FRONT_PAGE,
@@ -106,10 +106,9 @@ public class DrupalEditionAction implements EditionAction {
         String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT.
                 name());
         String excludeContentTypes =
-                properties.get(Property.EXCLUDE_MEDIA_CONTENT_TYPES.name());
+                properties.get(Property.EXCLUDE_MEDIA_TYPES.name());
         String mappings = properties.get(Property.SECTION_MAPPING.name());
-        String nodeContentType = properties.get(
-                Property.NODE_CONTENT_TYPE.name());
+        String nodeType = properties.get(Property.NODE_TYPE.name());
         String nodeLanguage = properties.get(Property.NODE_LANGUAGE.name());
         String password = properties.get(Property.PASSWORD.name());
         String serviceEndpoint =
@@ -142,8 +141,8 @@ public class DrupalEditionAction implements EditionAction {
             throw new NullPointerException("'Password' is null");
         }
 
-        if (nodeContentType == null) {
-            throw new NullPointerException("'Node Content Type' is null");
+        if (nodeType == null) {
+            throw new NullPointerException("'Node Type' is null");
         }
 
         if (mappings == null) {
@@ -224,7 +223,7 @@ public class DrupalEditionAction implements EditionAction {
                 nodeMessage.getFields().put("status", getStatus());
                 nodeMessage.getFields().put("sticky", getPromote(nip));
                 nodeMessage.getFields().put("title", getTitle(newsItem));
-                nodeMessage.getFields().put("type", nodeContentType);
+                nodeMessage.getFields().put("type", nodeType);
 
                 NewsItemEditionState status =
                         ctx.addNewsItemEditionState(edition.getId(), newsItem.
