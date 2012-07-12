@@ -17,7 +17,7 @@
 package dk.i2m.converge.ejb.facades;
 
 import dk.i2m.converge.core.DataNotFoundException;
-import dk.i2m.converge.core.Notification;
+import dk.i2m.converge.core.content.ContentResultSet;
 import dk.i2m.converge.core.content.NewsItemMediaAttachment;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.content.catalogue.*;
@@ -30,6 +30,7 @@ import dk.i2m.converge.core.search.QueueEntryOperation;
 import dk.i2m.converge.core.search.QueueEntryType;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.utils.StringUtils;
+import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.ejb.services.*;
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +41,7 @@ import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
+import javax.persistence.Query;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -70,6 +72,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     @EJB private NotificationServiceLocal notificationService;
 
     @EJB private CatalogueServiceLocal catalogueService;
+    
+    @EJB private ContentItemServiceLocal contentItemService;
 
     @Resource private SessionContext ctx;
 
@@ -105,24 +109,6 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     @Override
     public List<Catalogue> findWritableCatalogues() {
         return daoService.findWithNamedQuery(Catalogue.FIND_WRITABLE);
-    }
-
-    
-    @Override
-    public List<Catalogue> findCataloguesByUser(String username) {
-        UserAccount ua;
-        try {
-            ua = userFacade.findById(username);
-        } catch (DataNotFoundException ex) {
-            return Collections.EMPTY_LIST;
-        }
-
-        List<Catalogue> catalogues = daoService.findWithNamedQuery(
-                Catalogue.FIND_BY_USER,
-                QueryBuilder.with(Catalogue.PARAM_FIND_BY_USER_USER, ua).
-                parameters());
-
-        return catalogues;
     }
 
     /**
@@ -422,11 +408,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         }
     }
 
-    /**
-     * Deletes an existing {@link MediaItemRendition} from a {@link MediaItem}.
-     * <p/>
-     * @param id Unique identifier of the {@link MediaItemRendition}
-     */
+    /** {@inheritDoc } */
     @Override
     public void deleteMediaItemRenditionById(Long id) {
         try {
@@ -449,22 +431,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     /** {@inheritDoc } */
     @Override
-    public MediaItem create(MediaItem mediaItem) {
-        mediaItem.setCreated(Calendar.getInstance());
-        mediaItem.setUpdated(mediaItem.getCreated());
-
-        if (mediaItem.getId() == null) {
-            mediaItem = daoService.create(mediaItem);
-            if (mediaItem.getStatus() == null || !mediaItem.getStatus().equals(
-                    MediaItemStatus.APPROVED)) {
-                searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM,
-                        mediaItem.getId(), QueueEntryOperation.REMOVE);
-            } else {
-                searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM,
-                        mediaItem.getId(), QueueEntryOperation.UPDATE);
-            }
-        }
-        return mediaItem;
+    public MediaItem create(MediaItem mediaItem) throws WorkflowStateTransitionException {
+            return (MediaItem) contentItemService.start(mediaItem);
     }
 
     /**
@@ -472,12 +440,14 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
      * {@link MediaItem} will be updated and possibly deleted from the search
      * engine.
      *
-     * @param mediaItem {@link MediaItem} to update
+     * @param mediaItem 
+     *          {@link MediaItem} to update
      * @return Updated {@link MediaItem}
      */
     @Override
     public MediaItem update(MediaItem mediaItem) {
-        mediaItem.setUpdated(Calendar.getInstance());
+        mediaItem.setUpdated(Calendar.getInstance().getTime());
+        contentItemService.updateThumbnail(mediaItem);
         mediaItem = daoService.update(mediaItem);
 
         if (mediaItem.getStatus() == null || !mediaItem.getStatus().equals(
@@ -488,72 +458,6 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
             searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, mediaItem.
                     getId(), QueueEntryOperation.UPDATE);
         }
-
-        // TODO: Set-up as workflow
-
-        if (mediaItem.getStatus() != null) {
-            UserAccount user = null;
-            try {
-                user = userFacade.findById(ctx.getCallerPrincipal().getName());
-            } catch (DataNotFoundException ex) {
-                LOG.log(Level.SEVERE, null, ex);
-            }
-            Notification notification;
-            switch (mediaItem.getStatus()) {
-                case APPROVED:
-                    notification = new Notification("<b>" + mediaItem.getTitle()
-                            + "</b> was approved", "MediaItemDetails.xhtml?id="
-                            + mediaItem.getId(), mediaItem.getOwner(), user);
-                    notificationService.create(notification);
-                    if (!mediaItem.getOwner().equals(user)) {
-                        notification = new Notification("Approved <b>"
-                                + mediaItem.getTitle() + "</b>", "MediaItemDetails.xhtml?id="
-                                + mediaItem.getId(), user, user);
-                        notificationService.create(notification);
-                    }
-                    break;
-                case REJECTED:
-                    notification = new Notification("<b>" + mediaItem.getTitle()
-                            + "</b> was rejected", "MediaItemDetails.xhtml?id="
-                            + mediaItem.getId(), mediaItem.getOwner(), user);
-                    notificationService.create(notification);
-                    notification = new Notification("Rejected <b>" + mediaItem.
-                            getTitle() + "</b>", "MediaItemDetails.xhtml?id="
-                            + mediaItem.getId(), user, user);
-                    notificationService.create(notification);
-                    break;
-                case SUBMITTED:
-                    for (UserAccount editor : mediaItem.getCatalogue().
-                            getEditorRole().getUserAccounts()) {
-                        notification = new Notification("<b>" + mediaItem.
-                                getTitle() + "</b> was submitted for approval", "MediaItemDetails.xhtml?id="
-                                + mediaItem.getId(), editor,
-                                mediaItem.getOwner());
-                        notificationService.create(notification);
-                    }
-                    notification = new Notification("Submitted <b>" + mediaItem.
-                            getTitle() + "</b> for approval", "MediaItemDetails.xhtml?id="
-                            + mediaItem.getId(), user, user);
-                    notificationService.create(notification);
-                    break;
-                case SELF_UPLOAD:
-                    for (UserAccount editor : mediaItem.getCatalogue().
-                            getEditorRole().getUserAccounts()) {
-                        notification = new Notification("<b>" + mediaItem.
-                                getTitle()
-                                + "</b> was self-uploaded for approval", "MediaItemDetails.xhtml?id="
-                                + mediaItem.getId(), editor,
-                                mediaItem.getOwner());
-                        notificationService.create(notification);
-                    }
-                    notification = new Notification("Submitted <b>" + mediaItem.
-                            getTitle() + "</b> for approval", "MediaItemDetails.xhtml?id="
-                            + mediaItem.getId(), user, user);
-                    notificationService.create(notification);
-                    break;
-            }
-        }
-
 
         return mediaItem;
     }
@@ -577,8 +481,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         MediaItem item = new MediaItem();
         item.setByLine(newswireItem.getAuthor());
         Calendar now = Calendar.getInstance();
-        item.setCreated(now);
-        item.setUpdated(now);
+        item.setCreated(now.getTime());
+        item.setUpdated(now.getTime());
 
         StringBuilder description = new StringBuilder();
         if (org.apache.commons.lang.StringUtils.isNotBlank(newswireItem.
@@ -596,10 +500,14 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         item.setOwner(user);
         item.setCatalogue(catalogue);
         item.setStatus(MediaItemStatus.APPROVED);
-        item = create(item);
+        try {
+            create(item);
+        } catch (WorkflowStateTransitionException ex) {
+            // TODO: Gracefully handle workflow 
+            LOG.log(Level.SEVERE, null, ex);
+        }
 
         // TODO: Import tags
-
         for (NewswireItemAttachment attachment : newswireItem.getAttachments()) {
             if (attachment.isStoredInCatalogue() && attachment.isRenditionSet()) {
                 try {
@@ -620,16 +528,11 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
                 }
             }
         }
-
+        contentItemService.updateThumbnail(item);
         return item;
     }
 
-    /**
-     * Deletes an existing {@link MediaItem} from the database. Upon deletion
-     * the {@link MediaItem} will also be removed from the search engine.
-     *
-     * @param id Unique identifier of the {@link MediaItem}
-     */
+    /** {@inheritDoc } */
     @Override
     public void deleteMediaItemById(Long id) {
         // Remove from search engine
@@ -681,31 +584,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
                 parameters();
         return daoService.findWithNamedQuery(MediaItem.FIND_BY_OWNER, params);
     }
-
-    /** {@inheritDoc } */
-    @Override
-    public List<MediaItem> findCurrentMediaItems(UserAccount user,
-            Long catalogueId) {
-        try {
-            Catalogue catalogue = daoService.findById(Catalogue.class,
-                    catalogueId);
-            Map<String, Object> params = QueryBuilder.with("user", user).and(
-                    "mediaRepository", catalogue).parameters();
-
-            List<MediaItem> items = new ArrayList<MediaItem>();
-
-            items.addAll(daoService.findWithNamedQuery(
-                    MediaItem.FIND_CURRENT_AS_OWNER, params));
-            items.addAll(daoService.findWithNamedQuery(
-                    MediaItem.FIND_CURRENT_AS_EDITOR, params));
-
-            Set set = new HashSet(items);
-            return new ArrayList(set);
-        } catch (DataNotFoundException ex) {
-            return Collections.EMPTY_LIST;
-        }
-    }
-
+    
     /** {@inheritDoc} */
     @Override
     public List<MediaItem> findCurrentMediaItems(UserAccount user,
@@ -781,7 +660,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
                 usage.setNewsItemId(attachment.getNewsItem().getId());
                 usage.setTitle(attachment.getNewsItem().getTitle());
                 usage.setCaption(attachment.getCaption());
-                usage.setDate(attachment.getNewsItem().getUpdated().getTime());
+                usage.setDate(attachment.getNewsItem().getUpdated());
                 usage.setOutlet("");
                 usage.setSection("");
                 usage.setStart(0);
@@ -931,5 +810,103 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     public CatalogueHookInstance updateCatalogueAction(
             CatalogueHookInstance action) {
         return daoService.update(action);
+    }
+
+    /** {@inheritDoc } */
+    @Override
+    public ContentResultSet findMediaItemsByWorkflowState(String username,
+            Catalogue catalogue, WorkflowState state, int start, int rows, String sortField, String sortDirection) {
+        long startTime = Calendar.getInstance().getTimeInMillis();
+
+        
+        UserAccount ua;
+        try {
+            ua = userFacade.findById(username);
+        } catch (DataNotFoundException ex) {
+            LOG.log(Level.WARNING, ex.getMessage(), ex);
+            ua = null;
+        }
+        
+        ContentResultSet resultSet = new ContentResultSet();
+        resultSet.setResultsPerPage(rows);
+        resultSet.setStart(start);
+                
+        Map<String, Object> params =
+        QueryBuilder.with(MediaItem.PARAM_USER, ua)
+                .and(MediaItem.PARAM_CATALOGUE, catalogue)
+                .and(MediaItem.PARAM_WORKFLOW_STATE, state).parameters();
+        
+        Number count = daoService.executeNamedQuery(Number.class, MediaItem.COUNT_BY_USER_AND_CATALOGUE_AND_WORKFLOW_STATE, params);
+        resultSet.setNumberOfResults(count.longValue());
+        
+        Query q = daoService.getEntityManager().createQuery(
+                "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.precalculatedCurrentActor, n.currentState.name, n.catalogue.name, n.updated, n.thumbnailLink) "
+                + "FROM ContentItem AS ci, MediaItem AS n JOIN n.actors AS a "
+                + "WHERE ci.id=n.id AND n.catalogue = :" + MediaItem.PARAM_CATALOGUE + " AND n.currentState = :" + MediaItem.PARAM_WORKFLOW_STATE + " AND (( a.user = :"+MediaItem.PARAM_USER+") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"+MediaItem.PARAM_USER+" MEMBER OF n.currentState.actorRole.userAccounts)) "
+                + "ORDER BY n." + sortField + " " + sortDirection);
+        
+        resultSet.setHits(daoService.findWithQuery(q, params, start, rows));
+        
+        
+        long endTime = Calendar.getInstance().getTimeInMillis();
+        resultSet.setSearchTime(endTime-startTime);
+        
+        return resultSet;
+    }
+    
+    /** {@inheritDoc } */
+    @Override
+    public ContentResultSet findMediaItemsByCatalogue(String username,
+            Catalogue catalogue, int pagingStart, int pagingRows, 
+            String sortField, String sortDirection) {
+        
+        long startTime = Calendar.getInstance().getTimeInMillis();
+        
+        UserAccount ua;
+        try {
+            ua = userFacade.findById(username);
+        } catch (DataNotFoundException ex) {
+            LOG.log(Level.WARNING, ex.getMessage(), ex);
+            ua = null;
+        }
+        
+        ContentResultSet resultSet = new ContentResultSet();
+        resultSet.setResultsPerPage(pagingRows);
+        resultSet.setStart(pagingStart);
+        
+        Map<String, Object> params =
+        QueryBuilder.with(MediaItem.PARAM_USER, ua)
+                .and(MediaItem.PARAM_CATALOGUE, catalogue)
+                .parameters();
+        
+        Number count = daoService.executeNamedQuery(Number.class, 
+                MediaItem.COUNT_BY_USER_AND_CATALOGUE, params);
+        resultSet.setNumberOfResults(count.longValue());
+        
+        // DevNote: This is not very effecient but the old way to do dynamic
+        //          sorting in JPA1. In JPA2 the order can be added using the 
+        //          Criteria object
+        String findSql = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.precalculatedCurrentActor, n.currentState.name, n.catalogue.name, n.updated, n.thumbnailLink) " +
+                         "FROM ContentItem AS ci, MediaItem AS n JOIN n.actors AS a " +
+                         "WHERE ci.id=n.id AND n.catalogue = :" + MediaItem.PARAM_CATALOGUE + " AND (( a.user = :"+MediaItem.PARAM_USER+") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"+MediaItem.PARAM_USER+" MEMBER OF n.currentState.actorRole.userAccounts)) " +
+                         "ORDER BY n." + sortField + " " + sortDirection;
+        
+        Query q = daoService.getEntityManager().createQuery(findSql);
+        
+        
+        List results = daoService.findWithQuery(q, params, pagingStart, pagingRows);
+        resultSet.setHits(results);
+        
+        long endTime = Calendar.getInstance().getTimeInMillis();
+        resultSet.setSearchTime(endTime-startTime);
+        
+        return resultSet;
+    }
+    
+    /** {@inheritDoc } */
+    @Override
+    public MediaItem step(MediaItem mediaItem, Long stepId) throws
+            WorkflowStateTransitionException {
+        return (MediaItem) contentItemService.step(mediaItem, stepId);
     }
 }

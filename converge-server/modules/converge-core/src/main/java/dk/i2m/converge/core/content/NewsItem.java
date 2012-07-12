@@ -17,16 +17,18 @@
 package dk.i2m.converge.core.content;
 
 import dk.i2m.converge.core.calendar.Event;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.utils.BeanComparator;
 import dk.i2m.converge.core.utils.StringUtils;
-import dk.i2m.converge.core.workflow.*;
-import java.io.Serializable;
-import java.util.*;
+import dk.i2m.converge.core.workflow.Edition;
+import dk.i2m.converge.core.workflow.Outlet;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
 import javax.persistence.*;
-import org.eclipse.persistence.annotations.PrivateOwned;
 
 /**
  * {@link NewsItem} written by one or more journalists for publishing in an
@@ -36,97 +38,52 @@ import org.eclipse.persistence.annotations.PrivateOwned;
  */
 @Entity
 @Table(name = "news_item")
+@DiscriminatorValue("news_item")
 @NamedQueries({
-    @NamedQuery(name = NewsItem.FIND_BY_OUTLET,
-    query =
-    "SELECT n FROM NewsItem AS n WHERE n.outlet = :outlet ORDER BY n.created DESC"),
-    @NamedQuery(name = NewsItem.FIND_CURRENT_ASSIGNMENTS,
-    query =
-    "SELECT DISTINCT n FROM NewsItem n JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
-    @NamedQuery(name = NewsItem.VIEW_CURRENT_ASSIGNMENTS,
-    query =
-    "SELECT DISTINCT NEW dk.i2m.converge.core.views.CurrentAssignment(n.id, n.title, n.targetWordCount, n.deadline, n.assignmentBriefing, n.checkedOut, cob.fullName) FROM NewsItem n LEFT JOIN n.checkedOutBy cob JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
-    @NamedQuery(name = NewsItem.VIEW_INBOX,
-    query =
-    "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing) FROM NewsItem n LEFT JOIN n.checkedOutBy cob JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
-    @NamedQuery(name = NewsItem.VIEW_OUTLET_BOX,
-    query =
-    "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing) FROM NewsItemActor a JOIN a.newsItem n LEFT JOIN n.checkedOutBy cob WHERE (( a.user = :user) OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF n.currentState.actorRole.userAccounts)) AND n.currentState.workflow.endState <> n.currentState AND n.outlet = :outlet ORDER BY n.updated DESC"),
-    @NamedQuery(name = NewsItem.VIEW_OUTLET_BOX_STATE,
-    query =
-    "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing) FROM NewsItem AS n JOIN n.actors AS a LEFT JOIN n.checkedOutBy cob WHERE n.outlet = :outlet AND n.currentState = :state AND (( a.user = :user) OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.updated DESC"),
-    @NamedQuery(name = NewsItem.FIND_CHECKED_IN_NEWS_ITEM, query =
-    "SELECT n FROM NewsItem AS n WHERE n.id = :id AND n.checkedOut IS NULL"),
-    @NamedQuery(name = NewsItem.FIND_ASSIGNMENTS_BY_OUTLET,
-    query =
-    "SELECT n FROM NewsItem AS n WHERE n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND n.outlet = :outlet AND n.assigned = true ORDER BY n.created DESC"),
-    @NamedQuery(name = NewsItem.FIND_BY_OUTLET_AND_STATE,
-    query =
-    "SELECT n FROM NewsItem AS n WHERE n.currentState = :state AND n.outlet = :outlet ORDER BY n.updated DESC"),
-    @NamedQuery(name = NewsItem.FIND_BY_OUTLET_AND_STATE_NAME,
-    query =
-    "SELECT n FROM NewsItem AS n WHERE n.currentState.name = :stateName AND n.outlet = :outlet"),
-    @NamedQuery(name = NewsItem.FIND_BY_OUTLET_STATE_AND_USER,
-    query =
-    "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS n WHERE ni.outlet = :outlet AND ni.currentState = :state AND (( n.user = :user) OR (ni.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF ni.currentState.actorRole.userAccounts)) ORDER BY ni.updated DESC"),
-    @NamedQuery(name = NewsItem.FIND_VERSIONS,
-    query =
-    "SELECT n FROM NewsItem AS n WHERE n.versionOf = :newsItem ORDER BY n.updated DESC"),
-    @NamedQuery(name = NewsItem.FIND_TRASH,
-    query =
-    "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS n WHERE ni.currentState.workflow.trashState = ni.currentState AND (( n.user = :user) OR (ni.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF ni.currentState.actorRole.userAccounts)) ORDER BY ni.updated DESC"),
-    @NamedQuery(name = NewsItem.REVOKE_LOCK,
-    query =
-    "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.id = :id"),
-    @NamedQuery(name = NewsItem.REVOKE_LOCKS,
-    query =
-    "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.checkedOutBy = :user"),
-    @NamedQuery(name = NewsItem.REVOKE_ALL_LOCKS,
-    query =
-    "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.checkedOutBy IS NOT NULL"),
-    @NamedQuery(name = NewsItem.FIND_BY_USER_USER_ROLE_AND_DATE,
-    query =
-    "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.user = :user AND a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.state = :state) ORDER BY ni.updated DESC"),
-    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER,
-    query =
-    "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (h.user = :user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC"),
-    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_PASSIVE_USER,
-    query =
-    "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.user = :user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC"),
-    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER_ROLE,
-    query =
-    "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC")
+    @NamedQuery(name = NewsItem.FIND_BY_OUTLET, query = "SELECT n FROM NewsItem AS n WHERE n.outlet = :outlet ORDER BY n.created DESC"),
+    @NamedQuery(name = NewsItem.FIND_CURRENT_ASSIGNMENTS, query = "SELECT DISTINCT n FROM NewsItem n JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
+    @NamedQuery(name = NewsItem.VIEW_CURRENT_ASSIGNMENTS, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.CurrentAssignment(n.id, n.title, n.targetWordCount, n.deadline, n.assignmentBriefing, n.checkedOut, cob.fullName) FROM NewsItem n LEFT JOIN n.checkedOutBy cob JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
+    @NamedQuery(name = NewsItem.VIEW_INBOX, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing, n.thumbnailLink) FROM NewsItem n LEFT JOIN n.checkedOutBy cob JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
+    @NamedQuery(name = NewsItem.VIEW_OUTLET_BOX, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing, n.thumbnailLink) FROM NewsItem n, ContentItemActor a JOIN a.contentItem ci LEFT JOIN n.checkedOutBy cob WHERE n.id=ci.id AND (( a.user = :user) OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF n.currentState.actorRole.userAccounts)) AND n.currentState.workflow.endState <> n.currentState AND n.outlet = :outlet ORDER BY n.updated DESC"),
+    @NamedQuery(name = NewsItem.VIEW_OUTLET_BOX_STATE, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing, n.thumbnailLink) FROM NewsItem AS n JOIN n.actors AS a LEFT JOIN n.checkedOutBy cob WHERE n.outlet = :outlet AND n.currentState = :state AND (( a.user = :user) OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_CHECKED_IN_NEWS_ITEM, query = "SELECT n FROM NewsItem AS n WHERE n.id = :id AND n.checkedOut IS NULL"),
+    @NamedQuery(name = NewsItem.FIND_ASSIGNMENTS_BY_OUTLET, query = "SELECT n FROM NewsItem AS n WHERE n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND n.outlet = :outlet AND n.assigned = true ORDER BY n.created DESC"),
+    @NamedQuery(name = NewsItem.FIND_BY_OUTLET_AND_STATE, query = "SELECT n FROM NewsItem AS n WHERE n.currentState = :state AND n.outlet = :outlet ORDER BY n.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_BY_OUTLET_AND_STATE_NAME, query = "SELECT n FROM NewsItem AS n WHERE n.currentState.name = :stateName AND n.outlet = :outlet"),
+    @NamedQuery(name = NewsItem.FIND_BY_OUTLET_STATE_AND_USER, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS n WHERE ni.outlet = :outlet AND ni.currentState = :state AND (( n.user = :user) OR (ni.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF ni.currentState.actorRole.userAccounts)) ORDER BY ni.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_VERSIONS, query = "SELECT n FROM NewsItem AS n WHERE n.versionOf = :newsItem ORDER BY n.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_TRASH, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS n WHERE ni.currentState.workflow.trashState = ni.currentState AND (( n.user = :user) OR (ni.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF ni.currentState.actorRole.userAccounts)) ORDER BY ni.updated DESC"),
+    @NamedQuery(name = NewsItem.REVOKE_LOCK, query = "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.id = :id"),
+    @NamedQuery(name = NewsItem.REVOKE_LOCKS, query = "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.checkedOutBy = :user"),
+    @NamedQuery(name = NewsItem.REVOKE_ALL_LOCKS, query = "UPDATE NewsItem n SET n.checkedOut = NULL, n.checkedOutBy = NULL WHERE n.checkedOutBy IS NOT NULL"),
+    @NamedQuery(name = NewsItem.FIND_BY_USER_USER_ROLE_AND_DATE, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.user = :user AND a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.state = :state) ORDER BY ni.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (h.user = :user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_PASSIVE_USER, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.user = :user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC"),
+    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER_ROLE, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC")
 })
-public class NewsItem implements Serializable {
+public class NewsItem extends ContentItem {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
-    public static final String VIEW_CURRENT_ASSIGNMENTS =
-            "NewsItem.view.currentAssignments";
+    public static final String VIEW_CURRENT_ASSIGNMENTS = "NewsItem.view.currentAssignments";
 
     public static final String VIEW_INBOX = "NewsItem.view.inbox";
 
     public static final String VIEW_OUTLET_BOX = "NewsItem.view.outlet.inbox";
 
-    public static final String VIEW_OUTLET_BOX_STATE =
-            "NewsItem.view.outlet.inbox.state";
+    public static final String VIEW_OUTLET_BOX_STATE = "NewsItem.view.outlet.inbox.state";
 
-    public static final String FIND_CURRENT_ASSIGNMENTS =
-            "NewsItem.findCurrentAssignments";
+    public static final String FIND_CURRENT_ASSIGNMENTS = "NewsItem.findCurrentAssignments";
 
     public static final String FIND_BY_OUTLET = "NewsItem.findByOutlet";
 
-    public static final String FIND_ASSIGNMENTS_BY_OUTLET =
-            "NewsItem.findAssignmentsByOutlet";
+    public static final String FIND_ASSIGNMENTS_BY_OUTLET = "NewsItem.findAssignmentsByOutlet";
 
-    public static final String FIND_BY_OUTLET_AND_STATE =
-            "NewsItem.findByOutletAndState";
+    public static final String FIND_BY_OUTLET_AND_STATE = "NewsItem.findByOutletAndState";
 
-    public static final String FIND_BY_OUTLET_AND_STATE_NAME =
-            "NewsItem.findByOutletAndStateName";
+    public static final String FIND_BY_OUTLET_AND_STATE_NAME = "NewsItem.findByOutletAndStateName";
 
-    public static final String FIND_BY_OUTLET_STATE_AND_USER =
-            "NewsItem.findByOutletStateAndUser";
+    public static final String FIND_BY_OUTLET_STATE_AND_USER = "NewsItem.findByOutletStateAndUser";
 
     /** Query for finding all the versions of a given news item arranged by the date they were updated. */
     public static final String FIND_VERSIONS = "NewsItem.findVersions";
@@ -135,20 +92,15 @@ public class NewsItem implements Serializable {
     public static final String FIND_TRASH = "NewsItem.findTrash";
 
     /** Query for finding a news item that is checked-in by its unique identifier. */
-    public static final String FIND_CHECKED_IN_NEWS_ITEM =
-            "NewsItem.findCheckedInNewsItem";
+    public static final String FIND_CHECKED_IN_NEWS_ITEM = "NewsItem.findCheckedInNewsItem";
 
-    public static final String FIND_BY_USER_USER_ROLE_AND_DATE =
-            "NewsItem.findByUserUserRoleAndDate";
+    public static final String FIND_BY_USER_USER_ROLE_AND_DATE = "NewsItem.findByUserUserRoleAndDate";
 
-    public static final String FIND_SUBMITTED_BY_USER =
-            "NewsItem.findBySubmittedUser";
+    public static final String FIND_SUBMITTED_BY_USER = "NewsItem.findBySubmittedUser";
 
-    public static final String FIND_SUBMITTED_BY_PASSIVE_USER =
-            "NewsItem.findBySubmittedPassveUser";
+    public static final String FIND_SUBMITTED_BY_PASSIVE_USER = "NewsItem.findBySubmittedPassveUser";
 
-    public static final String FIND_SUBMITTED_BY_USER_ROLE =
-            "NewsItem.findBySubmittedAndUserRole";
+    public static final String FIND_SUBMITTED_BY_USER_ROLE = "NewsItem.findBySubmittedAndUserRole";
 
     /** Query for revoking the lock of a news item. */
     public static final String REVOKE_LOCK = "NewsItem.revokeLock";
@@ -158,11 +110,6 @@ public class NewsItem implements Serializable {
 
     /** Query for revoking the locks of all news item checked out. */
     public static final String REVOKE_ALL_LOCKS = "NewsItem.revokeAllLocks";
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
-    private Long id;
 
     @Column(name = "slugline")
     private String slugline = "";
@@ -208,35 +155,11 @@ public class NewsItem implements Serializable {
     @JoinColumn(name = "outlet_id")
     private Outlet outlet;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = true)
-    @JoinColumn(name = "department_id")
-    private Department department;
-
-    @Column(name = "created")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Calendar created = Calendar.getInstance();
-
-    @Column(name = "updated")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Calendar updated = Calendar.getInstance();
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "news_item_related",
-    joinColumns = {@JoinColumn(referencedColumnName = "id", name =
-        "news_item_id", nullable = false)},
-    inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name =
-        "related_news_item_id", nullable = false)})
+    joinColumns = {@JoinColumn(referencedColumnName = "id", name = "news_item_id", nullable = false)},
+    inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "related_news_item_id", nullable = false)})
     private List<NewsItem> related = new ArrayList<NewsItem>();
-
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "current_state_id")
-    private WorkflowState currentState;
-
-    @OneToMany(mappedBy = "newsItem", cascade = CascadeType.ALL, fetch =
-    FetchType.EAGER)
-    @OrderBy("timestamp DESC")
-    private List<WorkflowStateTransition> history =
-            new ArrayList<WorkflowStateTransition>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "news_item_concept",
@@ -254,11 +177,6 @@ public class NewsItem implements Serializable {
     @JoinColumn(name = "event_id")
     private Event event;
 
-    @OneToMany(mappedBy = "newsItem", cascade = CascadeType.ALL, fetch =
-    FetchType.EAGER)
-    @PrivateOwned
-    private List<NewsItemActor> actors = new ArrayList<NewsItemActor>();
-
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "checked_out")
     private Calendar checkedOut;
@@ -272,9 +190,6 @@ public class NewsItem implements Serializable {
 
     @Column(name = "precalc_word_count")
     private Long precalculatedWordCount = 0L;
-
-    @Column(name = "precalc_current_actor")
-    private String precalculatedCurrentActor = "";
 
     @javax.persistence.Version
     @Column(name = "opt_lock")
@@ -298,24 +213,6 @@ public class NewsItem implements Serializable {
      * Creates a new instance of {@link NewsItem}.
      */
     public NewsItem() {
-    }
-
-    /**
-     * Gets the unique ID of the {@link NewsItem}.
-     *
-     * @return Unique ID of the {@link NewsItem}.
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * Sets the unique ID of the {@link NewsItem}.
-     *
-     * @param id Unique ID of the {@link NewsItem}.
-     */
-    public void setId(Long id) {
-        this.id = id;
     }
 
     /**
@@ -353,24 +250,6 @@ public class NewsItem implements Serializable {
      */
     public void setBrief(String brief) {
         this.brief = brief;
-    }
-
-    /**
-     * Gets the date and time when the {@link NewsItem} was created.
-     *
-     * @return Date and time when the {@link NewsItem} was created.
-     */
-    public Calendar getCreated() {
-        return created;
-    }
-
-    /**
-     * Sets the date and time when the {@link NewsItem} was created.
-     *
-     * @param created Date and time when the {@link NewsItem} was created.
-     */
-    public void setCreated(Calendar created) {
-        this.created = created;
     }
 
     /**
@@ -447,24 +326,6 @@ public class NewsItem implements Serializable {
     }
 
     /**
-     * Gets the date and time when the {@link NewsItem} was updated.
-     *
-     * @return Date and time when the {@link NewsItem} was updated.
-     */
-    public Calendar getUpdated() {
-        return updated;
-    }
-
-    /**
-     * Sets the date and time when the {@link NewsItem} was updated.
-     *
-     * @param updated Date and time when the {@link NewsItem} was updated.
-     */
-    public void setUpdated(Calendar updated) {
-        this.updated = updated;
-    }
-
-    /**
      * Gets the user who assigned the news item. If the news item is
      * self-assigned, <code>null</code> is returned.
      *
@@ -483,28 +344,6 @@ public class NewsItem implements Serializable {
      */
     public void setAssignedBy(UserAccount assignedBy) {
         this.assignedBy = assignedBy;
-    }
-
-    /**
-     * Gets the history of the workflow for the {@link NewsItem}.
-     *
-     * @return {@link List} of {@link WorkflowStateTransition}s that has
-     *         occurred for the {@link NewsItem}
-     */
-    public List<WorkflowStateTransition> getHistory() {
-        Collections.sort(history, new BeanComparator("timestamp", false));
-        return history;
-    }
-
-    /**
-     * Sets the history of the workflow for the {@link NewsItem}.
-     *
-     * @param history
-     *          {@link List} of {@link WorkflowStateTransition}s that has
-     *          occurred for the {@link NewsItem}
-     */
-    public void setHistory(List<WorkflowStateTransition> history) {
-        this.history = history;
     }
 
     /**
@@ -569,14 +408,6 @@ public class NewsItem implements Serializable {
         }
     }
 
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
     public Outlet getOutlet() {
         return outlet;
     }
@@ -585,33 +416,6 @@ public class NewsItem implements Serializable {
         this.outlet = outlet;
     }
 
-    /**
-     * Gets the current state of the {@link NewsItem}.
-     *
-     * @return Current state of the {@link NewsItem}
-     */
-    public WorkflowState getCurrentState() {
-        return currentState;
-    }
-
-    public void setCurrentState(WorkflowState currentState) {
-        this.currentState = currentState;
-    }
-
-    public WorkflowStateTransition getLatestTransition() {
-        WorkflowStateTransition transition = null;
-        for (WorkflowStateTransition t : getHistory()) {
-            if (transition == null) {
-                transition = t;
-            } else {
-                if (t.getTimestamp().after(transition.getTimestamp())) {
-                    transition = t;
-                }
-            }
-        }
-
-        return transition;
-    }
 
     public boolean isUndisclosedAuthor() {
         return undisclosedAuthor;
@@ -762,31 +566,6 @@ public class NewsItem implements Serializable {
     }
 
     /**
-     * Gets the current actors of the {@link NewsItem}. {@link List} of
-     * users who are currently attached to the {@link NewsItem} with a specific
-     * role.
-     *
-     * @return {@link List} of users who are currently attached to the
-     *         {@link NewsItem} with a specific role.
-     */
-    public List<NewsItemActor> getActors() {
-        return actors;
-    }
-
-    /**
-     * Sets the current actors of the {@link NewsItem}. {@link List} of
-     * users who are currently attached to the {@link NewsItem} with a specific
-     * role.
-     *
-     * @param actors
-     *          {@link List} of users who are currently attached to the
-     *          {@link NewsItem} with a specific role.
-     */
-    public void setActors(List<NewsItemActor> actors) {
-        this.actors = actors;
-    }
-
-    /**
      * Gets a {@link List} of sorted asset attachments.
      * 
      * @return {@link List} of attached assets sorted by 
@@ -827,21 +606,6 @@ public class NewsItem implements Serializable {
      */
     public void setPlacements(List<NewsItemPlacement> placements) {
         this.placements = placements;
-    }
-
-    /**
-     * Gets a {@link String} containing the precalculated current actor.
-     * The current actor is precalculated everytime the {@link NewsItem}
-     * is saved.
-     * 
-     * @return {@link String} containing the precalculated current actor
-     */
-    public String getPrecalculatedCurrentActor() {
-        return precalculatedCurrentActor;
-    }
-
-    public void setPrecalculatedCurrentActor(String precalculatedCurrentActor) {
-        this.precalculatedCurrentActor = precalculatedCurrentActor;
     }
 
     /**
@@ -888,37 +652,7 @@ public class NewsItem implements Serializable {
     public int getVersionIdentifier() {
         return versionIdentifier;
     }
-
-    /**
-     * Gets the name of the current actor of the news item. If the current actor
-     * is a group, the name of the group will be returned, if the current actor
-     * is a user or multiple users, their names will be returned.
-     *
-     * @return Name(s) of the current actor
-     */
-    public String getCurrentActor() {
-        if (getCurrentState().isGroupPermission()) {
-            return getCurrentState().getActorRole().getName();
-        } else {
-            StringBuilder sb = new StringBuilder();
-            UserRole role = getCurrentState().getActorRole();
-
-            if (role != null) {
-                for (NewsItemActor actor : getActors()) {
-                    if (actor.getRole() != null) {
-                        if (actor.getRole().equals(role)) {
-                            if (sb.length() > 0) {
-                                sb.append(", ");
-                            }
-                            sb.append(actor.getUser().getFullName());
-                        }
-                    }
-                }
-            }
-            return sb.toString();
-        }
-    }
-
+    
     /**
      * Determines if the {@link NewsItem} has reached its 
      * end state in the workflow.
@@ -1016,24 +750,15 @@ public class NewsItem implements Serializable {
         return i;
     }
 
-    public boolean isSubmitted() {
-        for (WorkflowStateTransition transition : getHistory()) {
-            if (transition.isSubmitted()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public Date getSubmittedDate() {
-        for (WorkflowStateTransition transition : getHistory()) {
-            if (transition.isSubmitted()) {
-                return transition.getTimestamp().getTime();
-            }
-        }
-        return null;
-    }
-
+    /**
+     * A {@link NewsItem} is equal to this {@link NewsItem} if their 
+     * {@link #id}s are equal.
+     * 
+     * @param obj
+     *          {@link Object} to determine if equal to this {@link NewsItem}
+     * @return {@code true} if {@link Object} is a {@link NewsItem} with the 
+     *         same {@link #id} as this {@link NewsItem}
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -1043,22 +768,24 @@ public class NewsItem implements Serializable {
             return false;
         }
         final NewsItem other = (NewsItem) obj;
-        if (this.id != other.id
-                && (this.id == null || !this.id.equals(other.id))) {
+        if (getId() != other.getId()
+                && (getId() == null || !getId().equals(other.getId()))) {
             return false;
         }
         return true;
     }
 
+    /** {@inheritDoc } */
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 59 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 59 * hash + (getId() != null ? getId().hashCode() : 0);
         return hash;
     }
 
+    /** {@inheritDoc } */
     @Override
     public String toString() {
-        return getClass().getName() + "[id=" + id + "]";
+        return getClass().getName() + "[id=" + getId() + "]";
     }
 }

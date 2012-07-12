@@ -49,9 +49,9 @@ public class Catalogues {
 
     @EJB private SystemFacadeLocal systemFacade;
 
-    private DataModel repositories = null;
+    private DataModel catalogues = null;
 
-    private Catalogue selectedMediaRepository = null;
+    private Catalogue selectedCatalogue = null;
 
     private String selectedCatalogueActionDetailsTab = "tabCatalogueAction";
 
@@ -79,20 +79,20 @@ public class Catalogues {
     }
 
     public void onNew(ActionEvent event) {
-        selectedMediaRepository = new Catalogue();
+        selectedCatalogue = new Catalogue();
     }
 
     public void onSave(ActionEvent event) {
-        repositories = null;
+        catalogues = null;
         if (isEditMode()) {
-            selectedMediaRepository = catalogueFacade.update(
-                    selectedMediaRepository);
+            selectedCatalogue = catalogueFacade.update(
+                    selectedCatalogue);
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_UPDATED");
         } else {
-            selectedMediaRepository = catalogueFacade.create(
-                    selectedMediaRepository);
+            selectedCatalogue = catalogueFacade.create(
+                    selectedCatalogue);
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_CREATED");
@@ -100,14 +100,14 @@ public class Catalogues {
     }
 
     /**
-     * Event handler for deleting the {@link Catalogues#selectedMediaRepository}.
+     * Event handler for deleting the {@link Catalogues#selectedCatalogue}.
      * 
      * @param event 
      *          Event that invoked the handler
      */
     public void onDelete(ActionEvent event) {
         try {
-            catalogueFacade.deleteCatalogueById(selectedMediaRepository.getId());
+            catalogueFacade.deleteCatalogueById(selectedCatalogue.getId());
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_DELETED");
@@ -116,14 +116,14 @@ public class Catalogues {
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_DELETED_FAILED");
         }
-        this.repositories = null;
+        this.catalogues = null;
     }
 
     public void onActionBatchAll(ActionEvent event) {
-        for (CatalogueHookInstance instance : selectedMediaRepository.getHooks()) {
+        for (CatalogueHookInstance instance : selectedCatalogue.getHooks()) {
             try {
                 catalogueFacade.executeBatchHook(instance,
-                        selectedMediaRepository.getId());
+                        selectedCatalogue.getId());
             } catch (DataNotFoundException ex) {
                 return;
             }
@@ -132,31 +132,35 @@ public class Catalogues {
 
     public void setActionBatch(CatalogueHookInstance instance) {
         try {
-            catalogueFacade.executeBatchHook(instance, selectedMediaRepository.
-                    getId());
+            catalogueFacade.executeBatchHook(instance, selectedCatalogue.getId());
         } catch (DataNotFoundException ex) {
             return;
         }
     }
 
-    public DataModel getRepositories() {
-        if (repositories == null) {
-            repositories =
-                    new ListDataModel(catalogueFacade.findAllCatalogues());
+    /**
+     * Gets a {@link DataModel} of available {@link Catalogue}s.
+     * 
+     * @return {@link DataModel} of available {@link Catalogue}s
+     */
+    public DataModel getCatalogues() {
+        if (this.catalogues == null) {
+            this.catalogues = new ListDataModel(catalogueFacade.
+                    findAllCatalogues());
         }
-        return repositories;
+        return this.catalogues;
     }
 
-    public Catalogue getSelectedMediaRepository() {
-        return selectedMediaRepository;
+    public Catalogue getSelectedCatalogue() {
+        return selectedCatalogue;
     }
 
-    public void setSelectedMediaRepository(Catalogue selectedMediaRepository) {
-        this.selectedMediaRepository = selectedMediaRepository;
+    public void setSelectedCatalogue(Catalogue catalogue) {
+        this.selectedCatalogue = catalogue;
     }
 
     public boolean isEditMode() {
-        if (selectedMediaRepository == null || selectedMediaRepository.getId()
+        if (selectedCatalogue == null || selectedCatalogue.getId()
                 == null) {
             return false;
         } else {
@@ -265,7 +269,7 @@ public class Catalogues {
     public void onNewCatalogueAction(ActionEvent event) {
         selectedCatalogueActionProperty = new CatalogueHookInstanceProperty();
         selectedCatalogueAction = new CatalogueHookInstance();
-        selectedCatalogueAction.setCatalogue(selectedMediaRepository);
+        selectedCatalogueAction.setCatalogue(selectedCatalogue);
         selectedCatalogueAction.setExecuteOrder(1);
         // A default action class is required to avoid NullPointerException from JSF
         Map<String, Plugin> plugins = systemFacade.getPlugins();
@@ -279,7 +283,7 @@ public class Catalogues {
     }
 
     public void onDeleteCatalogueAction(ActionEvent event) {
-        selectedMediaRepository.getHooks().remove(selectedCatalogueAction);
+        selectedCatalogue.getHooks().remove(selectedCatalogueAction);
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(),
                 "administrator_Catalogues_CATALOGUE_ACTION_DELETED");
@@ -287,10 +291,10 @@ public class Catalogues {
 
     public void onSaveCatalogueAction(ActionEvent event) {
         if (isActionAddMode()) {
-            selectedCatalogueAction.setCatalogue(selectedMediaRepository);
+            selectedCatalogueAction.setCatalogue(selectedCatalogue);
             selectedCatalogueAction = catalogueFacade.createCatalogueAction(
                     selectedCatalogueAction);
-            selectedMediaRepository.getHooks().add(selectedCatalogueAction);
+            selectedCatalogue.getHooks().add(selectedCatalogueAction);
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_ACTION_CREATED");

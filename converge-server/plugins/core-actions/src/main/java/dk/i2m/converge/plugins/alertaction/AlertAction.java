@@ -18,7 +18,7 @@ package dk.i2m.converge.plugins.alertaction;
 
 import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.content.NewsItemActor;
+import dk.i2m.converge.core.content.ContentItemActor;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.plugin.WorkflowAction;
 import dk.i2m.converge.core.security.UserAccount;
@@ -130,7 +130,7 @@ public class AlertAction implements WorkflowAction {
         List<UserAccount> usersToNotify = new ArrayList<UserAccount>();
 
         if (sendToUser) {
-            for (NewsItemActor actor : item.getActors()) {
+            for (ContentItemActor actor : item.getActors()) {
                 if (actor.getRole().getName().equalsIgnoreCase(sendToUserRole)) {
                     usersToNotify.add(actor.getUser());
                 }

@@ -20,6 +20,7 @@ import dk.i2m.converge.domain.SystemTimer;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
 import dk.i2m.converge.ejb.facades.SearchEngineLocal;
+import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -37,7 +38,8 @@ import javax.ejb.*;
 @Stateless
 public class TimerServiceBean implements TimerServiceLocal {
 
-    private static final Logger LOG = Logger.getLogger(TimerServiceBean.class.getName());
+    private static final Logger LOG = Logger.getLogger(TimerServiceBean.class.
+            getName());
 
     @Resource private TimerService timerService;
 
@@ -50,6 +52,8 @@ public class TimerServiceBean implements TimerServiceLocal {
     @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @EJB private SearchEngineLocal searchEngineService;
+    
+    @EJB private SystemFacadeLocal systemFacade;
 
     /** {@inheritDoc} */
     @Override
@@ -63,7 +67,9 @@ public class TimerServiceBean implements TimerServiceLocal {
         boolean foundTimer = false;
         for (Timer t : (Collection<Timer>) timerService.getTimers()) {
             if (t.getInfo().equals(timer.name())) {
-                LOG.log(Level.INFO, "{0} is already active, next timeout on {1, date, d. MMMM} at {1, date, h:mm a}", new Object[]{timer.name(), t.getNextTimeout()});
+                LOG.log(Level.INFO,
+                        "{0} is already active, next timeout on {1, date, d. MMMM} at {1, date, h:mm a}",
+                        new Object[]{timer.name(), t.getNextTimeout()});
                 foundTimer = true;
             }
         }
@@ -71,7 +77,11 @@ public class TimerServiceBean implements TimerServiceLocal {
         if (!foundTimer) {
             String strReloadInterval = cfgService.getString(timer.interval());
             Long reloadInterval = Long.valueOf(strReloadInterval) * 60L * 1000L;
-            LOG.log(Level.INFO, "Starting timer [{0}] at {1} repeat every: {2} ms / {3} hrs / {4} mins ", new Object[]{timer.name(), now.getTime().toString(), reloadInterval, reloadInterval / 3600000L, reloadInterval / 60000L});
+            LOG.log(Level.INFO,
+                    "Starting timer [{0}] at {1} repeat every: {2} ms / {3} hrs / {4} mins ",
+                    new Object[]{timer.name(), now.getTime().toString(),
+                        reloadInterval, reloadInterval / 3600000L, reloadInterval
+                        / 60000L});
             timerService.createTimer(now.getTime(), reloadInterval, timer.name());
         }
     }
@@ -81,7 +91,8 @@ public class TimerServiceBean implements TimerServiceLocal {
     public void stopTimer(PeriodicTimer timer) {
         for (Timer t : (Collection<Timer>) timerService.getTimers()) {
             if (t.getInfo().equals(timer.name())) {
-                LOG.log(Level.INFO, "Stopping timer: {0}", new Object[]{timer.name()});
+                LOG.log(Level.INFO, "Stopping timer: {0}", new Object[]{timer.
+                            name()});
                 t.cancel();
             }
         }
@@ -108,10 +119,12 @@ public class TimerServiceBean implements TimerServiceLocal {
     /** {@inheritDoc} */
     @Override
     public List<dk.i2m.converge.domain.SystemTimer> getAllTimers() {
-        List<dk.i2m.converge.domain.SystemTimer> timers = new ArrayList<dk.i2m.converge.domain.SystemTimer>();
+        List<dk.i2m.converge.domain.SystemTimer> timers =
+                new ArrayList<dk.i2m.converge.domain.SystemTimer>();
 
         for (PeriodicTimer sTimer : PeriodicTimer.values()) {
-            dk.i2m.converge.domain.SystemTimer sysTimer = new dk.i2m.converge.domain.SystemTimer();
+            dk.i2m.converge.domain.SystemTimer sysTimer =
+                    new dk.i2m.converge.domain.SystemTimer();
             boolean set = false;
             for (Timer timer : (Collection<Timer>) timerService.getTimers()) {
                 if (timer.getInfo().equals(sTimer.name())) {
@@ -137,9 +150,11 @@ public class TimerServiceBean implements TimerServiceLocal {
     /** {@inheritDoc} */
     @Override
     public List<dk.i2m.converge.domain.SystemTimer> getActiveTimers() {
-        List<dk.i2m.converge.domain.SystemTimer> timers = new ArrayList<dk.i2m.converge.domain.SystemTimer>();
+        List<dk.i2m.converge.domain.SystemTimer> timers =
+                new ArrayList<dk.i2m.converge.domain.SystemTimer>();
         for (Timer timer : (Collection<Timer>) timerService.getTimers()) {
-            dk.i2m.converge.domain.SystemTimer sysTimer = new dk.i2m.converge.domain.SystemTimer();
+            dk.i2m.converge.domain.SystemTimer sysTimer =
+                    new dk.i2m.converge.domain.SystemTimer();
             sysTimer.setNextTimeout(timer.getNextTimeout());
             sysTimer.setTimeRemaining(timer.getTimeRemaining());
             sysTimer.setName((String) timer.getInfo());
@@ -156,23 +171,31 @@ public class TimerServiceBean implements TimerServiceLocal {
      */
     @Timeout
     public void executeTimer(Timer timer) {
-        LOG.log(Level.FINE, "Executing timer [{0}]", new Object[]{timer.getInfo()});
+        LOG.log(Level.FINE, "Executing timer [{0}]", new Object[]{
+                    timer.getInfo()});
 
         try {
             if (timer.getInfo().equals(PeriodicTimer.NEWSWIRE.name())) {
                 newswireService.downloadNewswireServices();
-            }else if (timer.getInfo().equals(PeriodicTimer.NEWSWIRE_PURGE.name())) {
+            } else if (timer.getInfo().equals(
+                    PeriodicTimer.NEWSWIRE_PURGE.name())) {
                 newswireService.purgeNewswires();
             } else if (timer.getInfo().equals(PeriodicTimer.EDITION.name())) {
                 outletFacade.closeOverdueEditions();
-            } else if (PeriodicTimer.CATALOGUE_WATCH.name().equals(timer.getInfo())) {
+            } else if (PeriodicTimer.CATALOGUE_WATCH.name().equals(
+                    timer.getInfo())) {
                 catalogueFacade.scanDropPoints();
-            } else if (PeriodicTimer.SEARCH_ENGINE_INDEXING.name().equals(timer.getInfo())) {
+            } else if (PeriodicTimer.SEARCH_ENGINE_INDEXING.name().equals(timer.
+                    getInfo())) {
                 searchEngineService.processIndexingQueue();
-            } else if (PeriodicTimer.NEWSWIRE_BASKET.name().equals(timer.getInfo())) {
+            } else if (PeriodicTimer.NEWSWIRE_BASKET.name().equals(
+                    timer.getInfo())) {
                 newswireService.dispatchBaskets();
+            } else if (PeriodicTimer.JOB_QUEUE.name().equals(timer.getInfo())) {
+                systemFacade.executeJobQueue();
             } else {
-                LOG.log(Level.WARNING, "Ignoring unknown timer [{0}]", new Object[]{timer.getInfo()});
+                LOG.log(Level.WARNING, "Ignoring unknown timer [{0}]",
+                        new Object[]{timer.getInfo()});
             }
         } catch (Throwable t) {
             LOG.log(Level.SEVERE, t.getMessage(), t);

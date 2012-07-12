@@ -17,11 +17,12 @@
 package dk.i2m.converge.core.content.catalogue;
 
 import dk.i2m.converge.core.content.Assignment;
+import dk.i2m.converge.core.content.ContentItem;
+import dk.i2m.converge.core.content.NewsItemMediaAttachment;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.metadata.Subject;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.utils.BeanComparator;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -37,15 +38,17 @@ import javax.persistence.*;
  */
 @Entity()
 @Table(name = "media_item")
+@DiscriminatorValue("media_item")
 @NamedQueries({
     @NamedQuery(name = MediaItem.FIND_BY_CATALOGUE, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.catalogue = :catalogue ORDER BY m.id ASC"),
     @NamedQuery(name = MediaItem.FIND_BY_STATUS, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.status = :status ORDER BY m.updated DESC"),
     @NamedQuery(name = MediaItem.FIND_BY_OWNER, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.owner = :owner ORDER BY m.id DESC"),
     @NamedQuery(name = MediaItem.FIND_CURRENT_AS_OWNER, query = "SELECT DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :mediaRepository AND m.owner = :user AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.APPROVED AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.REJECTED ORDER BY m.updated DESC"),
-    @NamedQuery(name = MediaItem.FIND_CURRENT_AS_EDITOR, query = "SELECT DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :mediaRepository AND (:user MEMBER OF c.editorRole.userAccounts) AND m.status = dk.i2m.converge.core.content.catalogue.MediaItemStatus.SUBMITTED ORDER BY m.updated DESC"),
-    @NamedQuery(name = MediaItem.FIND_BY_OWNER_AND_STATUS, query = "SELECT  DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :catalogue AND (m.owner = :user OR :user MEMBER OF c.editorRole.userAccounts) AND m.status = :status ORDER BY m.updated DESC")
+    @NamedQuery(name = MediaItem.FIND_BY_OWNER_AND_STATUS, query = "SELECT  DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :catalogue AND m.owner = :user AND m.status = :status ORDER BY m.updated DESC"),
+    @NamedQuery(name = MediaItem.COUNT_BY_USER_AND_CATALOGUE_AND_WORKFLOW_STATE, query = "SELECT COUNT(DISTINCT n) FROM ContentItem AS ci, MediaItem AS n JOIN n.actors AS a WHERE n.id=ci.id AND n.catalogue = :" + MediaItem.PARAM_CATALOGUE + " AND n.currentState = :" + MediaItem.PARAM_WORKFLOW_STATE + " AND (( a.user = :"+MediaItem.PARAM_USER+") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"+MediaItem.PARAM_USER+" MEMBER OF n.currentState.actorRole.userAccounts))"),
+    @NamedQuery(name = MediaItem.COUNT_BY_USER_AND_CATALOGUE, query = "SELECT COUNT(DISTINCT n) FROM ContentItem AS ci, MediaItem AS n JOIN n.actors AS a WHERE n.id=ci.id AND n.catalogue = :" + MediaItem.PARAM_CATALOGUE + " AND (( a.user = :"+MediaItem.PARAM_USER+") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"+MediaItem.PARAM_USER+" MEMBER OF n.currentState.actorRole.userAccounts))")
 })
-public class MediaItem implements Serializable {
+public class MediaItem extends ContentItem {
 
     public static final String FIND_BY_CATALOGUE = "MediaItem.FindByCatalogue";
 
@@ -55,16 +58,24 @@ public class MediaItem implements Serializable {
 
     public static final String FIND_CURRENT_AS_OWNER = "MediaItem.FindCurrentAsOwner";
 
-    public static final String FIND_CURRENT_AS_EDITOR = "MediaItem.FindCurrentAsEditor";
-
     public static final String FIND_BY_OWNER_AND_STATUS = "MediaItem.FindByOwnerAndStatus";
-
+    
+    /** Query for counting the results from the {@link #FIND_BY_USER_AND_CATALOGUE_AND_WORKFLOW_STATE} query. */
+    public static final String COUNT_BY_USER_AND_CATALOGUE_AND_WORKFLOW_STATE = "MediaItem.CountByUserAndCatalogueAndWorkflowState";
+        
+    /** Query for counting the results from the {@link #FIND_BY_USER_AND_CATALOGUE_AND_WORKFLOW_STATE} query. */
+    public static final String COUNT_BY_USER_AND_CATALOGUE = "MediaItem.CountByUserAndCatalogue";
+    
+    /** Query parameter used to specify the user. */
+    public static final String PARAM_USER = "user";
+    
+    /** Query parameter used to specify the catalogue. */
+    public static final String PARAM_CATALOGUE = "catalogue";
+    
+    /** Query parameter used to specify the workflow state. */
+    public static final String PARAM_WORKFLOW_STATE = "workflowState";
+    
     private static final long serialVersionUID = 2L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
-    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "assignment_id")
@@ -98,18 +109,10 @@ public class MediaItem implements Serializable {
     @Column(name = "media_date")
     private Calendar mediaDate = Calendar.getInstance();
 
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
-    @Column(name = "created")
-    private Calendar created = Calendar.getInstance();
-
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
-    @Column(name = "updated")
-    private Calendar updated = Calendar.getInstance();
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "media_item_concept",
-               joinColumns = {@JoinColumn(referencedColumnName = "id", name = "media_item_id", nullable = false)},
-               inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "concept_id", nullable = false)})
+    joinColumns = {@JoinColumn(referencedColumnName = "id", name = "media_item_id", nullable = false)},
+    inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "concept_id", nullable = false)})
     private List<Concept> concepts = new ArrayList<Concept>();
 
     @OneToMany(mappedBy = "mediaItem", fetch = FetchType.EAGER)
@@ -117,24 +120,20 @@ public class MediaItem implements Serializable {
 
     @Column(name = "held")
     private boolean held = false;
-    
+
     @javax.persistence.Version
     @Column(name = "opt_lock")
     private int versionIdentifier;
 
+    /** {@link List} of placements of this {@link MediaItem} in {@link Channel}s. */
+    @OneToMany(mappedBy = "mediaItem")
+    private List<MediaItemPlacement> placements =
+            new ArrayList<MediaItemPlacement>();
 
     /**
      * Creates a new instance of {@link MediaItem}.
      */
     public MediaItem() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getTitle() {
@@ -177,6 +176,29 @@ public class MediaItem implements Serializable {
         this.catalogue = catalogue;
     }
 
+    /**
+     * Property containing a {@link List} of placements of the {@link MediaItem}
+     * in {@link Channel}s.
+     * 
+     * @return {@link List} of placements of the {@link MediaItem} in
+     *         {@link Channel}s
+     */
+    public List<MediaItemPlacement> getPlacements() {
+        return placements;
+    }
+
+    /**
+     * Property containing a {@link List} of placements of the {@link MediaItem}
+     * in {@link Channel}s.
+     * 
+     * @param placements
+     *          {@link List} of placements of the {@link MediaItem} in
+     *          {@link Channel}s
+     */
+    public void setPlacements(List<MediaItemPlacement> placements) {
+        this.placements = placements;
+    }
+    
     public List<Concept> getConcepts() {
         return concepts;
     }
@@ -216,22 +238,6 @@ public class MediaItem implements Serializable {
 
     public void setMediaDate(Calendar mediaDate) {
         this.mediaDate = mediaDate;
-    }
-
-    public Calendar getUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(Calendar updated) {
-        this.updated = updated;
-    }
-
-    public Calendar getCreated() {
-        return created;
-    }
-
-    public void setCreated(Calendar created) {
-        this.created = created;
     }
 
     public MediaItemStatus getStatus() {
@@ -345,9 +351,7 @@ public class MediaItem implements Serializable {
     public MediaItemRendition getPreview() {
         if (isPreviewAvailable()) {
             try {
-                MediaItemRendition preview = findRendition(catalogue.
-                        getPreviewRendition());
-                return preview;
+                return findRendition(catalogue.getPreviewRendition());
             } catch (RenditionNotFoundException ex) {
                 return null;
             }
@@ -490,17 +494,24 @@ public class MediaItem implements Serializable {
             return false;
         }
         final MediaItem other = (MediaItem) obj;
-        if (this.id != other.id
-                && (this.id == null || !this.id.equals(other.id))) {
+        if (getId() != other.getId()
+                && (getId() == null || !getId().equals(other.getId()))) {
             return false;
         }
         return true;
     }
 
+    /** {@inheritDoc } */
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 79 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 79 * hash + (getId() != null ? getId().hashCode() : 0);
         return hash;
+    }
+
+    /** {@inheritDoc } */
+    @Override
+    public String toString() {
+        return getClass().getName() + "[id=" + getId() + "]";
     }
 }

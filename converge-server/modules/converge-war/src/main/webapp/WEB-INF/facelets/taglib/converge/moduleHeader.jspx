@@ -16,7 +16,7 @@
                 <table class="body_heading">
                     <tr>
                         <td class="left"></td>
-                        <td class="middle"><h:outputText value="#{moduleTitle}" escape="false" /></td>
+                        <td class="middle"><h:outputText value="#{moduleTitle}" escape="false" /><ui:insert name="inline_module_options" /></td>
                         <td class="right"></td>
                     </tr>
                 </table>
@@ -29,8 +29,9 @@
                 <table class="body_heading">
                     <tr>
                         <td class="left"></td>
-                        <td class="middle"><h:outputText value="#{moduleTitle}" escape="false" /></td>
-                        <td class="right"></td>
+                        <td class="middle"><h:outputText value="#{moduleTitle}" escape="false" /><ui:insert name="inline_module_options" /></td>
+                        <td class="right">
+                        </td>
                     </tr>
                 </table>
             </h:panelGroup>

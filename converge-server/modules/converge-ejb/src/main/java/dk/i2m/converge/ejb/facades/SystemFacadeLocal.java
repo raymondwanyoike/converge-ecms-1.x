@@ -18,12 +18,12 @@ package dk.i2m.converge.ejb.facades;
 
 import dk.i2m.converge.core.Announcement;
 import dk.i2m.converge.core.ConfigurationKey;
-import dk.i2m.converge.core.logging.LogEntry;
-import dk.i2m.converge.core.content.Language;
-import dk.i2m.converge.core.logging.LogSubject;
-import dk.i2m.converge.core.newswire.NewswireService;
-import dk.i2m.converge.domain.Property;
 import dk.i2m.converge.core.DataNotFoundException;
+import dk.i2m.converge.core.content.Language;
+import dk.i2m.converge.core.logging.LogEntry;
+import dk.i2m.converge.core.logging.LogSubject;
+import dk.i2m.converge.core.workflow.JobQueue;
+import dk.i2m.converge.domain.Property;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -169,4 +169,25 @@ public interface SystemFacadeLocal {
     List<LogEntry> findLogEntries();
 
     void removeLogEntries(Object entryType, String entryId);
+
+    /**
+     * Find all the items in the {@link JobQueue} sorted by execution time.
+     * 
+     * @return {@link JobQueue} items sorted by execution time
+     */
+    List<JobQueue> findJobQueue();
+
+    /**
+     * Removes an item from the {@link JobQueue}.
+     * 
+     * @param id 
+     *          Unique identifier of the {@link JobQueue} item
+     */
+    void removeJobQueue(Long id);
+    
+    /**
+     * Refreshes and executes the {@link JobQueue}.
+     */
+    void executeJobQueue();
+    
 }

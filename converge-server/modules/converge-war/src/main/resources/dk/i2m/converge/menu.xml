@@ -110,6 +110,12 @@
                 <role>ADMINISTRATOR</role>
             </children>
             
+            <children id="lnkAdministrationJobQueue" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/jobqueue</action>
+                <label>menu_JOB_QUEUE</label>
+                <role>ADMINISTRATOR</role>
+            </children>
+            
             <children id="lnkAdministrationLog" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/log</action>
                 <label>menu_SYSTEM_LOG</label>
@@ -147,14 +153,20 @@
             </children>
         </children>
 
-        <children id="lnkAdministrationOutlets" resetOnClick="false" sectionMenu="true">
+        <children id="lnkAdministrationContent" resetOnClick="false" sectionMenu="true">
             <action>/administration/outlets</action>
-            <label>menu_OUTLETS</label>
+            <label>menu_ADMINISTRATION_CONTENT</label>
             <role>ADMINISTRATOR</role>
 
             <children id="lnkOutlets" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/outlets</action>
                 <label>menu_OUTLETS</label>
+                <role>ADMINISTRATOR</role>
+            </children>
+            
+            <children id="lnkCatalogues" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/catalogues</action>
+                <label>menu_CATALOGUES</label>
                 <role>ADMINISTRATOR</role>
             </children>
             
@@ -167,18 +179,6 @@
             <children id="lnkAdministrationLanguages" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/languages</action>
                 <label>menu_LANGUAGES</label>
-                <role>ADMINISTRATOR</role>
-            </children>
-        </children>
-
-        <children id="lnkAdministrationCatalogues" resetOnClick="false" sectionMenu="true">
-            <action>/administration/catalogues</action>
-            <label>menu_CATALOGUES</label>
-            <role>ADMINISTRATOR</role>
-
-            <children id="lnkCatalogues" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
-                <action>/administration/catalogues</action>
-                <label>menu_CATALOGUES</label>
                 <role>ADMINISTRATOR</role>
             </children>
 

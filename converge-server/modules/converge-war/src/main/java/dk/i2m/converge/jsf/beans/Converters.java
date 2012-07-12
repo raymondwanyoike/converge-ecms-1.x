@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 - 2011 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,50 +16,14 @@
  */
 package dk.i2m.converge.jsf.beans;
 
-import dk.i2m.converge.core.workflow.Department;
-import dk.i2m.converge.core.workflow.Edition;
-import dk.i2m.converge.ejb.services.NewswireServiceLocal;
-import dk.i2m.converge.jsf.converters.NewsItemAuthorDisplayConverter;
-import dk.i2m.converge.jsf.converters.UserRoleConverter;
-import dk.i2m.converge.jsf.converters.WorkflowConverter;
-import dk.i2m.converge.jsf.converters.WorkflowStateConverter;
-import dk.i2m.converge.core.workflow.Outlet;
-import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.calendar.EventCategory;
 import dk.i2m.converge.core.metadata.Concept;
-import dk.i2m.converge.core.workflow.Workflow;
-import dk.i2m.converge.core.workflow.WorkflowState;
-import dk.i2m.converge.core.workflow.WorkflowStep;
-import dk.i2m.converge.ejb.facades.CalendarFacadeLocal;
-import dk.i2m.converge.ejb.facades.ListingFacadeLocal;
-import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
-import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
-import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
-import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
-import dk.i2m.converge.ejb.facades.UserFacadeLocal;
-import dk.i2m.converge.ejb.facades.WorkflowFacadeLocal;
-import dk.i2m.converge.jsf.converters.ClassConverter;
-import dk.i2m.converge.jsf.converters.ConceptConverter;
-import dk.i2m.converge.jsf.converters.CurrencyConverter;
-import dk.i2m.converge.jsf.converters.DepartmentConverter;
-import dk.i2m.converge.jsf.converters.EditionCandidateConverter;
-import dk.i2m.converge.jsf.converters.EditionConverter;
-import dk.i2m.converge.jsf.converters.NewsItemFieldConverter;
-import dk.i2m.converge.jsf.converters.EventCategoryConverter;
-import dk.i2m.converge.jsf.converters.FinancialMarketConverter;
-import dk.i2m.converge.jsf.converters.LanguageConverter;
-import dk.i2m.converge.jsf.converters.LocaleConverter;
-import dk.i2m.converge.jsf.converters.RenditionConverter;
-import dk.i2m.converge.jsf.converters.CatalogueConverter;
-import dk.i2m.converge.jsf.converters.NewswireServiceConverter;
-import dk.i2m.converge.jsf.converters.OutletConverter;
-import dk.i2m.converge.jsf.converters.SectionConverter;
-import dk.i2m.converge.jsf.converters.SystemPrivilegeConverter;
-import dk.i2m.converge.jsf.converters.UserAccountConverter;
-import dk.i2m.converge.jsf.converters.WeatherLocationConverter;
-import dk.i2m.converge.jsf.converters.WeatherSituationConverter;
-import dk.i2m.converge.jsf.converters.WorkflowStepConverter;
+import dk.i2m.converge.core.security.UserAccount;
+import dk.i2m.converge.core.security.UserRole;
+import dk.i2m.converge.core.workflow.*;
+import dk.i2m.converge.ejb.facades.*;
+import dk.i2m.converge.ejb.services.NewswireServiceLocal;
+import dk.i2m.converge.jsf.converters.*;
 import dk.i2m.jsf.converters.EnumTypeConverter;
 import java.util.Locale;
 import javax.ejb.EJB;
@@ -180,15 +144,6 @@ public class Converters {
      */
     public Converter getUserAccountConverter() {
         return new UserAccountConverter(userFacade);
-    }
-
-    /**
-     * Gets a {@link Converter} for {@link Department} objects.
-     *
-     * @return {@link Converter} for {@link Department} objects
-     */
-    public Converter getDepartmentConverter() {
-        return new DepartmentConverter(outletFacade);
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.plugins.validators.placementvalidator;
 
+import dk.i2m.converge.core.content.ContentItem;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.plugin.WorkflowValidator;
@@ -27,7 +28,8 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * Validator for checking the presence of {@link MediaItem}s in a {@link NewsItem}.
+ * Validator for checking the presence of {@link MediaItem}s in a 
+ * {@link NewsItem}.
  *
  * @author Allan Lykke Christensen
  */
@@ -58,23 +60,28 @@ public class PlacementValidator implements WorkflowValidator {
             "dk.i2m.converge.plugins.validators.placementvalidator.Messages");
 
     @Override
-    public void execute(NewsItem item, WorkflowStep step,
+    public void execute(ContentItem item, WorkflowStep step,
             WorkflowStepValidator validator) throws WorkflowValidatorException {
+        if (!(item instanceof NewsItem)) {
+            return;
+        }
+        NewsItem newsItem = (NewsItem) item;
+
         Map<String, String> properties = validator.getPropertiesAsMap();
 
         if (!properties.containsKey(PROPERTY_OPERATION)) {
-            throw new WorkflowValidatorException("Validation plug-in not configured. Missing property "
-                    + PROPERTY_OPERATION);
+            throw new WorkflowValidatorException("Validation plug-in not "
+                    + "configured. Missing property " + PROPERTY_OPERATION);
         }
 
         if (!properties.containsKey(PROPERTY_COUNT)) {
-            throw new WorkflowValidatorException("Validation plug-in not configured. Missing property "
-                    + PROPERTY_COUNT);
+            throw new WorkflowValidatorException("Validation plug-in not "
+                    + "configured. Missing property " + PROPERTY_COUNT);
         }
 
         if (!properties.containsKey(PROPERTY_MESSAGE)) {
-            throw new WorkflowValidatorException("Validation plug-in not configured. Missing property "
-                    + PROPERTY_MESSAGE);
+            throw new WorkflowValidatorException("Validation plug-in not "
+                    + "configured. Missing property " + PROPERTY_MESSAGE);
         }
 
         String operation = properties.get(PROPERTY_OPERATION);
@@ -108,7 +115,7 @@ public class PlacementValidator implements WorkflowValidator {
 
         try {
             int count = Integer.valueOf(fieldCount);
-            int placements = item.getPlacements().size();
+            int placements = newsItem.getPlacements().size();
 
             if (operation.equalsIgnoreCase(">")) {
                 if (!(placements > count)) {
@@ -123,13 +130,14 @@ public class PlacementValidator implements WorkflowValidator {
                     throw new WorkflowValidatorException(message);
                 }
             } else {
-                throw new WorkflowValidatorException("Validation plug-in not configured. Incorrect value ("
+                throw new WorkflowValidatorException("Validation plug-in not "
+                        + "configured. Incorrect value ("
                         + operation + ") set for property "
                         + PROPERTY_OPERATION);
             }
 
             if (mustHaveSection || mustHaveStart || mustHavePosition) {
-                for (NewsItemPlacement placement : item.getPlacements()) {
+                for (NewsItemPlacement placement : newsItem.getPlacements()) {
                     if (mustHaveEdition && placement.getEdition() == null) {
                         throw new WorkflowValidatorException(message);
                     }
@@ -149,7 +157,8 @@ public class PlacementValidator implements WorkflowValidator {
             }
 
         } catch (NumberFormatException ex) {
-            throw new WorkflowValidatorException("Validation plug-in not configured. Incorrect value ("
+            throw new WorkflowValidatorException("Validation plug-in not "
+                    + "configured. Incorrect value ("
                     + fieldCount + ") set for property " + PROPERTY_COUNT);
         }
 

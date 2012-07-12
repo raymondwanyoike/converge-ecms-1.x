@@ -32,6 +32,7 @@ public enum ConfigurationKey implements Serializable {
     WORKING_DIRECTORY,
     MESSAGE_BUNDLE,
     XML_MESSAGE_PACKAGE,
+    JOB_QUEUE_INTERVAL,
     LANGUAGE,
     COUNTRY,
     TIME_ZONE,

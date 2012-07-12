@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,13 +16,12 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.core.workflow.Department;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.security.Privilege;
 import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
-import dk.i2m.converge.core.DataNotFoundException;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -145,15 +144,6 @@ public interface UserFacadeLocal {
      */
     List<UserAccount> getMembers(Long outletId, SystemPrivilege privilege);
 
-    /**
-     * Finds all the {@link UserAccount}s in a given {@link Department}.
-     *
-     * @param departmentId
-     *          Unique identifier of the department
-     * @return {@link UserAccount}s in a given {@link Department}
-     */
-    List<UserAccount> getMembers(Long departmentId);
-
     List<Notification> getNotifications(String username);
 
     /**
@@ -179,8 +169,6 @@ public interface UserFacadeLocal {
     void synchroniseWithDirectory();
 
     Long getNotificationCount(java.lang.String username);
-
-    boolean isCatalogueEditor(String username);
 
     java.util.List<dk.i2m.converge.core.Notification> getNotifications(java.lang.String username, int start, int count);
 }

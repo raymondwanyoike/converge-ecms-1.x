@@ -5,7 +5,7 @@
         <ui:define name="header">
             <ui:insert name="header" />
         </ui:define>
-        
+
         <ui:define name="title">
             <h:outputText value="#{i18n.MediaItemDetails_MEDIA_ITEM}" />
         </ui:define>
@@ -21,6 +21,9 @@
                         <ui:insert name="body" />
                     </div>
                 </div>
+            </h:form>
+            <h:form>
+                <converge:conceptSelector onSelectSubject="#{mediaItemDetails.onSelectSubject}" />
             </h:form>
             <ui:insert name="pageBottom" />
         </ui:define>

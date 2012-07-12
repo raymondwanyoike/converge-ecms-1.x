@@ -8,7 +8,7 @@
 
             <div id="story">
                 <div id="controls">
-                    <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{mediaItemArchive.selectedMediaItem.id}" rendered="#{mediaItemArchive.editor}">
+                    <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{mediaItemArchive.selectedMediaItem.id}" rendered="#{mediaItemArchive.currentActor}">
                         <h:graphicImage url="/images/icons/edit-media-item.png" alt="#{i18n.MediaItemArchive_CONTROL_EDIT}" title="#{i18n.MediaItemArchive_CONTROL_EDIT}" />
                     </h:outputLink>
                     <h:graphicImage url="#{i18n.resource_ICON_PRINT}" title="#{i18n.MediaItemArchive_CONTROL_PRINT}" alt="#{i18n.MediaItemArchive_CONTROL_PRINT}" onclick="javascript:window.print();" />

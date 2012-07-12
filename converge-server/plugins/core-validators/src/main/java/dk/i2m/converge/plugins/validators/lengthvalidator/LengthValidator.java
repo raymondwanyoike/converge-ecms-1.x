@@ -1,14 +1,22 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later 
+ * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with 
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.plugins.validators.lengthvalidator;
 
+import dk.i2m.converge.core.content.ContentItem;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemField;
 import dk.i2m.converge.core.plugin.WorkflowValidator;
@@ -35,30 +43,42 @@ public class LengthValidator implements WorkflowValidator {
 
     public static final String PROPERTY_MESSAGE = "Message";
 
-    private static final Logger LOG = Logger.getLogger(LengthValidator.class.getName());
+    private static final Logger LOG = Logger.getLogger(LengthValidator.class.
+            getName());
 
     private Map<String, String> availableProperties = null;
 
-    private ResourceBundle bundle = ResourceBundle.getBundle("dk.i2m.converge.plugins.validators.lengthvalidator.Messages");
+    private ResourceBundle bundle = ResourceBundle.getBundle(
+            "dk.i2m.converge.plugins.validators.lengthvalidator.Messages");
 
     @Override
-    public void execute(NewsItem item, WorkflowStep step, WorkflowStepValidator validator) throws WorkflowValidatorException {
+    public void execute(ContentItem item, WorkflowStep step,
+            WorkflowStepValidator validator) throws WorkflowValidatorException {
+        if (!(item instanceof NewsItem)) {
+            return;
+        }
+        NewsItem ni = (NewsItem) item;
+
         Map<String, String> properties = validator.getPropertiesAsMap();
 
         if (!properties.containsKey(PROPERTY_FIELD)) {
-            throw new WorkflowValidatorException("Validation plug-in not configured. Missing property " + PROPERTY_FIELD);
+            throw new WorkflowValidatorException("Validation plug-in not "
+                    + "configured. Missing property " + PROPERTY_FIELD);
         }
 
         if (!properties.containsKey(PROPERTY_OPERATION)) {
-            throw new WorkflowValidatorException("Validation plug-in not configured. Missing property " + PROPERTY_OPERATION);
+            throw new WorkflowValidatorException("Validation plug-in not "
+                    + "configured. Missing property " + PROPERTY_OPERATION);
         }
 
         if (!properties.containsKey(PROPERTY_LENGTH)) {
-            throw new WorkflowValidatorException("Validation plug-in not configured. Missing property " + PROPERTY_LENGTH);
+            throw new WorkflowValidatorException("Validation plug-in not "
+                    + "configured. Missing property " + PROPERTY_LENGTH);
         }
 
         if (!properties.containsKey(PROPERTY_MESSAGE)) {
-            throw new WorkflowValidatorException("Validation plug-in not configured. Missing property " + PROPERTY_MESSAGE);
+            throw new WorkflowValidatorException("Validation plug-in not "
+                    + "configured. Missing property " + PROPERTY_MESSAGE);
         }
 
         String fieldName = properties.get(PROPERTY_FIELD);
@@ -75,19 +95,21 @@ public class LengthValidator implements WorkflowValidator {
 
             switch (field) {
                 case BRIEF:
-                    fieldValue = item.getBrief();
+                    fieldValue = ni.getBrief();
                     break;
                 case BY_LINE:
-                    fieldValue = item.getByLine();
+                    fieldValue = ni.getByLine();
                     break;
                 case STORY:
-                    fieldValue = item.getStory();
+                    fieldValue = ni.getStory();
                     break;
                 case TITLE:
-                    fieldValue = item.getTitle();
+                    fieldValue = ni.getTitle();
                     break;
                 default:
-                    throw new WorkflowValidatorException("Validation plug-in not configured. Unsupported field " + field.name());
+                    throw new WorkflowValidatorException("Validation plug-in "
+                            + "not configured. Unsupported field " 
+                            + field.name());
             }
 
             if (operation.equalsIgnoreCase(">")) {
@@ -103,13 +125,16 @@ public class LengthValidator implements WorkflowValidator {
                     throw new WorkflowValidatorException(message);
                 }
             } else {
-                throw new WorkflowValidatorException("Validation plug-in not configured. Incorrect value (" + operation + ") set for property " + PROPERTY_OPERATION);
+                throw new WorkflowValidatorException("Validation plug-in not configured. Incorrect value ("
+                        + operation + ") set for property " + PROPERTY_OPERATION);
             }
 
         } catch (NumberFormatException ex) {
-            throw new WorkflowValidatorException("Validation plug-in not configured. Incorrect value (" + fieldLength + ") set for property " + PROPERTY_LENGTH);
+            throw new WorkflowValidatorException("Validation plug-in not configured. Incorrect value ("
+                    + fieldLength + ") set for property " + PROPERTY_LENGTH);
         } catch (IllegalArgumentException ex) {
-            throw new WorkflowValidatorException("Validation plug-in not configured. Incorrect value (" + fieldName + ") set for property " + PROPERTY_FIELD);
+            throw new WorkflowValidatorException("Validation plug-in not configured. Incorrect value ("
+                    + fieldName + ") set for property " + PROPERTY_FIELD);
         }
 
     }
@@ -118,10 +143,14 @@ public class LengthValidator implements WorkflowValidator {
     public Map<String, String> getAvailableProperties() {
         if (availableProperties == null) {
             availableProperties = new LinkedHashMap<String, String>();
-            availableProperties.put(bundle.getString(PROPERTY_FIELD), PROPERTY_FIELD);
-            availableProperties.put(bundle.getString(PROPERTY_OPERATION), PROPERTY_OPERATION);
-            availableProperties.put(bundle.getString(PROPERTY_LENGTH), PROPERTY_LENGTH);
-            availableProperties.put(bundle.getString(PROPERTY_MESSAGE), PROPERTY_MESSAGE);
+            availableProperties.put(bundle.getString(PROPERTY_FIELD),
+                    PROPERTY_FIELD);
+            availableProperties.put(bundle.getString(PROPERTY_OPERATION),
+                    PROPERTY_OPERATION);
+            availableProperties.put(bundle.getString(PROPERTY_LENGTH),
+                    PROPERTY_LENGTH);
+            availableProperties.put(bundle.getString(PROPERTY_MESSAGE),
+                    PROPERTY_MESSAGE);
         }
         return availableProperties;
     }
@@ -144,7 +173,8 @@ public class LengthValidator implements WorkflowValidator {
     @Override
     public Date getDate() {
         try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat format =
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             return format.parse(bundle.getString("PLUGIN_BUILD_TIME"));
         } catch (Exception ex) {
             return Calendar.getInstance().getTime();

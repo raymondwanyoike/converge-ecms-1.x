@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * View of the inbox.
+ * Transfer bean used for presenting a view of the user inbox.
  *
  * @author Allan Lykke Christensen
  */
@@ -52,10 +52,15 @@ public class InboxView {
 
     private String briefing;
 
+    private String thumbnailLink;
+
     public InboxView() {
     }
 
-    public InboxView(Long id, String title, String slugline, Integer targetWordCount, Long wordCount, String actor, String status, String outlet, Calendar deadline, Calendar updated, Calendar checkedOut, String checkedOutBy, String briefing) {
+    public InboxView(Long id, String title, String slugline,
+            Integer targetWordCount, Long wordCount, String actor, String status,
+            String outlet, Calendar deadline, Date updated, Calendar checkedOut,
+            String checkedOutBy, String briefing, String thumbnailLink) {
         this.id = id;
         this.title = title;
         this.slugline = slugline;
@@ -67,14 +72,24 @@ public class InboxView {
         if (deadline != null) {
             this.deadline = deadline.getTime();
         }
-        if (updated != null) {
-            this.updated = updated.getTime();
-        }
+        this.updated = updated;
         if (checkedOut != null) {
             this.checkedOut = checkedOut.getTime();
         }
         this.checkedOutBy = checkedOutBy;
         this.briefing = briefing;
+        this.thumbnailLink = thumbnailLink;
+    }
+
+    public InboxView(Long id, String title, String actor, String status,
+            String location, Date updated, String thumbnailLink) {
+        this.id = id;
+        this.title = title;
+        this.actor = actor;
+        this.status = status;
+        this.outlet = location;
+        this.updated = updated;
+        this.thumbnailLink = thumbnailLink;
     }
 
     public String getActor() {
@@ -181,6 +196,14 @@ public class InboxView {
         this.targetWordCount = targetWordCount;
     }
 
+    public String getThumbnailLink() {
+        return thumbnailLink;
+    }
+
+    public void setThumbnailLink(String thumbnailLink) {
+        this.thumbnailLink = thumbnailLink;
+    }
+
     public boolean isLocked() {
         if (getCheckedOut() == null) {
             return false;
@@ -206,7 +229,8 @@ public class InboxView {
             return false;
         }
         final InboxView other = (InboxView) obj;
-        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+        if (this.id != other.id
+                && (this.id == null || !this.id.equals(other.id))) {
             return false;
         }
         return true;

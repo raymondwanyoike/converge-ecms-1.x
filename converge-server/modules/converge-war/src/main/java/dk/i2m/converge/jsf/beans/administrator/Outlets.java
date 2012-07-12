@@ -22,6 +22,7 @@ import dk.i2m.converge.core.subscriber.OutletSubscriber;
 import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.facades.EntityReferenceException;
 import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
+import dk.i2m.converge.ejb.services.ContentItemServiceLocal;
 import dk.i2m.converge.jsf.beans.BaseBean;
 import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.jsf.JsfUtils;
@@ -42,6 +43,7 @@ import javax.faces.model.ListDataModel;
 public class Outlets extends BaseBean {
 
     @EJB private OutletFacadeLocal outletFacade;
+    @EJB private ContentItemServiceLocal contentItemService;
 
     private DataModel outlets = null;
 
@@ -52,8 +54,6 @@ public class Outlets extends BaseBean {
     private DataModel selectedOutletSubscribers = new ListDataModel();
 
     private OutletSubscriber selectedOutletSubscriber = null;
-
-    private Department selectedDepartment = null;
 
     private Section selectedSection = null;
 
@@ -71,7 +71,7 @@ public class Outlets extends BaseBean {
 
     /**
      * Gets the {@link Outlet} that is currently selected.
-     * <p/>
+     *
      * @return Currently selected {@link Outlet}
      */
     public Outlet getSelectedOutlet() {
@@ -80,18 +80,26 @@ public class Outlets extends BaseBean {
 
     /**
      * Sets the {@link Outlet} that was selected by the user.
-     * <p/>
-     * @param selectedOutlet {@link Outlet} selected
+     *
+     * @param selectedOutlet 
+     *          {@link Outlet} selected
      */
     public void setSelectedOutlet(Outlet selectedOutlet) {
         this.selectedOutlet = selectedOutlet;
         onLoadSelectedOutletSubscribers(null);
     }
 
+    public void onRegenerateThumbnailLinks(ActionEvent event) {
+        contentItemService.generateThumbnailLinks();
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+                Bundle.i18n.name(), "administrator_Outlets_THUMBNAIL_LINKS_REGENERATED");
+    }
+    
     /**
      * Event handler for loading the subscribers of the selected outlet.
-     * <p/>
-     * @param event Event that invoked the handler
+     *
+     * @param event 
+     *          Event that invoked the handler
      */
     public void onLoadSelectedOutletSubscribers(ActionEvent event) {
         if (getSelectedOutlet() != null && getSelectedOutlet().getId() != null) {
@@ -151,14 +159,6 @@ public class Outlets extends BaseBean {
         this.selectedOutletTab = selectedOutletTab;
     }
 
-    public Department getSelectedDepartment() {
-        return selectedDepartment;
-    }
-
-    public void setSelectedDepartment(Department selectedDepartment) {
-        this.selectedDepartment = selectedDepartment;
-    }
-
     public Section getSelectedSection() {
         return selectedSection;
     }
@@ -188,18 +188,6 @@ public class Outlets extends BaseBean {
      */
     public boolean isOutletAddMode() {
         return !isOutletEditMode();
-    }
-
-    public boolean isDepartmentEditMode() {
-        if (selectedDepartment == null || selectedDepartment.getId() == null) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public boolean isDepartmentAddMode() {
-        return !isDepartmentEditMode();
     }
 
     public boolean isSectionEditMode() {
@@ -278,11 +266,6 @@ public class Outlets extends BaseBean {
         this.outlets = null;
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
                 Bundle.i18n.name(), "administrator_Outlets_OUTLET_DELETED");
-    }
-
-    public void onNewDepartment(ActionEvent event) {
-        selectedDepartment = new Department();
-        selectedDepartment.setOutlet(selectedOutlet);
     }
 
     public void onNewSection(ActionEvent event) {

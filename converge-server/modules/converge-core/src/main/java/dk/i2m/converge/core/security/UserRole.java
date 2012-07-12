@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 - 2011 Interactive Media Management
+ * Copyright (C) 2007 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,25 +16,18 @@
  */
 package dk.i2m.converge.core.security;
 
+import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.workflow.Outlet;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
- * {@link UserRole} represents a role that a user can be a member of.
+ * {@link UserRole} contains privileges which a {@link UserAccount} can obtain
+ * by being a member. A {@link UserRole} grants access to {@linkplain Outlet}s, 
+ * {@linkplain NewswireService}s and {@linkplain Catalogue}s.
  *
  * @author Allan Lykke Christensen
  */
@@ -69,12 +62,16 @@ public class UserRole implements Serializable {
     private List<UserAccount> userAccounts = new ArrayList<UserAccount>();
 
     @ManyToMany(mappedBy = "restrictedTo", fetch = FetchType.LAZY)
-    private List<NewswireService> newswireServices;
+    private List<NewswireService> newswireServices = new ArrayList<NewswireService>();
+
+    @ManyToMany(mappedBy = "userRoles")
+    private List<Catalogue> catalogues = new ArrayList<Catalogue>();
 
     /**
      * Creates a new instance of {@link UserRole}.
      */
     public UserRole() {
+        this("");
     }
 
     /**
@@ -167,30 +164,6 @@ public class UserRole implements Serializable {
     }
 
     /**
-     * Determines if the role is a system-level role.
-     *
-     * @return <code>true</code> if the role is system-level,
-     *         otherwise <code>false</code>
-     */
-    public boolean isSystemLevelRole() {
-        if (this.outlets == null || this.outlets.isEmpty()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Determines if the role is a outlet-level role.
-     *
-     * @return <code>true</code> if the role is outlet-level,
-     *         otherwise <code>false</code>
-     */
-    public boolean isOutletLevelRole() {
-        return !isSystemLevelRole();
-    }
-
-    /**
      * Gets a {@link List} of privileges when a user has this role.
      *
      * @return {@link List} of privileges when a user has this role
@@ -228,6 +201,74 @@ public class UserRole implements Serializable {
         this.userAccounts = userAccounts;
     }
 
+    /**
+     * Gets a {@link List} of {@link NewswireService} that can be subscribed
+     * to by a {@link UserAccount} with this role.
+     * 
+     * @return {@link List} of available {@link NewswireService}s for
+     *         subscription 
+     */
+    public List<NewswireService> getNewswireServices() {
+        return newswireServices;
+    }
+
+    /**
+     * Sets a {@link List} of {@link NewswireService} that can be subscribed
+     * to by a {@link UserAccount} with this role.
+     * 
+     * @param newswireServices
+     *          {@link List} of available {@link NewswireService}s for
+     *          subscription 
+     */
+    public void setNewswireServices(List<NewswireService> newswireServices) {
+        this.newswireServices = newswireServices;
+    }
+
+    /**
+     * Gets a {@link List} of {@link Catalogue}s that a member can access.
+     * 
+     * @return {@link List} of available {@link Catalogue}s to members
+     */
+    public List<Catalogue> getCatalogues() {
+        return catalogues;
+    }
+
+    /**
+     * Sets a {@link List} of {@link Catalogue}s that a member can access.
+     * 
+     * @param catalogues
+     *          {@link List} of available {@link Catalogue}s to members
+     */
+    public void setCatalogues(List<Catalogue> catalogues) {
+        this.catalogues = catalogues;
+    }
+    
+    /**
+     * Determines if the role is not attached to any {@link Outlet}, 
+     * {@link Catalogue} or {@link NewswireService} and therefore a system-level
+     * role.
+     *
+     * @return {@code true} if the role is system-level, otherwise {@code false}
+     */
+    public boolean isSystemLevelRole() {
+        if (this.outlets.isEmpty() && this.newswireServices.isEmpty() && 
+                this.catalogues.isEmpty()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Determines if the role is a outlet-level role.
+     *
+     * @return <code>true</code> if the role is outlet-level,
+     *         otherwise <code>false</code>
+     */
+    public boolean isOutletLevelRole() {
+        return !isSystemLevelRole();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -244,6 +285,7 @@ public class UserRole implements Serializable {
         return true;
     }
 
+    /** {@inheritDoc }. */
     @Override
     public int hashCode() {
         int hash = 3;
@@ -251,6 +293,7 @@ public class UserRole implements Serializable {
         return hash;
     }
 
+    /** {@inheritDoc }. */
     @Override
     public String toString() {
         return getClass().getName() + "[id=" + id + "]";

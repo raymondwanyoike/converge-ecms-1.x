@@ -24,6 +24,7 @@ import dk.i2m.converge.core.utils.HttpUtils;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
+import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -308,7 +309,11 @@ public class FileUploadServlet extends HttpServlet {
         mediaItem.setCatalogue(catalogue);
         mediaItem.setOwner(user);
         mediaItem.setByLine("");
-        mediaItem = catalogueFacade.create(mediaItem);
+        try {
+            catalogueFacade.create(mediaItem);
+        } catch (WorkflowStateTransitionException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        }
         this.returnValue = "" + mediaItem.getId();
 
         MediaItemRendition mir = new MediaItemRendition();
@@ -433,13 +438,19 @@ public class FileUploadServlet extends HttpServlet {
 
     /**
      * Gets the temporary directory for storing incoming files.
-     * <p/>
+     *
      * @return Temporary directory for storing incoming files
      */
     private String getTemporaryDirectory() {
         String home = systemFacade.getProperty(
                 ConfigurationKey.WORKING_DIRECTORY);
         String tempDirectory = home + "/tmp/";
+        
+        File f = new File(tempDirectory);
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+        
         return tempDirectory;
     }
 

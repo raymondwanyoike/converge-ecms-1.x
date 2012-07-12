@@ -31,7 +31,8 @@ public enum PeriodicTimer {
     CATALOGUE_WATCH(ConfigurationKey.CATALOGUE_WATCH_INTERVAL),
     SEARCH_ENGINE_INDEXING(ConfigurationKey.SEARCH_ENGINE_INDEXING_INTERVAL),
     NEWSWIRE_BASKET(ConfigurationKey.NEWSWIRE_BASKET_INTERVAL),
-    NEWSWIRE_PURGE(ConfigurationKey.NEWSWIRE_PURGE_INTERVAL);
+    NEWSWIRE_PURGE(ConfigurationKey.NEWSWIRE_PURGE_INTERVAL),
+    JOB_QUEUE(ConfigurationKey.JOB_QUEUE_INTERVAL);
 
     private final ConfigurationKey interval;
 

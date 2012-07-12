@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 - 2011 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,29 +16,22 @@
  */
 package dk.i2m.converge.core.content;
 
-import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.security.UserAccount;
+import dk.i2m.converge.core.security.UserRole;
 import java.io.Serializable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
- * Entity representing the role of a user in a {@link NewsItem}.
+ * Entity representing the role of a user in a {@link ContentItem}.
  *
  * @author Allan Lykke Christensen
  */
 @Entity
-@Table(name = "news_item_actor")
+@Table(name = "content_item_actor")
 @NamedQueries({})
-public class NewsItemActor implements Serializable {
+public class ContentItemActor implements Serializable {
 
+    /** Unique identifier of the {@link ContentItemActor}. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -53,12 +46,18 @@ public class NewsItemActor implements Serializable {
     private UserRole role;
 
     @ManyToOne
-    @JoinColumn(name = "news_item_id")
-    private NewsItem newsItem;
+    @JoinColumn(name = "content_item_id")
+    private ContentItem contentItem;
 
-    @javax.persistence.Version
-    @Column(name = "opt_lock")
-    private int versionIdentifier;
+    public ContentItemActor() {
+    }
+
+    public ContentItemActor(UserAccount user, UserRole role,
+            ContentItem contentItem) {
+        this.user = user;
+        this.role = role;
+        this.contentItem = contentItem;
+    }
 
     public Long getId() {
         return id;
@@ -95,27 +94,12 @@ public class NewsItemActor implements Serializable {
         this.user = user;
     }
 
-    public NewsItem getNewsItem() {
-        return newsItem;
+    public ContentItem getContentItem() {
+        return contentItem;
     }
 
-    public void setNewsItem(NewsItem newsItem) {
-        this.newsItem = newsItem;
-    }
-
-    public int getVersionIdentifier() {
-        return versionIdentifier;
-    }
-
-    public void setVersionIdentifier(int versionIdentifier) {
-        this.versionIdentifier = versionIdentifier;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+    public void setContentItem(ContentItem contentItem) {
+        this.contentItem = contentItem;
     }
 
     @Override
@@ -126,17 +110,19 @@ public class NewsItemActor implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final NewsItemActor other = (NewsItemActor) obj;
-        if (this.user != other.user && (this.user == null || !this.user.equals(other.user))) {
-            return false;
-        }
-        if (this.role != other.role && (this.role == null || !this.role.equals(other.role))) {
-            return false;
-        }
-        if (this.newsItem != other.newsItem && (this.newsItem == null || !this.newsItem.equals(other.newsItem))) {
+        final ContentItemActor other = (ContentItemActor) obj;
+        if (this.id != other.id
+                && (this.id == null || !this.id.equals(other.id))) {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 71 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
     }
 
     @Override

@@ -24,6 +24,7 @@ import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemEditionState;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.content.forex.Rate;
@@ -330,4 +331,8 @@ public interface PluginContext {
      */
     NewsItemEditionState updateNewsItemEditionState(
             NewsItemEditionState newsItemEditionState);
+
+    NewsItem findNewsItemById(Long id) throws DataNotFoundException;
+
+    MediaItem findMediaItemById(Long id) throws DataNotFoundException;
 }

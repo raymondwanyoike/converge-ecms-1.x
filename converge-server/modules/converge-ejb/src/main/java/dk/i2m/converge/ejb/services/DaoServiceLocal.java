@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Allan Lykke Christensen
+ *  Copyright (C) 2010 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ejb.Local;
 import javax.persistence.OptimisticLockException;
+import javax.persistence.Query;
 
 /**
  * Local interface for the Data Access Object Service.
@@ -34,9 +35,9 @@ public interface DaoServiceLocal {
      * Stores a given object in the data store.
      *
      * @param <T>
-     * Type of entity to store
+     *          Type of entity to store
      * @param t
-     * Entity to store
+     *          Entity to store
      * @return Object stored in the data store.
      */
      <T> T create(T t);
@@ -45,9 +46,9 @@ public interface DaoServiceLocal {
      * Remove a given object from the data store.
      *
      * @param type
-     * Type of object
+     *          Type of object
      * @param id
-     * Unique identifier of the object
+     *          Unique identifier of the object
      */
     void delete(Class type, Object id);
 
@@ -55,9 +56,9 @@ public interface DaoServiceLocal {
      * Finds all the entities of a given type.
      *
      * @param <T>
-     * Type of entity
+     *          Type of entity
      * @param type
-     * Type of entity
+     *          Type of entity
      * @return {@link List} of all entities of the given type
      */
      <T> List<T> findAll(Class<T> type);
@@ -74,14 +75,14 @@ public interface DaoServiceLocal {
      * Finds a given entity in the data store.
      *
      * @param <T>
-     * Type of entity
+     *          Type of entity
      * @param type
-     * Type of entity
+     *          Type of entity
      * @param id
-     * Unique identifier of the entity
+     *          Unique identifier of the entity
      * @return Entity matching the unique identifier
      * @throws DataNotFoundException
-     * If no match could be found
+     *          If no match could be found
      */
      <T> T findById(Class<T> type, Object id) throws DataNotFoundException;
 
@@ -90,9 +91,9 @@ public interface DaoServiceLocal {
      * query.
      *
      * @param sql
-     * Native SQL query
+     *          Native SQL query
      * @param type
-     * Type of entity
+     *          Type of entity
      * @return {@link List} of entities returned from the given native SQL query
      */
     List findByNativeQuery(String sql, Class type);
@@ -101,7 +102,7 @@ public interface DaoServiceLocal {
      * Finds a {@link List} of entity returned by the given named query.
      *
      * @param namedQueryName
-     * Name of the query
+     *          Name of the query
      * @return {@link List} of entities returned by the given query
      */
     List findWithNamedQuery(String namedQueryName);
@@ -110,9 +111,9 @@ public interface DaoServiceLocal {
      * Finds a {@link List} of entity returned by the given named query.
      *
      * @param namedQueryName
-     * Name of the query
+     *          Name of the query
      * @param parameters
-     * Parameters of the query
+     *          Parameters of the query
      * @return {@link List} of entities returned by the given query
      */
     List findWithNamedQuery(String namedQueryName, Map<String, Object> parameters);
@@ -176,6 +177,21 @@ public interface DaoServiceLocal {
     List findWithNamedQuery(String namedQueryName, Map<String, Object> parameters, int resultLimit);
 
     List findWithNamedQuery(String namedQueryName, Map<String, Object> parameters, int start, int resultLimit);
+    
+    /**
+     * Finds a {@link List} of entity returned by the given {@link Query}.
+     *
+     * @param query
+     *          {@link Query} to execute
+     * @param parameters
+     *          Parameters of the query
+     * @param start          
+     *          First record of the result set
+     * @param resultLimit    
+     *          Maximum number of results
+     * @return {@link List} of entities returned by the {@link Query}
+     */
+    List findWithQuery(Query query, Map<String, Object> parameters, int start, int resultLimit);
 
     /**
      * Updates an existing entity in the database.
@@ -212,4 +228,27 @@ public interface DaoServiceLocal {
     int executeQuery(String namedQueryName);
 
     void commit();
+    
+    /**
+     * Execute a {@link NamedQuery} and return a single result of the given type.
+     * 
+     * @param <T>
+     *          Type of entity
+     * @param type
+     *          Type to retrieve
+     * @param namedQueryName
+     *          Name of the {@link NamedQuery}
+     * @param parameters
+     *          Parameters to use in the {@link NamedQuery}
+     * @return Single result of type {@code T} from the given {@link NamedQuery}
+     */
+     <T> T executeNamedQuery(Class<T> type, String namedQueryName, Map<String, Object> parameters);
+
+
+    /**
+     * Obtain the {@link EntityManager} from the persistence framework.
+     * 
+     * @return {@link EntityManager} from the persistence framework
+     */
+    javax.persistence.EntityManager getEntityManager();
 }

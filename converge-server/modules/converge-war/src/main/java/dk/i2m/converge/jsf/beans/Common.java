@@ -105,7 +105,11 @@ public class Common {
         Map<String, UserRole> map = new LinkedHashMap<String, UserRole>();
 
         for (UserRole userRole : original) {
-            map.put(userRole.getName(), userRole);
+            String key = userRole.getName();
+            if (map.containsKey(key)) {
+                key = key + " (" + userRole.getId() + ")";
+            }
+            map.put(key, userRole);
         }
 
         return map;
@@ -135,9 +139,13 @@ public class Common {
     public Map<String, Workflow> getWorkflows() {
         List<Workflow> original = workflowFacade.findAllWorkflows();
         Map<String, Workflow> map = new LinkedHashMap<String, Workflow>();
-
+        
         for (Workflow workflow : original) {
-            map.put(workflow.getName(), workflow);
+            String key = workflow.getName();
+            if (map.containsKey(key)) {
+                key = key + " (" + workflow.getId() + ")";
+            }
+            map.put(key, workflow);
         }
 
         return map;

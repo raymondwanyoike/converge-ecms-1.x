@@ -16,11 +16,10 @@
  */
 package dk.i2m.converge.ejb.services;
 
-import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.ConfigurationKey;
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.security.*;
 import dk.i2m.converge.core.utils.BeanComparator;
-import dk.i2m.converge.core.workflow.Department;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.jndi.ldap.LdapUtils;
 import java.util.*;
@@ -65,20 +64,6 @@ public class UserServiceBean implements UserServiceLocal {
     @PostConstruct
     private void startup() {
         setupUserMapping();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<UserAccount> getMembers(Long departmentId) {
-        List<UserAccount> members = new ArrayList<UserAccount>();
-        try {
-            Department department = daoService.findById(Department.class,
-                    departmentId);
-            members = department.getUserAccounts();
-        } catch (DataNotFoundException ex) {
-            LOG.log(Level.FINE, "Invalid Department", ex);
-        }
-        return members;
     }
 
     /** {@inheritDoc} */
@@ -211,7 +196,7 @@ public class UserServiceBean implements UserServiceLocal {
      * Determines if a given user exists in the LDAP directory.
      *
      * @param id
-* Unique identifier of the user
+     * Unique identifier of the user
      * @return <
      * code>true</code> if the {@link UserAccount} exists in the LDAP
      * directory, otherwise
@@ -541,11 +526,11 @@ public class UserServiceBean implements UserServiceLocal {
      *
      * @return Established connection to the used LDAP directory
      * @throws NamingException
-* If the connection could not be established
+     *          If the connection could not be established
      */
     private DirContext getDirectoryConnection() throws NamingException {
         LOG.log(Level.FINE, "Opening directory connection");
-        DirContext dirContext = null;
+        DirContext dirContext;
 
         Properties p = new Properties();
         p.put(Context.INITIAL_CONTEXT_FACTORY,

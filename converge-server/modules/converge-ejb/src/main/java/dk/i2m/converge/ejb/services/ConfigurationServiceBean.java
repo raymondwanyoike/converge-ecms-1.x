@@ -16,8 +16,8 @@
  */
 package dk.i2m.converge.ejb.services;
 
-import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.Configuration;
+import dk.i2m.converge.core.ConfigurationKey;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;

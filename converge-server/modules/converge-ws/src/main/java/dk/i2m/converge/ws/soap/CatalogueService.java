@@ -24,6 +24,7 @@ import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
+import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
@@ -47,6 +48,8 @@ import org.apache.commons.io.FileUtils;
 @WebService(serviceName = "DigitalAssetService")
 public class CatalogueService {
 
+    private static final Logger LOG = Logger.getLogger(CatalogueService.class.getName());
+    
     @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @EJB private UserFacadeLocal userFacade;
@@ -79,7 +82,7 @@ public class CatalogueService {
         MediaItem mediaItem = new MediaItem();
         mediaItem.setCatalogue(catalogue);
         mediaItem.setByLine(byLine);
-        mediaItem.setCreated(now);
+        mediaItem.setCreated(now.getTime());
         mediaItem.setDescription(description);
 
         mediaItem.setEditorialNote(editorialNote);
@@ -88,10 +91,14 @@ public class CatalogueService {
         mediaItem.setMediaDate(mediaDate);
         mediaItem.setOwner(userAccount);
         mediaItem.setTitle(title);
-        mediaItem.setUpdated(now);
+        mediaItem.setUpdated(now.getTime());
         mediaItem.setStatus(MediaItemStatus.UNSUBMITTED);
-
-        mediaItem = catalogueFacade.create(mediaItem);
+        
+        try {
+            catalogueFacade.create(mediaItem);
+        } catch (WorkflowStateTransitionException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        }
 
         return mediaItem.getId();
     }
@@ -153,12 +160,13 @@ public class CatalogueService {
             throw new DigitalAssetNotFoundException(ex);
         }
 
-        UserRole catalogueEditor = item.getCatalogue().getEditorRole();
-        if (!userAccount.getUserRoles().contains(catalogueEditor)) {
-            throw new ServiceSecurityException(userAccount.getUsername()
-                    + " is not in the catalogue editor role '"
-                    + catalogueEditor.getName() + "'");
-        }
+        // TODO: Fix - Security
+//        UserRole catalogueEditor = item.getCatalogue().getEditorRole();
+//        if (!userAccount.getUserRoles().contains(catalogueEditor)) {
+//            throw new ServiceSecurityException(userAccount.getUsername()
+//                    + " is not in the catalogue editor role '"
+//                    + catalogueEditor.getName() + "'");
+//        }
 
         item.setStatus(mediaItemStatus);
         catalogueFacade.update(item);

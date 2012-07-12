@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,8 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.core.workflow.WorkflowStepValidator;
 import dk.i2m.converge.core.DataNotFoundException;
-import dk.i2m.converge.core.workflow.Workflow;
-import dk.i2m.converge.core.workflow.WorkflowState;
-import dk.i2m.converge.core.workflow.WorkflowStep;
-import dk.i2m.converge.core.workflow.WorkflowStepAction;
+import dk.i2m.converge.core.workflow.*;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -49,7 +45,7 @@ public interface WorkflowFacadeLocal {
      *          Unique identifier of the {@link Workflow}
      */
     void deleteWorkflowById(Long id);
-    
+
     /**
      * Deletes an existing {@link WorkflowStepAction} from the database.
      * 
@@ -106,10 +102,10 @@ public interface WorkflowFacadeLocal {
      * Finds an existing {@link WorkflowState} by its unique identifier.
      *
      * @param id
-     * Unique identifier of the {@link WorkflowState}
+     *          Unique identifier of the {@link WorkflowState}
      * @return {@link WorkflowState} matching the <code>id</code>
      * @throws DataNotFoundException
-     * If no {@link WorkflowState} could be found with the given id
+     *          If no {@link WorkflowState} could be found with the given id
      */
     WorkflowState findWorkflowStateById(Long id) throws DataNotFoundException;
 
@@ -117,7 +113,7 @@ public interface WorkflowFacadeLocal {
      * Updates an existing {@link WorkflowState} in the database.
      *
      * @param state
-     * {@link WorkflowState} to update
+     *          {@link WorkflowState} to update
      */
     WorkflowState updateWorkflowState(WorkflowState state);
 
@@ -176,7 +172,7 @@ public interface WorkflowFacadeLocal {
      */
     WorkflowStep updateWorkflowStep(WorkflowStep step);
 
-   /**
+    /**
      * Creates a new {@link WorkflowStepAction}.
      *
      * @param stepAction
@@ -194,12 +190,11 @@ public interface WorkflowFacadeLocal {
      */
     WorkflowStepAction updateWorkflowStepAction(WorkflowStepAction stepAction);
 
-    
-    WorkflowStepValidator createWorkflowStepValidator(WorkflowStepValidator validator);
+    WorkflowStepValidator createWorkflowStepValidator(
+            WorkflowStepValidator validator);
 
-    WorkflowStepValidator updateWorkflowStepValidator(WorkflowStepValidator validator);
+    WorkflowStepValidator updateWorkflowStepValidator(
+            WorkflowStepValidator validator);
 
     void deleteWorkflowStepValidatorById(Long id);
-    
-    
 }

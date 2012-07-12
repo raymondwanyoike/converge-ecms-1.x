@@ -10,6 +10,9 @@
                 <converge:moduleHeader moduleTitle="#{i18n.NewsItem_PROPERTIES}" />
                 <div>
                     <h:panelGrid id="pgProperties" style="margin-left: 2%; margin-right: 2%; width: 98%" rowClasses="left" columns="2">
+                        <h:outputText value="#{i18n.NewsItem_ID}"  />
+                        <h:outputText value="#{newsItem.selectedNewsItem.id}" />
+                        
                         <h:outputText value="#{i18n.NewsItem_WORKFLOW_OUTLET}"  />
                         <h:outputText value="#{newsItem.selectedNewsItem.outlet.title}" />
 

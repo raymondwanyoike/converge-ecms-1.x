@@ -34,7 +34,6 @@ import dk.i2m.converge.jsf.components.tags.UIEvent;
 import dk.i2m.converge.jsf.components.tags.UIEventListener;
 import dk.i2m.converge.utils.CalendarUtils;
 import dk.i2m.jsf.JsfUtils;
-import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.*;
 import java.util.logging.Level;
@@ -72,8 +71,6 @@ public class Planning implements UIEventListener {
     private DialogEventSelection dialogEventSelection = null;
 
     private Outlet selectedOutlet;
-
-    private Department selectedDepartment;
 
     private WorkflowState selectedState;
 
@@ -406,23 +403,6 @@ public class Planning implements UIEventListener {
         return authors;
     }
 
-    public Map<String, UserAccount> getOutletDepartmentEditors() {
-        Map<String, UserAccount> editors =
-                new LinkedHashMap<String, UserAccount>();
-
-        if (selectedAssignment.getDepartment() != null) {
-            List<UserAccount> members =
-                    userFacade.getMembers(selectedAssignment.getDepartment().
-                    getId());
-
-            for (UserAccount acc : members) {
-                editors.put(acc.getFullName(), acc);
-            }
-        }
-
-        return editors;
-    }
-
     public Outlet getSelectedOutlet() {
         return selectedOutlet;
     }
@@ -753,31 +733,6 @@ public class Planning implements UIEventListener {
                     findAssignmentsByOutlet(selectedOutlet));
         }
         return openAssignments;
-    }
-
-    public Map<String, UserAccount> getAssignmentOutletDepartmentEditors() {
-        Map<String, UserAccount> editors =
-                new LinkedHashMap<String, UserAccount>();
-
-        if (selectedAssignment.getDepartment() != null) {
-            List<UserAccount> members =
-                    userFacade.getMembers(selectedAssignment.getDepartment().
-                    getId());
-
-            for (UserAccount acc : members) {
-                editors.put(acc.getFullName(), acc);
-            }
-        }
-
-        return editors;
-    }
-
-    public Department getSelectedDepartment() {
-        return selectedDepartment;
-    }
-
-    public void setSelectedDepartment(Department selectedDepartment) {
-        this.selectedDepartment = selectedDepartment;
     }
 
     public WorkflowState getSelectedState() {

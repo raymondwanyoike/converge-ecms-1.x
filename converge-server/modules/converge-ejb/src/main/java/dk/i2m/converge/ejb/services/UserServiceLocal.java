@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 - 2010 Interactive Media Management
+ * Copyright (C) 2009 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -126,15 +126,6 @@ public interface UserServiceLocal {
      *         outlet
      */
     List<UserAccount> getMembers(Long outletId, SystemPrivilege privilege);
-
-    /**
-     * Finds all the {@link UserAccount}s in a given {@link Department}.
-     *
-     * @param departmentId
-     *          Unique identifier of the department
-     * @return {@link UserAccount}s in a given {@link Department}
-     */
-    List<UserAccount> getMembers(Long departmentId);
 
     /**
      * Takes a {@link UserAccount} from the database and supplies it with

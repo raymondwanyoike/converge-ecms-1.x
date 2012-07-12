@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,19 +16,19 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.core.content.catalogue.MediaItem;
-import dk.i2m.converge.core.views.CurrentAssignment;
 import dk.i2m.converge.core.DataNotFoundException;
-import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.content.ContentItemPermission;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemMediaAttachment;
 import dk.i2m.converge.core.content.NewsItemPlacement;
-import dk.i2m.converge.core.workflow.WorkflowState;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.security.UserAccount;
+import dk.i2m.converge.core.views.CurrentAssignment;
 import dk.i2m.converge.core.views.InboxView;
 import dk.i2m.converge.core.workflow.Edition;
+import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.Section;
+import dk.i2m.converge.core.workflow.WorkflowState;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -40,9 +40,31 @@ import javax.ejb.Local;
 @Local
 public interface NewsItemFacadeLocal {
 
+    /**
+     * Starts a new {@link NewsItem}.
+     *
+     * @param newsItem 
+     *          {@link NewsItem} to start.
+     * @throws WorkflowStateTransitionException 
+     *          If the workflow could not be started for the {@code newsItem}
+     */
     NewsItem start(NewsItem newsItem) throws WorkflowStateTransitionException;
 
-    NewsItem step(NewsItem newsItem, Long step, String comment) throws WorkflowStateTransitionException;
+    /**
+     * Promotes the {@link NewsItem} in the workflow.
+     *
+     * @param newsItem 
+     *          {@link NewsItem} to promote
+     * @param step     
+     *          Unique identifier of the next step
+     * @param comment  
+     *          Comment from the sender
+     * @return Promoted {@link NewsItem}
+     * @throws WorkflowStateTransitionException 
+     *          If the next step is not legal
+     */
+    NewsItem step(NewsItem newsItem, Long step, String comment) throws
+            WorkflowStateTransitionException;
 
     /**
      * Promotes the {@link NewsItem} in the workflow. This step is done
@@ -58,10 +80,11 @@ public interface NewsItemFacadeLocal {
      * @throws WorkflowStateTransitionException
      *          If the transition could not be completed
      */
-    NewsItem step(NewsItem newsItem, WorkflowState state, String comment) throws WorkflowStateTransitionException;
+    NewsItem step(NewsItem newsItem, WorkflowState state, String comment) throws
+            WorkflowStateTransitionException;
 
-    
-    NewsItemHolder checkout(java.lang.Long id) throws dk.i2m.converge.core.DataNotFoundException;
+    NewsItemHolder checkout(java.lang.Long id) throws
+            dk.i2m.converge.core.DataNotFoundException;
 
     /**
      * Determines if a given {@link NewsItem} has been checked out.
@@ -83,7 +106,9 @@ public interface NewsItemFacadeLocal {
      *          If the {@link NewsItem} is not checked-out or checked-out by a
      *          different user
      */
-    dk.i2m.converge.core.content.NewsItem save(dk.i2m.converge.core.content.NewsItem newsItem) throws dk.i2m.converge.ejb.facades.LockingException;
+    dk.i2m.converge.core.content.NewsItem save(
+            dk.i2m.converge.core.content.NewsItem newsItem) throws
+            dk.i2m.converge.ejb.facades.LockingException;
 
     int emptyTrash(String username);
 
@@ -113,7 +138,8 @@ public interface NewsItemFacadeLocal {
      */
     List<NewsItem> findByStateAndOutlet(String stateName, Outlet outlet);
 
-    List<NewsItem> findByStateAndOutlet(WorkflowState state, Outlet outlet, int start, int results);
+    List<NewsItem> findByStateAndOutlet(WorkflowState state, Outlet outlet,
+            int start, int results);
 
     /**
      * Finds an {@link NewsItem} by its unique identifier.
@@ -139,7 +165,8 @@ public interface NewsItemFacadeLocal {
      * @throws DataNotFoundException
      *          If the {@link NewsItem} does not exist
      */
-    boolean isNewsItemPublished(final Long newsItemId) throws DataNotFoundException;
+    boolean isNewsItemPublished(final Long newsItemId) throws
+            DataNotFoundException;
 
     /**
      * Check-in a {@link NewsItem} in the database without making a state
@@ -202,7 +229,8 @@ public interface NewsItemFacadeLocal {
      *          Actor to remove from the {@link NewsItem}
      * @return Updated {@link NewsItem}
      */
-    NewsItem removeActorFromNewsItem(dk.i2m.converge.core.content.NewsItemActor actor);
+    NewsItem removeActorFromNewsItem(
+            dk.i2m.converge.core.content.ContentItemActor actor);
 
     /**
      * Add an actor to a {@link NewsItem}.
@@ -211,7 +239,8 @@ public interface NewsItemFacadeLocal {
      *          Actor to add to the {@link NewsItem}
      * @return Actor added to the {@link NewsItem}
      */
-    dk.i2m.converge.core.content.NewsItemActor addActorToNewsItem(dk.i2m.converge.core.content.NewsItemActor actor);
+    dk.i2m.converge.core.content.ContentItemActor addActorToNewsItem(
+            dk.i2m.converge.core.content.ContentItemActor actor);
 
     /**
      * Determines if the given user is the current actor of the given news item.
@@ -231,7 +260,8 @@ public interface NewsItemFacadeLocal {
      *          Unique identifier of the {@link NewsItem} for which to find the version
      * @return {@link List} of {@link NewsItem}s that are a version of the given {@link NewsItem}.
      */
-    java.util.List<dk.i2m.converge.core.content.NewsItem> findVersions(java.lang.Long newsItemId);
+    java.util.List<dk.i2m.converge.core.content.NewsItem> findVersions(
+            java.lang.Long newsItemId);
 
     /**
      * Revokes a lock on a {@link NewsItem}.
@@ -278,7 +308,8 @@ public interface NewsItemFacadeLocal {
      * @throws WorkflowStateTransitionException
      *          If the state does not support workflow pullback
      */
-    void pullback(Long id) throws LockingException, WorkflowStateTransitionException;
+    void pullback(Long id) throws LockingException,
+            WorkflowStateTransitionException;
 
     /**
      * Creates a new {@link MediaItem} in the database.
@@ -315,13 +346,15 @@ public interface NewsItemFacadeLocal {
      * @throws DataNotFoundException
      *          If an {@link Edition} could not be located
      */
-    NewsItemPlacement addToNextEdition(NewsItem newsItem, Section section) throws DataNotFoundException;
+    NewsItemPlacement addToNextEdition(NewsItem newsItem, Section section)
+            throws DataNotFoundException;
 
     NewsItemPlacement createPlacement(NewsItemPlacement placement);
 
     NewsItemPlacement updatePlacement(NewsItemPlacement placement);
 
-    NewsItemPlacement updatePlacement(Long placementId, Integer start, Integer position);
+    NewsItemPlacement updatePlacement(Long placementId, Integer start,
+            Integer position);
 
     void deletePlacementById(Long id);
 
@@ -329,15 +362,26 @@ public interface NewsItemFacadeLocal {
 
     void updatePrecalculatedFields();
 
-    java.util.List<InboxView> findInbox(java.lang.String username, int start, int limit);
+    java.util.List<InboxView> findInbox(java.lang.String username, int start,
+            int limit);
 
     java.util.List<InboxView> findInbox(java.lang.String username);
 
-    java.util.List<dk.i2m.converge.core.views.InboxView> findOutletBox(java.lang.String username, dk.i2m.converge.core.workflow.Outlet outlet);
+    java.util.List<dk.i2m.converge.core.views.InboxView> findOutletBox(
+            java.lang.String username,
+            dk.i2m.converge.core.workflow.Outlet outlet);
 
-    java.util.List<dk.i2m.converge.core.views.InboxView> findOutletBox(java.lang.String username, dk.i2m.converge.core.workflow.Outlet outlet, dk.i2m.converge.core.workflow.WorkflowState state);
+    java.util.List<dk.i2m.converge.core.views.InboxView> findOutletBox(
+            java.lang.String username,
+            dk.i2m.converge.core.workflow.Outlet outlet,
+            dk.i2m.converge.core.workflow.WorkflowState state);
 
-    java.util.List<dk.i2m.converge.core.views.InboxView> findOutletBox(java.lang.String username, dk.i2m.converge.core.workflow.Outlet outlet, dk.i2m.converge.core.workflow.WorkflowState state, int start, int results);
+    java.util.List<dk.i2m.converge.core.views.InboxView> findOutletBox(
+            java.lang.String username,
+            dk.i2m.converge.core.workflow.Outlet outlet,
+            dk.i2m.converge.core.workflow.WorkflowState state, int start,
+            int results);
 
-    NewsItemPlacement findNewsItemPlacementById(Long id) throws DataNotFoundException;
+    NewsItemPlacement findNewsItemPlacementById(Long id) throws
+            DataNotFoundException;
 }

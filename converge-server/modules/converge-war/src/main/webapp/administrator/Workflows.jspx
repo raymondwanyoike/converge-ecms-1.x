@@ -94,7 +94,8 @@
                             </rich:tab>
 
                             <rich:tab id="tabProcess" label="#{i18n.administrator_Workflows_PROCESS}" disabled="#{administrator_Workflows.addMode}">
-                                <h:panelGrid id="pgWorkflowDetailsProcess" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                
+                                <h:panelGrid id="pgWorkflowDetailsProcess" columnClasses="tabSheet" style="padding: 10px; width: 100%" styleClass="scrollableDialogContent">
 
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                                         <h:outputText value="" />
@@ -106,8 +107,8 @@
 
                                     <rich:dataTable id="dtWorkflowProcess"
                                                     value="#{administrator_Workflows.selected.states}"
-                                                    var="state" styleClass="table scrollableDialogContent" headerClass="tableHeader"
-                                                    columnClasses="center columnIcon, left nowrap, left nowrap, left nowrap, right columnCount"
+                                                    var="state" styleClass="table" headerClass="tableHeader"
+                                                    columnClasses="center columnIcon, left nowrap, left nowrap, left nowrap, left columnCount"
                                                     rowClasses="odd, even">
                                         <rich:column>
                                             <f:facet name="header">&#160;</f:facet>

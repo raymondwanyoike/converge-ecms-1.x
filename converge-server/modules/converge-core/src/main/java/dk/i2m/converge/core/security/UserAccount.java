@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,13 +45,13 @@ import javax.persistence.*;
 @NamedQueries({
     @NamedQuery(name = UserAccount.FIND_BY_UID, query = "SELECT u FROM UserAccount u WHERE u.username=:username"),
     @NamedQuery(name = UserAccount.FIND_BY_USER_ROLE, query = "SELECT u FROM UserRole r JOIN r.userAccounts u WHERE r.name=:roleName"),
-    @NamedQuery(name = UserAccount.FIND_USERS_WITH_PUBLICATIONS, query = "SELECT u FROM NewsItemActor n JOIN n.newsItem ni JOIN ni.placements p JOIN n.user u WHERE (n.role = :userRole AND p.edition.publicationDate >= :startDate AND p.edition.publicationDate <= :endDate) GROUP BY u"),
+    @NamedQuery(name = UserAccount.FIND_USERS_WITH_PUBLICATIONS, query = "SELECT u FROM NewsItem ni, ContentItemActor n JOIN n.contentItem ci JOIN ni.placements p JOIN n.user u WHERE (ci.id = ni.id AND n.role = :userRole AND p.edition.publicationDate >= :startDate AND p.edition.publicationDate <= :endDate) GROUP BY u"),
     @NamedQuery(name = UserAccount.FIND_ACTIVE_USERS_BY_ROLE, query = "SELECT DISTINCT u FROM NewsItem AS ni JOIN ni.actors AS a JOIN a.user AS u JOIN ni.history AS h WHERE (a.role = :userRole AND h.user = a.user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY a.user.username DESC"),
     @NamedQuery(name = UserAccount.FIND_PASSIVE_USERS_BY_ROLE, query = "SELECT DISTINCT u FROM NewsItem AS ni JOIN ni.actors AS a JOIN a.user AS u JOIN ni.history AS h WHERE (a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY a.user.username DESC")
 })
 public class UserAccount implements Serializable {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     /** Query for finding a user account by its unique user identifier. */
     public static final String FIND_BY_UID = "UserAccount.findByUid";
@@ -113,10 +113,6 @@ public class UserAccount implements Serializable {
     @Column(name = "default_work_day")
     private int defaultWorkDay;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "clearance_level")
-    private ClearanceLevel clearanceLevel;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_account_newswire_services",
     joinColumns = {@JoinColumn(referencedColumnName = "id", name = "user_account_id", nullable = false)},
@@ -167,10 +163,6 @@ public class UserAccount implements Serializable {
     @OneToMany(mappedBy = "recipient", fetch = FetchType.LAZY)
     private List<Notification> notifications;
 
-    @javax.persistence.Version
-    @Column(name = "opt_lock")
-    private int versionIdentifier;
-
     @OneToMany(mappedBy = "checkedOutBy", fetch = FetchType.LAZY)
     private List<NewsItem> checkedOut;
 
@@ -211,14 +203,6 @@ public class UserAccount implements Serializable {
      */
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public ClearanceLevel getClearanceLevel() {
-        return clearanceLevel;
-    }
-
-    public void setClearanceLevel(ClearanceLevel clearanceLevel) {
-        this.clearanceLevel = clearanceLevel;
     }
 
     /**
@@ -516,6 +500,27 @@ public class UserAccount implements Serializable {
     }
 
     /**
+     * Gets a {@link List} of {@link Catalogue}s where the {@link UserAccount} 
+     * has privileges.
+     *
+     * @return {@link List} of {@link Catalogue}s where the {@link UserAccount}
+     *         has privileges.
+     */
+    public List<Catalogue> getPrivilegedCatalogues() {
+        List<Catalogue> catalogues = new ArrayList<Catalogue>();
+
+        for (UserRole userRole : this.userRoles) {
+            catalogues.addAll(userRole.getCatalogues());
+        }
+
+        // Only unique outlets
+        Set set = new HashSet(catalogues);
+        catalogues = new ArrayList(set);
+
+        return catalogues;
+    }
+    
+    /**
      * Gets a {@link List} of {@link Outlet}s where the {@link UserAccount} has
      * privileges.
      *
@@ -644,10 +649,6 @@ public class UserAccount implements Serializable {
 
     public void setNotifications(List<Notification> notifications) {
         this.notifications = notifications;
-    }
-
-    public int getVersionIdentifier() {
-        return versionIdentifier;
     }
 
     public List<NewswireService> getNewswireServices() {

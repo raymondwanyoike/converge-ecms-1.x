@@ -634,9 +634,9 @@ public class MediaItemRendition implements Serializable {
      * Determines if the {@link Rendition} of this {@link MediaItemRendition}
      * is the same as the original {@link Rendition} of the {@link MediaItem}
      * {@link Catalogue}.
-     * <p/>
+     * 
      * @return {@code true} if this is the original {@link Rendition},
-     * otherwise {@code false}
+     *         otherwise {@code false}
      */
     public boolean isOriginalRendition() {
         if (getMediaItem() == null || getMediaItem().getCatalogue() == null

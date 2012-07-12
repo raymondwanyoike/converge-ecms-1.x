@@ -41,6 +41,11 @@
             <redirect/>
         </navigation-case>
         <navigation-case>
+            <from-outcome>/administration/jobqueue</from-outcome>
+            <to-view-id>/administrator/JobQueue.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
             <from-outcome>/administration/languages</from-outcome>
             <to-view-id>/administrator/Languages.xhtml</to-view-id>
             <redirect/>
@@ -423,10 +428,17 @@
     </managed-bean>
 
     <managed-bean>
+        <managed-bean-name>administrator_JobQueue</managed-bean-name>
+        <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.JobQueue</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+        <managed-bean>
         <managed-bean-name>administrator_Administration</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Administration</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
+
 
     <managed-bean>
         <managed-bean-name>administrator_Log</managed-bean-name>

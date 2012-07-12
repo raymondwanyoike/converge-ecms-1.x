@@ -16,18 +16,18 @@
  */
 package dk.i2m.converge.jsf.beans;
 
-import dk.i2m.converge.core.DataNotFoundException;
+import dk.i2m.commons.BeanComparator;
 import dk.i2m.converge.core.content.catalogue.*;
+import dk.i2m.converge.core.DataNotFoundException;
+import dk.i2m.converge.core.content.ContentItemActor;
+import dk.i2m.converge.core.content.ContentItemPermission;
 import dk.i2m.converge.core.metadata.*;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
-import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
-import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
-import dk.i2m.converge.ejb.facades.UserFacadeLocal;
+import dk.i2m.converge.core.workflow.WorkflowStep;
+import dk.i2m.converge.ejb.facades.*;
 import dk.i2m.jsf.JsfUtils;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -72,6 +72,9 @@ public class MediaItemDetails {
 
     private int renditionUploadFailedSize = 0;
 
+    /** User selected {@link WorkflowStep}. */
+    private WorkflowStep selectedWorkflowStep = null;
+
     /**
      * Dev Note: Could not use a Concept object for direct entry as it is
      * abstract.
@@ -90,16 +93,23 @@ public class MediaItemDetails {
      */
     private String conceptType = "";
 
-    /**
-     * Editors of the MediaItem catalogue.
-     */
-    private List<UserAccount> editors = new ArrayList<UserAccount>();
-
     private Map<String, Rendition> renditions;
 
     private DataModel availableRenditions;
 
     private Rendition uploadRendition;
+
+    /** State containing the permission of the current user to the selected media item. */
+    private ContentItemPermission permission;
+
+    /** Lazy loaded Map of available user roles for the Catalogue of the MediaItem. */
+    private Map<String, UserRole> availableRoles;
+
+    /** Placeholder of creating a new actor. */
+    private ContentItemActor newActor;
+
+    /** Top-level subjects from the classification selector. */
+    private Subject[] topSubjects = null;
 
     /**
      * Creates a new instance of {@link MediaItemDetails}.
@@ -108,48 +118,66 @@ public class MediaItemDetails {
     }
 
     /**
-     * Event handler for suggesting concepts based on inputted string. Note that
-     * {@link dk.i2m.converge.core.metadata.Subject}s are not returned as they
-     * are selected through the subject selection dialog.
-     * <p/>
-     * @param suggestion String for which to base the suggestions
-     * @return {@link List} of suggested {@link Concept}s based on
-     *         {@code suggestion}
+     * Gets the unique identifier of the {@link MediaItem} opened.
+     * 
+     * @return Unique identifier of the opened {@link MediaItem}
      */
-    public List<Concept> onConceptSuggestion(Object suggestion) {
-        String conceptName = (String) suggestion;
-        List<Concept> suggestedConcepts;
-        suggestedConcepts = metaDataFacade.findConceptsByName(conceptName,
-                Person.class, GeoArea.class, PointOfInterest.class,
-                Organisation.class);
-
-        return suggestedConcepts;
+    public Long getId() {
+        return id;
     }
 
     /**
-     * Event handler for deleting the selected {@link MediaItem}. The handler
-     * will not allow for the item to be deleted if it is referenced.
-     * <p/>
-     * @return {@code /inbox} if the {@link MediaItem} was deleted, otherwise
-     *         {@code null}
+     * Initialises the bean by retrieving the {@link MediaItem} and related data
+     * from the database.
+     *
+     * @param id 
+     *          Unique identifier of the {@link MediaItem} to open
      */
-    public String onDelete() {
-        boolean used =
-                catalogueFacade.isMediaItemUsed(selectedMediaItem.getId());
+    public void setId(Long id) {
+        this.id = id;
 
-        if (used) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    Bundle.i18n.name(),
-                    "MediaItemDetails_MEDIA_ITEM_REFERENCED_COULD_NOT_BE_DELETED");
-            return null;
-        } else {
-            catalogueFacade.deleteMediaItemById(selectedMediaItem.getId());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    Bundle.i18n.name(), "MediaItemDetails_MEDIA_ITEM_DELETED");
-            return "/inbox";
+        if (this.id != null && id != null && selectedMediaItem == null) {
+            try {
+                selectedMediaItem = catalogueFacade.findMediaItemById(id);
+                usage = new ListDataModel(catalogueFacade.getMediaItemUsage(id));
+                this.availableRenditions = null;
+
+                // Authorisation check
+                this.permission = ContentItemPermission.UNAUTHORIZED;
+                for (ContentItemActor a : selectedMediaItem.getActors()) {
+                    if (a.getUser().equals(getUser())) {
+                        this.permission = ContentItemPermission.ACTOR;
+                    }
+                }
+
+                UserRole stateRole = selectedMediaItem.getCurrentState().
+                        getActorRole();
+
+                if (selectedMediaItem.getCurrentState().isGroupPermission()) {
+                    if (getUser().getUserRoles().contains(stateRole)) {
+                        this.permission = ContentItemPermission.ROLE;
+                    }
+                } else {
+                    for (ContentItemActor a : selectedMediaItem.getActors()) {
+                        if (a.getRole().equals(stateRole) && a.getUser().equals(
+                                getUser())) {
+                            this.permission = ContentItemPermission.USER;
+                            break;
+                        }
+                    }
+                }
+            } catch (DataNotFoundException ex) {
+                LOG.log(Level.SEVERE, ex.getMessage());
+            }
         }
     }
 
+    /**
+     * Event handler for saving changes made to the {@link MediaItem}.
+     * 
+     * @param event 
+     *          Event that occurred
+     */
     public void onApply(ActionEvent event) {
         try {
             if (!selectedMediaItem.isOriginalAvailable()) {
@@ -174,10 +202,36 @@ public class MediaItemDetails {
         }
     }
 
+    public String selectWorkflowOption() {
+        try {
+            selectedMediaItem = catalogueFacade.step(selectedMediaItem,
+                    getSelectedWorkflowStep().
+                    getId());
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(), "MediaItemDetails_MEDIA_ITEM_SUBMITTED");
+            return "/inbox";
+        } catch (WorkflowStateTransitionValidationException ex) {
+            if (ex.isLocalisedMessage()) {
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        Bundle.i18n.name(), ex.getMessage(), ex.
+                        getLocalisationParameters());
+            } else {
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        ex.getMessage());
+            }
+        } catch (WorkflowStateTransitionException ex) {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, ex.
+                    getMessage());
+        }
+        return null;
+    }
+
     public void onSelectSubject(NodeSelectedEvent event) {
         HtmlTree tree = (HtmlTree) event.getComponent();
         Subject subj = (Subject) tree.getRowData();
         this.selectedMediaItem.getConcepts().add(subj);
+        this.selectedMediaItem = catalogueFacade.update(selectedMediaItem);
+
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(),
                 "MediaItemDetails_CONCEPT_X_ADDED_TO_MEDIA_ITEM_Y",
@@ -189,6 +243,8 @@ public class MediaItemDetails {
             Concept concept = metaDataFacade.findConceptByName(newConcept);
             if (!this.selectedMediaItem.getConcepts().contains(concept)) {
                 this.selectedMediaItem.getConcepts().add(concept);
+                this.selectedMediaItem = catalogueFacade.update(
+                        selectedMediaItem);
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                         Bundle.i18n.name(),
                         "MediaItemDetails_CONCEPT_X_ADDED_TO_MEDIA_ITEM_Y",
@@ -224,6 +280,8 @@ public class MediaItemDetails {
             c = metaDataFacade.create(c);
             if (!this.selectedMediaItem.getConcepts().contains(c)) {
                 this.selectedMediaItem.getConcepts().add(c);
+                this.selectedMediaItem = catalogueFacade.update(
+                        selectedMediaItem);
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                         Bundle.i18n.name(),
                         "MediaItemDetails_CONCEPT_X_ADDED_TO_MEDIA_ITEM_Y",
@@ -235,37 +293,135 @@ public class MediaItemDetails {
     }
 
     /**
-     * Determine if the current user is authorised to view and work with the
-     * selected {@link MediaItem}.
-     * <p/>
-     * @return {@code true} if the user is authorised, otherwise {@code false}
+     * Event handler for suggesting concepts based on inputted string. Note that
+     * {@link dk.i2m.converge.core.metadata.Subject}s are not returned as they
+     * are selected through the subject selection dialog.
+     * 
+     * @param suggestion 
+     *          String for which to base the suggestions
+     * @return {@link List} of suggested {@link Concept}s based on
+     *         {@code suggestion}
      */
-    public boolean isAuthorized() {
-        if (selectedMediaItem == null) {
-            return false;
-        }
+    public List<Concept> onConceptSuggestion(Object suggestion) {
+        String conceptName = (String) suggestion;
+        List<Concept> suggestedConcepts;
+        suggestedConcepts = metaDataFacade.findConceptsByName(conceptName,
+                Person.class, GeoArea.class, PointOfInterest.class,
+                Organisation.class);
 
-        return isEditor() || isOwner();
+        return suggestedConcepts;
     }
 
     /**
-     * Determine if the current user is an editor of the {@link Catalogue} of
-     * the {@link MediaItem}.
-     * <p/>
-     * @return {@code true} if the user is an editor of the {@link Catalogue} of
-     * the {@link MediaItem}, otherwise {@code false}
+     * Determine if the current user is authorised to view and work with the
+     * selected {@link MediaItem}.
+     * 
+     * @return {@code true} if the user is authorised, otherwise {@code false}
      */
-    public boolean isEditor() {
-        UserRole editorRole = selectedMediaItem.getCatalogue().getEditorRole();
-        return getUser().getUserRoles().contains(editorRole);
+    public boolean isAuthorized() {
+        if (permission == null) {
+            return false;
+        }
+
+        switch (permission) {
+            case UNAUTHORIZED:
+                return false;
+            default:
+                return true;
+        }
     }
 
-    public boolean isOwner() {
-        return getUser().equals(selectedMediaItem.getOwner());
+    /**
+     * Determines if the current user is the current actor of the
+     * {@link ContentItem}.
+     *
+     * @return {@code true} if the current user is among the current actors of
+     *         the {@link ContentItem}, otherwise {@code false}
+     */
+    public boolean isCurrentActor() {
+        boolean currentActor;
+        if (permission == null) {
+            return false;
+        }
+
+        switch (permission) {
+            case USER:
+            case ROLE:
+                currentActor = true;
+                break;
+            default:
+                currentActor = false;
+        }
+        return currentActor;
     }
 
-    public Long getId() {
-        return id;
+    /**
+     * Event handler for starting the creation of a new actor.
+     * 
+     * @param event
+     *          Event that invoked the handler
+     */
+    public void onActorSelect(ActionEvent event) {
+        this.newActor = new ContentItemActor();
+    }
+
+    /**
+     * Property handler for removing an actor from the {@link MediaItem}.
+     * 
+     * @param actor 
+     *          Actor to remove from the item
+     */
+    public void setRemoveActor(ContentItemActor actor) {
+        if (actor != null) {
+            getSelectedMediaItem().getActors().remove(actor);
+            setSelectedMediaItem(catalogueFacade.update(selectedMediaItem));
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(), "MediaItemDetails_ACTOR_REMOVED");
+        }
+    }
+
+    /**
+     * Event handler for adding a new actor to the MediaItem.
+     * 
+     * @param event 
+     *          Event that invoked the handler
+     */
+    public void onAddActor(ActionEvent event) {
+        if (this.newActor != null && this.newActor.getRole() != null
+                && this.newActor.getUser() != null) {
+
+            boolean dup = false;
+
+            for (ContentItemActor cia : getSelectedMediaItem().getActors()) {
+                if (cia.getRole().equals(getNewActor().getRole())
+                        && cia.getUser().equals(getNewActor().getUser())) {
+                    dup = true;
+                    JsfUtils.createMessage("frmPage",
+                            FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                            "MediaItemDetails_ACTOR_DUPLICATE_USER_ROLE",
+                            new Object[]{getNewActor().getUser().getFullName(),
+                                getNewActor().getRole().getName()});
+                }
+            }
+
+            // If the actor is not a duplicate
+            if (!dup) {
+
+                getNewActor().setContentItem(getSelectedMediaItem());
+                getSelectedMediaItem().getActors().add(newActor);
+                setSelectedMediaItem(catalogueFacade.update(
+                        getSelectedMediaItem()));
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
+                    "MediaItemDetails_ACTOR_X_ADDED_AS_Y_TO_ITEM", new Object[]{getNewActor().getUser().getFullName(), getNewActor().getRole().getName()});
+            }
+            this.newActor = new ContentItemActor();
+
+        } else {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(),
+                    "MediaItemDetails_ACTOR_SELECT_USER_AND_ROLE");
+        }
     }
 
     public MediaItemRendition getSelectedRendition() {
@@ -345,30 +501,6 @@ public class MediaItemDetails {
                 Bundle.i18n.name(), "MediaItemDetails_RENDITION_DELETED");
     }
 
-    /**
-     * Initialises the bean by retrieving the {@link MediaItem} and related data
-     * from the database.
-     *
-     * @param id 
-     *          Unique identifier of the {@link MediaItem} to open
-     */
-    public void setId(Long id) {
-        this.id = id;
-
-        if (this.id != null && id != null && selectedMediaItem == null) {
-            try {
-                selectedMediaItem = catalogueFacade.findMediaItemById(id);
-                usage = new ListDataModel(catalogueFacade.getMediaItemUsage(id));
-                editors = userFacade.getMembers(selectedMediaItem.getCatalogue().
-                        getEditorRole());
-                this.availableRenditions = null;
-
-            } catch (DataNotFoundException ex) {
-                LOG.log(Level.SEVERE, ex.getMessage());
-            }
-        }
-    }
-
     public DataModel getAvailableRenditions() {
         if (this.availableRenditions == null) {
             Catalogue catalogue = selectedMediaItem.getCatalogue();
@@ -392,29 +524,6 @@ public class MediaItemDetails {
         return this.availableRenditions;
     }
 
-    public boolean isNotProcessed() {
-        if (selectedMediaItem.getStatus() != null) {
-            switch (selectedMediaItem.getStatus()) {
-                case APPROVED:
-                case REJECTED:
-                case SELF_UPLOAD:
-                    return false;
-                default:
-                    return true;
-            }
-        } else {
-            return true;
-        }
-    }
-
-    public boolean isChangable() {
-        if (!isNotProcessed() && isOwner() && !isEditor()) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     /**
      * Executes a {@link CatalogueHookInstance} on the selected 
      * {@link MediaItem}.
@@ -428,12 +537,12 @@ public class MediaItemDetails {
             this.availableRenditions = null;
             this.selectedMediaItem = null;
             setId(getId());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
-                    Bundle.i18n.name(), "MediaItemDetails_EXECUTE_HOOK_DONE", 
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(), "MediaItemDetails_EXECUTE_HOOK_DONE",
                     new Object[]{instance.getLabel()});
         } catch (DataNotFoundException ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    Bundle.i18n.name(), "MediaItemDetails_EXECUTE_HOOK_FAILED", 
+                    Bundle.i18n.name(), "MediaItemDetails_EXECUTE_HOOK_FAILED",
                     new Object[]{instance.getLabel()});
         }
     }
@@ -444,6 +553,90 @@ public class MediaItemDetails {
 
     public void setSelectedMediaItem(MediaItem selectedMediaItem) {
         this.selectedMediaItem = selectedMediaItem;
+    }
+
+    /**
+     * Gets a {@link Map} of available {@link UserRole}s for the 
+     * {@link Catalogue} of the selected {@link MediaItem}. The {@link Map} uses
+     * the name of the {@link UserRole} as the key and the {@link UserRole} as
+     * the value.
+     * 
+     * @return {@link Map} of available {@link UserRole}s
+     */
+    public Map<String, UserRole> getAvailableRoles() {
+        if (this.availableRoles == null) {
+            this.availableRoles = new LinkedHashMap<String, UserRole>();
+
+            Catalogue c = getSelectedMediaItem().getCatalogue();
+            for (UserRole role : c.getUserRoles()) {
+                String key = role.getName();
+                if (this.availableRoles.containsKey(key)) {
+                    key = key + " (" + role.getId() + ")";
+                }
+                this.availableRoles.put(key, role);
+            }
+        }
+        return this.availableRoles;
+    }
+
+    /**
+     * Gets a {@link Map} of {@link UserAccount}s in the selected 
+     * {@link UserRole}. The {@link Map} uses the full name of the 
+     * {@link UserAccount} as the key and the {@link UserAccount} as the value.
+     * 
+     * @return {@link Map} of {@link UserAccount}s for the selected 
+     *         {@link UserRole}
+     */
+    public Map<String, UserAccount> getRoleUsers() {
+        Map<String, UserAccount> users =
+                new LinkedHashMap<String, UserAccount>();
+
+        if (getNewActor() != null && getNewActor().getRole() != null) {
+            List<UserAccount> accounts = userFacade.getMembers(
+                    getNewActor().getRole());
+            Collections.sort(accounts, new BeanComparator("fullName"));
+
+            for (UserAccount user : accounts) {
+                String key = user.getFullName();
+                if (users.containsKey(key)) {
+                    key = key + " (" + user.getId() + ")";
+                }
+                users.put(key, user);
+            }
+        }
+
+
+        return users;
+    }
+
+    /**
+     * Gets the placeholder for creating a new actor for the {@link MediaItem}.
+     * 
+     * @return New actor for the {@link MediaItem}
+     */
+    public ContentItemActor getNewActor() {
+        if (newActor == null) {
+            this.newActor = new ContentItemActor();
+        }
+        return newActor;
+    }
+
+    /**
+     * Sets the placeholder for creating a new actor for the {@link MediaItem}.
+     * 
+     * @param newActor
+     *          New actor for the {@link MediaItem}
+     */
+    public void setNewActor(ContentItemActor newActor) {
+        this.newActor = newActor;
+    }
+    
+    public Subject[] getParentSubjects() {
+        if (this.topSubjects == null) {
+            List<Subject> parents = metaDataFacade.findTopLevelSubjects();
+            this.topSubjects = parents.toArray(new Subject[parents.size()]);
+        }
+        return this.topSubjects;
     }
 
     private UserAccount getUser() {
@@ -467,16 +660,14 @@ public class MediaItemDetails {
         this.newConcept = newConcept;
     }
 
-    public List<UserAccount> getEditors() {
-        return editors;
-    }
-
     public Rendition getUploadRendition() {
         return uploadRendition;
     }
 
     public void setUploadRendition(Rendition uploadRendition) {
         this.uploadRendition = uploadRendition;
+
+
     }
 
     public class AvailableMediaItemRendition {
@@ -569,5 +760,34 @@ public class MediaItemDetails {
 
     public void setNewConceptName(String newConceptName) {
         this.newConceptName = newConceptName;
+    }
+
+    /**
+     * Gets the {@link WorkflowStep} selected by the user.
+     * 
+     * @return {@link WorkflowStep} selected by the user
+     */
+    public WorkflowStep getSelectedWorkflowStep() {
+        return selectedWorkflowStep;
+    }
+
+    /**
+     * Sets the {@link WorkflowStep} selected by the user.
+     * 
+     * @param selectedWorkflowStep 
+     *          {@link WorkflowStep} selected by the user
+     */
+    public void setSelectedWorkflowStep(WorkflowStep selectedWorkflowStep) {
+        this.selectedWorkflowStep = selectedWorkflowStep;
+    }
+
+    /**
+     * Gets the permission of the {@link #selectedMediaItem} for the current
+     * {@link UserAccount}.
+     * 
+     * @return Permission for the current {@link UserAccount}
+     */
+    public ContentItemPermission getPermission() {
+        return permission;
     }
 }

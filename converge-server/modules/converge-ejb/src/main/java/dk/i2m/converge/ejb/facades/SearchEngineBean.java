@@ -16,10 +16,10 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.ConfigurationKey;
+import dk.i2m.converge.core.DataNotFoundException;
+import dk.i2m.converge.core.content.ContentItemActor;
 import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.content.NewsItemActor;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
@@ -34,7 +34,10 @@ import dk.i2m.converge.domain.search.IndexField;
 import dk.i2m.converge.domain.search.SearchFacet;
 import dk.i2m.converge.domain.search.SearchResult;
 import dk.i2m.converge.domain.search.SearchResults;
-import dk.i2m.converge.ejb.services.*;
+import dk.i2m.converge.ejb.services.ConfigurationServiceLocal;
+import dk.i2m.converge.ejb.services.DaoServiceLocal;
+import dk.i2m.converge.ejb.services.MetaDataServiceLocal;
+import dk.i2m.converge.ejb.services.QueryBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -928,7 +931,7 @@ public class SearchEngineBean implements SearchEngineLocal {
         //                }
 
 
-        for (NewsItemActor actor : ni.getActors()) {
+        for (ContentItemActor actor : ni.getActors()) {
             solrDoc.addField(IndexField.ACTOR.getName(), actor.getUser().
                     getFullName());
             // Dynamic fields for the actors role

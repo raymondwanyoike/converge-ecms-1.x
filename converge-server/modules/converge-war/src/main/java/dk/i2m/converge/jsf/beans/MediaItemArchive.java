@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 - 2011 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,13 +17,8 @@
 package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.converge.core.DataNotFoundException;
-import dk.i2m.converge.core.content.catalogue.Catalogue;
-import dk.i2m.converge.core.content.catalogue.MediaItem;
-import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
-import dk.i2m.converge.core.content.catalogue.Rendition;
-import dk.i2m.converge.core.content.catalogue.RenditionNotFoundException;
+import dk.i2m.converge.core.content.catalogue.*;
 import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.jsf.JsfUtils;
 import java.util.ArrayList;
@@ -152,18 +147,23 @@ public class MediaItemArchive {
     }
 
     /**
-     * Determines if the current user is an editor of the media repository.
+     * Determines if the current user is the current actor of the 
+     * {@link MediaItem}.
      * 
-     * @return {@code true} if the current user is an editor of the media repository, otherwise {@code false}
+     * @return {@code true} if the current user is the current actor of the 
+     *         {@link MediaItem}, otherwise {@code false}
      */
-    public boolean isEditor() {
-        UserRole editorRole = getSelectedMediaItem().getCatalogue().getEditorRole();
-
-        if (getUser().getUserRoles().contains(editorRole)) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean isCurrentActor() {
+        //TODO: Fix
+//        UserRole editorRole = getSelectedMediaItem().getCatalogue().getEditorRole();
+//
+//        if (getUser().getUserRoles().contains(editorRole)) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+        
+        return true;
     }
 
     private UserAccount getUser() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,20 +16,14 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.core.Notification;
-import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.DataNotFoundException;
+import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.security.Privilege;
 import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.utils.BeanComparator;
-import dk.i2m.converge.ejb.services.ConfigurationServiceLocal;
-import dk.i2m.converge.ejb.services.DaoServiceLocal;
-import dk.i2m.converge.ejb.services.DirectoryException;
-import dk.i2m.converge.ejb.services.QueryBuilder;
-import dk.i2m.converge.ejb.services.UserNotFoundException;
-import dk.i2m.converge.ejb.services.UserServiceLocal;
+import dk.i2m.converge.ejb.services.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -61,12 +55,6 @@ public class UserFacadeBean implements UserFacadeLocal {
     @Override
     public List<UserAccount> getMembers(Long outletId, SystemPrivilege privilege) {
         return userService.getMembers(outletId, privilege);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<UserAccount> getMembers(Long departmentId) {
-        return userService.getMembers(departmentId);
     }
 
     /** {@inheritDoc} */
@@ -238,31 +226,6 @@ public class UserFacadeBean implements UserFacadeLocal {
     @Override
     public UserAccount update(UserAccount userAccount) {
         return userService.update(userAccount);
-    }
-
-    /**
-     * Determines if the given user is a catalogue editor.
-     * 
-     * @param username
-     *          Username of the {@link UserAccount}
-     * @return {@code true} if the user is an editor of a writable
-     *         catalogue, otherwise {@code false}
-     */
-    @Override
-    public boolean isCatalogueEditor(String username) {
-        try {
-            UserAccount user = findById(username);
-            List<UserRole> roles = user.getUserRoles();
-            List<Catalogue> catalogues = catalogueFacade.findWritableCatalogues();
-            for (Catalogue catalogue : catalogues) {
-                if (roles.contains(catalogue.getEditorRole())) {
-                    return true;
-                }
-            }
-        } catch (DataNotFoundException ex) {
-            return false;
-        }
-        return false;
     }
 
     @Override

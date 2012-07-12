@@ -21,7 +21,7 @@ import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.calendar.Event;
 import dk.i2m.converge.core.content.ContentItemPermission;
 import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.content.NewsItemActor;
+import dk.i2m.converge.core.content.ContentItemActor;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
@@ -63,7 +63,7 @@ public class DialogAssignment {
 
     private UserAccount selectedUser;
 
-    private NewsItemActor selectedActor;
+    private ContentItemActor selectedActor;
 
     private NewsItem assignment;
 
@@ -156,7 +156,7 @@ public class DialogAssignment {
 
         // Check that the actor is not already there
         boolean duplicate = false;
-        for (NewsItemActor nia : assignment.getActors()) {
+        for (ContentItemActor nia : assignment.getActors()) {
             if (nia.getRole().equals(selectedOutletRole) && nia.getUser().equals(
                     selectedUser)) {
                 duplicate = true;
@@ -165,8 +165,8 @@ public class DialogAssignment {
         }
 
         if (!duplicate) {
-            NewsItemActor actor = new NewsItemActor();
-            actor.setNewsItem(assignment);
+            ContentItemActor actor = new ContentItemActor();
+            actor.setContentItem(assignment);
             actor.setRole(selectedOutletRole);
             actor.setUser(selectedUser);
             assignment.getActors().add(actor);
@@ -411,11 +411,11 @@ public class DialogAssignment {
         this.selectedUser = selectedUser;
     }
 
-    public NewsItemActor getSelectedActor() {
+    public ContentItemActor getSelectedActor() {
         return selectedActor;
     }
 
-    public void setSelectedActor(NewsItemActor selectedActor) {
+    public void setSelectedActor(ContentItemActor selectedActor) {
         this.selectedActor = selectedActor;
     }
 

@@ -84,9 +84,9 @@ public class NewsItem {
 
     private WorkflowStateTransition selectedWorkflowStateTransition;
 
-    private NewsItemActor selectedActor;
+    private ContentItemActor selectedActor;
 
-    private NewsItemActor newActor = new NewsItemActor();
+    private ContentItemActor newActor = new ContentItemActor();
 
     private Concept selectedMetaDataConcept;
 
@@ -453,10 +453,10 @@ public class NewsItem {
     }
 
     public void onActorSelect(ActionEvent event) {
-        this.newActor = new NewsItemActor();
+        this.newActor = new ContentItemActor();
     }
 
-    public void setDeleteActor(NewsItemActor actor) {
+    public void setDeleteActor(ContentItemActor actor) {
         if (actor != null) {
             try {
                 selectedNewsItem.getActors().remove(actor);
@@ -496,7 +496,7 @@ public class NewsItem {
                 && this.newActor.getUser() != null) {
             boolean dup = false;
 
-            for (NewsItemActor nia : selectedNewsItem.getActors()) {
+            for (ContentItemActor nia : selectedNewsItem.getActors()) {
                 if (nia.getRole().equals(this.newActor.getRole())
                         && nia.getUser().equals(this.newActor.getUser())) {
                     dup = true;
@@ -510,7 +510,7 @@ public class NewsItem {
 
             if (!dup) {
 
-                this.newActor.setNewsItem(selectedNewsItem);
+                this.newActor.setContentItem(selectedNewsItem);
                 newsItemFacade.addActorToNewsItem(newActor);
                 try {
                     selectedNewsItem =
@@ -523,7 +523,7 @@ public class NewsItem {
                             new Object[]{ex.getMessage()});
                 }
             }
-            this.newActor = new NewsItemActor();
+            this.newActor = new ContentItemActor();
 
         } else {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
@@ -599,7 +599,7 @@ public class NewsItem {
         boolean isUserRole = selectedStep.getToState().isUserPermission();
 
         if (isUserRole) {
-            for (NewsItemActor actor : selectedNewsItem.getActors()) {
+            for (ContentItemActor actor : selectedNewsItem.getActors()) {
                 if (actor.getRole().equals(requiredRole)) {
                     // User role was already added
                     isRoleValidated = true;
@@ -641,19 +641,19 @@ public class NewsItem {
         this.comment = comment;
     }
 
-    public NewsItemActor getSelectedActor() {
+    public ContentItemActor getSelectedActor() {
         return selectedActor;
     }
 
-    public void setSelectedActor(NewsItemActor selectedActor) {
+    public void setSelectedActor(ContentItemActor selectedActor) {
         this.selectedActor = selectedActor;
     }
 
-    public NewsItemActor getNewActor() {
+    public ContentItemActor getNewActor() {
         return newActor;
     }
 
-    public void setNewActor(NewsItemActor newActor) {
+    public void setNewActor(ContentItemActor newActor) {
         this.newActor = newActor;
     }
 

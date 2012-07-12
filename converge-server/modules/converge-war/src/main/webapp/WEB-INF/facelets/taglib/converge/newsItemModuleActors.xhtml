@@ -2,7 +2,7 @@
 
     <converge:moduleHeader moduleTitle="#{msgs.newsitem_ACTORS}" />
     <div>
-        <rich:dataTable id="dtNewsItemActors" var="actor" value="#{value.selectedNewsItem.actors}" columnClasses="left, left" rowClasses="odd, even" style="width: 96%; margin-left: 2%; margin-right: 2%;  border: 0px;">
+        <rich:dataTable id="dtNewsItemActors" var="actor" value="#{value.selectedNewsItem.actors}" columnClasses="left, left" style="width: 96%; margin-left: 2%; margin-right: 2%;  border: 0px;">
             <rich:column style="width: 37px;  border: 0px;">
                 <h:graphicImage styleClass="profilePhoto" value="/UserPhoto?uid=#{actor.user.id}" alt="#{actor.user.fullName}" title="#{actor.user.fullName}" height="32" width="32" />
             </rich:column>
@@ -10,7 +10,7 @@
                 <h:panelGrid>
                     <h:outputText value="#{actor.user.fullName}" style="font-weight: bold; font-size: 11px;" title="#{actor.user.fullName}">
                         <f:converter converterId="i2m.abbreviationDisplay" />
-                        <f:attribute name="maxLength" value="19" />
+                        <f:attribute name="maxLength" value="30" />
                     </h:outputText>
                     <h:outputText value="#{actor.role.name}" style="font-size: 10px;" />
                 </h:panelGrid>
@@ -27,8 +27,6 @@
     </div>
 
     <a4j:region id="regActorSelect">
-
-
 
         <rich:modalPanel id="mpActorSelect" autosized="true" domElementAttachment="parent" rendered="#{value.currentActor}">
             <f:facet name="header">

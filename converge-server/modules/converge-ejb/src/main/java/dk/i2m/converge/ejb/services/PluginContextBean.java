@@ -343,4 +343,14 @@ public class PluginContextBean implements PluginContextBeanLocal {
             NewsItemEditionState newsItemEditionState) {
         return daoService.update(newsItemEditionState);
     }
+
+    @Override
+    public NewsItem findNewsItemById(Long id) throws DataNotFoundException {
+        return newsItemFacade.findNewsItemById(id);
+    }
+
+    @Override
+    public MediaItem findMediaItemById(Long id) throws DataNotFoundException {
+        return catalogueFacade.findMediaItemById(id);
+    }
 }

@@ -19,8 +19,9 @@ package dk.i2m.converge.jsf.beans;
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.AssignmentType;
 import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.content.NewsItemActor;
+import dk.i2m.converge.core.content.ContentItemActor;
 import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.content.ContentResultSet;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
@@ -34,6 +35,7 @@ import dk.i2m.converge.ejb.facades.DuplicateExecutionException;
 import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
 import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
 import dk.i2m.converge.jsf.components.tags.DialogSelfAssignment;
+import dk.i2m.jsf.CookieNotFoundException;
 import dk.i2m.jsf.JsfUtils;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -59,7 +61,27 @@ import org.richfaces.model.TreeNodeImpl;
  */
 public class Inbox {
 
+    private static final int ONE_YEAR = 31276800;
+
+    private static final int PAGE_SIZE = 25;
+
     private static final Logger LOG = Logger.getLogger(Inbox.class.getName());
+
+    private Catalogue selectedCatalogue;
+
+    private WorkflowState selectedWorkflowState;
+
+    private void resetSelectedCookies() {
+        JsfUtils.removeCookie("selected-catalogue");
+        JsfUtils.removeCookie("selected-catalogue-workflowstate");
+        JsfUtils.removeCookie("selected-outlet");
+        JsfUtils.removeCookie("selected-outlet-workflowstate");
+    }
+
+    private enum ResultType {
+
+        CATALOGUE, CATALOGUE_WITH_STATE, OUTLET, OUTLET_WITH_STATE
+    }
 
     @EJB private NewsItemFacadeLocal newsItemFacade;
 
@@ -68,6 +90,8 @@ public class Inbox {
     private NewsItem selectedNewsItem;
 
     private MediaItem selectedMediaItem;
+
+    private ContentResultSet resultSet;
 
     private DataModel newsItems = null;
 
@@ -85,11 +109,21 @@ public class Inbox {
 
     private boolean showNewsItem = true;
 
-    private boolean catalogueEditor = false;
-
     private String newAssignmentType = "tabStory";
 
     private String createdItemLink;
+
+    private int pagingStart;
+
+    private int pagingRows;
+
+    private String sortBy = "updated";
+
+    private String sortDirection = "desc";
+
+    private ResultType resultType;
+
+    private String contentView;
 
     /**
      * Creates a new instance of {@link Inbox}.
@@ -99,16 +133,32 @@ public class Inbox {
 
     @PostConstruct
     public void onInit() {
-        onShowMyAssignments(null);
+        resetPaging();
+        this.contentView = "list";
+
+        if (fetchSelectedFromCookies()) {
+            this.resultType = ResultType.CATALOGUE;
+            this.showNewsItem = false;
+            fetchViewPreferenceFromCookies();
+            loadContentResultSet();
+        } else {
+            onShowMyAssignments(null);
+        }
+    }
+
+    private void resetPaging() {
+        this.pagingRows = PAGE_SIZE;
+        this.pagingStart = 0;
     }
 
     /**
      * Action listeners for preparing the creation of a new assignment.
      *
      * @param event
-     * {@link ActionEvent} that invoked the listener.
+     *          {@link ActionEvent} that invoked the listener.
      */
     public void onNewAssignment(ActionEvent event) {
+
         try {
             switch (getUser().getDefaultAssignmentType()) {
                 case MEDIA_ITEM:
@@ -154,8 +204,9 @@ public class Inbox {
 
     /**
      * Event handler for creating a new assignment.
-     * <p/>
-     * @param event Event that invoked the handler
+     * 
+     * @param event 
+     *          Event that invoked the handler
      */
     public void onAddAssignment(ActionEvent event) {
 
@@ -176,11 +227,11 @@ public class Inbox {
 
                 try {
                     selectedNewsItem = newAssignment.getNewsItem();
-                    NewsItemActor nia = new NewsItemActor();
+                    ContentItemActor nia = new ContentItemActor();
                     nia.setRole(selectedNewsItem.getOutlet().getWorkflow().
                             getStartState().getActorRole());
                     nia.setUser(getUser());
-                    nia.setNewsItem(selectedNewsItem);
+                    nia.setContentItem(selectedNewsItem);
                     selectedNewsItem.getActors().add(nia);
                     selectedNewsItem.setDeadline(newAssignment.getAssignment().
                             getDeadline());
@@ -190,6 +241,7 @@ public class Inbox {
                                 getLanguage());
                     }
                     selectedNewsItem.setTitle(newAssignment.getTitle());
+
                     selectedNewsItem = newsItemFacade.start(selectedNewsItem);
                     this.createdItemLink = "NewsItem.xhtml?id="
                             + selectedNewsItem.getId();
@@ -218,6 +270,7 @@ public class Inbox {
                     LOG.log(Level.SEVERE, ex.getMessage(), ex);
                 }
                 break;
+
             case MEDIA_ITEM:
                 if (newAssignment.getMediaItem().getCatalogue() == null) {
                     JsfUtils.createMessage("frmInbox",
@@ -226,15 +279,28 @@ public class Inbox {
                     return;
                 }
 
+                ContentItemActor nia = new ContentItemActor();
+                nia.setRole(newAssignment.getMediaItem().getCatalogue().
+                        getWorkflow().getStartState().getActorRole());
+                nia.setUser(getUser());
+                nia.setContentItem(newAssignment.getMediaItem());
+                newAssignment.getMediaItem().getActors().add(nia);
+
                 newAssignment.getMediaItem().setStatus(
                         MediaItemStatus.UNSUBMITTED);
                 newAssignment.getMediaItem().setTitle(newAssignment.getTitle());
                 newAssignment.getMediaItem().setOwner(getUser());
                 newAssignment.getMediaItem().setByLine(getUser().getFullName());
-                MediaItem newItem = catalogueFacade.create(newAssignment.
-                        getMediaItem());
-                this.createdItemLink = "MediaItemDetails.xhtml?id=" + newItem.
-                        getId();
+
+                MediaItem item = null;
+                try {
+                    item = catalogueFacade.create(newAssignment.getMediaItem());
+                } catch (WorkflowStateTransitionException ex) {
+                    LOG.log(Level.SEVERE, null, ex);
+                }
+
+                this.createdItemLink = "MediaItemDetails.xhtml?id="
+                        + item.getId();
                 JsfUtils.createMessage("frmInbox", FacesMessage.SEVERITY_INFO,
                         Bundle.i18n.name(), "Inbox_ASSIGNMENT_CREATED");
                 showNewsItem = false;
@@ -245,7 +311,8 @@ public class Inbox {
     /**
      * Action Listener for removing articles marked as deleted.
      *
-     * @param event {@link ActionEvent} that invoked the listener
+     * @param event 
+     *          {@link ActionEvent} that invoked the listener
      */
     public void onEmptyTrash(ActionEvent event) {
         int deleted = newsItemFacade.emptyTrash(getUser().getUsername());
@@ -258,10 +325,13 @@ public class Inbox {
 
     /**
      * Event handler for showing the current assignments of the user.
-     * <p/>
-     * @param event * Event that invoked the handler
+     *
+     * @param event
+     *          Event that invoked the handler
      */
     public void onShowMyAssignments(ActionEvent event) {
+        resetSelectedCookies();
+
         showNewsItem = true;
 
         List<InboxView> inboxView = newsItemFacade.findInbox(getUser().
@@ -273,14 +343,140 @@ public class Inbox {
     }
 
     /**
+     * Event handler for handling selection of an {@link Outlet} or 
+     * {@link Catalogue} folder.
+     *
+     * @param event 
+     *          Event that invoked the handler
+     */
+    public void onOutletFolderSelect(NodeSelectedEvent event) {
+        final int MAX_STATE_ITEMS = 100;
+        showNewsItem = true;
+        mediaItems = new ListDataModel();
+
+        HtmlTree tree = (HtmlTree) event.getComponent();
+        OutletNode node = (OutletNode) tree.getRowData();
+
+        if (node.getData() instanceof Outlet) {
+
+            Outlet outlet = (Outlet) node.getData();
+            newsItems = new ListDataModel(newsItemFacade.findOutletBox(getUser().
+                    getUsername(), outlet));
+
+            inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
+                    "Inbox_OUTLET_STATUS_CURRENT", new Object[]{
+                        outlet.getTitle(),
+                        newsItems.getRowCount()});
+        } else if (node.getData() instanceof WorkflowState) {
+            showNewsItem = true;
+            mediaItems = new ListDataModel();
+            WorkflowState state = (WorkflowState) node.getData();
+            Outlet outlet = (Outlet) node.getParentData();
+
+            if (state.equals(outlet.getWorkflow().getEndState())) {
+                newsItems =
+                        new ListDataModel(newsItemFacade.findOutletBox(getUser().
+                        getUsername(), outlet, state, 0, MAX_STATE_ITEMS));
+            } else {
+                newsItems =
+                        new ListDataModel(newsItemFacade.findOutletBox(getUser().
+                        getUsername(), outlet, state));
+            }
+
+            inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
+                    "Inbox_OUTLET_STATUS", new Object[]{outlet.getTitle(),
+                        state.getName(), newsItems.getRowCount()});
+        }
+    }
+
+    /**
+     * Event handler for handling selection of a {@link Catalogue} folder.
+     *
+     * @param event 
+     *          Event that invoked the handler
+     */
+    public void onCatalogueFolderSelect(NodeSelectedEvent event) {
+        this.showNewsItem = false;
+        this.newsItems = new ListDataModel();
+
+        HtmlTree tree = (HtmlTree) event.getComponent();
+        OutletNode node = (OutletNode) tree.getRowData();
+
+        resetPaging();
+
+        if (node.getData() instanceof Catalogue) {
+            this.resultType = ResultType.CATALOGUE;
+            this.selectedCatalogue = (Catalogue) node.getData();
+        } else if (node.getData() instanceof WorkflowState) {
+            this.resultType = ResultType.CATALOGUE_WITH_STATE;
+            this.selectedCatalogue = (Catalogue) node.getParentData();
+            this.selectedWorkflowState = (WorkflowState) node.getData();
+        }
+        loadContentResultSet();
+        fetchViewPreferenceFromCookies();
+        storeSelectedInCookies();
+    }
+
+    /**
+     * Event handler for changing the view of the {@link ContentResultSet}.
+     * 
+     * @param event 
+     *          Event that invoked the handler
+     */
+    public void onChangeView(ActionEvent event) {
+        this.contentView = JsfUtils.getRequestParameterMap().get("view");
+        storeViewPreferenceInCookies();
+    }
+
+    /**
+     * Event handler for changing the page of the current 
+     * {@link ContentResultSet}.
+     * 
+     * @param event 
+     *          Event that invoked the handler
+     */
+    public void onChangePage(ActionEvent event) {
+        String changePage = JsfUtils.getRequestParameterMap().get("changePage");
+        if (changePage != null) {
+            int newPage = Integer.valueOf(changePage);
+            this.pagingStart = (newPage - 1)
+                    * getResultSet().getResultsPerPage();
+            this.pagingRows = getResultSet().getResultsPerPage();
+            loadContentResultSet();
+        }
+    }
+
+    /**
+     * Event handler for changing the sort order and direction of 
+     * {@link ContentResultSet}.
+     * 
+     * @param event 
+     *          Event that invoked the handler
+     */
+    public void onChangeSorting(ActionEvent event) {
+        String newSortBy = JsfUtils.getRequestParameterMap().get("sortField");
+        if (this.sortBy.equalsIgnoreCase(newSortBy)) {
+            if (this.sortDirection.equalsIgnoreCase("desc")) {
+                this.sortDirection = "asc";
+            } else {
+                this.sortDirection = "desc";
+            }
+        } else {
+            this.sortBy = newSortBy;
+            this.sortDirection = "asc";
+        }
+        loadContentResultSet();
+    }
+
+    /**
      * Gets the title of the Inbox. The title changes depending on the selected
      * folder/state.
      *
      * @return Title of the inbox
      */
     public String getInboxTitle() {
-        return JsfUtils.getMessage("i18n", "Inbox_INBOX_X", new Object[]{
-                    inboxTitle});
+        return JsfUtils.getMessage(Bundle.i18n.name(), "Inbox_INBOX_X",
+                new Object[]{inboxTitle});
     }
 
     public String getNewAssignmentType() {
@@ -333,6 +529,14 @@ public class Inbox {
      */
     public void setSelectedMediaItem(MediaItem selectedMediaItem) {
         this.selectedMediaItem = selectedMediaItem;
+    }
+
+    public void setContentMediaItem(Long id) throws DataNotFoundException {
+        this.selectedMediaItem = catalogueFacade.findMediaItemById(id);
+    }
+
+    public void setContentNewsItem(Long id) throws DataNotFoundException {
+        this.selectedNewsItem = newsItemFacade.findNewsItemById(id);
     }
 
     public NewsItem getSelectedNewsItem() {
@@ -400,21 +604,24 @@ public class Inbox {
         if (this.cataloguesNode == null) {
             this.cataloguesNode = new TreeNodeImpl();
 
-            List<Catalogue> myCatalogues = catalogueFacade.findCataloguesByUser(
-                    getUser().getUsername());
+            List<Catalogue> myCatalogues = getUser().getPrivilegedCatalogues();
 
             for (Catalogue myCatalogue : myCatalogues) {
 
+                // Add top-level catalogue node
                 TreeNode node = new TreeNodeImpl();
                 node.setData(new OutletNode(myCatalogue, null,
                         myCatalogue.getClass().getName()));
 
-                // Generate child nodes (status nodes)
-                for (MediaItemStatus status : MediaItemStatus.values()) {
-                    TreeNode childNode = new TreeNodeImpl();
-                    childNode.setData(new OutletNode(status, myCatalogue,
-                            MediaItemStatus.class.getName()));
-                    node.addChild(status.name(), childNode);
+                List<WorkflowState> states =
+                        myCatalogue.getWorkflow().getStates();
+
+                // Add children nodes (workflow states) to the catalogue node
+                for (WorkflowState state : states) {
+                    TreeNode subNode = new TreeNodeImpl();
+                    subNode.setData(new OutletNode(state, myCatalogue, state.
+                            getClass().getName()));
+                    node.addChild(state.getId(), subNode);
                 }
 
                 this.cataloguesNode.addChild("M" + myCatalogue.getId(), node);
@@ -425,106 +632,51 @@ public class Inbox {
     }
 
     /**
-     * Event handler for handling selection of an {@link Outlet} or 
-     * {@link Catalogue} folder.
-     *
-     * @param event 
-     *          Event that invoked the handler
+     * Loads the {@link ContentResultSet} into the view based on the state 
+     * properties.
      */
-    public void onOutletFolderSelect(NodeSelectedEvent event) {
-        final int MAX_STATE_ITEMS = 100;
-        showNewsItem = true;
-        mediaItems = new ListDataModel();
+    private void loadContentResultSet() {
+        switch (this.resultType) {
+            case CATALOGUE:
+                // Query for items in this catalogue and state
+                this.resultSet =
+                        catalogueFacade.findMediaItemsByCatalogue(getUser().
+                        getUsername(), this.selectedCatalogue, this.pagingStart,
+                        this.pagingRows, this.sortBy, this.sortDirection);
+                this.mediaItems = new ListDataModel(this.resultSet.getHits());
 
-        HtmlTree tree = (HtmlTree) event.getComponent();
-        OutletNode node = (OutletNode) tree.getRowData();
-
-        if (node.getData() instanceof Outlet) {
-
-            Outlet outlet = (Outlet) node.getData();
-            newsItems = new ListDataModel(newsItemFacade.findOutletBox(getUser().
-                    getUsername(), outlet));
-
-            inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
-                    "Inbox_OUTLET_STATUS_CURRENT", new Object[]{
-                        outlet.getTitle(),
-                        newsItems.getRowCount()});
-        } else if (node.getData() instanceof WorkflowState) {
-            showNewsItem = true;
-            mediaItems = new ListDataModel();
-            WorkflowState state = (WorkflowState) node.getData();
-            Outlet outlet = (Outlet) node.getParentData();
-
-            if (state.equals(outlet.getWorkflow().getEndState())) {
-                newsItems =
-                        new ListDataModel(newsItemFacade.findOutletBox(getUser().
-                        getUsername(), outlet, state, 0, MAX_STATE_ITEMS));
-            } else {
-                newsItems =
-                        new ListDataModel(newsItemFacade.findOutletBox(getUser().
-                        getUsername(), outlet, state));
-            }
-
-            inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
-                    "Inbox_OUTLET_STATUS", new Object[]{outlet.getTitle(),
-                        state.getName(), newsItems.getRowCount()});
-        }
-    }
-
-    /**
-     * Event handler for handling selection of a {@link Catalogue} folder.
-     *
-     * @param event 
-     *          Event that invoked the handler
-     */
-    public void onCatalogueFolderSelect(NodeSelectedEvent event) {
-        this.catalogueEditor = false;
-        this.showNewsItem = false;
-        this.newsItems = new ListDataModel();
-
-        HtmlTree tree = (HtmlTree) event.getComponent();
-        OutletNode node = (OutletNode) tree.getRowData();
-
-        if (node.getData() instanceof Catalogue) {
-            // User selected a Catalogue Node    
-            Catalogue catalogue = (Catalogue) node.getData();
-            if (getUser().getUserRoles().contains(catalogue.getEditorRole())) {
-                this.catalogueEditor = true;
-            }
-            mediaItems =
-                    new ListDataModel(catalogueFacade.findCurrentMediaItems(
-                    getUser(), catalogue.getId()));
-            inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
-                    "Inbox_CATALOGUE_STATUS_CURRENT", new Object[]{catalogue.
-                        getName(), mediaItems.getRowCount()});
-        } else if (node.getData() instanceof MediaItemStatus) {
-            // User selected a Catalogue Status Node
-            Catalogue catalogue = (Catalogue) node.getParentData();
-            MediaItemStatus status = (MediaItemStatus) node.getData();
-
-            if (getUser().getUserRoles().contains(catalogue.getEditorRole())) {
-                this.catalogueEditor = true;
-            }
-
-            String catalogueStatus = JsfUtils.getMessage(Bundle.i18n.name(),
-                    "Generic_MEDIA_ITEM_STATUS_"
-                    + status.name(), new Object[]{});
-
-            mediaItems =
-                    new ListDataModel(catalogueFacade.findCurrentMediaItems(
-                    getUser(), status, catalogue.getId()));
-
-            inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
-                    "Inbox_CATALOGUE_STATUS", new Object[]{catalogue.getName(),
-                        catalogueStatus, mediaItems.getRowCount()});
+                // Update inbox title
+                this.inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
+                        "Inbox_CATALOGUE_STATUS_CURRENT",
+                        new Object[]{this.selectedCatalogue.getName(),
+                            this.resultSet.getNumberOfResults(), this.resultSet.
+                            getSearchTimeInSeconds()});
+                break;
+            case CATALOGUE_WITH_STATE:
+                this.resultSet =
+                        catalogueFacade.findMediaItemsByWorkflowState(getUser().
+                        getUsername(), this.selectedCatalogue,
+                        this.selectedWorkflowState, this.pagingStart,
+                        this.pagingRows, this.sortBy, this.sortDirection);
+                this.mediaItems = new ListDataModel(this.resultSet.getHits());
+                this.inboxTitle = JsfUtils.getMessage(Bundle.i18n.name(),
+                        "Inbox_CATALOGUE_STATUS",
+                        new Object[]{this.selectedCatalogue.getName(),
+                            this.selectedWorkflowState.getName(),
+                            this.resultSet.getNumberOfResults(), this.resultSet.
+                            getSearchTimeInSeconds()});
+                break;
+            default:
+                LOG.log(Level.INFO, "Unknown page");
         }
     }
 
     /**
      * Event handler for updating the state of an {@link MediaItem} from the
      * list of {@link MediaItem}s in a {@link Catalogue} folder.
-     * <p/>
-     * @param item {@link MediaItem} to update
+     *
+     * @param item 
+     *          {@link MediaItem} to update
      */
     public void setUpdateMediaItem(MediaItem item) {
         // The media item must be removed and added to keep its version 
@@ -539,10 +691,6 @@ public class Inbox {
 
         // Add the media item back in the data model
         ((List<MediaItem>) getMediaItems().getWrappedData()).add(item);
-    }
-
-    public boolean isCatalogueEditor() {
-        return this.catalogueEditor;
     }
 
     public NewsItem getDuplicateNewsItem() {
@@ -585,6 +733,112 @@ public class Inbox {
 
     public boolean isShowMediaItem() {
         return !showNewsItem;
+    }
+
+    public int getPagingRows() {
+        return pagingRows;
+    }
+
+    public void setPagingRows(int pagingRows) {
+        this.pagingRows = pagingRows;
+    }
+
+    public int getPagingStart() {
+        return pagingStart;
+    }
+
+    public void setPagingStart(int pagingStart) {
+        this.pagingStart = pagingStart;
+    }
+
+    public ContentResultSet getResultSet() {
+        return resultSet;
+    }
+
+    public void setResultSet(ContentResultSet resultSet) {
+        this.resultSet = resultSet;
+    }
+
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
+    }
+
+    public String getSortDirection() {
+        return sortDirection;
+    }
+
+    public void setSortDirection(String sortDirection) {
+        this.sortDirection = sortDirection;
+    }
+
+    public String getContentView() {
+        return contentView;
+    }
+
+    /**
+     * Stores the view preference in the cookies stored in the client browser.
+     */
+    private void storeViewPreferenceInCookies() {
+        JsfUtils.addCookie("view-catalogue-" + this.selectedCatalogue.getId(),
+                this.contentView, ONE_YEAR);
+    }
+
+    /**
+     * Store the selected catalogue or outlet + workflow state in the client
+     * browser.
+     */
+    private void storeSelectedInCookies() {
+        if (showNewsItem) {
+            JsfUtils.removeCookie("selected-catalogue");
+            JsfUtils.removeCookie("selected-catalogue-workflowstate");
+        } else {
+            JsfUtils.removeCookie("selected-outlet");
+            JsfUtils.removeCookie("selected-outlet-workflowstate");
+            if (this.selectedCatalogue != null) {
+                JsfUtils.addCookie("selected-catalogue", ""
+                        + this.selectedCatalogue.getId(), ONE_YEAR);
+            }
+            if (this.selectedWorkflowState != null) {
+                JsfUtils.addCookie("selected-catalogue-workflowstate", ""
+                        + this.selectedWorkflowState.getId(), ONE_YEAR);
+            }
+        }
+    }
+
+    /**
+     * Fetches the view preference from the cookies stored in the client 
+     * browser.
+     */
+    private void fetchViewPreferenceFromCookies() {
+        try {
+            String catViewCookie = JsfUtils.getCookieValue("view-catalogue-"
+                    + this.selectedCatalogue.getId());
+            if (catViewCookie.equalsIgnoreCase("grid")) {
+                this.contentView = "grid";
+            } else {
+                this.contentView = "list";
+            }
+        } catch (CookieNotFoundException ex) {
+            // View preference for the selected catalogue was not available
+        }
+    }
+
+    private boolean fetchSelectedFromCookies() {
+        try {
+            String catId = JsfUtils.getCookieValue("selected-catalogue");
+            this.selectedCatalogue = catalogueFacade.findCatalogueById(Long.
+                    valueOf(catId));
+            return true;
+        } catch (CookieNotFoundException ex) {
+            // Selected catalogue cookie was not available
+        } catch (DataNotFoundException ex) {
+            // Catalogue doesn't exist
+        }
+        return false;
     }
 
     public class OutletNode {

@@ -27,6 +27,7 @@ import dk.i2m.converge.core.logging.LogSubject;
 import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.plugin.Plugin;
 import dk.i2m.converge.core.plugin.PluginManager;
+import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.domain.Property;
 import dk.i2m.converge.ejb.services.*;
 import java.io.File;
@@ -62,6 +63,8 @@ public class SystemFacadeBean implements SystemFacadeLocal {
 
     @EJB private TimerServiceLocal timerService;
 
+    @EJB private PluginContextBeanLocal pluginContext;
+
     /**
      * Creates a new instance of {@link SystemFacadeBean}.
      */
@@ -80,7 +83,7 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         LOG.log(Level.INFO,
                 "{0} newswire {0, choice, 0#services|1#service|2#services} reset",
                 reset);
-        
+
         int userCount = userService.findAll().size();
         LOG.log(Level.INFO,
                 "{0} user {0, choice, 0#accounts|1#account|2#accounts} in the system",
@@ -347,7 +350,8 @@ public class SystemFacadeBean implements SystemFacadeLocal {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void log(LogSeverity severity, String message, Object origin, String originId) {
+    public void log(LogSeverity severity, String message, Object origin,
+            String originId) {
         log(severity, message, origin.getClass().getName(), originId);
     }
 
@@ -396,6 +400,68 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         for (LogEntry entry : entries) {
             daoService.delete(LogEntry.class, entry.getId());
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<JobQueue> findJobQueue() {
+        return daoService.findAll(JobQueue.class, "executionTime", true);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void removeJobQueue(Long id) {
+        daoService.delete(JobQueue.class, id);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void executeJobQueue() {
+        List<JobQueue> queue = findJobQueue();
+        Calendar now = Calendar.getInstance();
+        for (JobQueue item : queue) {
+            try {
+                if (item.getStatus().equals(JobQueueStatus.WAITING) && item.
+                        getExecutionTime().after(now.getTime())) {
+                    item.setStatus(JobQueueStatus.READY);
+                }
+
+                if (item.getStatus().equals(JobQueueStatus.READY) || item.
+                        getStatus().equals(JobQueueStatus.FAILED)) {
+                    item.setStatus(JobQueueStatus.EXECUTION);
+                    item.setStarted(Calendar.getInstance().getTime());
+                    daoService.update(item);
+                    PluginAction action = item.getAction();
+
+                    try {
+                        PluginConfiguration cfg =
+                                daoService.findById(PluginConfiguration.class,
+                                item.getPluginConfiguration());
+                        action.execute(pluginContext, item.getTypeClass(),
+                                item.getTypeClassId(), cfg, item.getParametersMap());
+
+                        item.setFinished(Calendar.getInstance().getTime());
+                        item.setStatus(JobQueueStatus.COMPLETED);
+                    } catch (DataNotFoundException ex) {
+                        item.setStatus(JobQueueStatus.FAILED_COMPLETED);
+                        item.setFinished(Calendar.getInstance().getTime());
+                    } catch (PluginActionException ex) {
+                        if (ex.isPermanent()) {
+                            item.setStatus(JobQueueStatus.FAILED_COMPLETED);
+                        } else {
+                            item.setStatus(JobQueueStatus.FAILED);
+                        }
+
+                        item.setFinished(Calendar.getInstance().getTime());
+                    }
+                    daoService.update(item);
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+        }
+
+        daoService.executeQuery(JobQueue.REMOVE_COMPLETED);
     }
 
     private int removeAllNewswireProcessing() {

@@ -32,7 +32,6 @@ import dk.i2m.converge.core.views.InboxView;
 import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.services.*;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,236 +66,23 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
     @EJB private PluginContextBeanLocal pluginContext;
 
-    @EJB private SystemFacadeLocal systemFacade;
+    @EJB private ContentItemServiceLocal contentItemService;
 
     @Resource private SessionContext ctx;
 
-    /**
-     * Starts a new {@link NewsItem}.
-     *
-     * @param newsItem {@link NewsItem} to start.
-     * @return Started {@link NewsItem}
-     * @throws WorkflowStateTransitionException If the workflow could not be started for the
-     * <code>newsItem</code>
-     */
+    /** {@inheritDoc} */
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public NewsItem start(NewsItem newsItem) throws
             WorkflowStateTransitionException {
-        if (newsItem == null) {
-            throw new WorkflowStateTransitionException("NewsItem not available");
-        }
-
-        if (newsItem.getId() != null) {
-            throw new DuplicateExecutionException("NewsItem #"
-                    + newsItem.getId() + " already started");
-        }
-
-        if (newsItem.getOutlet() == null) {
-            throw new WorkflowStateTransitionException("Outlet must be selected");
-        }
-
-
-        WorkflowState startState = newsItem.getOutlet().getWorkflow().
-                getStartState();
-        boolean actorSet = false;
-        UserRole requiredRole = startState.getActorRole();
-        for (NewsItemActor actor : newsItem.getActors()) {
-            if (actor.getRole().equals(requiredRole)) {
-                actorSet = true;
-                break;
-            }
-        }
-
-        if (!actorSet) {
-            throw new MissingActorException("Actor with role " + requiredRole.
-                    getName() + " is missing", requiredRole);
-        }
-
-        try {
-            daoService.findById(NewsItem.class, newsItem.getId());
-            throw new DuplicateExecutionException("NewsItem #"
-                    + newsItem.getId() + " already exist");
-        } catch (DataNotFoundException ex) {
-        }
-
-        String uid = ctx.getCallerPrincipal().getName();
-        UserAccount ua = null;
-        try {
-            ua = userService.findById(uid);
-        } catch (Exception ex) {
-            throw new WorkflowStateTransitionException(
-                    "Could not resolve transition initator", ex);
-        }
-
-        try {
-            Calendar now = Calendar.getInstance();
-
-            Outlet outlet = newsItem.getOutlet();
-
-            // Ensure that the outlet is set
-//            if (outlet != null) {
-//                WorkflowState startState = outlet.getWorkflow().getStartState();
-            WorkflowStateTransition transition = new WorkflowStateTransition(
-                    newsItem, now, startState, ua);
-            transition.setStoryVersion("");
-            transition.setComment("");
-            newsItem.getHistory().add(transition);
-            newsItem.setCurrentState(startState);
-//            }
-
-            newsItem.setUpdated(now);
-            newsItem.setCreated(now);
-            newsItem.setPrecalculatedWordCount(newsItem.getWordCount());
-            newsItem.setPrecalculatedCurrentActor(newsItem.getCurrentActor());
-
-            newsItem = daoService.create(newsItem);
-
-            List<UserAccount> usersToNotify = new ArrayList<UserAccount>();
-            WorkflowState state = newsItem.getCurrentState();
-
-            switch (state.getPermission()) {
-                case USER:
-                    for (NewsItemActor actor : newsItem.getActors()) {
-                        if (actor.getRole().equals(state.getActorRole())) {
-                            usersToNotify.add(actor.getUser());
-                        }
-                    }
-                    break;
-                case GROUP:
-                    for (UserAccount actor : userService.findAll()) {
-                        if (actor.getUserRoles().contains(state.getActorRole())) {
-                            usersToNotify.add(actor);
-                        }
-                    }
-                    break;
-            }
-
-            for (UserAccount userToNotify : usersToNotify) {
-                if (!userToNotify.equals(ua)) {
-                    String msgPattern = cfgService.getMessage(
-                            "notification_MSG_STORY_ASSIGNED");
-                    SimpleDateFormat sdf = new SimpleDateFormat(cfgService.
-                            getMessage("FORMAT_SHORT_DATE_AND_TIME"));
-                    sdf.setTimeZone(userToNotify.getTimeZone());
-
-                    String date = sdf.format(newsItem.getDeadline().getTime());
-
-                    Object[] args = new Object[]{newsItem.getTitle(), date, ua.
-                        getFullName()};
-                    String msg = MessageFormat.format(msgPattern, args);
-
-                    notificationService.create(userToNotify, msg);
-                }
-            }
-            return newsItem;
-
-        } catch (Exception ex) {
-            throw new WorkflowStateTransitionException(ex);
-        }
+        return (NewsItem) contentItemService.start(newsItem);
     }
 
-    /**
-     * Promotes the {@link NewsItem} in the workflow.
-     *
-     * @param newsItem {@link NewsItem} to promote
-     * @param step     Unique identifier of the next step
-     * @param comment  Comment from the sender
-     * @return Promoted {@link NewsItem}
-     * @throws WorkflowStateTransitionException If the next step is not legal
-     */
+    /** {@inheritDoc} */
     @Override
     public NewsItem step(NewsItem newsItem, Long step, String comment) throws
             WorkflowStateTransitionException {
-
-        // Get current user
-        String uid = ctx.getCallerPrincipal().getName();
-        UserAccount ua = null;
-        try {
-            ua = userService.findById(uid);
-            pluginContext.setCurrentUserAccount(ua);
-        } catch (Exception ex) {
-            throw new WorkflowStateTransitionException(
-                    "Could not resolve transition initator", ex);
-        }
-
-        // Log the workflow step
-        pluginContext.log(LogSeverity.INFO, "Promoting news item #{0} to {1}",
-                new Object[]{newsItem.getId(), step}, newsItem, newsItem.getId());
-
-        Calendar now = Calendar.getInstance();
-
-        WorkflowStep transitionStep;
-        try {
-            transitionStep = daoService.findById(WorkflowStep.class, step);
-        } catch (DataNotFoundException ex) {
-            throw new WorkflowStateTransitionException("Transition (WorkflowStep) #"
-                    + step + " does not exist", ex);
-        }
-
-        WorkflowState nextState = transitionStep.getToState();
-
-        // Checking validity of step
-        WorkflowState state = newsItem.getCurrentState();
-        boolean legalStep = false;
-        for (WorkflowStep nextWorkflowStep : state.getNextStates()) {
-
-            if (nextWorkflowStep.getToState().equals(nextState)) {
-
-                boolean isInRole = !Collections.disjoint(nextWorkflowStep.
-                        getValidFor(), ua.getUserRoles());
-
-                if (nextWorkflowStep.isValidForAll() || isInRole) {
-                    legalStep = true;
-                }
-                break;
-            }
-        }
-
-        if (!legalStep) {
-            throw new WorkflowStateTransitionException("Illegal transition from "
-                    + state.getId() + " to " + nextState.getId());
-        }
-
-        WorkflowStateTransition transition = new WorkflowStateTransition(
-                newsItem, now, nextState, ua);
-        transition.setStoryVersion(newsItem.getStory());
-        transition.setHeadlineVersion(newsItem.getTitle());
-        transition.setBriefVersion(newsItem.getBrief());
-        transition.setComment(comment);
-        transition.setSubmitted(transitionStep.isTreatAsSubmitted());
-        // Strip unwanted characters
-        newsItem.setStory(newsItem.getStory().replaceAll("\\p{Cntrl}", " "));
-        newsItem.setCurrentState(nextState);
-        newsItem.getHistory().add(transition);
-        newsItem.setUpdated(now);
-        newsItem.setPrecalculatedWordCount(newsItem.getWordCount());
-        newsItem.setPrecalculatedCurrentActor(newsItem.getCurrentActor());
-
-        try {
-            newsItem = checkin(newsItem);
-        } catch (LockingException ex) {
-            throw new WorkflowStateTransitionException(ex);
-        }
-
-        // Actions
-        pluginContext.log(LogSeverity.INFO, "Executing workflow step actions",
-                newsItem, newsItem.getId());
-        //LOG.log(Level.INFO, "Executing workflow step actions");
-
-        for (WorkflowStepAction action : transitionStep.getActions()) {
-            try {
-                WorkflowAction act = action.getAction();
-                act.execute(pluginContext, newsItem, action, ua);
-            } catch (WorkflowActionException ex) {
-                //LOG.log(Level.SEVERE, "Could not execute action {0}", action.getLabel());
-                pluginContext.log(LogSeverity.SEVERE,
-                        "Could not execute action {0}", new Object[]{action.
-                            getLabel()}, newsItem, newsItem.getId());
-            }
-        }
-
-        return newsItem;
+        return (NewsItem) contentItemService.step(newsItem, step);
     }
 
     /** {@inheritDoc} */
@@ -327,14 +113,14 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
 
         WorkflowStateTransition transition = new WorkflowStateTransition(
-                newsItem, now, nextState, ua);
+                newsItem, now.getTime(), nextState, ua);
         transition.setStoryVersion(newsItem.getStory());
         transition.setHeadlineVersion(newsItem.getTitle());
         transition.setBriefVersion(newsItem.getBrief());
         transition.setComment(comment);
         newsItem.setCurrentState(nextState);
         newsItem.getHistory().add(transition);
-        newsItem.setUpdated(now);
+        newsItem.setUpdated(now.getTime());
         try {
             newsItem = checkin(newsItem);
         } catch (LockingException ex) {
@@ -348,7 +134,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
      * Finds the current assignments of a given user.
      * <p/>
      * @param username
-* Username of the user
+     * Username of the user
      * @return {@link List} of current assignments
      */
     @Override
@@ -369,11 +155,11 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
      * Gets items in the inbox for a particular user.
      * <p/>
      * @param username
-* Username of the {@link UserAccount}
+     * Username of the {@link UserAccount}
      * @param start
-   * First record to retrieve
+     * First record to retrieve
      * @param limit
-   * Number of records to retrieve
+     * Number of records to retrieve
      * @return
      */
     @Override
@@ -394,7 +180,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
      * Gets items in the inbox for a particular user.
      * <p/>
      * @param username
-* Username of the {@link UserAccount}
+     * Username of the {@link UserAccount}
      * @return {@link List} of inbox items
      */
     @Override
@@ -448,7 +234,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
                             case USER:
                                 // Check all the actors for the news item
-                                for (NewsItemActor actor : ni.getActors()) {
+                                for (ContentItemActor actor : ni.getActors()) {
                                     // If the actor has the role of the state, he is a current actor
                                     if (actor.getRole().equals(state.
                                             getActorRole()) && actor.getUser().
@@ -558,7 +344,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
             return false;
         }
 
-        for (NewsItemActor nia : item.getActors()) {
+        for (ContentItemActor nia : item.getActors()) {
             if (nia.getRole().equals(role) && nia.getUser().equals(user)) {
                 return true;
             }
@@ -665,15 +451,15 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
     /** {@inheritDoc} */
     @Override
-    public NewsItemActor addActorToNewsItem(NewsItemActor actor) {
+    public ContentItemActor addActorToNewsItem(ContentItemActor actor) {
         return daoService.create(actor);
     }
 
     /** {@inheritDoc} */
     @Override
-    public NewsItem removeActorFromNewsItem(NewsItemActor actor) {
-        Long newsItemId = actor.getNewsItem().getId();
-        daoService.delete(NewsItemActor.class, actor.getId());
+    public NewsItem removeActorFromNewsItem(ContentItemActor actor) {
+        Long newsItemId = actor.getContentItem().getId();
+        daoService.delete(ContentItemActor.class, actor.getId());
         try {
             return daoService.findById(NewsItem.class, newsItemId);
         } catch (DataNotFoundException ex) {
@@ -713,7 +499,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         } else {
             // NewsItem has been sent to selected users, check if the user
             // is among the selected users
-            for (NewsItemActor actor : item.getActors()) {
+            for (ContentItemActor actor : item.getActors()) {
                 if (actor.getUser().equals(user) && actor.getRole().equals(
                         currentRole)) {
                     return ContentItemPermission.USER;
@@ -723,7 +509,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
         // If user is neither in the current role or among the current
         // actors, check if the user is among the other actors
-        for (NewsItemActor actor : item.getActors()) {
+        for (ContentItemActor actor : item.getActors()) {
             if (actor.getUser().equals(user)) {
                 return ContentItemPermission.ACTOR;
             }
@@ -767,7 +553,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     public NewsItem save(NewsItem newsItem) throws LockingException {
         try {
             Calendar now = Calendar.getInstance();
-            newsItem.setUpdated(now);
+            newsItem.setUpdated(now.getTime());
             newsItem.setPrecalculatedWordCount(newsItem.getWordCount());
             newsItem.setPrecalculatedCurrentActor(newsItem.getCurrentActor());
             return daoService.update(newsItem);
@@ -817,7 +603,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
             String oldBriefing = orig.getAssignmentBriefing();
             Calendar now = Calendar.getInstance();
-            newsItem.setUpdated(now);
+            newsItem.setUpdated(now.getTime());
             newsItem.setCheckedOut(null);
             newsItem.setCheckedOutBy(null);
             newsItem.setPrecalculatedWordCount(newsItem.getWordCount());
@@ -844,7 +630,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
                         WorkflowStatePermission.USER)) {
 
                     // Check all the actors for the news item
-                    for (NewsItemActor actor : updated.getActors()) {
+                    for (ContentItemActor actor : updated.getActors()) {
                         // If the actor has the role of the state, he is a current actor
                         if (actor.getRole().equals(state.getActorRole())) {
                             usersToNotify.add(actor.getUser());
@@ -1057,14 +843,14 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
                     oldTransition.getState().getId());
 
             WorkflowStateTransition transition = new WorkflowStateTransition(ni,
-                    now, nextState, ua);
+                    now.getTime(), nextState, ua);
             transition.setStoryVersion(ni.getStory());
             transition.setHeadlineVersion(ni.getTitle());
             transition.setBriefVersion(ni.getBrief());
             transition.setComment("");
             ni.setCurrentState(nextState);
             ni.getHistory().add(transition);
-            ni.setUpdated(now);
+            ni.setUpdated(now.getTime());
 
             try {
                 if (nih.getPermission() == ContentItemPermission.USER) {
@@ -1083,7 +869,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     /** {@inheritDoc } */
     @Override
     public MediaItem create(MediaItem mediaItem) {
-        mediaItem.setCreated(java.util.Calendar.getInstance());
+        mediaItem.setCreated(java.util.Calendar.getInstance().getTime());
         return daoService.create(mediaItem);
     }
 

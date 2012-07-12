@@ -5,7 +5,7 @@
         <rich:dataTable id="dtWorkflowHistory" value="#{value.history}" var="history" styleClass="table no-table-header" rowClasses="odd, even" style="width: 96%; margin-left: 2%; margin-right: 2%">
 
             <rich:column styleClass="left" sortOrder="ASCENDING" sortBy="#{history.timestamp}" selfSorted="false">
-                <h:outputText value="#{history.timestamp.time}">
+                <h:outputText value="#{history.timestamp}">
                     <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                 </h:outputText>
             </rich:column>
@@ -49,7 +49,7 @@
                             <h:inputText value="#{newsItem.selectedWorkflowStateTransition.user.fullName}" disabled="true" style="width: 100%" styleClass="text" />
 
                             <h:outputText value="#{msgs.DATE}" />
-                            <h:inputText value="#{newsItem.selectedWorkflowStateTransition.timestamp.time}" disabled="true" style="width: 100%" styleClass="text">
+                            <h:inputText value="#{newsItem.selectedWorkflowStateTransition.timestamp}" disabled="true" style="width: 100%" styleClass="text">
                                 <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                             </h:inputText>
 
