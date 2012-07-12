@@ -72,7 +72,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     @EJB private NotificationServiceLocal notificationService;
 
     @EJB private CatalogueServiceLocal catalogueService;
-    
+
     @EJB private ContentItemServiceLocal contentItemService;
 
     @Resource private SessionContext ctx;
@@ -368,8 +368,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
                 + hookInstance.getLabel() + " (" + hook.getName() + ")");
 
         Catalogue catalogue = findCatalogueById(catalogueId);
-        Map<String, Object> params = QueryBuilder.with("catalogue", catalogue).
-                parameters();
+        Map<String, Object> params = QueryBuilder.with(MediaItem.PARAM_CATALOGUE,
+                catalogue).parameters();
         List<MediaItem> mediaItems = daoService.findWithNamedQuery(
                 MediaItem.FIND_BY_CATALOGUE, params);
 
@@ -431,8 +431,9 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     /** {@inheritDoc } */
     @Override
-    public MediaItem create(MediaItem mediaItem) throws WorkflowStateTransitionException {
-            return (MediaItem) contentItemService.start(mediaItem);
+    public MediaItem create(MediaItem mediaItem) throws
+            WorkflowStateTransitionException {
+        return (MediaItem) contentItemService.start(mediaItem);
     }
 
     /**
@@ -584,7 +585,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
                 parameters();
         return daoService.findWithNamedQuery(MediaItem.FIND_BY_OWNER, params);
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public List<MediaItem> findCurrentMediaItems(UserAccount user,
@@ -815,10 +816,11 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     /** {@inheritDoc } */
     @Override
     public ContentResultSet findMediaItemsByWorkflowState(String username,
-            Catalogue catalogue, WorkflowState state, int start, int rows, String sortField, String sortDirection) {
+            Catalogue catalogue, WorkflowState state, int start, int rows,
+            String sortField, String sortDirection) {
         long startTime = Calendar.getInstance().getTimeInMillis();
 
-        
+
         UserAccount ua;
         try {
             ua = userFacade.findById(username);
@@ -826,42 +828,50 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
             LOG.log(Level.WARNING, ex.getMessage(), ex);
             ua = null;
         }
-        
+
         ContentResultSet resultSet = new ContentResultSet();
         resultSet.setResultsPerPage(rows);
         resultSet.setStart(start);
-                
+
         Map<String, Object> params =
-        QueryBuilder.with(MediaItem.PARAM_USER, ua)
-                .and(MediaItem.PARAM_CATALOGUE, catalogue)
-                .and(MediaItem.PARAM_WORKFLOW_STATE, state).parameters();
-        
-        Number count = daoService.executeNamedQuery(Number.class, MediaItem.COUNT_BY_USER_AND_CATALOGUE_AND_WORKFLOW_STATE, params);
+                QueryBuilder.with(MediaItem.PARAM_USER, ua).and(
+                MediaItem.PARAM_CATALOGUE, catalogue).and(
+                MediaItem.PARAM_WORKFLOW_STATE, state).parameters();
+
+        Number count =
+                daoService.executeNamedQuery(Number.class,
+                MediaItem.COUNT_BY_USER_AND_CATALOGUE_AND_WORKFLOW_STATE, params);
         resultSet.setNumberOfResults(count.longValue());
-        
+
         Query q = daoService.getEntityManager().createQuery(
                 "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.precalculatedCurrentActor, n.currentState.name, n.catalogue.name, n.updated, n.thumbnailLink) "
                 + "FROM ContentItem AS ci, MediaItem AS n JOIN n.actors AS a "
-                + "WHERE ci.id=n.id AND n.catalogue = :" + MediaItem.PARAM_CATALOGUE + " AND n.currentState = :" + MediaItem.PARAM_WORKFLOW_STATE + " AND (( a.user = :"+MediaItem.PARAM_USER+") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"+MediaItem.PARAM_USER+" MEMBER OF n.currentState.actorRole.userAccounts)) "
+                + "WHERE ci.id=n.id AND n.catalogue = :"
+                + MediaItem.PARAM_CATALOGUE + " AND n.currentState = :"
+                + MediaItem.PARAM_WORKFLOW_STATE + " AND (( a.user = :"
+                + MediaItem.PARAM_USER
+                + ") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"
+                + MediaItem.PARAM_USER
+                + " MEMBER OF n.currentState.actorRole.userAccounts)) "
                 + "ORDER BY n." + sortField + " " + sortDirection);
-        
+
         resultSet.setHits(daoService.findWithQuery(q, params, start, rows));
-        
-        
+
+
         long endTime = Calendar.getInstance().getTimeInMillis();
-        resultSet.setSearchTime(endTime-startTime);
-        
+        resultSet.setSearchTime(endTime - startTime);
+
         return resultSet;
     }
-    
+
     /** {@inheritDoc } */
     @Override
     public ContentResultSet findMediaItemsByCatalogue(String username,
-            Catalogue catalogue, int pagingStart, int pagingRows, 
+            Catalogue catalogue, int pagingStart, int pagingRows,
             String sortField, String sortDirection) {
-        
+
         long startTime = Calendar.getInstance().getTimeInMillis();
-        
+
         UserAccount ua;
         try {
             ua = userFacade.findById(username);
@@ -869,40 +879,45 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
             LOG.log(Level.WARNING, ex.getMessage(), ex);
             ua = null;
         }
-        
+
         ContentResultSet resultSet = new ContentResultSet();
         resultSet.setResultsPerPage(pagingRows);
         resultSet.setStart(pagingStart);
-        
+
         Map<String, Object> params =
-        QueryBuilder.with(MediaItem.PARAM_USER, ua)
-                .and(MediaItem.PARAM_CATALOGUE, catalogue)
-                .parameters();
-        
-        Number count = daoService.executeNamedQuery(Number.class, 
+                QueryBuilder.with(MediaItem.PARAM_USER, ua).and(
+                MediaItem.PARAM_CATALOGUE, catalogue).parameters();
+
+        Number count = daoService.executeNamedQuery(Number.class,
                 MediaItem.COUNT_BY_USER_AND_CATALOGUE, params);
         resultSet.setNumberOfResults(count.longValue());
-        
+
         // DevNote: This is not very effecient but the old way to do dynamic
         //          sorting in JPA1. In JPA2 the order can be added using the 
         //          Criteria object
-        String findSql = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.precalculatedCurrentActor, n.currentState.name, n.catalogue.name, n.updated, n.thumbnailLink) " +
-                         "FROM ContentItem AS ci, MediaItem AS n JOIN n.actors AS a " +
-                         "WHERE ci.id=n.id AND n.catalogue = :" + MediaItem.PARAM_CATALOGUE + " AND (( a.user = :"+MediaItem.PARAM_USER+") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"+MediaItem.PARAM_USER+" MEMBER OF n.currentState.actorRole.userAccounts)) " +
-                         "ORDER BY n." + sortField + " " + sortDirection;
-        
+        String findSql = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.precalculatedCurrentActor, n.currentState.name, n.catalogue.name, n.updated, n.thumbnailLink) "
+                + "FROM ContentItem AS ci, MediaItem AS n JOIN n.actors AS a "
+                + "WHERE ci.id=n.id AND n.catalogue = :"
+                + MediaItem.PARAM_CATALOGUE + " AND (( a.user = :"
+                + MediaItem.PARAM_USER
+                + ") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"
+                + MediaItem.PARAM_USER
+                + " MEMBER OF n.currentState.actorRole.userAccounts)) "
+                + "ORDER BY n." + sortField + " " + sortDirection;
+
         Query q = daoService.getEntityManager().createQuery(findSql);
-        
-        
-        List results = daoService.findWithQuery(q, params, pagingStart, pagingRows);
+
+
+        List results = daoService.findWithQuery(q, params, pagingStart,
+                pagingRows);
         resultSet.setHits(results);
-        
+
         long endTime = Calendar.getInstance().getTimeInMillis();
-        resultSet.setSearchTime(endTime-startTime);
-        
+        resultSet.setSearchTime(endTime - startTime);
+
         return resultSet;
     }
-    
+
     /** {@inheritDoc } */
     @Override
     public MediaItem step(MediaItem mediaItem, Long stepId) throws

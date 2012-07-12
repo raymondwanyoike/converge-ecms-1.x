@@ -18,7 +18,6 @@ package dk.i2m.converge.core.content.catalogue;
 
 import dk.i2m.converge.core.content.Assignment;
 import dk.i2m.converge.core.content.ContentItem;
-import dk.i2m.converge.core.content.NewsItemMediaAttachment;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.metadata.Subject;
 import dk.i2m.converge.core.security.UserAccount;
@@ -40,7 +39,7 @@ import javax.persistence.*;
 @Table(name = "media_item")
 @DiscriminatorValue("media_item")
 @NamedQueries({
-    @NamedQuery(name = MediaItem.FIND_BY_CATALOGUE, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.catalogue = :catalogue ORDER BY m.id ASC"),
+    @NamedQuery(name = MediaItem.FIND_BY_CATALOGUE, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.catalogue = :" + MediaItem.PARAM_CATALOGUE + " ORDER BY m.id ASC"),
     @NamedQuery(name = MediaItem.FIND_BY_STATUS, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.status = :status ORDER BY m.updated DESC"),
     @NamedQuery(name = MediaItem.FIND_BY_OWNER, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.owner = :owner ORDER BY m.id DESC"),
     @NamedQuery(name = MediaItem.FIND_CURRENT_AS_OWNER, query = "SELECT DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :mediaRepository AND m.owner = :user AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.APPROVED AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.REJECTED ORDER BY m.updated DESC"),
@@ -50,6 +49,7 @@ import javax.persistence.*;
 })
 public class MediaItem extends ContentItem {
 
+    /** Query for finding all {@link MediaItem}s by {@link Catalogue}. Use the {@link #PARAM_CATALOGUE} parameter to specify the {@link Catalogue}. */
     public static final String FIND_BY_CATALOGUE = "MediaItem.FindByCatalogue";
 
     public static final String FIND_BY_STATUS = "MediaItem.FindByStatus";
