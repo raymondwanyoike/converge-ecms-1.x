@@ -17,9 +17,11 @@
 package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.converge.core.DataNotFoundException;
+import dk.i2m.converge.core.content.ContentItemPermission;
 import dk.i2m.converge.core.content.catalogue.*;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
+import dk.i2m.converge.ejb.facades.ContentItemFacadeLocal;
 import dk.i2m.jsf.JsfUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +38,12 @@ import javax.faces.model.ListDataModel;
  */
 public class MediaItemArchive {
 
-    private static final Logger LOG = Logger.getLogger(MediaItemArchive.class.getName());
+    private static final Logger LOG = Logger.getLogger(MediaItemArchive.class.
+            getName());
 
     @EJB private CatalogueFacadeLocal catalogueFacade;
+
+    @EJB private ContentItemFacadeLocal contentItemFacade;
 
     /** {@link MediaItem} being displayed. */
     private MediaItem selectedMediaItem;
@@ -52,6 +57,18 @@ public class MediaItemArchive {
     /** {@link DataModel} showing where the selected {@link MediaItem} was used. */
     private DataModel usage;
 
+    /** Placeholder for the permission to change the {@link MediaItem} by the current user. */
+    private ContentItemPermission permission = ContentItemPermission.UNAUTHORIZED;
+
+    /**
+     * Creates a new instance of {@link MediaItemArchive}.
+     */
+    public MediaItemArchive() {
+    }
+
+    // -------------------------------------------------------------------------
+    // -- PROPERTIES 
+    // -------------------------------------------------------------------------
     /**
      * Gets the unique identifier of the {@link MediaItem} displayed.
      * 
@@ -62,8 +79,8 @@ public class MediaItemArchive {
     }
 
     /**
-     * Sets the unique identifier of the {@link MediaItem} to display. This method is 
-     * used to initialise the item to display.
+     * Sets the unique identifier of the {@link MediaItem} to display. This 
+     * method is used to initialise the item to display.
      * 
      * @param id
      *          Unique identifier of the {@link MediaItem} to display
@@ -73,8 +90,12 @@ public class MediaItemArchive {
 
         if (this.id != null && id != null && selectedMediaItem == null) {
             try {
-                selectedMediaItem = catalogueFacade.findMediaItemById(id);
-                this.usage = new ListDataModel(catalogueFacade.getMediaItemUsage(id));
+                this.selectedMediaItem = catalogueFacade.findMediaItemById(id);
+                this.permission = contentItemFacade.
+                        findContentItemPermissionById(id,
+                        getUser().getUsername());
+                this.usage =
+                        new ListDataModel(catalogueFacade.getMediaItemUsage(id));
                 this.availableRenditions = null;
             } catch (DataNotFoundException ex) {
                 LOG.log(Level.SEVERE, ex.getMessage());
@@ -100,16 +121,20 @@ public class MediaItemArchive {
         if (this.availableRenditions == null) {
             Catalogue catalogue = selectedMediaItem.getCatalogue();
 
-            List<AvailableMediaItemRendition> availableMediaItemRenditions = new ArrayList<AvailableMediaItemRendition>();
+            List<AvailableMediaItemRendition> availableMediaItemRenditions =
+                    new ArrayList<AvailableMediaItemRendition>();
             for (Rendition rendition : catalogue.getRenditions()) {
                 try {
-                    availableMediaItemRenditions.add(new AvailableMediaItemRendition(rendition, selectedMediaItem.findRendition(rendition)));
+                    availableMediaItemRenditions.add(new AvailableMediaItemRendition(
+                            rendition,
+                            selectedMediaItem.findRendition(rendition)));
                 } catch (RenditionNotFoundException rnfe) {
                     //availableMediaItemRenditions.add(new AvailableMediaItemRendition(rendition));
                 }
             }
 
-            availableRenditions = new ListDataModel(availableMediaItemRenditions);
+            availableRenditions =
+                    new ListDataModel(availableMediaItemRenditions);
         }
         return this.availableRenditions;
     }
@@ -118,13 +143,42 @@ public class MediaItemArchive {
         return usage;
     }
 
+    /**
+     * Determines if the current user is the current actor of the 
+     * {@link MediaItem}.
+     * 
+     * @return {@code true} if the current user is the current actor of the 
+     *         {@link MediaItem}, otherwise {@code false}
+     */
+    public boolean isCurrentActor() {
+        switch (this.permission) {
+            case ACTOR:
+            case ROLE:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // -- HELPERS 
+    // -------------------------------------------------------------------------
+    private UserAccount getUser() {
+        final String valueExpression = "#{userSession.user}";
+        return (UserAccount) JsfUtils.getValueOfValueExpression(valueExpression);
+    }
+
+    // -------------------------------------------------------------------------
+    // -- INNER CLASSES (TODO: REFACTOR)
+    // -------------------------------------------------------------------------
     public class AvailableMediaItemRendition {
 
         private MediaItemRendition mediaItemRendition;
 
         private Rendition rendition;
 
-        public AvailableMediaItemRendition(Rendition rendition, MediaItemRendition mediaItemRendition) {
+        public AvailableMediaItemRendition(Rendition rendition,
+                MediaItemRendition mediaItemRendition) {
             this.rendition = rendition;
             this.mediaItemRendition = mediaItemRendition;
         }
@@ -144,30 +198,5 @@ public class MediaItemArchive {
         public Rendition getRendition() {
             return this.rendition;
         }
-    }
-
-    /**
-     * Determines if the current user is the current actor of the 
-     * {@link MediaItem}.
-     * 
-     * @return {@code true} if the current user is the current actor of the 
-     *         {@link MediaItem}, otherwise {@code false}
-     */
-    public boolean isCurrentActor() {
-        //TODO: Fix
-//        UserRole editorRole = getSelectedMediaItem().getCatalogue().getEditorRole();
-//
-//        if (getUser().getUserRoles().contains(editorRole)) {
-//            return true;
-//        } else {
-//            return false;
-//        }
-        
-        return true;
-    }
-
-    private UserAccount getUser() {
-        final String valueExpression = "#{userSession.user}";
-        return (UserAccount) JsfUtils.getValueOfValueExpression(valueExpression);
     }
 }

@@ -22,11 +22,13 @@ import dk.i2m.converge.core.content.catalogue.CatalogueHookInstance;
 import dk.i2m.converge.core.content.catalogue.CatalogueHookInstanceProperty;
 import dk.i2m.converge.core.plugin.CatalogueHook;
 import dk.i2m.converge.core.plugin.Plugin;
+import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import dk.i2m.converge.jsf.beans.Bundle;
-import dk.i2m.jsf.JsfUtils;
+import static dk.i2m.jsf.JsfUtils.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -68,11 +70,11 @@ public class Catalogues {
     public void onIndex(ActionEvent event) {
         try {
             catalogueFacade.indexCatalogues();
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_INDEXING_COMPLETE");
         } catch (Exception ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
                     new Object[]{ex.getMessage()});
         }
@@ -87,13 +89,13 @@ public class Catalogues {
         if (isEditMode()) {
             selectedCatalogue = catalogueFacade.update(
                     selectedCatalogue);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_UPDATED");
         } else {
             selectedCatalogue = catalogueFacade.create(
                     selectedCatalogue);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_CREATED");
         }
@@ -108,11 +110,11 @@ public class Catalogues {
     public void onDelete(ActionEvent event) {
         try {
             catalogueFacade.deleteCatalogueById(selectedCatalogue.getId());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_DELETED");
         } catch (DataNotFoundException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_DELETED_FAILED");
         }
@@ -149,6 +151,30 @@ public class Catalogues {
                     findAllCatalogues());
         }
         return this.catalogues;
+    }
+
+    /**
+     * Gets the {@link WorkflowState}s in the {@link Workflow} of the selected
+     * {@link Catalogue}.
+     * 
+     * @return {@link WorkflowState}s in the {@link Workflow} of the selected
+     *         {@link Catalogue}
+     */
+    public Map<String, WorkflowState> getSelectedCatalogueWorkflowStates() {
+        Map<String, WorkflowState> states =
+                new LinkedHashMap<String, WorkflowState>();
+        if (getSelectedCatalogue().getWorkflow() != null) {
+            for (WorkflowState state : getSelectedCatalogue().getWorkflow().
+                    getStates()) {
+                String key = state.getName();
+                if (states.containsKey(key)) {
+                    key = key + " (" + state.getId() + ")";
+                }
+                states.put(key, state);
+            }
+        }
+
+        return states;
     }
 
     public Catalogue getSelectedCatalogue() {
@@ -284,7 +310,7 @@ public class Catalogues {
 
     public void onDeleteCatalogueAction(ActionEvent event) {
         selectedCatalogue.getHooks().remove(selectedCatalogueAction);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+        createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(),
                 "administrator_Catalogues_CATALOGUE_ACTION_DELETED");
     }
@@ -295,13 +321,13 @@ public class Catalogues {
             selectedCatalogueAction = catalogueFacade.createCatalogueAction(
                     selectedCatalogueAction);
             selectedCatalogue.getHooks().add(selectedCatalogueAction);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_ACTION_CREATED");
         } else {
             selectedCatalogueAction = catalogueFacade.updateCatalogueAction(
                     selectedCatalogueAction);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_ACTION_UPDATED");
         }

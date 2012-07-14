@@ -343,12 +343,14 @@
 
                             <rich:tab id="tabItem" label="#{i18n.Inbox_WORKFLOW_OPTIONS}" >
                                 <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%" rendered="#{inbox.currentUserOfSelectedContentItem}">
-                                    <ui:repeat var="workflowOption" value="#{inbox.selectedContentItem.currentState.nextStates}">
-                                        <a4j:commandButton style="width: 220px;" styleClass="button mediumButton" value="#{workflowOption.name}" actionListener="#{inbox.onContentItemWorkflowSelection}" reRender="frmInbox"
-                                                           oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpUpdateItem')}.hide(); return false; }">
-                                            <f:param name="workflow_step_id" value="#{workflowOption.id}" />
-                                        </a4j:commandButton>
-                                    </ui:repeat>
+                                    <h:dataTable var="workflowOption" value="#{inbox.selectedContentItem.currentState.nextStates}">
+                                        <h:column>
+                                            <a4j:commandButton style="width: 220px;" styleClass="button mediumButton" value="#{workflowOption.name}" actionListener="#{inbox.onContentItemWorkflowSelection}" reRender="frmInbox"
+                                                               oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpUpdateItem')}.hide(); return false; }">
+                                                <f:param name="workflow_step_id" value="#{workflowOption.id}" />
+                                            </a4j:commandButton>
+                                        </h:column>
+                                    </h:dataTable>
                                 </h:panelGrid>
                                 <h:panelGrid columnClasses="tabSheet" style="padding: 10px; width: 100%" rendered="#{!inbox.currentUserOfSelectedContentItem}">
                                     <h:outputText value="#{i18n.Inbox_CANNOT_CHANGE_WORKFLOW}" />

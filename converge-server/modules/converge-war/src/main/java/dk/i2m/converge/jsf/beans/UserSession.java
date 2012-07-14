@@ -403,6 +403,26 @@ public class UserSession {
         }
         return mine;
     }
+    
+    /**
+     * Gets the privileged <em>self-upload</em> catalogues of the current user.
+     * 
+     * @return {@link Map} of privileged <em>self-upload</em> catalogues of the 
+     *         current user
+     */
+    public Map<String, Catalogue> getMySelfUploadCatalogues() {
+        Map<String, Catalogue> mine = new LinkedHashMap<String, Catalogue>();
+        for (Catalogue c : this.catalogues) {
+            if (c.getSelfUploadState() == null) continue;
+            
+            String key = c.getName();
+            if (mine.containsKey(key)) {
+                key = key + " (" + c.getId() + ")";
+            }
+            mine.put(key, c);
+        }
+        return mine;
+    }
 
     /**
      * Refreshes the {@link UserActivitySummary} for the past two months.

@@ -63,6 +63,8 @@ public class NewsItem {
     private static final Logger LOG = Logger.getLogger(NewsItem.class.getName());
 
     @EJB private CatalogueFacadeLocal catalogueFacade;
+    
+    @EJB private ContentItemFacadeLocal contentItemFacade;
 
     @EJB private NewsItemFacadeLocal newsItemFacade;
 
@@ -1344,5 +1346,30 @@ public class NewsItem {
 
     public void setSelectedConcepts(List<Concept> selectedConcepts) {
         this.selectedConcepts = selectedConcepts;
+    }
+    
+    public Map<Long, Boolean> getCurrentMediaItemActor() {
+        Map<Long, Boolean> currentMediaActors = new HashMap<Long, Boolean>();
+        for (NewsItemMediaAttachment nima :this.selectedNewsItem.getMediaAttachments()) {
+            try {
+                Boolean status;
+                ContentItemPermission permission = contentItemFacade.findContentItemPermissionById(nima.getMediaItem().getId(), getUser().getUsername());
+                switch (permission) {
+                    case USER:
+                    case ROLE:
+                        status = Boolean.TRUE;
+                        break;
+                    default:
+                        status = Boolean.FALSE;
+                }
+                currentMediaActors.put(nima.getMediaItem().getId(), status);
+            } catch (DataNotFoundException ex) {
+                // Theorically this should never happen
+                LOG.log(Level.SEVERE, null, ex);
+            }
+        }
+        return currentMediaActors;
+        
+        
     }
 }

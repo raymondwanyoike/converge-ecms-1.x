@@ -46,14 +46,17 @@ public interface ContentItemServiceLocal {
      *          {@link ContentItem} to promote
      * @param step
      *          Unique identifier of the next step
+     * @param stateTransition 
+     *          Is the step a state transition (skipping the WorkflowOption) or
+     *          is it a WorkflowOption transition. A state transition can be used
+     *          to move from one state to another by-passing declared workflow 
+     *          options.
      * @return Promoted {@link ContentItem}
      * @throws WorkflowStateTransitionException 
      *          If the next state is not legal or if the step failed
      */
-    dk.i2m.converge.core.content.ContentItem step(
-            dk.i2m.converge.core.content.ContentItem contentItem,
-            java.lang.Long step) throws
-            dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
+    ContentItem step(ContentItem contentItem, Long step, boolean stateTransition) throws
+            WorkflowStateTransitionException;
 
     /**
      * Re-generate the thumbnail links for all {@link ContentItem}s. 
@@ -65,5 +68,5 @@ public interface ContentItemServiceLocal {
     /**
      * Updates the {@link ContentItem#thumbnailLink}.
      */
-    void updateThumbnail(dk.i2m.converge.core.content.ContentItem ci);
+    void updateThumbnail(ContentItem ci);
 }

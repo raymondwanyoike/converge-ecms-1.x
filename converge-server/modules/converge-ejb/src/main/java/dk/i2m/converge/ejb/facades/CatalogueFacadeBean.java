@@ -17,6 +17,7 @@
 package dk.i2m.converge.ejb.facades;
 
 import dk.i2m.converge.core.DataNotFoundException;
+import dk.i2m.converge.core.content.ContentItem;
 import dk.i2m.converge.core.content.ContentResultSet;
 import dk.i2m.converge.core.content.NewsItemMediaAttachment;
 import dk.i2m.converge.core.content.NewsItemPlacement;
@@ -34,7 +35,10 @@ import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.ejb.services.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
@@ -124,22 +128,38 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     }
 
     /**
-     * Indexes enabled {@link Catalogue}s.
+     * Indexes approved items in all enabled {@link Catalogue}s.
      *
-     * @throws InvalidMediaRepositoryException  If the location of the {@link Catalogue} is not valid
-     * @throws MediaRepositoryIndexingException If the location of the {@link Catalogue} could not be indexed
+     * @throws InvalidCatalogueException  
+     *          If the location of the {@link Catalogue} is not valid
+     * @throws CatalogueIndexingException 
+     *          If the location of the {@link Catalogue} could not be indexed
      */
     @Override
-    public void indexCatalogues() throws InvalidMediaRepositoryException,
-            MediaRepositoryIndexingException {
-        Map<String, Object> parameters = QueryBuilder.with("status",
-                MediaItemStatus.APPROVED).parameters();
-        List<MediaItem> items = daoService.findWithNamedQuery(
-                MediaItem.FIND_BY_STATUS, parameters);
+    public void indexCatalogues() throws InvalidCatalogueException,
+            CatalogueIndexingException {
 
-        for (MediaItem item : items) {
-            searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, item.getId(),
-                    QueueEntryOperation.UPDATE);
+        List<Catalogue> catalogues = daoService.findWithNamedQuery(
+                Catalogue.FIND_ENABLED);
+
+        int start = 0;
+        final int BATCH = 50;
+        for (Catalogue c : catalogues) {
+            WorkflowState state = c.getWorkflow().getEndState();
+
+            ContentResultSet examine = findMediaItemsByWorkflowState(c, state,
+                    start, 1, "id", "ASC");
+
+            for (int page = 0; page < examine.getNumberOfPages(); page++) {
+                ContentResultSet rs = findMediaItemsByWorkflowState(c, state,
+                        start + (page * BATCH), BATCH, "id", "ASC");
+
+                for (ContentItem item : rs.getHits()) {
+                    searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM,
+                            item.getId(),
+                            QueueEntryOperation.UPDATE);
+                }
+            }
         }
     }
 
@@ -267,7 +287,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
                 }
             }
         }
-
+        
         return mediaItemRendition;
     }
 
@@ -451,14 +471,14 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         contentItemService.updateThumbnail(mediaItem);
         mediaItem = daoService.update(mediaItem);
 
-        if (mediaItem.getStatus() == null || !mediaItem.getStatus().equals(
-                MediaItemStatus.APPROVED)) {
-            searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, mediaItem.
-                    getId(), QueueEntryOperation.REMOVE);
-        } else {
-            searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, mediaItem.
-                    getId(), QueueEntryOperation.UPDATE);
-        }
+//        if (mediaItem.getStatus() == null || !mediaItem.getStatus().equals(
+//                MediaItemStatus.APPROVED)) {
+//            searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, mediaItem.
+//                    getId(), QueueEntryOperation.REMOVE);
+//        } else {
+//            searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, mediaItem.
+//                    getId(), QueueEntryOperation.UPDATE);
+//        }
 
         return mediaItem;
     }
@@ -498,9 +518,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
         item.setDescription(description.toString());
         item.setTitle(newswireItem.getTitle());
-        item.setOwner(user);
         item.setCatalogue(catalogue);
-        item.setStatus(MediaItemStatus.APPROVED);
         try {
             create(item);
         } catch (WorkflowStateTransitionException ex) {
@@ -570,38 +588,6 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     @Override
     public MediaItem findMediaItemById(Long id) throws DataNotFoundException {
         return daoService.findById(MediaItem.class, id);
-    }
-
-    @Override
-    public List<MediaItem> findMediaItemsByStatus(MediaItemStatus status) {
-        Map<String, Object> params = QueryBuilder.with("status", status).
-                parameters();
-        return daoService.findWithNamedQuery(MediaItem.FIND_BY_STATUS, params);
-    }
-
-    @Override
-    public List<MediaItem> findMediaItemsByOwner(UserAccount owner) {
-        Map<String, Object> params = QueryBuilder.with("owner", owner).
-                parameters();
-        return daoService.findWithNamedQuery(MediaItem.FIND_BY_OWNER, params);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<MediaItem> findCurrentMediaItems(UserAccount user,
-            MediaItemStatus mediaItemStatus, Long catalogueId) {
-        final int MAX_RETURN = 200;
-        try {
-            Catalogue catalogue = daoService.findById(Catalogue.class,
-                    catalogueId);
-            Map<String, Object> params = QueryBuilder.with("user", user).
-                    and("status", mediaItemStatus).
-                    and("catalogue", catalogue).parameters();
-            return daoService.findWithNamedQuery(
-                    MediaItem.FIND_BY_OWNER_AND_STATUS, params, MAX_RETURN);
-        } catch (DataNotFoundException ex) {
-            return Collections.EMPTY_LIST;
-        }
     }
 
     /** {@inheritDoc } */
@@ -815,6 +801,44 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     /** {@inheritDoc } */
     @Override
+    public ContentResultSet findMediaItemsByWorkflowState(Catalogue catalogue,
+            WorkflowState state, int start, int rows,
+            String sortField, String sortDirection) {
+        long startTime = Calendar.getInstance().getTimeInMillis();
+
+
+        ContentResultSet resultSet = new ContentResultSet();
+        resultSet.setResultsPerPage(rows);
+        resultSet.setStart(start);
+
+        Map<String, Object> params =
+                QueryBuilder.with(MediaItem.PARAM_CATALOGUE, catalogue).and(
+                MediaItem.PARAM_WORKFLOW_STATE, state).parameters();
+
+        Number count =
+                daoService.executeNamedQuery(Number.class,
+                MediaItem.COUNT_BY_CATALOGUE_AND_WORKFLOW_STATE, params);
+        resultSet.setNumberOfResults(count.longValue());
+
+        Query q = daoService.getEntityManager().createQuery(
+                "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.precalculatedCurrentActor, n.currentState.name, n.catalogue.name, n.updated, n.thumbnailLink) "
+                + "FROM ContentItem AS ci, MediaItem AS n "
+                + "WHERE ci.id=n.id AND n.catalogue = :"
+                + MediaItem.PARAM_CATALOGUE + " AND n.currentState = :"
+                + MediaItem.PARAM_WORKFLOW_STATE + " "
+                + "ORDER BY n." + sortField + " " + sortDirection);
+
+        resultSet.setHits(daoService.findWithQuery(q, params, start, rows));
+
+
+        long endTime = Calendar.getInstance().getTimeInMillis();
+        resultSet.setSearchTime(endTime - startTime);
+
+        return resultSet;
+    }
+
+    /** {@inheritDoc } */
+    @Override
     public ContentResultSet findMediaItemsByWorkflowState(String username,
             Catalogue catalogue, WorkflowState state, int start, int rows,
             String sortField, String sortDirection) {
@@ -845,7 +869,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
         Query q = daoService.getEntityManager().createQuery(
                 "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.precalculatedCurrentActor, n.currentState.name, n.catalogue.name, n.updated, n.thumbnailLink) "
-                + "FROM ContentItem AS ci, MediaItem AS n JOIN n.actors AS a "
+                + "FROM ContentItem AS ci, MediaItem AS n LEFT JOIN n.actors AS a "
                 + "WHERE ci.id=n.id AND n.catalogue = :"
                 + MediaItem.PARAM_CATALOGUE + " AND n.currentState = :"
                 + MediaItem.PARAM_WORKFLOW_STATE + " AND (( a.user = :"
@@ -896,7 +920,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         //          sorting in JPA1. In JPA2 the order can be added using the 
         //          Criteria object
         String findSql = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.precalculatedCurrentActor, n.currentState.name, n.catalogue.name, n.updated, n.thumbnailLink) "
-                + "FROM ContentItem AS ci, MediaItem AS n JOIN n.actors AS a "
+                + "FROM ContentItem AS ci, MediaItem AS n LEFT JOIN n.actors AS a "
                 + "WHERE ci.id=n.id AND n.catalogue = :"
                 + MediaItem.PARAM_CATALOGUE + " AND (( a.user = :"
                 + MediaItem.PARAM_USER
@@ -920,8 +944,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     /** {@inheritDoc } */
     @Override
-    public MediaItem step(MediaItem mediaItem, Long stepId) throws
+    public MediaItem step(MediaItem mediaItem, Long stepId, boolean stateTransition) throws
             WorkflowStateTransitionException {
-        return (MediaItem) contentItemService.step(mediaItem, stepId);
+        return (MediaItem) contentItemService.step(mediaItem, stepId, stateTransition);
     }
 }

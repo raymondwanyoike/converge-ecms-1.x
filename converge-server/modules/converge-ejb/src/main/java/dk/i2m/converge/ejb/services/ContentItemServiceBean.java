@@ -57,10 +57,12 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
     @EJB private PluginContextBeanLocal pluginContext;
 
     @EJB private NewsItemFacadeLocal newsItemFacade;
+
     @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @Resource private SessionContext ctx;
 
+    /** {@inheritDoc } */
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public ContentItem start(ContentItem contentItem) throws
@@ -104,11 +106,15 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
         WorkflowState startState = workflow.getStartState();
         boolean actorSet = false;
         UserRole requiredRole = startState.getActorRole();
-        for (ContentItemActor actor : contentItem.getActors()) {
-            if (actor.getRole().equals(requiredRole)) {
-                actorSet = true;
-                break;
+        if (!startState.isGroupPermission()) {
+            for (ContentItemActor actor : contentItem.getActors()) {
+                if (actor.getRole().equals(requiredRole)) {
+                    actorSet = true;
+                    break;
+                }
             }
+        } else {
+            actorSet = true;
         }
 
         if (!actorSet) {
@@ -191,9 +197,12 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
 
     /** {@inheritDoc} */
     @Override
-    public ContentItem step(ContentItem contentItem, Long step) throws
+    public ContentItem step(ContentItem contentItem, Long step,
+            boolean stateTransition) throws
             WorkflowStateTransitionException {
-
+        
+        
+        
         // Get current user
         String uid = ctx.getCallerPrincipal().getName();
         UserAccount ua = null;
@@ -208,14 +217,26 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
         Calendar now = Calendar.getInstance();
 
         WorkflowStep transitionStep;
-        try {
-            transitionStep = daoService.findById(WorkflowStep.class, step);
-        } catch (DataNotFoundException ex) {
-            throw new WorkflowStateTransitionException("Transition (WorkflowStep) #"
-                    + step + " does not exist", ex);
-        }
+        WorkflowState nextState;
+        boolean isSelfUploadState = false;
+        if (stateTransition) {
+            try {
+                nextState = daoService.findById(WorkflowState.class, step);
+            } catch (DataNotFoundException ex) {
+                throw new WorkflowStateTransitionException("Transition (WorkflowState) #"
+                        + step + " does not exist", ex);
+            }
+            transitionStep = null;
+        } else {
+            try {
+                transitionStep = daoService.findById(WorkflowStep.class, step);
+            } catch (DataNotFoundException ex) {
+                throw new WorkflowStateTransitionException("Transition (WorkflowStep) #"
+                        + step + " does not exist", ex);
+            }
 
-        WorkflowState nextState = transitionStep.getToState();
+            nextState = transitionStep.getToState();
+        }
 
         // Checking validity of step
         WorkflowState state = contentItem.getCurrentState();
@@ -234,6 +255,17 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
             }
         }
 
+        if (contentItem instanceof MediaItem) {
+            MediaItem mi = (MediaItem) contentItem;
+            WorkflowState selfUpload = mi.getCatalogue().getSelfUploadState();
+
+            if (selfUpload != null && nextState.equals(selfUpload)) {
+                legalStep = true;
+                isSelfUploadState = true;
+            }
+        }
+
+
         if (!legalStep) {
             throw new WorkflowStateTransitionException("Illegal transition from "
                     + state.getId() + " to " + nextState.getId());
@@ -241,8 +273,8 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
 
         // Checking that the necessary roles were added
         boolean isRoleValidated = false;
-        UserRole requiredRole = transitionStep.getToState().getActorRole();
-        boolean isUserRole = transitionStep.getToState().isUserPermission();
+        UserRole requiredRole = nextState.getActorRole();
+        boolean isUserRole = nextState.isUserPermission();
 
         if (isUserRole) {
             for (ContentItemActor actor : contentItem.getActors()) {
@@ -263,16 +295,21 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
         }
 
         // Checking the result of workflow step validators
-        for (WorkflowStepValidator validator : transitionStep.getValidators()) {
-            try {
-                WorkflowValidator workflowValidator = validator.getValidator();
-                workflowValidator.execute(contentItem, transitionStep, validator);
-            } catch (WorkflowValidatorException ex) {
-                throw new WorkflowStateTransitionValidationException(ex.
-                        getMessage());
+        if (!stateTransition) {
+            for (WorkflowStepValidator validator :
+                    transitionStep.getValidators()) {
+                try {
+                    WorkflowValidator workflowValidator =
+                            validator.getValidator();
+                    workflowValidator.execute(contentItem, transitionStep,
+                            validator);
+                } catch (WorkflowValidatorException ex) {
+                    throw new WorkflowStateTransitionValidationException(ex.
+                            getMessage());
+                }
             }
         }
-        
+
         UserRole stateRole = state.getActorRole();
         boolean skipAddCurrentUserToActors = false;
         if (state.isGroupPermission()) {
@@ -284,9 +321,10 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
         } else {
             skipAddCurrentUserToActors = true;
         }
-        
+
         if (!skipAddCurrentUserToActors) {
-            ContentItemActor cia = new ContentItemActor(ua, stateRole, contentItem);
+            ContentItemActor cia = new ContentItemActor(ua, stateRole,
+                    contentItem);
             contentItem.getActors().add(cia);
         }
 
@@ -302,15 +340,18 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
             newsItem.setPrecalculatedWordCount(newsItem.getWordCount());
         }
 
-        transition.setSubmitted(transitionStep.isTreatAsSubmitted());
+
+        if (!stateTransition) {
+            transition.setSubmitted(transitionStep.isTreatAsSubmitted());
+        } else {
+            transition.setSubmitted(isSelfUploadState);
+        }
+
         contentItem.setCurrentState(nextState);
         contentItem.getHistory().add(transition);
         contentItem.setUpdated(now.getTime());
         contentItem.setPrecalculatedCurrentActor(contentItem.getCurrentActor());
 
-        
-        
-        
         if (contentItem instanceof NewsItem) {
             try {
                 contentItem = newsItemFacade.checkin((NewsItem) contentItem);
@@ -319,18 +360,21 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
             }
 
             // Actions
-            for (WorkflowStepAction action : transitionStep.getActions()) {
-                try {
-                    WorkflowAction act = action.getAction();
-                    act.execute(pluginContext, (NewsItem) contentItem, action,
-                            ua);
-                } catch (WorkflowActionException ex) {
-                    LOG.log(Level.SEVERE, "Could not execute action {0}",
-                            action.getLabel());
+            if (!stateTransition) {
+                for (WorkflowStepAction action : transitionStep.getActions()) {
+                    try {
+                        WorkflowAction act = action.getAction();
+                        act.execute(pluginContext, (NewsItem) contentItem,
+                                action,
+                                ua);
+                    } catch (WorkflowActionException ex) {
+                        LOG.log(Level.SEVERE, "Could not execute action {0}",
+                                action.getLabel());
+                    }
                 }
             }
         } else if (contentItem instanceof MediaItem) {
-            contentItem = catalogueFacade.update((MediaItem)contentItem);
+            contentItem = catalogueFacade.update((MediaItem) contentItem);
         }
 
         return contentItem;

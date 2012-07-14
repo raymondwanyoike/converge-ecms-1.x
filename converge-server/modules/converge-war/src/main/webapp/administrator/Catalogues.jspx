@@ -105,9 +105,9 @@
                     <h:panelGrid id="pgMediaRepositoryDetails" style="width: 480px;">
 
                         <rich:tabPanel id="tpMediaRepository" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
-                            
+
                             <rich:tab id="tabMediaRepository" label="#{i18n.Catalogues_MEDIA_ITEM_LABEL}">
-                 
+
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_NAME}:" />
                                     <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedCatalogue.name}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_NAME_TOOLTIP}" required="true" requiredMessage="#{i18n.Catalogues_MEDIA_REPOSITORY_NAME_REQUIRED}"/>
@@ -127,15 +127,22 @@
                                     <h:inputText id="txtMaxFileUpload" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedCatalogue.maxFileUploadSize}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_MAX_FILE_UPLOAD_SIZE_REQUIRED}" title="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_MAX_FILE_UPLOAD_SIZE_TOOLTIP}" converterMessage="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_MAX_FILE_UPLOAD_SIZE_INVALID}" disabled="#{administrator_Catalogues.selectedCatalogue.readOnly}">
                                         <f:convertNumber integerOnly="true" />
                                     </h:inputText>
-                           
+
                                     <h:outputText value="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_WORKFLOW}" />
                                     <h:selectOneMenu id="somWorkflow" value="#{administrator_Catalogues.selectedCatalogue.workflow}" converter="#{converters.workflowConverter}" disabled="#{administrator_Catalogues.selectedCatalogue.readOnly}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_WORKFLOW_REQUIRED}" title="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_WORKFLOW_TOOLTIP}">
                                         <f:selectItem itemLabel=""  />
                                         <f:selectItems value="#{common.workflows}" />
+                                        <a4j:support event="onchange" reRender="somSelfUploadState" />
+                                    </h:selectOneMenu>
+
+                                    <h:outputText value="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_SELF_UPLOAD_STATE}" />
+                                    <h:selectOneMenu id="somSelfUploadState" value="#{administrator_Catalogues.selectedCatalogue.selfUploadState}" converter="#{converters.workflowStateConverter}" disabled="#{administrator_Catalogues.selectedCatalogue.readOnly}" title="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_SELF_UPLOAD_STATE_TOOLTIP}">
+                                        <f:selectItem itemLabel=""  />
+                                        <f:selectItems value="#{administrator_Catalogues.selectedCatalogueWorkflowStates}" />
                                     </h:selectOneMenu>
                                 </h:panelGrid>
                             </rich:tab>
-            
+
                             <rich:tab id="tabRoles" label="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_USER_ROLES}">
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <rich:pickList id="plUserRoles"

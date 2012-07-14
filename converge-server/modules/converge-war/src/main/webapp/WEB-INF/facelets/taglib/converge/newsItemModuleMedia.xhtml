@@ -75,15 +75,15 @@
                         <h:outputText value="#{attachment.mediaItem.byLine}" rendered="#{attachment.mediaItem.byLine != ''}" />
                         <h:outputText value="#{attachment.mediaItem.owner.fullName}" rendered="#{attachment.mediaItem.byLine == ''}" />
 
-                        <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_RENDITIONS}" rendered="#{userSession.catalogueEditorRole[attachment.mediaItem.catalogue.id]}" />
-                        <rich:dataGrid value="#{attachment.mediaItem.renditions}" var="rendition" style="background: #33aa33; width: 100%; font-weight: bold;" rendered="#{userSession.catalogueEditorRole[attachment.mediaItem.catalogue.id]}">
+                        <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_RENDITIONS}" rendered="#{newsItem.currentMediaItemActor[attachment.mediaItem.id]}" />
+                        <rich:dataGrid value="#{attachment.mediaItem.renditions}" var="rendition" style="background: #33aa33; width: 100%; font-weight: bold;" rendered="#{newsItem.currentMediaItemActor[attachment.mediaItem.id]}">
                             <h:outputLink value="#{rendition.absoluteFilename}" style=" font-size: 0.9em; color: white; text-transform: uppercase;" target="_blank">
                                 <h:outputText value="#{rendition.rendition.label}" />
                             </h:outputLink>
                         </rich:dataGrid>
 
-                        <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_RENDITIONS_MISSING}" rendered="#{userSession.catalogueEditorRole[attachment.mediaItem.catalogue.id] &amp;&amp; !empty attachment.mediaItem.missingRenditions}" />
-                        <rich:dataGrid value="#{attachment.mediaItem.missingRenditions}" style="background: #aa3333; width: 100%; font-weight: bold;" var="rendition" rendered="#{userSession.catalogueEditorRole[attachment.mediaItem.catalogue.id] &amp;&amp; !empty attachment.mediaItem.missingRenditions}">
+                        <h:outputText value="#{i18n.NewsItem_MEDIA_ATTACHMENT_RENDITIONS_MISSING}" rendered="#{newsItem.currentMediaItemActor[attachment.mediaItem.id] &amp;&amp; !empty attachment.mediaItem.missingRenditions}" />
+                        <rich:dataGrid value="#{attachment.mediaItem.missingRenditions}" style="background: #aa3333; width: 100%; font-weight: bold;" var="rendition" rendered="#{newsItem.currentMediaItemActor[attachment.mediaItem.id] &amp;&amp; !empty attachment.mediaItem.missingRenditions}">
                             <h:outputLink value="#{facesContext.externalContext.request.contextPath}/CropRendition.xhtml" target="_blank">
                                 <f:param name="mid" value="#{attachment.mediaItem.id}" />
                                 <f:param name="tid" value="#{rendition.id}" />
@@ -179,7 +179,7 @@
                                 <h:outputText value="#{i18n.NewsItem_MEDIA_FILE_UPLOAD_CATALOGUE}" />
                                 <h:selectOneMenu id="somCatalogue" styleClass="text mediumInput" value="#{newsItem.selectedCatalogue}" converter="#{converters.mediaRepositoryConverter}">
                                     <f:selectItem itemLabel="" />
-                                    <f:selectItems value="#{userSession.myCatalogues}" />
+                                    <f:selectItems value="#{userSession.mySelfUploadCatalogues}" />
                                     <a4j:support event="onchange" reRender="pgMedia" ajaxSingle="true" />
                                 </h:selectOneMenu>
 
@@ -243,9 +243,9 @@
                                     <h:outputText value="#{i18n.NewsItem_MEDIA_SELECTED_ITEM_CAPTION}" />
                                     <h:inputTextarea id="txtCaption" value="#{newsItem.selectedAttachment.caption}" style="width: 98%; height: 100px; margin-left: 1%; margin-right: 1%" styleClass="text mediumInput" required="true" requiredMessage="#{i18n.NewsItem_SELECTED_ITEM_CAPTION_REQUIRED}" />
                                     <h:outputText value="#{i18n.NewsItem_MEDIA_SELECTED_ITEM_BY_LINE}" />
-                                    <h:inputText value="#{newsItem.selectedAttachment.mediaItem.byLine}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text mediumInput" rendered="#{newsItem.selectedAttachment.mediaItem.status == 'SELF_UPLOAD'}"/>
-                                    <h:inputText value="#{newsItem.selectedAttachment.mediaItem.byLine}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text mediumInput" disabled="true" rendered="#{newsItem.selectedAttachment.mediaItem.status != 'SELF_UPLOAD' &amp;&amp; newsItem.selectedAttachment.mediaItem.byLine != ''}"/>
-                                    <h:inputText value="#{newsItem.selectedAttachment.mediaItem.owner.fullName}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text mediumInput" disabled="true" rendered="#{newsItem.selectedAttachment.mediaItem.status != 'SELF_UPLOAD' &amp;&amp; newsItem.selectedAttachment.mediaItem.byLine == ''}"/>
+                                    <h:inputText value="#{newsItem.selectedAttachment.mediaItem.byLine}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text mediumInput" rendered="#{newsItem.selectedAttachment.mediaItem.selfUpload}"/>
+                                    <h:inputText value="#{newsItem.selectedAttachment.mediaItem.byLine}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text mediumInput" disabled="true" rendered="#{!newsItem.selectedAttachment.mediaItem.selfUpload &amp;&amp; newsItem.selectedAttachment.mediaItem.byLine != ''}"/>
+                                    <h:inputText value="#{newsItem.selectedAttachment.mediaItem.owner.fullName}" style="width: 98%; margin-left: 1%; margin-right: 1%" styleClass="text mediumInput" disabled="true" rendered="#{!newsItem.selectedAttachment.mediaItem.selfUpload &amp;&amp; newsItem.selectedAttachment.mediaItem.byLine == ''}"/>
                                 </h:panelGrid>
                                 <h:panelGrid columnClasses="tabSheet center" styleClass="tabSheetGrid" rendered="#{newsItem.selectedAttachment.mediaItem.held}">
                                     <h:outputText value="#{i18n.NewsItem_MEDIA_SELECTED_IS_HELD}" />                                

@@ -29,7 +29,7 @@ import javax.persistence.*;
  * @author Allan Lykke Christensen
  */
 @Entity
-@Table(name = "news_item_workflow_state_transition")
+@Table(name = "content_item_workflow_transition")
 public class WorkflowStateTransition implements Serializable {
 
     private static final long serialVersionUID = 2L;

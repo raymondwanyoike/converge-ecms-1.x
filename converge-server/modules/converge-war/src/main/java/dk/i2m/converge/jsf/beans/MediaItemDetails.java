@@ -206,7 +206,7 @@ public class MediaItemDetails {
         try {
             selectedMediaItem = catalogueFacade.step(selectedMediaItem,
                     getSelectedWorkflowStep().
-                    getId());
+                    getId(), false);
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(), "MediaItemDetails_MEDIA_ITEM_SUBMITTED");
             return "/inbox";

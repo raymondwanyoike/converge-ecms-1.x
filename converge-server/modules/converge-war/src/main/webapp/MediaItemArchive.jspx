@@ -16,8 +16,7 @@
                 </div>
 
                 <h1 style="margin-bottom: 5px; padding-bottom: 0px;">#{mediaItemArchive.selectedMediaItem.title}</h1>
-                <h2 style="margin-top: 0px; padding-top: 0px;">#{mediaItemArchive.selectedMediaItem.byLine == '' ? mediaItemArchive.selectedMediaItem.owner.fullName : mediaItemArchive.selectedMediaItem.byLine}</h2>
-
+                <h2 style="margin-top: 0px; padding-top: 0px;">#{mediaItemArchive.selectedMediaItem.byLine}</h2>
                 
                 <h:panelGroup rendered="#{mediaItemArchive.selectedMediaItem.held}" layout="block" styleClass="mediaItemHeld">
                     <h:outputText value="#{i18n.MediaItemArchive_MEDIA_ITEM_HELD}" />

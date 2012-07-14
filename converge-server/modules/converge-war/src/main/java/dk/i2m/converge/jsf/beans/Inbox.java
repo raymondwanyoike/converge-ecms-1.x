@@ -26,7 +26,6 @@ import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.content.ContentResultSet;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
-import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
 import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.views.InboxView;
@@ -223,7 +222,7 @@ public class Inbox {
             return;
         }
         try {
-            catalogueFacade.step((MediaItem)getSelectedContentItem(), wsId);
+            catalogueFacade.step((MediaItem)getSelectedContentItem(), wsId, false);
             createMessage("frmInbox", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(), "MediaItemDetails_MEDIA_ITEM_SUBMITTED");
             loadContentResultSet();
@@ -325,11 +324,7 @@ public class Inbox {
                 nia.setUser(getUser());
                 nia.setContentItem(newAssignment.getMediaItem());
                 newAssignment.getMediaItem().getActors().add(nia);
-
-                newAssignment.getMediaItem().setStatus(
-                        MediaItemStatus.UNSUBMITTED);
                 newAssignment.getMediaItem().setTitle(newAssignment.getTitle());
-                newAssignment.getMediaItem().setOwner(getUser());
                 newAssignment.getMediaItem().setByLine(getUser().getFullName());
 
                 MediaItem item = null;

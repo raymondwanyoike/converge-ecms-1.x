@@ -239,6 +239,7 @@ public class CropRendition {
             FileUtils.writeByteArrayToFile(tempFile, baos.toByteArray());
 
             MediaItemRendition mir = catalogueFacade.create(tempFile, mediaItem, targetRendition, targetRendition.getId() + ".png", "image/png", false);
+            mediaItem = catalogueFacade.update(mediaItem);
         } catch (IOException ex) {
             Logger.getLogger(CropRendition.class.getName()).log(Level.SEVERE, null, ex);
         }

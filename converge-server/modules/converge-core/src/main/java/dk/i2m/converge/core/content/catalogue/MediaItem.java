@@ -20,8 +20,8 @@ import dk.i2m.converge.core.content.Assignment;
 import dk.i2m.converge.core.content.ContentItem;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.metadata.Subject;
-import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.utils.BeanComparator;
+import dk.i2m.converge.core.workflow.WorkflowState;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -40,30 +40,22 @@ import javax.persistence.*;
 @DiscriminatorValue("media_item")
 @NamedQueries({
     @NamedQuery(name = MediaItem.FIND_BY_CATALOGUE, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.catalogue = :" + MediaItem.PARAM_CATALOGUE + " ORDER BY m.id ASC"),
-    @NamedQuery(name = MediaItem.FIND_BY_STATUS, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.status = :status ORDER BY m.updated DESC"),
-    @NamedQuery(name = MediaItem.FIND_BY_OWNER, query = "SELECT DISTINCT m FROM MediaItem m WHERE m.owner = :owner ORDER BY m.id DESC"),
-    @NamedQuery(name = MediaItem.FIND_CURRENT_AS_OWNER, query = "SELECT DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :mediaRepository AND m.owner = :user AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.APPROVED AND m.status <> dk.i2m.converge.core.content.catalogue.MediaItemStatus.REJECTED ORDER BY m.updated DESC"),
-    @NamedQuery(name = MediaItem.FIND_BY_OWNER_AND_STATUS, query = "SELECT  DISTINCT m FROM MediaItem m JOIN m.catalogue c WHERE c = :catalogue AND m.owner = :user AND m.status = :status ORDER BY m.updated DESC"),
-    @NamedQuery(name = MediaItem.COUNT_BY_USER_AND_CATALOGUE_AND_WORKFLOW_STATE, query = "SELECT COUNT(DISTINCT n) FROM ContentItem AS ci, MediaItem AS n JOIN n.actors AS a WHERE n.id=ci.id AND n.catalogue = :" + MediaItem.PARAM_CATALOGUE + " AND n.currentState = :" + MediaItem.PARAM_WORKFLOW_STATE + " AND (( a.user = :"+MediaItem.PARAM_USER+") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"+MediaItem.PARAM_USER+" MEMBER OF n.currentState.actorRole.userAccounts))"),
-    @NamedQuery(name = MediaItem.COUNT_BY_USER_AND_CATALOGUE, query = "SELECT COUNT(DISTINCT n) FROM ContentItem AS ci, MediaItem AS n JOIN n.actors AS a WHERE n.id=ci.id AND n.catalogue = :" + MediaItem.PARAM_CATALOGUE + " AND (( a.user = :"+MediaItem.PARAM_USER+") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"+MediaItem.PARAM_USER+" MEMBER OF n.currentState.actorRole.userAccounts))")
+    @NamedQuery(name = MediaItem.COUNT_BY_USER_AND_CATALOGUE_AND_WORKFLOW_STATE, query = "SELECT COUNT(DISTINCT n) FROM ContentItem AS ci, MediaItem AS n LEFT JOIN n.actors AS a WHERE n.id=ci.id AND n.catalogue = :" + MediaItem.PARAM_CATALOGUE + " AND n.currentState = :" + MediaItem.PARAM_WORKFLOW_STATE + " AND (( a.user = :"+MediaItem.PARAM_USER+") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"+MediaItem.PARAM_USER+" MEMBER OF n.currentState.actorRole.userAccounts))"),
+    @NamedQuery(name = MediaItem.COUNT_BY_CATALOGUE_AND_WORKFLOW_STATE, query = "SELECT COUNT(DISTINCT n) FROM ContentItem AS ci, MediaItem AS n WHERE n.id=ci.id AND n.catalogue = :" + MediaItem.PARAM_CATALOGUE + " AND n.currentState = :" + MediaItem.PARAM_WORKFLOW_STATE),
+    @NamedQuery(name = MediaItem.COUNT_BY_USER_AND_CATALOGUE, query = "SELECT COUNT(DISTINCT n) FROM ContentItem AS ci, MediaItem AS n LEFT JOIN n.actors AS a WHERE n.id=ci.id AND n.catalogue = :" + MediaItem.PARAM_CATALOGUE + " AND (( a.user = :"+MediaItem.PARAM_USER+") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"+MediaItem.PARAM_USER+" MEMBER OF n.currentState.actorRole.userAccounts))")
 })
 public class MediaItem extends ContentItem {
 
     /** Query for finding all {@link MediaItem}s by {@link Catalogue}. Use the {@link #PARAM_CATALOGUE} parameter to specify the {@link Catalogue}. */
     public static final String FIND_BY_CATALOGUE = "MediaItem.FindByCatalogue";
 
-    public static final String FIND_BY_STATUS = "MediaItem.FindByStatus";
-
-    public static final String FIND_BY_OWNER = "MediaItem.FindByOwner";
-
-    public static final String FIND_CURRENT_AS_OWNER = "MediaItem.FindCurrentAsOwner";
-
-    public static final String FIND_BY_OWNER_AND_STATUS = "MediaItem.FindByOwnerAndStatus";
-    
-    /** Query for counting the results from the {@link #FIND_BY_USER_AND_CATALOGUE_AND_WORKFLOW_STATE} query. */
+    /** Query for counting the results from finding items in a given catalogue with a given state for a given user. */
     public static final String COUNT_BY_USER_AND_CATALOGUE_AND_WORKFLOW_STATE = "MediaItem.CountByUserAndCatalogueAndWorkflowState";
+    
+    /** Query for counting the results from finding items in a given catalogue with a given state. */
+    public static final String COUNT_BY_CATALOGUE_AND_WORKFLOW_STATE = "MediaItem.CountByCatalogueAndWorkflowState";
         
-    /** Query for counting the results from the {@link #FIND_BY_USER_AND_CATALOGUE_AND_WORKFLOW_STATE} query. */
+    /** Query for counting the results from finding items in a given catalogue for a given user. */
     public static final String COUNT_BY_USER_AND_CATALOGUE = "MediaItem.CountByUserAndCatalogue";
     
     /** Query parameter used to specify the user. */
@@ -87,14 +79,6 @@ public class MediaItem extends ContentItem {
 
     @Column(name = "byline") @Lob
     private String byLine = "";
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private MediaItemStatus status = MediaItemStatus.UNSUBMITTED;
-
-    @ManyToOne
-    @JoinColumn(name = "owner")
-    private UserAccount owner;
 
     @Column(name = "editorial_note")
     private String editorialNote = "";
@@ -150,14 +134,6 @@ public class MediaItem extends ContentItem {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public UserAccount getOwner() {
-        return owner;
-    }
-
-    public void setOwner(UserAccount owner) {
-        this.owner = owner;
     }
 
     public String getEditorialNote() {
@@ -238,14 +214,6 @@ public class MediaItem extends ContentItem {
 
     public void setMediaDate(Calendar mediaDate) {
         this.mediaDate = mediaDate;
-    }
-
-    public MediaItemStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(MediaItemStatus status) {
-        this.status = status;
     }
 
     public String getByLine() {
@@ -483,6 +451,23 @@ public class MediaItem extends ContentItem {
         } catch (RenditionNotFoundException ex) {
             return false;
         }
+    }
+    
+    /**
+     * Determine if the {@link MediaItem} is at the <em>self upload</em> status.
+     * 
+     * @return {@code true} if the {@link MediaItem} is at the <em>self 
+     *         upload</em> status, otherwise {@code false}
+     */
+    public boolean isSelfUpload() {
+        boolean selfUpload = false;
+        WorkflowState ws = getCatalogue().getSelfUploadState();
+        if (ws != null) {
+            if (getCurrentState().equals(ws)) {
+                selfUpload = true;
+            }
+        }
+        return selfUpload;
     }
 
     @Override

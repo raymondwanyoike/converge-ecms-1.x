@@ -60,9 +60,6 @@
                         <h:outputText value="#{i18n.MediaItemDetails_PROPERTY_TITLE}" />
                         <h:inputText id="txtHeadline" styleClass="text mediaItemProperty" value="#{mediaItemDetails.selectedMediaItem.title}" required="true" requiredMessage="#{i18n.MediaItemDetails_PROPERTY_TITLE_REQUIRED}" disabled="#{!mediaItemDetails.currentActor}" />
 
-                        <h:outputText value="#{i18n.MediaItemDetails_PROPERTY_OWNER}" />
-                        <h:inputText styleClass="text mediaItemProperty" disabled="true" value="#{mediaItemDetails.selectedMediaItem.owner.fullName}" />
-
                         <h:outputText value="#{i18n.MediaItemDetails_PROPERTY_DATE}" />
                         <rich:calendar popup="true" value="#{mediaItemDetails.selectedMediaItem.mediaDate.time}" datePattern="#{i18n.Generic_FORMAT_DATE}" timeZone="#{userSession.user.timeZone}" disabled="#{!mediaItemDetails.currentActor}"/>
 

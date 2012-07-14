@@ -23,7 +23,6 @@ import dk.i2m.converge.core.content.AssignmentType;
 import dk.i2m.converge.core.content.Language;
 import dk.i2m.converge.core.content.NewsItemField;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
-import dk.i2m.converge.core.content.catalogue.MediaItemStatus;
 import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.content.forex.Currency;
 import dk.i2m.converge.core.content.markets.FinancialMarket;
@@ -583,26 +582,6 @@ public class Common {
         }
 
         return repositories;
-    }
-
-    public Map<String, MediaItemStatus> getMediaItemStatuses() {
-        Map<String, MediaItemStatus> statuses = new LinkedHashMap<String, MediaItemStatus>();
-
-        for (MediaItemStatus status : MediaItemStatus.values()) {
-            String lbl = i18n.getString("Generic_MEDIA_ITEM_STATUS_" + status.name());
-            statuses.put(lbl, status);
-        }
-
-        return statuses;
-    }
-
-    public Map<String, MediaItemStatus> getMediaItemOwnerStatuses() {
-        Map<String, MediaItemStatus> statuses = new LinkedHashMap<String, MediaItemStatus>();
-
-        statuses.put(i18n.getString("Generic_MEDIA_ITEM_STATUS_OWNER_" + MediaItemStatus.SUBMITTED.name()), MediaItemStatus.SUBMITTED);
-        statuses.put(i18n.getString("Generic_MEDIA_ITEM_STATUS_OWNER_" + MediaItemStatus.UNSUBMITTED.name()), MediaItemStatus.UNSUBMITTED);
-
-        return statuses;
     }
 
     public Map<String, Rendition> getRenditions() {

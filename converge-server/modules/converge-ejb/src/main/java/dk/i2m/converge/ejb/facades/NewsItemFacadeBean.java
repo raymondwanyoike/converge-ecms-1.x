@@ -20,7 +20,6 @@ import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.*;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.logging.LogSeverity;
-import dk.i2m.converge.core.plugin.WorkflowAction;
 import dk.i2m.converge.core.search.QueueEntryOperation;
 import dk.i2m.converge.core.search.QueueEntryType;
 import dk.i2m.converge.core.security.SystemPrivilege;
@@ -82,7 +81,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     @Override
     public NewsItem step(NewsItem newsItem, Long step, String comment) throws
             WorkflowStateTransitionException {
-        return (NewsItem) contentItemService.step(newsItem, step);
+        return (NewsItem) contentItemService.step(newsItem, step, false);
     }
 
     /** {@inheritDoc} */

@@ -392,7 +392,7 @@ public class SearchEngineBean implements SearchEngineLocal {
                                         new ArrayList<SearchFacet>());
                             }
 
-                            String facetLabel = "";
+                            String facetLabel;
                             try {
                                 Date facetDate = ORIGINAL_FORMAT.parse(fcount.
                                         getName());
@@ -1029,9 +1029,12 @@ public class SearchEngineBean implements SearchEngineLocal {
                 solrDoc.addField(IndexField.DIRECT_URL.getName(),
                         mi.getPreview().getFileLocation());
             }
-
-            solrDoc.addField(IndexField.ACTOR.getName(), mi.getOwner().
-                    getFullName());
+            
+            for (ContentItemActor actor : mi.getActors()) {
+                solrDoc.addField(IndexField.ACTOR.getName(), actor.getUser().getFullName());
+                // Dynamic fields for the actors role
+                solrDoc.addField(actor.getRole().getName(), actor.getUser().getFullName());
+            }
 
             for (Concept concept : mi.getConcepts()) {
                 if (concept instanceof Subject) {

@@ -19,6 +19,7 @@ package dk.i2m.converge.core.content.catalogue;
 import dk.i2m.converge.core.newswire.NewswireItemAttachment;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.workflow.Workflow;
+import dk.i2m.converge.core.workflow.WorkflowState;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -120,6 +121,10 @@ public class Catalogue implements Serializable {
         joinColumns = {@JoinColumn(referencedColumnName = "id", name = "catalogue_id", nullable = false)},
         inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "role_id", nullable = false)})
     private List<UserRole> userRoles = new ArrayList<UserRole>();
+    
+    @ManyToOne
+    @JoinColumn(name="self_upload_state")
+    private WorkflowState selfUploadState;
 
     /**
      * Creates a new instance of {@link Catalogue}.
@@ -223,6 +228,31 @@ public class Catalogue implements Serializable {
 
     public void setWebAccess(String webAccess) {
         this.webAccess = webAccess;
+    }
+
+    /**
+     * Gets the {@link WorkflowState} to use for self-uploaded 
+     * {@link ContentItem}s. This state will automatically be set for 
+     * {@link ContentItem} uploaded inside a {@link NewsItem}.
+     * 
+     * @return {@link WorkflowState} to use for self-uploaded 
+     *         {@link ContentItem}s
+     */
+    public WorkflowState getSelfUploadState() {
+        return selfUploadState;
+    }
+
+    /**
+     * Sets the {@link WorkflowState} to use for self-uploaded 
+     * {@link ContentItem}s. This state will automatically be set for 
+     * {@link ContentItem} uploaded inside a {@link NewsItem}.
+     * 
+     * @param selfUploadState
+     *          {@link WorkflowState} to use for self-uploaded 
+     *          {@link ContentItem}s
+     */
+    public void setSelfUploadState(WorkflowState selfUploadState) {
+        this.selfUploadState = selfUploadState;
     }
 
     /**
