@@ -287,7 +287,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
                 }
             }
         }
-        
+
         return mediaItemRendition;
     }
 
@@ -409,25 +409,6 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         systemFacade.removeBackgroundTask(taskId);
     }
 
-    private void fillWithMetadata(MediaItemRendition mediaItemRendition) {
-        // Discover meta data and format info
-        Map<String, String> metaData =
-                metaDataService.extract(mediaItemRendition.getFileLocation());
-
-        for (String key : metaData.keySet()) {
-            if (key.equalsIgnoreCase("width")) {
-                mediaItemRendition.setWidth(Integer.valueOf(metaData.get(key)));
-            } else if (key.equalsIgnoreCase("height")) {
-                mediaItemRendition.setHeight(Integer.valueOf(metaData.get(key)));
-            } else if (key.equalsIgnoreCase("colourSpace")) {
-                mediaItemRendition.setColourSpace(metaData.get(key));
-            } else if (key.equalsIgnoreCase("Resolution")) {
-                mediaItemRendition.setResolution(Integer.valueOf(metaData.get(
-                        key)));
-            }
-        }
-    }
-
     /** {@inheritDoc } */
     @Override
     public void deleteMediaItemRenditionById(Long id) {
@@ -456,30 +437,14 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         return (MediaItem) contentItemService.start(mediaItem);
     }
 
-    /**
-     * Updates an existing {@link MediaItem} in the database. Upon updating the
-     * {@link MediaItem} will be updated and possibly deleted from the search
-     * engine.
-     *
-     * @param mediaItem 
-     *          {@link MediaItem} to update
-     * @return Updated {@link MediaItem}
-     */
+    /** {@inheritDoc } */
     @Override
     public MediaItem update(MediaItem mediaItem) {
         mediaItem.setUpdated(Calendar.getInstance().getTime());
+        LOG.log(Level.INFO, "Thumbnail B: {0}", mediaItem.getThumbnailLink());
         contentItemService.updateThumbnail(mediaItem);
+        LOG.log(Level.INFO, "Thumbnail A: {0}", mediaItem.getThumbnailLink());
         mediaItem = daoService.update(mediaItem);
-
-//        if (mediaItem.getStatus() == null || !mediaItem.getStatus().equals(
-//                MediaItemStatus.APPROVED)) {
-//            searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, mediaItem.
-//                    getId(), QueueEntryOperation.REMOVE);
-//        } else {
-//            searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, mediaItem.
-//                    getId(), QueueEntryOperation.UPDATE);
-//        }
-
         return mediaItem;
     }
 
@@ -944,8 +909,40 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
 
     /** {@inheritDoc } */
     @Override
-    public MediaItem step(MediaItem mediaItem, Long stepId, boolean stateTransition) throws
+    public MediaItem step(MediaItem mediaItem, Long stepId,
+            boolean stateTransition) throws
             WorkflowStateTransitionException {
-        return (MediaItem) contentItemService.step(mediaItem, stepId, stateTransition);
+        return (MediaItem) contentItemService.step(mediaItem, stepId,
+                stateTransition);
+    }
+
+    // -------------------------------------------------------------------------
+    // -- HELPERS
+    // -------------------------------------------------------------------------
+    
+    
+    /**
+     * Helper for adding basic meta data to a {@link MediaItemRendition}.
+     * 
+     * @param mediaItemRendition 
+     *          {@link MediaItemRendition} to add basic meta data
+     */
+    private void fillWithMetadata(MediaItemRendition mediaItemRendition) {
+        // Discover meta data and format info
+        Map<String, String> metaData =
+                metaDataService.extract(mediaItemRendition.getFileLocation());
+
+        for (String key : metaData.keySet()) {
+            if (key.equalsIgnoreCase("width")) {
+                mediaItemRendition.setWidth(Integer.valueOf(metaData.get(key)));
+            } else if (key.equalsIgnoreCase("height")) {
+                mediaItemRendition.setHeight(Integer.valueOf(metaData.get(key)));
+            } else if (key.equalsIgnoreCase("colourSpace")) {
+                mediaItemRendition.setColourSpace(metaData.get(key));
+            } else if (key.equalsIgnoreCase("Resolution")) {
+                mediaItemRendition.setResolution(Integer.valueOf(metaData.get(
+                        key)));
+            }
+        }
     }
 }

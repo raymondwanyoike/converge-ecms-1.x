@@ -8,10 +8,10 @@
             <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%" rendered="#{newsItem.currentActor &amp;&amp; !newsItem.readOnly}">
                 <h:outputText value="" />
                 <a4j:commandButton styleClass="button mediumButton" value="#{i18n.NewsItem_MEDIA_ATTACH}" ajaxSingle="true" actionListener="#{newsItem.onPreAttachMediaFile}"
-                                   oncomplete="#{rich:component('mpMediaFileUpload')}.show();#{rich:element('frmNewsItem:txtSearchKeyword')}.focus()" />
+                                   oncomplete="#{rich:component('mpMediaFileUpload')}.show(); #{rich:element('frmNewsItem:txtSearchKeyword')}.focus()" />
             </h:panelGrid>
 
-            <rich:dataGrid id="dtMediaFiles" value="#{newsItem.selectedNewsItem.mediaAttachments}" var="attachment" columns="#{newsItem.numberOfMediaAttachmentsColumns}" columnClasses="colMediaAttachment"> 
+            <rich:dataGrid id="dtMediaFiles" styleClass="media-item-attachment-grid" value="#{newsItem.selectedNewsItem.mediaAttachments}" var="attachment" columns="#{newsItem.numberOfMediaAttachmentsColumns}" columnClasses="colMediaAttachment"> 
                 <h:panelGrid style="width:100%;">
                     <h:panelGroup layout="block">
                         <h:panelGroup layout="block" style="float: left; font-size: smaller; padding: 4px; margin:4px; font-weight: bold; background: #dddddd; text-align: center; width: 15px; border: 1px solid #ccc;">

@@ -57,4 +57,12 @@ public interface ContentItemFacadeLocal {
      */
     ContentItemPermission findContentItemPermissionById(Long id, String uid) throws
             DataNotFoundException;
+
+    /**
+     * Update the thumbnail cache link for a given {@link ContentItem}.
+     * 
+     * @param id 
+     *          Unique identifier of the {@link ContentItem}.
+     */
+    void updateThumbnailLink(Long id);
 }

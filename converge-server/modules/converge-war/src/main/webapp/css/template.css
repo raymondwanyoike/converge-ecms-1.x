@@ -2074,3 +2074,6 @@ a.sort-field-activate, a.sort-field-activate:visited, a.sort-field-activate:hove
     border: none;
 }
 
+.media-item-attachment-grid {
+    border: none;
+}

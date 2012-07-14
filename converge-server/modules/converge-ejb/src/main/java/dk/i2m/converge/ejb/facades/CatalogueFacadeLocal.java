@@ -113,6 +113,13 @@ public interface CatalogueFacadeLocal {
 
     MediaItem create(NewswireItem newswireItem, Catalogue catalogue);
 
+    /**
+     * Updates an existing {@link MediaItem} in the database.
+     *
+     * @param mediaItem 
+     *          {@link MediaItem} to update
+     * @return Updated {@link MediaItem}
+     */
     MediaItem update(MediaItem mediaItem);
 
     /**

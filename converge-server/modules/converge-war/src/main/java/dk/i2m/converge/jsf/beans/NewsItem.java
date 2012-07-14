@@ -63,7 +63,7 @@ public class NewsItem {
     private static final Logger LOG = Logger.getLogger(NewsItem.class.getName());
 
     @EJB private CatalogueFacadeLocal catalogueFacade;
-    
+
     @EJB private ContentItemFacadeLocal contentItemFacade;
 
     @EJB private NewsItemFacadeLocal newsItemFacade;
@@ -118,6 +118,9 @@ public class NewsItem {
 
     private String newConcept = "";
 
+    /** Map of rights to the media attachments. */
+    private Map<Long, Boolean> currentMediaActors = new HashMap<Long, Boolean>();
+
     /**
      * Dev Note: Could not use a Concept object for direct entry as it is
      * abstract.
@@ -166,205 +169,9 @@ public class NewsItem {
     public NewsItem() {
     }
 
-    /**
-     * Event handler for suggesting concepts based on inputted string. Note that
-     * {@link dk.i2m.converge.core.metadata.Subject}s are not returned as they
-     * are selected through the subject selection dialog.
-     *
-     * @param suggestion
-     *          String for which to base the suggestions
-     * @return {@link List} of suggested {@link Concept}s based on
-     *         {@code suggestion}
-     */
-    public List<Concept> onConceptSuggestion(Object suggestion) {
-        String conceptName = (String) suggestion;
-        List<Concept> suggestedConcepts = new ArrayList<Concept>();
-        suggestedConcepts = metaDataFacade.findConceptsByName(conceptName,
-                Person.class, GeoArea.class, PointOfInterest.class,
-                Organisation.class);
-
-        return suggestedConcepts;
-    }
-
-    public void onAddConcept(ActionEvent event) {
-        try {
-            Concept concept = metaDataFacade.findConceptByName(newConcept);
-            if (!this.selectedNewsItem.getConcepts().contains(concept)) {
-                this.selectedNewsItem.getConcepts().add(concept);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                        Bundle.i18n.name(),
-                        "NewsItem_CONCEPT_X_ADDED_TO_NEWS_ITEM_Y",
-                        new Object[]{concept.getFullTitle(), selectedNewsItem.
-                            getTitle()});
-            }
-            this.newConcept = "";
-            conceptAdded = true;
-            onAutoSave(event);
-        } catch (DataNotFoundException ex) {
-            this.conceptType = "";
-            this.newConceptName = this.newConcept;
-            conceptAdded = false;
-        }
-    }
-
-    public void onAddNewConcept(ActionEvent event) {
-        Concept c = null;
-        if ("ORGANISATION".equalsIgnoreCase(conceptType)) {
-            c = new Organisation(newConceptName, newConceptDescription);
-        } else if ("PERSON".equalsIgnoreCase(conceptType)) {
-            c = new Person(newConceptName, newConceptDescription);
-        } else if ("LOCATION".equalsIgnoreCase(conceptType)) {
-            c = new GeoArea(newConceptName, newConceptDescription);
-        } else if ("POI".equalsIgnoreCase(conceptType)) {
-            c = new PointOfInterest(newConceptName, newConceptDescription);
-        } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    Bundle.i18n.name(), "NewsItem_CONCEPT_TYPE_MISSING");
-        }
-
-        if (c != null) {
-            c = metaDataFacade.create(c);
-            if (!this.selectedNewsItem.getConcepts().contains(c)) {
-                this.selectedNewsItem.getConcepts().add(c);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                        Bundle.i18n.name(),
-                        "NewsItem_CONCEPT_X_ADDED_TO_NEWS_ITEM_Y",
-                        new Object[]{c.getFullTitle(),
-                            selectedNewsItem.getTitle()});
-                onAutoSave(event);
-            }
-            this.newConcept = "";
-        }
-    }
-
-    public void onSelectSubject(NodeSelectedEvent event) {
-        HtmlTree tree = (HtmlTree) event.getComponent();
-        Subject subj = (Subject) tree.getRowData();
-        this.selectedNewsItem.getConcepts().add(subj);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                Bundle.i18n.name(),
-                "NewsItem_CONCEPT_X_ADDED_TO_NEWS_ITEM_Y",
-                new Object[]{subj.getFullTitle(), selectedNewsItem.getTitle()});
-    }
-
-    /**
-     * Gets the unique identifier of the loaded news item.
-     *
-     * @return Unique identifier of the loaded news item
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * Get the auto-save interval in milliseconds.
-     * 
-     * @return Auto-save interval in milliseconds. A value less than 1 indicates
-     *         that auto-save is disabled
-     */
-    public Integer getAutoSaveInterval() {
-        return cfgService.getInteger(ConfigurationKey.AUTO_SAVE_INTERVAL);
-    }
-
-    /**
-     * Determines if auto-save is enabled.
-     * 
-     * @return {@code true} if auto-save is enabled, otherwise {@code false}
-     */
-    public boolean isAutoSaveEnabled() {
-        if (getAutoSaveInterval() > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Sets the id of the news item to load. Upon setting the identifier, the
-     * news item will be checked-out from the database.
-     *
-     * @param id
-     *          Unique identifier of the news item to load
-     */
-    public void setId(Long id) {
-        LOG.log(Level.FINE, "Setting News Item #{0}", id);
-        this.id = id;
-
-        if (id == null) {
-            return;
-        }
-
-        if (selectedNewsItem == null || (selectedNewsItem.getId() != id)) {
-            String username = getUser().getUsername();
-            LOG.log(Level.FINE,
-                    "Checking if {0} is permitted to open news item #{1}",
-                    new Object[]{username, id});
-
-            NewsItemHolder nih;
-            try {
-                nih = newsItemFacade.checkout(id);
-                this.permission = nih.getPermission();
-                this.readOnly = nih.isReadOnly();
-                this.selectedNewsItem = nih.getNewsItem();
-//                if (selectedNewsItem.getEdition() != null && selectedNewsItem.getEdition().getPublicationDate() != null) {
-//                    setEditionDate(this.selectedNewsItem.getEdition().getPublicationDate().getTime());
-//                }
-                this.pullbackAvailable = nih.isPullbackAvailable();
-                this.fieldVisibible = nih.getFieldVisibility();
-                this.versions = new ListDataModel(nih.getVersions());
-                if (!nih.isCheckedOut() && (this.permission
-                        == ContentItemPermission.USER || this.permission
-                        == ContentItemPermission.ROLE)) {
-                    JsfUtils.createMessage("frmPage",
-                            FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
-                            "NewsItem_OPEN_READ_ONLY",
-                            new Object[]{selectedNewsItem.getCheckedOutBy().
-                                getFullName()});
-                }
-            } catch (DataNotFoundException ex) {
-                this.permission = ContentItemPermission.UNAUTHORIZED;
-                this.readOnly = true;
-                this.selectedNewsItem = null;
-                this.pullbackAvailable = false;
-            }
-        }
-    }
-
-    /**
-     * Determines if a news item has been loaded. If a news item cannot be
-     * retrieved from {@link NewsItem#getSelectedNewsItem()} it is not loaded.
-     *
-     * @return {@code true} if a news item has been selected and loaded,
-     * otherwise {@code false}
-     */
-    public boolean isNewsItemLoaded() {
-        if (getSelectedNewsItem() == null) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public void setSelectedNewsItem(
-            dk.i2m.converge.core.content.NewsItem newsItem) {
-        this.selectedNewsItem = newsItem;
-    }
-
-    public dk.i2m.converge.core.content.NewsItem getSelectedNewsItem() {
-        return selectedNewsItem;
-    }
-
-    /**
-     * Gets a {@link Map} containing the visibility indicators for each field.
-     * The Map key is the name of the news item field,
-     * corresponding to the full name of a {@link NewsItemField}.
-     *
-     * @return Visibility indicators for the news item fields
-     */
-    public Map<String, Boolean> getFieldVisible() {
-        return this.fieldVisibible;
-    }
-
+    // -------------------------------------------------------------------------
+    // -- EVENT HANDLERS
+    // -------------------------------------------------------------------------
     public String onSubmit() {
         if (getSelectedStep() == null) {
             try {
@@ -458,25 +265,85 @@ public class NewsItem {
         this.newActor = new ContentItemActor();
     }
 
-    public void setDeleteActor(ContentItemActor actor) {
-        if (actor != null) {
-            try {
-                selectedNewsItem.getActors().remove(actor);
-                selectedNewsItem = newsItemFacade.save(selectedNewsItem);
+    /**
+     * Event handler for suggesting concepts based on inputted string. Note that
+     * {@link dk.i2m.converge.core.metadata.Subject}s are not returned as they
+     * are selected through the subject selection dialog.
+     *
+     * @param suggestion
+     *          String for which to base the suggestions
+     * @return {@link List} of suggested {@link Concept}s based on
+     *         {@code suggestion}
+     */
+    public List<Concept> onConceptSuggestion(Object suggestion) {
+        String conceptName = (String) suggestion;
+        List<Concept> suggestedConcepts = new ArrayList<Concept>();
+        suggestedConcepts = metaDataFacade.findConceptsByName(conceptName,
+                Person.class, GeoArea.class, PointOfInterest.class,
+                Organisation.class);
+
+        return suggestedConcepts;
+    }
+
+    public void onAddConcept(ActionEvent event) {
+        try {
+            Concept concept = metaDataFacade.findConceptByName(newConcept);
+            if (!this.selectedNewsItem.getConcepts().contains(concept)) {
+                this.selectedNewsItem.getConcepts().add(concept);
                 JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                        Bundle.i18n.name(), "NewsItem_ACTOR_REMOVED");
-            } catch (LockingException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                        Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
-                        new Object[]{ex.getMessage()});
+                        Bundle.i18n.name(),
+                        "NewsItem_CONCEPT_X_ADDED_TO_NEWS_ITEM_Y",
+                        new Object[]{concept.getFullTitle(), selectedNewsItem.
+                            getTitle()});
             }
+            this.newConcept = "";
+            conceptAdded = true;
+            onAutoSave(event);
+        } catch (DataNotFoundException ex) {
+            this.conceptType = "";
+            this.newConceptName = this.newConcept;
+            conceptAdded = false;
         }
     }
 
-    public void setUpdateAttachment(NewsItemMediaAttachment attachment) {
-        attachment = newsItemFacade.update(attachment);
+    public void onAddNewConcept(ActionEvent event) {
+        Concept c = null;
+        if ("ORGANISATION".equalsIgnoreCase(conceptType)) {
+            c = new Organisation(newConceptName, newConceptDescription);
+        } else if ("PERSON".equalsIgnoreCase(conceptType)) {
+            c = new Person(newConceptName, newConceptDescription);
+        } else if ("LOCATION".equalsIgnoreCase(conceptType)) {
+            c = new GeoArea(newConceptName, newConceptDescription);
+        } else if ("POI".equalsIgnoreCase(conceptType)) {
+            c = new PointOfInterest(newConceptName, newConceptDescription);
+        } else {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(), "NewsItem_CONCEPT_TYPE_MISSING");
+        }
+
+        if (c != null) {
+            c = metaDataFacade.create(c);
+            if (!this.selectedNewsItem.getConcepts().contains(c)) {
+                this.selectedNewsItem.getConcepts().add(c);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                        Bundle.i18n.name(),
+                        "NewsItem_CONCEPT_X_ADDED_TO_NEWS_ITEM_Y",
+                        new Object[]{c.getFullTitle(),
+                            selectedNewsItem.getTitle()});
+                onAutoSave(event);
+            }
+            this.newConcept = "";
+        }
+    }
+
+    public void onSelectSubject(NodeSelectedEvent event) {
+        HtmlTree tree = (HtmlTree) event.getComponent();
+        Subject subj = (Subject) tree.getRowData();
+        this.selectedNewsItem.getConcepts().add(subj);
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                Bundle.i18n.name(), "NewsItem_MEDIA_ATTACHMENT_UPDATED");
+                Bundle.i18n.name(),
+                "NewsItem_CONCEPT_X_ADDED_TO_NEWS_ITEM_Y",
+                new Object[]{subj.getFullTitle(), selectedNewsItem.getTitle()});
     }
 
     public void onDeleteSelectedActor(ActionEvent event) {
@@ -633,6 +500,375 @@ public class NewsItem {
                 this.validWorkflowStep = false;
             }
         }
+    }
+
+    /**
+     * Event handler for starting the search.
+     *
+     * @param event Event that invoked the handler
+     */
+    public void onSearch(ActionEvent event) {
+        if (!getKeyword().trim().isEmpty()) {
+            lastSearch = searchEngine.search(getKeyword(), 0, 50, "type:Media");
+            List<SearchResult> results = lastSearch.getHits();
+
+            List<SearchResult> realResults = new ArrayList<SearchResult>();
+            for (SearchResult result : results) {
+                realResults.add(result);
+            }
+
+            if (realResults.isEmpty()) {
+                searchResults = new ListDataModel(new ArrayList());
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                        Bundle.i18n.name(),
+                        "NewsItem_NO_MEDIA_ITEM_MATCHING_X",
+                        new Object[]{getKeyword()});
+            } else {
+
+                for (SearchResult hit : realResults) {
+                    hit.setLink(
+                            MessageFormat.format(hit.getLink(),
+                            new Object[]{
+                                JsfUtils.getValueOfValueExpression(
+                                "#{facesContext.externalContext.request.contextPath}")}));
+                }
+                searchResults = new ListDataModel(realResults);
+            }
+        }
+    }
+
+    /**
+     * Event handler for attaching a {@link MediaItem} to the 
+     * {@link dk.i2m.converge.core.content.NewsItem}.
+     * 
+     * @param event Event that invoked the handler
+     */
+    public void onUseAttachment(ActionEvent event) {
+        boolean isNewUpload = this.uploadedMediaItem.longValue()
+                == this.selectedAttachment.getMediaItem().getId().longValue();
+
+        if (isNewUpload) {
+            try {
+                MediaItem mediaItem = catalogueFacade.findMediaItemById(
+                        this.uploadedMediaItem);
+                mediaItem.setDescription(selectedAttachment.getCaption());
+                mediaItem.setByLine(
+                        selectedAttachment.getMediaItem().getByLine());
+                mediaItem = catalogueFacade.update(mediaItem);
+                selectedAttachment.setMediaItem(mediaItem);
+            } catch (DataNotFoundException ex) {
+                LOG.warning(ex.getMessage());
+            }
+        }
+
+        this.selectedAttachment.setDisplayOrder(this.selectedNewsItem.
+                getNextAssetAttachmentDisplayOrder());
+        this.selectedAttachment = newsItemFacade.create(selectedAttachment);
+        this.selectedNewsItem.getMediaAttachments().add(selectedAttachment);
+        
+        loadCurrentMediaActor(selectedAttachment.getMediaItem().getId());
+
+        onPreAttachMediaFile(event);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                Bundle.i18n.name(),
+                "NewsItem_MEDIA_ITEM_ATTACHED_TO_NEWS_ITEM");
+    }
+
+    public void onPreAttachMediaFile(ActionEvent event) {
+        this.selectedCatalogue = null;
+        this.selectedCatalogue = getUser().getDefaultMediaRepository();
+        this.selectedAttachment = new NewsItemMediaAttachment();
+        this.selectedAttachment.setNewsItem(selectedNewsItem);
+        searchResults = new ListDataModel(new ArrayList());
+        setKeyword("");
+    }
+
+    public void onNewPlacement(ActionEvent event) {
+        this.selectedNewsItemPlacement = new NewsItemPlacement();
+        this.selectedNewsItemPlacement.setNewsItem(selectedNewsItem);
+        if (getUser().getDefaultOutlet() != null) {
+            this.selectedNewsItemPlacement.setOutlet(
+                    getUser().getDefaultOutlet());
+        } else {
+            this.selectedNewsItemPlacement.setOutlet(
+                    selectedNewsItem.getOutlet());
+        }
+
+        if (getUser().getDefaultSection() != null
+                && this.selectedNewsItemPlacement.getOutlet() != null
+                && getUser().getDefaultSection().getOutlet().equals(this.selectedNewsItemPlacement.
+                getOutlet())) {
+            this.selectedNewsItemPlacement.setSection(getUser().
+                    getDefaultSection());
+        }
+
+        this.editionCandidates = new LinkedHashMap<String, EditionCandidate>();
+        this.editionCandidate = null;
+        this.editionDate = null;
+    }
+
+    public void onAddPlacement(ActionEvent event) {
+
+        if (getEditionCandidate() == null) {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(),
+                    "NewsItem_OUTLET_PLACEMENT_SELECT_EDITION");
+            return;
+        }
+
+        if (getEditionCandidate().isExist()) {
+            try {
+                selectedNewsItemPlacement.setEdition(outletFacade.
+                        findEditionById(getEditionCandidate().getEditionId()));
+            } catch (DataNotFoundException ex) {
+                LOG.log(Level.INFO,
+                        "Edition {0} could not be found in the database",
+                        getEditionCandidate().getEditionId());
+            }
+        } else {
+            selectedNewsItemPlacement.setEdition(outletFacade.createEdition(
+                    getEditionCandidate()));
+        }
+
+        selectedNewsItemPlacement = newsItemFacade.createPlacement(
+                selectedNewsItemPlacement);
+
+        if (!selectedNewsItem.getPlacements().contains(selectedNewsItemPlacement)) {
+            selectedNewsItem.getPlacements().add(selectedNewsItemPlacement);
+        }
+    }
+
+    public void onChangePlacementOutlet(ValueChangeEvent event) {
+        this.selectedNewsItemPlacement.setOutlet((Outlet) event.getNewValue());
+        setEditionDate(getEditionDate());
+    }
+
+    public void onUpdatePlacement(ActionEvent event) {
+        if (getEditionCandidate() == null) {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(),
+                    "NewsItem_OUTLET_PLACEMENT_SELECT_EDITION");
+            return;
+        }
+
+        if (getEditionCandidate().isExist()) {
+            try {
+                selectedNewsItemPlacement.setEdition(outletFacade.
+                        findEditionById(getEditionCandidate().getEditionId()));
+            } catch (DataNotFoundException ex) {
+                LOG.log(Level.INFO, "Edition {0} does not exist",
+                        getEditionCandidate().getEditionId());
+            }
+        } else {
+            selectedNewsItemPlacement.setEdition(outletFacade.createEdition(
+                    getEditionCandidate()));
+        }
+
+        selectedNewsItemPlacement = newsItemFacade.updatePlacement(
+                selectedNewsItemPlacement);
+
+        if (!selectedNewsItem.getPlacements().contains(selectedNewsItemPlacement)) {
+            selectedNewsItem.getPlacements().add(selectedNewsItemPlacement);
+        }
+    }
+
+    public void onRemovePlacement(ActionEvent event) {
+        if (selectedNewsItem.getPlacements().contains(selectedNewsItemPlacement)) {
+            selectedNewsItem.getPlacements().remove(selectedNewsItemPlacement);
+        }
+        newsItemFacade.deletePlacement(selectedNewsItemPlacement);
+    }
+
+    public void onSuggestConcepts(ActionEvent event) {
+        if (getSelectedNewsItem().getStory().trim().isEmpty()) {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    Bundle.i18n.name(),
+                    "NewsItem_CONCEPTS_SUGGEST_FAILED_NO_STORY");
+            return;
+        }
+
+        try {
+            List<Concept> concepts = metaDataService.enrich(StringUtils.
+                    stripHtml(getSelectedNewsItem().getStory()));
+            suggestedConcepts = new LinkedHashMap<String, Concept>();
+            this.selectedConcepts = new ArrayList<Concept>();
+            ResourceBundle bundle = JsfUtils.getResourceBundle(
+                    Bundle.i18n.name());
+            for (Concept concept : concepts) {
+                String type = bundle.getString("Generic_" + concept.getType()
+                        + "_NAME");
+                suggestedConcepts.put(concept.getName() + " (" + type + ")",
+                        concept);
+            }
+
+            if (suggestedConcepts.isEmpty()) {
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        Bundle.i18n.name(),
+                        "NewsItem_CONCEPTS_SUGGEST_NO_RESULTS");
+            }
+
+        } catch (EnrichException ex) {
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                    "i18n", "NewsItem_CONCEPTS_SUGGEST_FAILED", null);
+        }
+    }
+
+    public void onSaveConceptSuggestions(ActionEvent event) {
+        getSelectedNewsItem().getConcepts().addAll(getSelectedConcepts());
+
+        List<Concept> allConcepts = getSelectedNewsItem().getConcepts();
+        Set<Concept> uniqueConcepts = new HashSet<Concept>(allConcepts);
+        allConcepts = new ArrayList<Concept>(uniqueConcepts);
+        getSelectedNewsItem().setConcepts(allConcepts);
+        onAutoSave(event);
+    }
+
+    public void onToggleShowClosedEditions(ActionEvent event) {
+        setEditionDate(editionDate);
+    }
+
+    // -------------------------------------------------------------------------
+    // -- PROPERTIES
+    // -------------------------------------------------------------------------
+    /**
+     * Gets the unique identifier of the loaded news item.
+     *
+     * @return Unique identifier of the loaded news item
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * Get the auto-save interval in milliseconds.
+     * 
+     * @return Auto-save interval in milliseconds. A value less than 1 indicates
+     *         that auto-save is disabled
+     */
+    public Integer getAutoSaveInterval() {
+        return cfgService.getInteger(ConfigurationKey.AUTO_SAVE_INTERVAL);
+    }
+
+    /**
+     * Determines if auto-save is enabled.
+     * 
+     * @return {@code true} if auto-save is enabled, otherwise {@code false}
+     */
+    public boolean isAutoSaveEnabled() {
+        if (getAutoSaveInterval() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Sets the id of the news item to load. Upon setting the identifier, the
+     * news item will be checked-out from the database.
+     *
+     * @param id
+     *          Unique identifier of the news item to load
+     */
+    public void setId(Long id) {
+        LOG.log(Level.FINE, "Setting News Item #{0}", id);
+        this.id = id;
+
+        if (id == null) {
+            return;
+        }
+
+        if (selectedNewsItem == null || (selectedNewsItem.getId() != id)) {
+            String username = getUser().getUsername();
+            LOG.log(Level.FINE,
+                    "Checking if {0} is permitted to open news item #{1}",
+                    new Object[]{username, id});
+
+            NewsItemHolder nih;
+            try {
+                nih = newsItemFacade.checkout(id);
+                this.permission = nih.getPermission();
+                this.readOnly = nih.isReadOnly();
+                this.selectedNewsItem = nih.getNewsItem();
+//                if (selectedNewsItem.getEdition() != null && selectedNewsItem.getEdition().getPublicationDate() != null) {
+//                    setEditionDate(this.selectedNewsItem.getEdition().getPublicationDate().getTime());
+//                }
+                this.pullbackAvailable = nih.isPullbackAvailable();
+                this.fieldVisibible = nih.getFieldVisibility();
+                this.versions = new ListDataModel(nih.getVersions());
+                if (!nih.isCheckedOut() && (this.permission
+                        == ContentItemPermission.USER || this.permission
+                        == ContentItemPermission.ROLE)) {
+                    JsfUtils.createMessage("frmPage",
+                            FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+                            "NewsItem_OPEN_READ_ONLY",
+                            new Object[]{selectedNewsItem.getCheckedOutBy().
+                                getFullName()});
+                }
+            } catch (DataNotFoundException ex) {
+                this.permission = ContentItemPermission.UNAUTHORIZED;
+                this.readOnly = true;
+                this.selectedNewsItem = null;
+                this.pullbackAvailable = false;
+            }
+
+            loadCurrentMediaActors();
+        }
+    }
+
+    /**
+     * Determines if a news item has been loaded. If a news item cannot be
+     * retrieved from {@link NewsItem#getSelectedNewsItem()} it is not loaded.
+     *
+     * @return {@code true} if a news item has been selected and loaded,
+     * otherwise {@code false}
+     */
+    public boolean isNewsItemLoaded() {
+        if (getSelectedNewsItem() == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public void setSelectedNewsItem(
+            dk.i2m.converge.core.content.NewsItem newsItem) {
+        this.selectedNewsItem = newsItem;
+    }
+
+    public dk.i2m.converge.core.content.NewsItem getSelectedNewsItem() {
+        return selectedNewsItem;
+    }
+
+    /**
+     * Gets a {@link Map} containing the visibility indicators for each field.
+     * The Map key is the name of the news item field,
+     * corresponding to the full name of a {@link NewsItemField}.
+     *
+     * @return Visibility indicators for the news item fields
+     */
+    public Map<String, Boolean> getFieldVisible() {
+        return this.fieldVisibible;
+    }
+
+    public void setDeleteActor(ContentItemActor actor) {
+        if (actor != null) {
+            try {
+                selectedNewsItem.getActors().remove(actor);
+                selectedNewsItem = newsItemFacade.save(selectedNewsItem);
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                        Bundle.i18n.name(), "NewsItem_ACTOR_REMOVED");
+            } catch (LockingException ex) {
+                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                        Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
+                        new Object[]{ex.getMessage()});
+            }
+        }
+    }
+
+    public void setUpdateAttachment(NewsItemMediaAttachment attachment) {
+        attachment = newsItemFacade.update(attachment);
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                Bundle.i18n.name(), "NewsItem_MEDIA_ATTACHMENT_UPDATED");
     }
 
     public String getComment() {
@@ -901,41 +1137,6 @@ public class NewsItem {
         return lastSearch;
     }
 
-    /**
-     * Event handler for starting the search.
-     *
-     * @param event Event that invoked the handler
-     */
-    public void onSearch(ActionEvent event) {
-        if (!getKeyword().trim().isEmpty()) {
-            lastSearch = searchEngine.search(getKeyword(), 0, 50, "type:Media");
-            List<SearchResult> results = lastSearch.getHits();
-
-            List<SearchResult> realResults = new ArrayList<SearchResult>();
-            for (SearchResult result : results) {
-                realResults.add(result);
-            }
-
-            if (realResults.isEmpty()) {
-                searchResults = new ListDataModel(new ArrayList());
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                        Bundle.i18n.name(),
-                        "NewsItem_NO_MEDIA_ITEM_MATCHING_X",
-                        new Object[]{getKeyword()});
-            } else {
-
-                for (SearchResult hit : realResults) {
-                    hit.setLink(
-                            MessageFormat.format(hit.getLink(),
-                            new Object[]{
-                                JsfUtils.getValueOfValueExpression(
-                                "#{facesContext.externalContext.request.contextPath}")}));
-                }
-                searchResults = new ListDataModel(realResults);
-            }
-        }
-    }
-
     public void setUploadedMediaItem(String id) {
         id = id.replaceAll("SUCCESS" + System.getProperty("line.separator"), "");
         this.uploadedMediaItem = Long.valueOf(id.trim());
@@ -966,81 +1167,6 @@ public class NewsItem {
         }
     }
 
-    /**
-     * Event handler for attaching a {@link MediaItem} to the 
-     * {@link dk.i2m.converge.core.content.NewsItem}.
-     * 
-     * @param event Event that invoked the handler
-     */
-    public void onUseAttachment(ActionEvent event) {
-        boolean isNewUpload = this.uploadedMediaItem.longValue()
-                == this.selectedAttachment.getMediaItem().getId().longValue();
-
-        if (isNewUpload) {
-            try {
-                MediaItem mediaItem = catalogueFacade.findMediaItemById(
-                        this.uploadedMediaItem);
-                mediaItem.setDescription(selectedAttachment.getCaption());
-                mediaItem.setByLine(
-                        selectedAttachment.getMediaItem().getByLine());
-                mediaItem = catalogueFacade.update(mediaItem);
-                selectedAttachment.setMediaItem(mediaItem);
-            } catch (DataNotFoundException ex) {
-                LOG.warning(ex.getMessage());
-            }
-        }
-
-        this.selectedAttachment.setDisplayOrder(this.selectedNewsItem.
-                getNextAssetAttachmentDisplayOrder());
-        this.selectedAttachment = newsItemFacade.create(selectedAttachment);
-        this.selectedNewsItem.getMediaAttachments().add(selectedAttachment);
-
-        onPreAttachMediaFile(event);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                Bundle.i18n.name(),
-                "NewsItem_MEDIA_ITEM_ATTACHED_TO_NEWS_ITEM");
-    }
-
-    public void onPreAttachMediaFile(ActionEvent event) {
-        this.selectedCatalogue = null;
-        this.selectedCatalogue = getUser().getDefaultMediaRepository();
-        this.selectedAttachment = new NewsItemMediaAttachment();
-        this.selectedAttachment.setNewsItem(selectedNewsItem);
-        searchResults = new ListDataModel(new ArrayList());
-        setKeyword("");
-    }
-
-    public class DiscoveredProperty {
-
-        private String property = "";
-
-        private String value = "";
-
-        public DiscoveredProperty() {
-        }
-
-        public DiscoveredProperty(String property, String value) {
-            this.property = property;
-            this.value = value;
-        }
-
-        public String getProperty() {
-            return property;
-        }
-
-        public void setProperty(String property) {
-            this.property = property;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-    }
-
     public NewsItemMediaAttachment getDeleteMediaItem() {
         return deleteMediaItem;
     }
@@ -1053,6 +1179,8 @@ public class NewsItem {
                     this.deleteMediaItem.getId());
             this.selectedNewsItem.getMediaAttachments().remove(
                     this.deleteMediaItem);
+            removeCurrentMediaActor(this.deleteMediaItem.getId());
+
         }
     }
 
@@ -1129,21 +1257,12 @@ public class NewsItem {
         }
     }
 
-    public void onToggleShowClosedEditions(ActionEvent event) {
-        setEditionDate(editionDate);
-    }
-
     public boolean isShowClosedEditions() {
         return showClosedEditions;
     }
 
     public void setShowClosedEditions(boolean showClosedEditions) {
         this.showClosedEditions = showClosedEditions;
-    }
-
-    public void onChangePlacementOutlet(ValueChangeEvent event) {
-        this.selectedNewsItemPlacement.setOutlet((Outlet) event.getNewValue());
-        setEditionDate(getEditionDate());
     }
 
     /**
@@ -1155,97 +1274,6 @@ public class NewsItem {
      */
     public Map<String, EditionCandidate> getEditionCandidates() {
         return this.editionCandidates;
-    }
-
-    public void onNewPlacement(ActionEvent event) {
-        this.selectedNewsItemPlacement = new NewsItemPlacement();
-        this.selectedNewsItemPlacement.setNewsItem(selectedNewsItem);
-        if (getUser().getDefaultOutlet() != null) {
-            this.selectedNewsItemPlacement.setOutlet(
-                    getUser().getDefaultOutlet());
-        } else {
-            this.selectedNewsItemPlacement.setOutlet(
-                    selectedNewsItem.getOutlet());
-        }
-
-        if (getUser().getDefaultSection() != null
-                && this.selectedNewsItemPlacement.getOutlet() != null
-                && getUser().getDefaultSection().getOutlet().equals(this.selectedNewsItemPlacement.
-                getOutlet())) {
-            this.selectedNewsItemPlacement.setSection(getUser().
-                    getDefaultSection());
-        }
-
-        this.editionCandidates = new LinkedHashMap<String, EditionCandidate>();
-        this.editionCandidate = null;
-        this.editionDate = null;
-    }
-
-    public void onAddPlacement(ActionEvent event) {
-
-        if (getEditionCandidate() == null) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    Bundle.i18n.name(),
-                    "NewsItem_OUTLET_PLACEMENT_SELECT_EDITION");
-            return;
-        }
-
-        if (getEditionCandidate().isExist()) {
-            try {
-                selectedNewsItemPlacement.setEdition(outletFacade.
-                        findEditionById(getEditionCandidate().getEditionId()));
-            } catch (DataNotFoundException ex) {
-                LOG.log(Level.INFO,
-                        "Edition {0} could not be found in the database",
-                        getEditionCandidate().getEditionId());
-            }
-        } else {
-            selectedNewsItemPlacement.setEdition(outletFacade.createEdition(
-                    getEditionCandidate()));
-        }
-
-        selectedNewsItemPlacement = newsItemFacade.createPlacement(
-                selectedNewsItemPlacement);
-
-        if (!selectedNewsItem.getPlacements().contains(selectedNewsItemPlacement)) {
-            selectedNewsItem.getPlacements().add(selectedNewsItemPlacement);
-        }
-    }
-
-    public void onUpdatePlacement(ActionEvent event) {
-        if (getEditionCandidate() == null) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    Bundle.i18n.name(),
-                    "NewsItem_OUTLET_PLACEMENT_SELECT_EDITION");
-            return;
-        }
-
-        if (getEditionCandidate().isExist()) {
-            try {
-                selectedNewsItemPlacement.setEdition(outletFacade.
-                        findEditionById(getEditionCandidate().getEditionId()));
-            } catch (DataNotFoundException ex) {
-                LOG.log(Level.INFO, "Edition {0} does not exist",
-                        getEditionCandidate().getEditionId());
-            }
-        } else {
-            selectedNewsItemPlacement.setEdition(outletFacade.createEdition(
-                    getEditionCandidate()));
-        }
-
-        selectedNewsItemPlacement = newsItemFacade.updatePlacement(
-                selectedNewsItemPlacement);
-
-        if (!selectedNewsItem.getPlacements().contains(selectedNewsItemPlacement)) {
-            selectedNewsItem.getPlacements().add(selectedNewsItemPlacement);
-        }
-    }
-
-    public void onRemovePlacement(ActionEvent event) {
-        if (selectedNewsItem.getPlacements().contains(selectedNewsItemPlacement)) {
-            selectedNewsItem.getPlacements().remove(selectedNewsItemPlacement);
-        }
-        newsItemFacade.deletePlacement(selectedNewsItemPlacement);
     }
 
     public NewsItemPlacement getSelectedNewsItemPlacement() {
@@ -1295,47 +1323,6 @@ public class NewsItem {
         }
     }
 
-    public void onSuggestConcepts(ActionEvent event) {
-        if (getSelectedNewsItem().getStory().trim().isEmpty()) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    Bundle.i18n.name(), "NewsItem_CONCEPTS_SUGGEST_FAILED_NO_STORY");
-            return;
-        }
-
-        try {
-            List<Concept> concepts = metaDataService.enrich(StringUtils.
-                    stripHtml(getSelectedNewsItem().getStory()));
-            suggestedConcepts = new LinkedHashMap<String, Concept>();
-            this.selectedConcepts = new ArrayList<Concept>();
-            ResourceBundle bundle = JsfUtils.getResourceBundle(Bundle.i18n.name());
-            for (Concept concept : concepts) {
-                String type = bundle.getString("Generic_" + concept.getType()
-                        + "_NAME");
-                suggestedConcepts.put(concept.getName() + " (" + type + ")",
-                        concept);
-            }
-
-            if (suggestedConcepts.isEmpty()) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                        Bundle.i18n.name(), "NewsItem_CONCEPTS_SUGGEST_NO_RESULTS");
-            }
-
-        } catch (EnrichException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
-                    "i18n", "NewsItem_CONCEPTS_SUGGEST_FAILED", null);
-        }
-    }
-
-    public void onSaveConceptSuggestions(ActionEvent event) {
-        getSelectedNewsItem().getConcepts().addAll(getSelectedConcepts());
-
-        List<Concept> allConcepts = getSelectedNewsItem().getConcepts();
-        Set<Concept> uniqueConcepts = new HashSet<Concept>(allConcepts);
-        allConcepts = new ArrayList<Concept>(uniqueConcepts);
-        getSelectedNewsItem().setConcepts(allConcepts);
-        onAutoSave(event);
-    }
-
     public Map<String, Concept> getSuggestedConcepts() {
         return suggestedConcepts;
     }
@@ -1347,29 +1334,98 @@ public class NewsItem {
     public void setSelectedConcepts(List<Concept> selectedConcepts) {
         this.selectedConcepts = selectedConcepts;
     }
-    
+
     public Map<Long, Boolean> getCurrentMediaItemActor() {
-        Map<Long, Boolean> currentMediaActors = new HashMap<Long, Boolean>();
-        for (NewsItemMediaAttachment nima :this.selectedNewsItem.getMediaAttachments()) {
-            try {
-                Boolean status;
-                ContentItemPermission permission = contentItemFacade.findContentItemPermissionById(nima.getMediaItem().getId(), getUser().getUsername());
-                switch (permission) {
-                    case USER:
-                    case ROLE:
-                        status = Boolean.TRUE;
-                        break;
-                    default:
-                        status = Boolean.FALSE;
-                }
-                currentMediaActors.put(nima.getMediaItem().getId(), status);
-            } catch (DataNotFoundException ex) {
-                // Theorically this should never happen
-                LOG.log(Level.SEVERE, null, ex);
-            }
+        return this.currentMediaActors;
+    }
+
+    // -------------------------------------------------------------------------
+    // -- HELPERS
+    // -------------------------------------------------------------------------
+    
+    /**
+     * Loads the rights to attached media item. This method clears the map 
+     * containing the rights before re-iterating over attached media items.
+     */
+    private void loadCurrentMediaActors() {
+        this.currentMediaActors.clear();
+        for (NewsItemMediaAttachment nima : this.selectedNewsItem.
+                getMediaAttachments()) {
+            loadCurrentMediaActor(nima.getMediaItem().getId());
         }
-        return currentMediaActors;
-        
-        
+    }
+
+    /**
+     * Load a single media item rights into the map of rights without clearing
+     * the map.
+     * 
+     * @param mediaItemId 
+     *          Unique identifier of the {@link MediaItem}.
+     */
+    private void loadCurrentMediaActor(Long mediaItemId) {
+        try {
+            Boolean status;
+            ContentItemPermission itemPermission = contentItemFacade.
+                    findContentItemPermissionById(
+                    mediaItemId, getUser().getUsername());
+            switch (itemPermission) {
+                case USER:
+                case ROLE:
+                    status = Boolean.TRUE;
+                    break;
+                default:
+                    status = Boolean.FALSE;
+            }
+            currentMediaActors.put(mediaItemId, status);
+        } catch (DataNotFoundException ex) {
+            // Theorically this should never happen
+            LOG.log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    /**
+     * Removes a right from the map of rights without clearing the map.
+     * 
+     * @param mediaItemId 
+     *          Unique identifier of the {@link MediaItem}.
+     */
+    private void removeCurrentMediaActor(Long mediaItemId) {
+        if (this.currentMediaActors.containsKey(mediaItemId)) {
+            this.currentMediaActors.remove(mediaItemId);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // -- INNER CLASSES - TODO: Refactor
+    // -------------------------------------------------------------------------
+    public class DiscoveredProperty {
+
+        private String property = "";
+
+        private String value = "";
+
+        public DiscoveredProperty() {
+        }
+
+        public DiscoveredProperty(String property, String value) {
+            this.property = property;
+            this.value = value;
+        }
+
+        public String getProperty() {
+            return property;
+        }
+
+        public void setProperty(String property) {
+            this.property = property;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
     }
 }

@@ -24,6 +24,8 @@ import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.ejb.services.ContentItemServiceLocal;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
@@ -35,6 +37,9 @@ import javax.ejb.Stateless;
  */
 @Stateless
 public class ContentItemFacadeBean implements ContentItemFacadeLocal {
+
+    private static final Logger LOG =
+            Logger.getLogger(ContentItemFacadeBean.class.getName());
 
     @EJB private DaoServiceLocal daoService;
 
@@ -84,6 +89,18 @@ public class ContentItemFacadeBean implements ContentItemFacadeLocal {
         }
 
         return permission;
+
+    }
+
+    @Override
+    public void updateThumbnailLink(Long id) {
+        try {
+            ContentItem ci = findContentItemById(id);
+            contentItemService.updateThumbnail(ci);
+        } catch (DataNotFoundException ex) {
+            LOG.log(Level.WARNING, "Could not update ThumbnailLink for ContentItem #"
+                    + id, ex);
+        }
 
     }
 }
