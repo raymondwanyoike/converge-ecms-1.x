@@ -204,6 +204,7 @@ public class DrupalEditionAction implements EditionAction {
 
                 DrupalMessage nodeMessage = new DrupalMessage();
                 nodeMessage.getFields().put("actor", getActor(newsItem));
+                nodeMessage.getFields().put("converge_id", getConvergeId(newsItem));
                 nodeMessage.getFields().put("body", getBody(newsItem));
                 nodeMessage.getFields().put("language", nodeLanguage);
                 nodeMessage.getFields().put("publish_on", getPublishOn());
@@ -415,7 +416,6 @@ public class DrupalEditionAction implements EditionAction {
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
         // Get the post delay property
         Integer amount = Integer.valueOf(publishDelay);
         Calendar calendar = Calendar.getInstance();
@@ -488,7 +488,7 @@ public class DrupalEditionAction implements EditionAction {
      * @return actor text field
      */
     private FieldModule getActor(NewsItem newsItem) {
-        TextField textField = null;
+        TextField textField;
 
         if (newsItem.isUndisclosedAuthor()) {
             textField = new TextField(null, undisclosedAuthor, null);
@@ -527,6 +527,19 @@ public class DrupalEditionAction implements EditionAction {
         return new FieldModule(map);
     }
 
+    /**
+     * Get <b>Converge ID</b> text field.
+     * 
+     * @param newsItem NewsItem
+     * @return converge_id text field
+     */
+    private FieldModule getConvergeId(NewsItem newsItem) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("0", newsItem.getId());
+
+        return new FieldModule(map);
+    }
+    
     /**
      * Get <b>Section</b> taxonomy field.
      * 
