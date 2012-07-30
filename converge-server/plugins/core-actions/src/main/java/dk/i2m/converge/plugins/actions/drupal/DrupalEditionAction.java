@@ -221,7 +221,7 @@ public class DrupalEditionAction implements EditionAction {
                 nodeMessage.getFields().put("publish_on", getPublishOn());
                 nodeMessage.getFields().put("section", new FieldModule(section));
                 nodeMessage.getFields().put("status", getStatus());
-                nodeMessage.getFields().put("sticky", getPromote(nip));
+                nodeMessage.getFields().put("promote", getPromote(nip));
                 nodeMessage.getFields().put("title", getTitle(newsItem));
                 nodeMessage.getFields().put("type", nodeType);
 
