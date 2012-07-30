@@ -372,11 +372,12 @@ public class DrupalEditionAction implements EditionAction {
     /**
      * Get safe HTML from untrusted input HTML.
      * 
-     * @param content input untrusted HTML
+     * @param html input untrusted HTML
      * @return safe HTML
      */
-    private String cleanString(String content) {
-        return Jsoup.clean(content, Whitelist.relaxed());
+    private String cleanHTML(String html) {
+        // return Jsoup.clean(html, Whitelist.relaxed());
+        return html;
     }
 
     /**
@@ -472,7 +473,7 @@ public class DrupalEditionAction implements EditionAction {
      */
     private FieldModule getBody(NewsItem newsItem) {
         TextField textField = new TextField(newsItem.getBrief(),
-                cleanString(newsItem.getStory()), "html");
+                cleanHTML(newsItem.getStory()), "html");
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("0", textField);
