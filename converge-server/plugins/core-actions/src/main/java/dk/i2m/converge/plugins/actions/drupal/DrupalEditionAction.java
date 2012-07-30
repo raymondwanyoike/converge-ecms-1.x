@@ -47,9 +47,9 @@ public class DrupalEditionAction implements EditionAction {
     private enum Property {
 
         CONNECTION_TIMEOUT,
-        EXCLUDE_MEDIA_CONTENT_TYPES,
+        EXCLUDE_MEDIA_TYPES,
         IMAGE_RENDITION,
-        NODE_CONTENT_TYPE,
+        NODE_TYPE,
         NODE_LANGUAGE,
         PASSWORD,
         PROMOTE_TO_FRONT_PAGE,
@@ -94,7 +94,7 @@ public class DrupalEditionAction implements EditionAction {
 
     private String undisclosedAuthor;
 
-    private String[] excludeMediaContentTypes;
+    private String[] excludeMediaTypes;
 
     private Map<Long, Long> sectionMapping;
 
@@ -106,10 +106,9 @@ public class DrupalEditionAction implements EditionAction {
         String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT.
                 name());
         String excludeContentTypes =
-                properties.get(Property.EXCLUDE_MEDIA_CONTENT_TYPES.name());
+                properties.get(Property.EXCLUDE_MEDIA_TYPES.name());
         String mappings = properties.get(Property.SECTION_MAPPING.name());
-        String nodeContentType = properties.get(
-                Property.NODE_CONTENT_TYPE.name());
+        String nodeType = properties.get(Property.NODE_TYPE.name());
         String nodeLanguage = properties.get(Property.NODE_LANGUAGE.name());
         String password = properties.get(Property.PASSWORD.name());
         String serviceEndpoint =
@@ -142,8 +141,8 @@ public class DrupalEditionAction implements EditionAction {
             throw new NullPointerException("'Password' is null");
         }
 
-        if (nodeContentType == null) {
-            throw new NullPointerException("'Node Content Type' is null");
+        if (nodeType == null) {
+            throw new NullPointerException("'Node Type' is null");
         }
 
         if (mappings == null) {
@@ -162,26 +161,25 @@ public class DrupalEditionAction implements EditionAction {
             }
         }
 
+        if (connectionTimeout == null) {
+            connectionTimeout = "30000"; // 30 seconds
+        }
+
         if (nodeLanguage == null) {
             nodeLanguage = "und";
         }
 
         if (socketTimeout == null) {
-            socketTimeout = "30000"; // 30 sec
-        }
-
-        if (connectionTimeout == null) {
-            connectionTimeout = "30000"; // 30 sec
+            socketTimeout = "30000"; // 30 seconds
         }
 
         DrupalClient client = new DrupalClient(url, serviceEndpoint);
         client.setSocketTimeout(Integer.parseInt(socketTimeout));
         client.setConnectionTimeout(Integer.parseInt(connectionTimeout));
-        client.setup();
 
         LOG.log(Level.INFO, "Starting action... Edition #{0}", edition.getId());
-        LOG.log(Level.INFO, "Found {0} News Item(s)", edition.
-                getNumberOfPlacements());
+
+        client.setup();
 
         UserResource ur = new UserResource(client);
         NodeResource nr = new NodeResource(client);
@@ -191,40 +189,30 @@ public class DrupalEditionAction implements EditionAction {
         ur.setPassword(password);
 
         setSectionMapping(mappings);
-        setExcludeMediaContentTypes(excludeContentTypes);
+        setExcludeMediaTypes(excludeContentTypes);
 
         try {
             LOG.log(Level.INFO, "Trying to login");
 
             ur.connect();
 
+            LOG.log(Level.INFO, "Found {0} News Item(s)", edition.
+                    getNumberOfPlacements());
+
             for (NewsItemPlacement nip : edition.getPlacements()) {
                 NewsItem newsItem = nip.getNewsItem();
 
-                List<MediaItemRendition> renditions = getMedia(newsItem);
-
-                LOG.log(Level.INFO, "> Uploading News Item #{0} & {1} image(s)",
-                        new Object[]{newsItem.getId(), renditions.size()});
-
-                Map<String, Object> actor = new HashMap<String, Object>();
-                Map<String, Object> body = new HashMap<String, Object>();
-                Map<String, Object> image = new HashMap<String, Object>();
-                Map<String, Object> section = getSection(nip);
-
-                actor.put("0", new TextField(null, getActor(newsItem), null));
-                body.put("0", new TextField(newsItem.getBrief(),
-                        cleanString(newsItem.getStory()), "html"));
-
                 DrupalMessage nodeMessage = new DrupalMessage();
-                nodeMessage.getFields().put("actor", new FieldModule(actor));
-                nodeMessage.getFields().put("body", new FieldModule(body));
+                nodeMessage.getFields().put("actor", getActor(newsItem));
+                nodeMessage.getFields().put("converge_id", getConvergeId(newsItem));
+                nodeMessage.getFields().put("body", getBody(newsItem));
                 nodeMessage.getFields().put("language", nodeLanguage);
                 nodeMessage.getFields().put("publish_on", getPublishOn());
-                nodeMessage.getFields().put("section", new FieldModule(section));
+                nodeMessage.getFields().put("section", getSection(nip));
                 nodeMessage.getFields().put("status", getStatus());
-                nodeMessage.getFields().put("sticky", getPromote(nip));
+                nodeMessage.getFields().put("promote", getPromote(nip));
                 nodeMessage.getFields().put("title", getTitle(newsItem));
-                nodeMessage.getFields().put("type", nodeContentType);
+                nodeMessage.getFields().put("type", nodeType);
 
                 NewsItemEditionState status =
                         ctx.addNewsItemEditionState(edition.getId(), newsItem.
@@ -238,16 +226,14 @@ public class DrupalEditionAction implements EditionAction {
                         getId(), SUBMITTED, null);
 
                 try {
-                    ArrayList<FileCreateMessage> messages =
-                            fr.create(renditions);
+                    List<MediaItemRendition> renditions = getMedia(newsItem);
 
-                    for (int i = 0; i < messages.size(); i++) {
-                        image.put(String.valueOf(i),
-                                new ImageField(messages.get(i).getFid(), 1, NID,
-                                nodeContentType));
-                    }
+                    LOG.log(Level.INFO,
+                            "> Uploading News Item #{0} & {1} image(s)",
+                            new Object[]{newsItem.getId(), renditions.size()});
 
-                    nodeMessage.getFields().put("image", new FieldModule(image));
+                    ArrayList<FileCreateMessage> msgs = fr.create(renditions);
+                    nodeMessage.getFields().put("image", getImage(msgs));
 
                     NodeCreateMessage ncm = nr.create(nodeMessage);
 
@@ -357,39 +343,15 @@ public class DrupalEditionAction implements EditionAction {
         }
     }
 
-    private void setExcludeMediaContentTypes(String mapping) {
+    private void setExcludeMediaTypes(String mapping) {
         if (mapping == null) {
             return;
         }
 
         String[] values = mapping.split(";");
-        excludeMediaContentTypes = values;
+        excludeMediaTypes = values;
 
-        LOG.log(Level.INFO, "Found {0} excluded media content type(s)", values.length);
-    }
-
-    private Map<String, Object> getSection(NewsItemPlacement placement) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        Section section = placement.getSection();
-
-        if (section != null) {
-            if (sectionMapping.containsKey(section.getId())) {
-                map.put("0", sectionMapping.get(section.getId()));
-                return map;
-            }
-        }
-
-        if (sectionMapping.containsKey(Long.parseLong("0"))) {
-            map.put("0", sectionMapping.get(Long.parseLong("0")));
-            return map;
-        }
-
-        NewsItem newsItem = placement.getNewsItem();
-
-        LOG.log(Level.WARNING, "Section mapping failed for News Item #{0}",
-                newsItem.getId());
-
-        return map;
+        LOG.log(Level.INFO, "Found {0} excluded media type(s)", values.length);
     }
 
     /**
@@ -411,11 +373,12 @@ public class DrupalEditionAction implements EditionAction {
     /**
      * Get safe HTML from untrusted input HTML.
      * 
-     * @param content input untrusted HTML
+     * @param html input untrusted HTML
      * @return safe HTML
      */
-    private String cleanString(String content) {
-        return Jsoup.clean(content, Whitelist.relaxed());
+    private String cleanHTML(String html) {
+        // return Jsoup.clean(html, Whitelist.relaxed());
+        return html;
     }
 
     /**
@@ -426,45 +389,6 @@ public class DrupalEditionAction implements EditionAction {
      */
     private String getTitle(NewsItem newsItem) {
         return truncateString(newsItem.getTitle(), 254);
-    }
-
-    /**
-     * Get <b>Actor</b> text value.
-     * 
-     * @param newsItem NewsItem
-     * @return actor, or actors (separated by ', ')
-     */
-    private String getActor(NewsItem newsItem) {
-        if (newsItem.isUndisclosedAuthor()) {
-            // Return the UNDISCLOSED_AUTHOR_LABEL property value
-            return undisclosedAuthor;
-        } else {
-            if (newsItem.getByLine().trim().isEmpty()) {
-                StringBuilder by = new StringBuilder();
-
-                // Iterate over all the actors
-                for (NewsItemActor actor : newsItem.getActors()) {
-                    boolean firstActor = true;
-
-                    // TODO: Document
-                    if (actor.getRole().equals(newsItem.getOutlet().getWorkflow().
-                            getStartState().getActorRole())) {
-                        if (!firstActor) {
-                            by.append(", ");
-                        } else {
-                            firstActor = false;
-                        }
-
-                        by.append(actor.getUser().getFullName());
-                    }
-                }
-
-                return by.toString();
-            } else {
-                // Return the "by-line" of the NewsItem
-                return newsItem.getByLine();
-            }
-        }
     }
 
     /**
@@ -492,7 +416,6 @@ public class DrupalEditionAction implements EditionAction {
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
         // Get the post delay property
         Integer amount = Integer.valueOf(publishDelay);
         Calendar calendar = Calendar.getInstance();
@@ -524,6 +447,130 @@ public class DrupalEditionAction implements EditionAction {
         return "0";
     }
 
+    /**
+     * Get <b>Image</b> image field.
+     * 
+     * @param msgs ?
+     * @return image image field
+     */
+    private FieldModule getImage(ArrayList<FileCreateMessage> msgs) {
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        for (int i = 0; i < msgs.size(); i++) {
+            ImageField imageField = new ImageField(msgs.get(i).
+                    getFid(), 1, "", "");
+            map.put(String.valueOf(i), imageField);
+        }
+
+        return new FieldModule(map);
+    }
+
+    /**
+     * Get <b>Body</b> text field.
+     * 
+     * @param newsItem NewsItem
+     * @return body text field
+     */
+    private FieldModule getBody(NewsItem newsItem) {
+        TextField textField = new TextField(newsItem.getBrief(),
+                cleanHTML(newsItem.getStory()), "html");
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("0", textField);
+
+        return new FieldModule(map);
+    }
+
+    /**
+     * Get <b>Actor</b> text field.
+     * 
+     * @param newsItem NewsItem
+     * @return actor text field
+     */
+    private FieldModule getActor(NewsItem newsItem) {
+        TextField textField;
+
+        if (newsItem.isUndisclosedAuthor()) {
+            textField = new TextField(null, undisclosedAuthor, null);
+        } else {
+            if (newsItem.getByLine().trim().isEmpty()) {
+                StringBuilder by = new StringBuilder();
+
+                // Iterate over all the actors
+                for (NewsItemActor actor : newsItem.getActors()) {
+                    boolean firstActor = true;
+
+                    // TODO: Document
+                    if (actor.getRole().equals(newsItem.getOutlet().
+                            getWorkflow().
+                            getStartState().getActorRole())) {
+                        if (!firstActor) {
+                            by.append(", ");
+                        } else {
+                            firstActor = false;
+                        }
+
+                        by.append(actor.getUser().getFullName());
+                    }
+                }
+
+                textField = new TextField(null, by.toString(), null);
+            } else {
+                // Return the "by-line" of the NewsItem
+                textField = new TextField(null, newsItem.getByLine(), null);
+            }
+        }
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("0", textField);
+
+        return new FieldModule(map);
+    }
+
+    /**
+     * Get <b>Converge ID</b> text field.
+     * 
+     * @param newsItem NewsItem
+     * @return converge_id text field
+     */
+    private FieldModule getConvergeId(NewsItem newsItem) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("0", newsItem.getId());
+
+        return new FieldModule(map);
+    }
+    
+    /**
+     * Get <b>Section</b> taxonomy field.
+     * 
+     * @param newsItem NewsItemPlacement
+     * @return section taxonomy field
+     */
+    private FieldModule getSection(NewsItemPlacement placement) {
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        Section section = placement.getSection();
+
+        if (section != null) {
+            if (sectionMapping.containsKey(section.getId())) {
+                map.put("0", sectionMapping.get(section.getId()));
+                return new FieldModule(map);
+            }
+        }
+
+        if (sectionMapping.containsKey(Long.parseLong("0"))) {
+            map.put("0", sectionMapping.get(Long.parseLong("0")));
+            return new FieldModule(map);
+        }
+
+        NewsItem newsItem = placement.getNewsItem();
+
+        LOG.log(Level.WARNING, "Section mapping failed for News Item #{0}",
+                newsItem.getId());
+
+        return new FieldModule(map);
+    }
+
     private List<MediaItemRendition> getMedia(NewsItem newsItem) {
         List<MediaItemRendition> renditions =
                 new ArrayList<MediaItemRendition>();
@@ -553,7 +600,7 @@ public class DrupalEditionAction implements EditionAction {
             }
 
             // Check if the file should be excluded
-            if (ArrayUtils.contains(excludeMediaContentTypes, rendition.
+            if (ArrayUtils.contains(excludeMediaTypes, rendition.
                     getContentType())) {
                 continue;
             }
