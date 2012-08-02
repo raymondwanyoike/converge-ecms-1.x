@@ -179,7 +179,6 @@ public class DrupalEditionAction implements EditionAction {
         ur.setPassword(password);
 
         setSectionMapping(mappings);
-        setExcludeMediaTypes(excludeContentTypes);
 
         try {
             LOG.log(Level.INFO, "Trying to login");
