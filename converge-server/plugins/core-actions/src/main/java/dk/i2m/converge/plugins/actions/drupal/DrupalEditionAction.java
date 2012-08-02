@@ -51,7 +51,6 @@ public class DrupalEditionAction implements EditionAction {
         NODE_TYPE,
         NODE_LANGUAGE,
         PASSWORD,
-        PROMOTE_TO_FRONT_PAGE,
         PUBLISH_DELAY,
         PUBLISH_IMMEDIATELY,
         SECTION_MAPPING,
@@ -83,8 +82,6 @@ public class DrupalEditionAction implements EditionAction {
 
     private Map<String, String> availableProperties;
 
-    private String promoteToFrontPage;
-
     private String publishDelay;
 
     private String publishImmediately;
@@ -112,8 +109,6 @@ public class DrupalEditionAction implements EditionAction {
         String url = properties.get(Property.URL.name());
         String username = properties.get(Property.USERNAME.name());
 
-        promoteToFrontPage = properties.get(
-                Property.PROMOTE_TO_FRONT_PAGE.name());
         publishDelay = properties.get(Property.PUBLISH_DELAY.name());
         publishImmediately = properties.get(Property.PUBLISH_IMMEDIATELY.name());
         renditionName = properties.get(Property.IMAGE_RENDITION.name());
@@ -416,19 +411,12 @@ public class DrupalEditionAction implements EditionAction {
      * @param placement placement of the {@link NewsItem}
      * @return 1 = checked, 0 otherwise
      */
-    private String getPromote(NewsItemPlacement placement) {
-        if (promoteToFrontPage != null) {
-            // Get the NewsItemPlacement's' start page
-            String start = String.valueOf(placement.getStart());
-
-            // Check if the start page matches the FRONT_PAGE_MAPPING
-            if (promoteToFrontPage.equalsIgnoreCase(start)) {
-                return "1";
-            }
+    private String getPromoted(NewsItemPlacement placement) {
+        if (placement.getStart() == 1) {
+            return "1";
+        } else {
+            return "0";
         }
-
-        // Default
-        return "0";
     }
 
     /**
