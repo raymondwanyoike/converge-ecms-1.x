@@ -25,7 +25,7 @@ import java.io.File;
  */
 public class ImageField {
 
-    private Long id;
+    private Long fid;
 
     private String alt;
 
@@ -44,13 +44,13 @@ public class ImageField {
     /**
      * Construct an image field.
      * 
-     * @param id id
+     * @param fid fid
      * @param alt alt
      * @param title title
      * @param file file
      */
-    public ImageField(Long id, String alt, String title, String contentType, File file) {
-        this.id = id;
+    public ImageField(Long fid, String alt, String title, String contentType, File file) {
+        this.fid = fid;
         this.alt = alt;
         this.title = title;
         this.contentType = contentType;
@@ -58,17 +58,17 @@ public class ImageField {
     }
 
     /**
-     * @return the id
+     * @return the fid
      */
-    public Long getId() {
-        return id;
+    public Long getFid() {
+        return fid;
     }
 
     /**
-     * @param id the id to set
+     * @param fid the fid to set
      */
-    public void setId(Long id) {
-        this.id = id;
+    public void setFid(Long fid) {
+        this.fid = fid;
     }
 
     /**
