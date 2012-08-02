@@ -72,4 +72,17 @@ public interface NotificationServiceLocal {
     void dispatchMail(String to, String from, String subject, String content);
 
     void dispatchMail(java.lang.String to, java.lang.String from, java.lang.String subject, java.lang.String htmlContent, java.lang.String plainContent);
+
+    /**
+     * Delete notifications older than the given date.
+     * 
+     * @param date Date of latest notification to keep
+     */
+    void deleteOld(java.util.Date date);
+
+    /**
+     * Delete notifications older than the retention period specified in the 
+     * application configuration.
+     */
+    public void deleteOld();
 }

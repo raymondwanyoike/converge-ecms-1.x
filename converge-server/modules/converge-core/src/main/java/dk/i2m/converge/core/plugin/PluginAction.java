@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.core.workflow;
+package dk.i2m.converge.core.plugin;
 
-import dk.i2m.converge.core.plugin.Plugin;
-import dk.i2m.converge.core.plugin.PluginContext;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -34,7 +32,7 @@ public abstract class PluginAction implements Plugin {
      * set in the constructor of implementations. 
      */
     protected ResourceBundle bundle;
-
+    
     /**
      * Executes the {@link JobQueueAction}.
      *
@@ -62,26 +60,41 @@ public abstract class PluginAction implements Plugin {
      */
     public abstract List<PluginActionPropertyDefinition> getAvailableProperties();
 
+    /**
+     * Initialise the bundle used by the plugin.
+     * 
+     * @param name 
+     *          Full class name of the bundle
+     */
+    protected void setBundle(String name) {
+        this.bundle = ResourceBundle.getBundle(name);
+    }
+    
+    /** {@inheritDoc } */
     @Override
     public String getName() {
         return bundle.getString("PLUGIN_NAME");
     }
 
+    /** {@inheritDoc } */
     @Override
     public String getAbout() {
         return bundle.getString("PLUGIN_ABOUT");
     }
 
+    /** {@inheritDoc } */
     @Override
     public String getDescription() {
         return bundle.getString("PLUGIN_DESCRIPTION");
     }
 
+    /** {@inheritDoc } */
     @Override
     public String getVendor() {
         return bundle.getString("PLUGIN_VENDOR");
     }
 
+    /** {@inheritDoc } */
     @Override
     public Date getDate() {
         try {
@@ -93,6 +106,7 @@ public abstract class PluginAction implements Plugin {
         }
     }
 
+    /** {@inheritDoc } */
     @Override
     public ResourceBundle getBundle() {
         return bundle;

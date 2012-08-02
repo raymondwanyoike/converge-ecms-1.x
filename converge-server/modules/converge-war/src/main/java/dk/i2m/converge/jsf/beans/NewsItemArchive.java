@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
 package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.converge.core.DataNotFoundException;
-import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.ejb.facades.NewsItemFacadeLocal;
-import dk.i2m.jsf.JsfUtils;
+import static dk.i2m.jsf.JsfUtils.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 
 /**
@@ -34,14 +34,28 @@ import javax.ejb.EJB;
 public class NewsItemArchive {
 
     private static final Logger log = Logger.getLogger(NewsItemArchive.class.getName());
-
-    @EJB private NewsItemFacadeLocal newsItemFacade;
-
+    @EJB
+    private NewsItemFacadeLocal newsItemFacade;
     private dk.i2m.converge.core.content.NewsItem selectedNewsItem = null;
-
     private Long id = 0L;
 
+    /**
+     * Creates a new instance of {@link NewsItemArhive}. Obtaining the id of the
+     * {@link NewsItem} to display.
+     */
     public NewsItemArchive() {
+        if (getRequestParameterMap().containsKey("id")) {
+            this.id = Long.valueOf(getRequestParameterMap().get("id"));
+        }
+    }
+
+    /**
+     * Event handler for loading the {@link NewsItem} after the page has been
+     * constructed.
+     */
+    @PostConstruct
+    public void onInit() {
+        setId(this.id);
     }
 
     /**
@@ -57,8 +71,7 @@ public class NewsItemArchive {
      * Sets the id of the news item to load. Upon setting the identifier, the
      * news item will be loaded from the database.
      *
-     * @param id
-     *          Unique identifier of the news item to load
+     * @param id Unique identifier of the news item to load
      */
     public void setId(Long id) {
         log.log(Level.INFO, "Setting News Item #{0}", id);
@@ -78,7 +91,7 @@ public class NewsItemArchive {
      * retrieved from {@link NewsItem#getSelectedNewsItem()} it is not loaded.
      *
      * @return {@code true} if a news item has been selected and loaded,
-     *         otherwise {@code false}
+     * otherwise {@code false}
      */
     public boolean isNewsItemLoaded() {
         if (getSelectedNewsItem() == null) {
@@ -88,11 +101,12 @@ public class NewsItemArchive {
         }
     }
 
-     public dk.i2m.converge.core.content.NewsItem getSelectedNewsItem() {
+    /**
+     * Gets the {@link NewsItem} to display.
+     * 
+     * @return {@link NewsItem} to display
+     */
+    public dk.i2m.converge.core.content.NewsItem getSelectedNewsItem() {
         return selectedNewsItem;
-    }
-    
-    private UserAccount getUser() {
-        return (UserAccount) JsfUtils.getValueOfValueExpression("#{userSession.user}");
     }
 }

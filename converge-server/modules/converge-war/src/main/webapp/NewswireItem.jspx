@@ -20,7 +20,7 @@
                             <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                         </h:outputText></span></h2>
 
-                <c:if test="#{newswireitem.selectedItem.newswireService.copyright != ''}">
+                <c:if test="#{newswireitem.selectedItem.newswireService.copyright != '' &amp;&amp; newswireitem.selectedItem.newswireService.copyright != null}">
                     <p class="newswireServiceCopyright"><h:outputText value="#{newswireitem.selectedItem.newswireService.copyright}" escape="false" /></p>
                 </c:if>
 

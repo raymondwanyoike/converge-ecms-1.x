@@ -40,22 +40,26 @@ public class TimerServiceBean implements TimerServiceLocal {
 
     private static final Logger LOG = Logger.getLogger(TimerServiceBean.class.
             getName());
+    @Resource
+    private TimerService timerService;
+    @EJB
+    private ConfigurationServiceLocal cfgService;
+    @EJB
+    private NewswireServiceLocal newswireService;
+    @EJB
+    private OutletFacadeLocal outletFacade;
+    @EJB
+    private CatalogueFacadeLocal catalogueFacade;
+    @EJB
+    private SearchEngineLocal searchEngineService;
+    @EJB
+    private SystemFacadeLocal systemFacade;
+    @EJB
+    private NotificationServiceLocal notificationService;
 
-    @Resource private TimerService timerService;
-
-    @EJB private ConfigurationServiceLocal cfgService;
-
-    @EJB private NewswireServiceLocal newswireService;
-
-    @EJB private OutletFacadeLocal outletFacade;
-
-    @EJB private CatalogueFacadeLocal catalogueFacade;
-
-    @EJB private SearchEngineLocal searchEngineService;
-    
-    @EJB private SystemFacadeLocal systemFacade;
-
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void startTimer(PeriodicTimer timer) {
         Calendar now = Calendar.getInstance();
@@ -86,7 +90,9 @@ public class TimerServiceBean implements TimerServiceLocal {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void stopTimer(PeriodicTimer timer) {
         for (Timer t : (Collection<Timer>) timerService.getTimers()) {
@@ -98,7 +104,9 @@ public class TimerServiceBean implements TimerServiceLocal {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void startTimers() {
         LOG.log(Level.INFO, "Starting timers");
@@ -107,7 +115,9 @@ public class TimerServiceBean implements TimerServiceLocal {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void stopTimers() {
         LOG.log(Level.INFO, "Stopping timers");
@@ -116,7 +126,9 @@ public class TimerServiceBean implements TimerServiceLocal {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<dk.i2m.converge.domain.SystemTimer> getAllTimers() {
         List<dk.i2m.converge.domain.SystemTimer> timers =
@@ -147,7 +159,9 @@ public class TimerServiceBean implements TimerServiceLocal {
         return timers;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<dk.i2m.converge.domain.SystemTimer> getActiveTimers() {
         List<dk.i2m.converge.domain.SystemTimer> timers =
@@ -166,8 +180,7 @@ public class TimerServiceBean implements TimerServiceLocal {
     /**
      * Executes a {@link Timer}
      *
-     * @param timer
-     *          Timer that initiated the timeout
+     * @param timer Timer that initiated the timeout
      */
     @Timeout
     public void executeTimer(Timer timer) {
@@ -193,6 +206,9 @@ public class TimerServiceBean implements TimerServiceLocal {
                 newswireService.dispatchBaskets();
             } else if (PeriodicTimer.JOB_QUEUE.name().equals(timer.getInfo())) {
                 systemFacade.executeJobQueue();
+            } else if (PeriodicTimer.DAILY.name().equals(timer.getInfo())) {
+                systemFacade.clearOldLogEntries();
+                notificationService.deleteOld();
             } else {
                 LOG.log(Level.WARNING, "Ignoring unknown timer [{0}]",
                         new Object[]{timer.getInfo()});

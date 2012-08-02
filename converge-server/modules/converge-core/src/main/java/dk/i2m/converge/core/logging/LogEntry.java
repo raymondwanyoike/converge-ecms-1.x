@@ -31,43 +31,52 @@ import javax.persistence.*;
 @Entity
 @Table(name = "log_entry")
 @NamedQueries({
-    @NamedQuery(name = LogEntry.FIND_BY_ENTITY,
-    query =
-    "SELECT l FROM LogEntry l JOIN l.subjects s WHERE s.entity = :"
-    + LogEntry.PARAMETER_ENTITY + " AND s.entityId = :"
-    + LogEntry.PARAMETER_ENTITY_ID + " ORDER BY l.date DESC")
+    @NamedQuery(name = LogEntry.FIND_BY_ENTITY, query = "SELECT l FROM LogEntry l JOIN l.subjects s WHERE s.entity = :" + LogEntry.PARAMETER_ENTITY + " AND s.entityId = :" + LogEntry.PARAMETER_ENTITY_ID + " ORDER BY l.date DESC"),
+    @NamedQuery(name = LogEntry.DELETE_ALL, query = "DELETE FROM LogEntry"),
+    @NamedQuery(name = LogEntry.DELETE_OLD, query = "DELETE FROM LogEntry l WHERE l.date <= :" + LogEntry.PARAMETER_DATE),
 })
 public class LogEntry implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
     /**
-     * Query for finding log entries by a given {@link LogEntry#PARAMETER_ENTITY entity} and {@link LogEntry#PARAMETER_ENTITY_ID entityId}.
+     * Query for finding log entries by a given
+     * {@link LogEntry#PARAMETER_ENTITY entity} and
+     * {@link LogEntry#PARAMETER_ENTITY_ID entityId}.
      */
     public static final String FIND_BY_ENTITY = "LogEntry.findByEntity";
-
-    /** Parameter used to specify the entity. */
+    /**
+     * Query for deleting all log entries.
+     */
+    public static final String DELETE_ALL = "LogEntry.deleteAll";
+    /**
+     * Query for deleting old log entries.
+     */
+    public static final String DELETE_OLD = "LogEntry.deleteOld";
+    /**
+     * Parameter used to specify the entity.
+     */
     public static final String PARAMETER_ENTITY = "entity";
-
-    /** Parameter used to specify the unique ID of the entity. */
+    /**
+     * Parameter used to specify the unique ID of the entity.
+     */
     public static final String PARAMETER_ENTITY_ID = "entityId";
-
+    /**
+     * Parameter used to specify the date of a LogEntry.
+     */
+    public static final String PARAMETER_DATE = "date";
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "severity")
     private LogSeverity severity;
-
-    @Column(name = "description") @Lob
+    @Column(name = "description")
+    @Lob
     private String description = "";
-
     @Column(name = "log_date")
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date date;
-
     @OneToMany(mappedBy = "logEntry", cascade = CascadeType.ALL)
     private List<LogSubject> subjects = new ArrayList<LogSubject>();
 
@@ -81,7 +90,7 @@ public class LogEntry implements Serializable {
     /**
      * Creates a new {@link LogEntry}.
      *
-     * @param severity    {@link LogSeverity} of the {@link LogEntry}
+     * @param severity {@link LogSeverity} of the {@link LogEntry}
      * @param description Description of the {@link LogEntry}
      */
     public LogEntry(LogSeverity severity, String description) {
@@ -91,10 +100,10 @@ public class LogEntry implements Serializable {
     /**
      * Creates a new {@link LogEntry}.
      *
-     * @param severity    {@link LogSeverity} of the {@link LogEntry}
+     * @param severity {@link LogSeverity} of the {@link LogEntry}
      * @param description Description of the {@link LogEntry}
-     * @param entity      Entity relating to the {@link LogEntry}
-     * @param entityId    Identifier of the entity
+     * @param entity Entity relating to the {@link LogEntry}
+     * @param entityId Identifier of the entity
      */
     public LogEntry(LogSeverity severity, String description, String entity,
             String entityId) {
@@ -199,7 +208,7 @@ public class LogEntry implements Serializable {
     /**
      * Adds an entity that relates to the {@link LogEntry}.
      *
-     * @param entity   Entity relating to the {@link LogEntry}
+     * @param entity Entity relating to the {@link LogEntry}
      * @param entityId Unique ID of the entity
      */
     public final void addSubject(String entity, String entityId) {

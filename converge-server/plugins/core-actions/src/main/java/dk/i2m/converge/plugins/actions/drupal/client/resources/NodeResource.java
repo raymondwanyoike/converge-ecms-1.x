@@ -28,7 +28,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.jactiveresource.URLBuilder;
+import dk.i2m.converge.core.utils.URLBuilder;
 
 /**
  * The core that allows node content to be submitted to the site.

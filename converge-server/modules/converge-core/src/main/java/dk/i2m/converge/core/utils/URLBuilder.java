@@ -30,7 +30,7 @@
  POSSIBILITY OF SUCH DAMAGE.
 
  */
-package org.jactiveresource;
+package dk.i2m.converge.core.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;

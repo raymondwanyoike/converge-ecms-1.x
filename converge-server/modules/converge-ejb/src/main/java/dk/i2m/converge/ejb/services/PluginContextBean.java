@@ -20,10 +20,7 @@ import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.Notification;
-import dk.i2m.converge.core.content.ContentTag;
-import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.content.NewsItemEditionState;
-import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.content.*;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
@@ -40,12 +37,12 @@ import dk.i2m.converge.core.search.QueueEntryOperation;
 import dk.i2m.converge.core.search.QueueEntryType;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.core.workflow.Edition;
-import dk.i2m.converge.core.workflow.Outlet;
+import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.facades.*;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -85,6 +82,8 @@ public class PluginContextBean implements PluginContextBeanLocal {
     @EJB private MetaDataServiceLocal metaDataService;
 
     @EJB private OutletFacadeLocal outletFacade;
+
+    @EJB private ContentItemFacadeLocal contentItemFacade;
 
     private UserAccount currentUserAccount = null;
 
@@ -148,10 +147,24 @@ public class PluginContextBean implements PluginContextBeanLocal {
         return newsItemFacade.findByStateAndOutlet(stateName, outlet);
     }
 
+    /** {@inheritDoc } */
     @Override
     public void index(NewsItem item) throws SearchEngineIndexingException {
         searchEngine.addToIndexQueue(QueueEntryType.NEWS_ITEM, item.getId(),
                 QueueEntryOperation.UPDATE);
+    }
+
+    /** {@inheritDoc } */
+    @Override
+    public void index(MediaItem item) throws SearchEngineIndexingException {
+        searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, item.getId(),
+                QueueEntryOperation.UPDATE);
+    }
+
+    /** {@inheritDoc } */
+    @Override
+    public void index(NewswireItem item) throws SearchEngineIndexingException {
+        newswireService.index(item);
     }
 
     @Override
@@ -257,11 +270,6 @@ public class PluginContextBean implements PluginContextBeanLocal {
     }
 
     @Override
-    public void index(NewswireItem item) throws SearchEngineIndexingException {
-        newswireService.index(item);
-    }
-
-    @Override
     public void log(dk.i2m.converge.core.logging.LogSeverity severity,
             java.lang.String message, java.lang.Object[] messageArguments,
             java.lang.Object origin,
@@ -352,5 +360,20 @@ public class PluginContextBean implements PluginContextBeanLocal {
     @Override
     public MediaItem findMediaItemById(Long id) throws DataNotFoundException {
         return catalogueFacade.findMediaItemById(id);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ContentItem findContentItemById(Long id) throws DataNotFoundException {
+        return contentItemFacade.findContentItemById(id);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public JobQueue addToJobQueue(String name, String typeName, Long typeId,
+            Long pluginConfigurationId, List<JobQueueParameter> parameters)
+            throws DataNotFoundException {
+        return systemFacade.addToJobQueue(name, typeName, typeId,
+                pluginConfigurationId, parameters);
     }
 }

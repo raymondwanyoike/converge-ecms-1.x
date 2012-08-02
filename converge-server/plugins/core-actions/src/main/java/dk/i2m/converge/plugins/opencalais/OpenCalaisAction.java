@@ -22,11 +22,7 @@ import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.metadata.Concept;
-import dk.i2m.converge.core.plugin.PluginContext;
-import dk.i2m.converge.core.workflow.PluginAction;
-import dk.i2m.converge.core.workflow.PluginActionException;
-import dk.i2m.converge.core.workflow.PluginActionPropertyDefinition;
-import dk.i2m.converge.core.workflow.PluginConfiguration;
+import dk.i2m.converge.core.plugin.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,8 +62,7 @@ public class OpenCalaisAction extends PluginAction {
      * Constructs a new instance of {@link OpenCalaisAction}.
      */
     public OpenCalaisAction() {
-        this.bundle = ResourceBundle.getBundle(
-                "dk.i2m.converge.i18n.OpenCalaisActionMessages");
+        setBundle("dk.i2m.converge.plugins.opencalais.Messages");
     }
 
     @Override

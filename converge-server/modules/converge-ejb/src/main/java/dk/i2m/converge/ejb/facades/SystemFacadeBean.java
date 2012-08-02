@@ -25,16 +25,14 @@ import dk.i2m.converge.core.logging.LogEntry;
 import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.logging.LogSubject;
 import dk.i2m.converge.core.newswire.NewswireService;
-import dk.i2m.converge.core.plugin.Plugin;
-import dk.i2m.converge.core.plugin.PluginManager;
-import dk.i2m.converge.core.workflow.*;
+import dk.i2m.converge.core.plugin.*;
+import dk.i2m.converge.core.workflow.JobQueue;
+import dk.i2m.converge.core.workflow.JobQueueParameter;
+import dk.i2m.converge.core.workflow.JobQueueStatus;
 import dk.i2m.converge.domain.Property;
 import dk.i2m.converge.ejb.services.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -112,8 +110,14 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         }
 
         timerService.startTimers();
+        PluginService pluginService = PluginManager.createPluginService();
 
         return true;
+    }
+
+    @Override
+    public Iterator<PluginAction> findPluginActions() {
+        return PluginManager.createPluginService().getPlugins();
     }
 
     /**
@@ -401,6 +405,28 @@ public class SystemFacadeBean implements SystemFacadeLocal {
             daoService.delete(LogEntry.class, entry.getId());
         }
     }
+    
+    /** {@inheritDoc } */
+    @Override
+    public void clearAllLogEntries() {
+        daoService.executeQuery(LogEntry.DELETE_ALL);
+    }
+    
+    /** {@inheritDoc } */
+    @Override
+    public void clearOldLogEntries(Date date) {
+        daoService.executeQuery(LogEntry.DELETE_OLD, QueryBuilder.with(LogEntry.PARAMETER_DATE, date));
+    }
+    
+    /** {@inheritDoc } */
+    @Override
+    public void clearOldLogEntries() {
+        int daysToKeep = cfgService.getInteger(ConfigurationKey.LOG_KEEP);
+        Calendar now = Calendar.getInstance();
+        now.roll(Calendar.DAY_OF_MONTH, -daysToKeep);
+        clearOldLogEntries(now.getTime());
+    }
+    
 
     /** {@inheritDoc} */
     @Override
@@ -412,6 +438,27 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     @Override
     public void removeJobQueue(Long id) {
         daoService.delete(JobQueue.class, id);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public JobQueue addToJobQueue(String name, String typeName, Long typeId,
+            Long pluginConfigurationId, List<JobQueueParameter> parameters)
+            throws DataNotFoundException {
+
+        JobQueue q = new JobQueue();
+        q.setAdded(Calendar.getInstance().getTime());
+        q.setName(name);
+        q.setParameters(parameters);
+        q.setStatus(JobQueueStatus.WAITING);
+        q.setPluginConfiguration(pluginConfigurationId);
+        PluginConfiguration pluginCfg =
+                daoService.findById(PluginConfiguration.class,
+                pluginConfigurationId);
+        q.setPluginAction(pluginCfg.getActionClass());
+        q.setTypeClass(typeName);
+        q.setTypeClassId(typeId);
+        return daoService.create(q);
     }
 
     /** {@inheritDoc} */
@@ -438,7 +485,8 @@ public class SystemFacadeBean implements SystemFacadeLocal {
                                 daoService.findById(PluginConfiguration.class,
                                 item.getPluginConfiguration());
                         action.execute(pluginContext, item.getTypeClass(),
-                                item.getTypeClassId(), cfg, item.getParametersMap());
+                                item.getTypeClassId(), cfg, item.
+                                getParametersMap());
 
                         item.setFinished(Calendar.getInstance().getTime());
                         item.setStatus(JobQueueStatus.COMPLETED);
@@ -466,5 +514,32 @@ public class SystemFacadeBean implements SystemFacadeLocal {
 
     private int removeAllNewswireProcessing() {
         return daoService.executeQuery(NewswireService.RESET_PROCESSING);
+    }
+
+    /** {@inheritDoc } */
+    @Override
+    public List<PluginConfiguration> findPluginConfigurations() {
+        return daoService.findAll(PluginConfiguration.class);
+    }
+
+    /** {@inheritDoc } */
+    @Override
+    public PluginConfiguration findPluginConfigurationById(Long id) throws
+            DataNotFoundException {
+        return daoService.findById(PluginConfiguration.class, id);
+    }
+
+    /** {@inheritDoc } */
+    @Override
+    public PluginConfiguration createPluginConfiguration(
+            PluginConfiguration pluginConfiguration) {
+        return daoService.create(pluginConfiguration);
+    }
+
+    /** {@inheritDoc } */
+    @Override
+    public PluginConfiguration updatePluginConfiguration(
+            PluginConfiguration pluginConfiguration) {
+        return daoService.update(pluginConfiguration);
     }
 }

@@ -318,14 +318,7 @@ public class Inbox {
                     return;
                 }
 
-                ContentItemActor nia = new ContentItemActor();
-                nia.setRole(newAssignment.getMediaItem().getCatalogue().
-                        getWorkflow().getStartState().getActorRole());
-                nia.setUser(getUser());
-                nia.setContentItem(newAssignment.getMediaItem());
-                newAssignment.getMediaItem().getActors().add(nia);
                 newAssignment.getMediaItem().setTitle(newAssignment.getTitle());
-                newAssignment.getMediaItem().setByLine(getUser().getFullName());
 
                 MediaItem item = null;
                 try {

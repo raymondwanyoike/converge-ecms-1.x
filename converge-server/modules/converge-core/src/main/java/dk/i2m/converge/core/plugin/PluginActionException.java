@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.core.workflow;
+package dk.i2m.converge.core.plugin;
 
 /**
  * Exception thrown if a {@link PluginAction} failed execution.
@@ -25,6 +25,10 @@ public class PluginActionException extends Exception {
 
     private boolean permanent = false;
 
+    public PluginActionException() {
+        super();
+    }
+    
     public PluginActionException(Throwable cause) {
         super(cause);
     }
@@ -35,10 +39,6 @@ public class PluginActionException extends Exception {
 
     public PluginActionException(String message) {
         super(message);
-    }
-
-    public PluginActionException() {
-        super();
     }
 
     public PluginActionException(Throwable cause, boolean permanent) {
@@ -62,6 +62,16 @@ public class PluginActionException extends Exception {
         this.permanent = permanent;
     }
 
+    /**
+     * Determines if the error is permanent. A permanent error indicates that
+     * there is no purpose in re-executing the plug-in at a later time. Some
+     * plug-ins may throw a non-permanent exception indicating that the plug-in
+     * could not finish executing at the moment, but upon retrying the execution
+     * may succeed. 
+     * 
+     * @return {@code true} if the underlying problem is permanent, otherwise
+     *         {@code false}
+     */
     public boolean isPermanent() {
         return permanent;
     }

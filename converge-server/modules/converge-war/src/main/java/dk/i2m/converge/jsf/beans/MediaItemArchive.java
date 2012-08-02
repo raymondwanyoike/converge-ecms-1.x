@@ -22,17 +22,18 @@ import dk.i2m.converge.core.content.catalogue.*;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.ContentItemFacadeLocal;
-import dk.i2m.jsf.JsfUtils;
+import static dk.i2m.jsf.JsfUtils.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 
 /**
- * Backing bean for {@code /MediaItemArchive.jspx}.
+ * View-scoped managed backing bean for {@code /MediaItemArchive.jspx}.
  *
  * @author Allan Lykke Christensen
  */
@@ -61,9 +62,22 @@ public class MediaItemArchive {
     private ContentItemPermission permission = ContentItemPermission.UNAUTHORIZED;
 
     /**
-     * Creates a new instance of {@link MediaItemArchive}.
+     * Creates a new instance of {@link MediaItemArchive}. Sets the media item
+     * to display through the received request parameter.
      */
     public MediaItemArchive() {
+        if (getRequestParameterMap().containsKey("id")) {
+            this.id = Long.valueOf(getRequestParameterMap().get("id"));
+        }
+    }
+    
+    /**
+     * Initialises the {@link MediaItem} to display based on the request 
+     * parameter received.
+     */
+    @PostConstruct
+    public void onInit() {
+        setId(this.id);
     }
 
     // -------------------------------------------------------------------------
@@ -165,7 +179,7 @@ public class MediaItemArchive {
     // -------------------------------------------------------------------------
     private UserAccount getUser() {
         final String valueExpression = "#{userSession.user}";
-        return (UserAccount) JsfUtils.getValueOfValueExpression(valueExpression);
+        return (UserAccount) getValueOfValueExpression(valueExpression);
     }
 
     // -------------------------------------------------------------------------

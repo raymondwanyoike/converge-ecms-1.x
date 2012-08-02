@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.plugins.textoutput;
 
+import dk.i2m.converge.core.content.ContentItem;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.plugin.WorkflowAction;
@@ -88,8 +89,14 @@ public class TextOutputAction implements WorkflowAction {
     private Map<String, String> availableProperties = null;
 
     @Override
-    public void execute(PluginContext ctx, NewsItem item,
+    public void execute(PluginContext ctx, ContentItem item,
             WorkflowStepAction stepAction, UserAccount user) {
+        
+        if (!(item instanceof NewsItem)) {
+            return;
+        }
+        NewsItem ni = (NewsItem)item;
+        
         this.properties = stepAction.getPropertiesAsMap();
 
         if (!validateProperties()) {
@@ -109,7 +116,7 @@ public class TextOutputAction implements WorkflowAction {
             String stateName = this.properties.get(
                     PROPERTY_OUTPUT_COLLECTION_STATE);
             List<NewsItem> items = ctx.findNewsItemsByStateAndOutlet(stateName,
-                    item.getOutlet());
+                    ni.getOutlet());
             templateAttributes.put("newsitems", items);
         }
 

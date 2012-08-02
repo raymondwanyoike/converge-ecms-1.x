@@ -18,6 +18,7 @@ package dk.i2m.converge.ejb.facades;
 
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.ContentItem;
+import dk.i2m.converge.core.content.ContentItemActor;
 import dk.i2m.converge.core.content.ContentResultSet;
 import dk.i2m.converge.core.content.NewsItemMediaAttachment;
 import dk.i2m.converge.core.content.NewsItemPlacement;
@@ -353,7 +354,8 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     @Override
     public void executeHook(Long mediaItemId, Long hookInstanceId) throws
             DataNotFoundException {
-
+        LOG.log(Level.INFO, "Executing CatalogueHook");
+        LOG.log(Level.FINE, "Executing CatalogueHook #{0} on MediaItem #{1}", new Object[]{hookInstanceId, mediaItemId});
         CatalogueHookInstance hookInstance =
                 daoService.findById(CatalogueHookInstance.class, hookInstanceId);
 
@@ -434,6 +436,25 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     @Override
     public MediaItem create(MediaItem mediaItem) throws
             WorkflowStateTransitionException {
+        
+        // Add the default actor to the item
+        UserAccount user = null;
+        try {
+            user = userFacade.findById(ctx.getCallerPrincipal().getName());
+        } catch (DataNotFoundException ex) {
+            throw new WorkflowStateTransitionException(ex);
+        }
+        
+        ContentItemActor nia = new ContentItemActor();
+        nia.setRole(mediaItem.getCatalogue().getWorkflow().getStartState().getActorRole());
+        nia.setUser(user);
+        nia.setContentItem(mediaItem);
+        mediaItem.getActors().add(nia);
+        if (mediaItem.getTitle() == null) {
+            mediaItem.setTitle("");
+        }
+        mediaItem.setByLine(user.getFullName());
+        
         return (MediaItem) contentItemService.start(mediaItem);
     }
 

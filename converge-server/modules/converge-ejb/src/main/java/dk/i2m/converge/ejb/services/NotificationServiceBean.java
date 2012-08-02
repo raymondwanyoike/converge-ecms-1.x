@@ -16,9 +16,11 @@
  */
 package dk.i2m.converge.ejb.services;
 
+import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.Notification;
 import dk.i2m.converge.core.security.UserAccount;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
@@ -42,11 +44,16 @@ import javax.mail.internet.MimeMultipart;
 @Stateless
 public class NotificationServiceBean implements NotificationServiceLocal {
 
-    @EJB private DaoServiceLocal daoService;
+    @EJB
+    private ConfigurationServiceLocal cfgService;
+    @EJB
+    private DaoServiceLocal daoService;
+    @Resource(name = "mail/converge")
+    private javax.mail.Session mailSession;
 
-    @Resource(name = "mail/converge") private javax.mail.Session mailSession;
-
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void dispatchMail(String to, String from, String subject, String content) {
         try {
@@ -71,20 +78,15 @@ public class NotificationServiceBean implements NotificationServiceLocal {
             Logger.getLogger(NotificationServiceBean.class.getName()).log(Level.FINE, "", e);
         }
     }
-    
+
     /**
      * Dispatches an e-mail with both HTML and plain text content.
-     * 
-     * @param to
-     *          E-mail address of the recipient
-     * @param from
-     *          E-mail address of the sender
-     * @param subject
-     *          Subject of the e-mail
-     * @param htmlContent
-     *          HTML content of the e-mail
-     * @param plainContent
-     *          Plain content of the e-mail
+     *
+     * @param to E-mail address of the recipient
+     * @param from E-mail address of the sender
+     * @param subject Subject of the e-mail
+     * @param htmlContent HTML content of the e-mail
+     * @param plainContent Plain content of the e-mail
      */
     @Override
     public void dispatchMail(String to, String from, String subject, String htmlContent, String plainContent) {
@@ -118,22 +120,48 @@ public class NotificationServiceBean implements NotificationServiceLocal {
         }
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Notification create(Notification notification) {
         return daoService.create(notification);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Notification create(UserAccount recipient, String message) {
         Notification notification = new Notification(message, recipient);
         return daoService.create(notification);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void dismiss(Notification notification) {
         daoService.delete(Notification.class, notification.getId());
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void deleteOld(Date date) {
+        daoService.executeQuery(Notification.DELETE_OLD,
+                QueryBuilder.with(Notification.PARAMETER_DATE, date));
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void deleteOld() {
+        int keep = cfgService.getInteger(ConfigurationKey.ACTIVITY_STREAM_KEEP);
+        Calendar now = Calendar.getInstance();
+        now.roll(Calendar.DAY_OF_MONTH, -keep);
+        deleteOld(now.getTime());
     }
 }

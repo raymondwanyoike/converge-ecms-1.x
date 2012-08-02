@@ -18,18 +18,23 @@
                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                         <h:outputText value="&#160;" />
                         <h:column>
-                            <a4j:commandButton id="btnNew" styleClass="button dynamicButton" value="#{i18n.Catalogues_NEW}" actionListener="#{administrator_Catalogues.onNew}" reRender="frmCatalogueDetails" ajaxSingle="true">
-                                <rich:componentControl for="mpCatalogueDetails" operation="show" event="oncomplete" />
-                            </a4j:commandButton>
+                            <a4j:commandButton id="btnNew" 
+                                               styleClass="button dynamicButton" 
+                                               value="#{i18n.Catalogues_NEW}" 
+                                               actionListener="#{administrator_Catalogues.onNew}" 
+                                               reRender="frmCatalogueDetails" 
+                                               ajaxSingle="true"
+                                               oncomplete="#{rich:component('mpCatalogueDetails')}.show();" />
                         </h:column>
                     </h:panelGrid>
 
                     <rich:dataTable id="dtCatalogues" value="#{administrator_Catalogues.catalogues}" var="catalogue" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
                         <rich:column styleClass="center columnIcon">
                             <f:facet name="header">&#160;</f:facet>
-                            <a4j:commandLink reRender="frmCatalogueDetails" ajaxSingle="true">
+                            <a4j:commandLink reRender="frmCatalogueDetails" 
+                                             ajaxSingle="true"
+                                             oncomplete="#{rich:component('mpCatalogueDetails')}.show();">
                                 <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogue}" value="#{catalogue}" />
-                                <rich:componentControl for="mpCatalogueDetails" operation="show" event="oncomplete" />
                                 <h:graphicImage alt="" title="" value="#{i18n.resource_ICON_CATALOGUE}" />
                             </a4j:commandLink>
                         </rich:column>
@@ -38,9 +43,10 @@
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_ID}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_NAME_TOOLTIP}" />
                             </f:facet>
-                            <a4j:commandLink reRender="frmCatalogueDetails" ajaxSingle="true">
+                            <a4j:commandLink reRender="frmCatalogueDetails" 
+                                             ajaxSingle="true"
+                                             oncomplete="#{rich:component('mpCatalogueDetails')}.show();">
                                 <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogue}" value="#{catalogue}" />
-                                <rich:componentControl for="mpCatalogueDetails" operation="show" event="oncomplete" />
                                 <h:outputText value="#{catalogue.id}">
                                     <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
                                 </h:outputText>
@@ -97,8 +103,10 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseCatalogueDetails" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                            <rich:componentControl for="mpCatalogueDetails" attachTo="imgCloseCatalogueDetails" operation="hide" event="onclick"/>
+                            <h:graphicImage id="imgCloseCatalogueDetails" 
+                                            value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                            style="link"
+                                            onclick="#{rich:component('mpCatalogueDetails')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
 
@@ -201,8 +209,12 @@
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                                         <h:outputText value="" />
-                                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.Catalogues_MEDIA_ITEM_ACTION_NEW}" reRender="frmCatalogueActionDetails" ajaxSingle="true" actionListener="#{administrator_Catalogues.onNewCatalogueAction}">
-                                            <rich:componentControl for="mpCatalogueActionDetails" operation="show" event="oncomplete" />
+                                        <a4j:commandButton styleClass="button dynamicButton" 
+                                                           value="#{i18n.Catalogues_MEDIA_ITEM_ACTION_NEW}" 
+                                                           reRender="frmCatalogueActionDetails" 
+                                                           ajaxSingle="true" 
+                                                           actionListener="#{administrator_Catalogues.onNewCatalogueAction}"
+                                                           oncomplete="#{rich:component('mpCatalogueActionDetails')}.show();">
                                             <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogueActionDetailsTab}" value="tabCatalogueAction" />
                                         </a4j:commandButton>
                                     </h:panelGrid>
@@ -211,10 +223,11 @@
 
                                         <rich:column styleClass="columnIcon center">
                                             <f:facet name="header">&#160;</f:facet>
-                                            <a4j:commandLink reRender="frmCatalogueActionDetails" ajaxSingle="true">
+                                            <a4j:commandLink reRender="frmCatalogueActionDetails" 
+                                                             ajaxSingle="true"
+                                                             oncomplete="#{rich:component('mpCatalogueActionDetails')}.show();">
                                                 <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogueAction}" value="#{action}" />
                                                 <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogueActionDetailsTab}" value="tabCatalogueAction" />
-                                                <rich:componentControl for="mpCatalogueActionDetails" operation="show" event="oncomplete" />
                                                 <h:graphicImage value="#{res.ADDON_ACTION_ICON}" />
                                             </a4j:commandLink>
                                         </rich:column>
@@ -223,10 +236,11 @@
                                             <f:facet name="header">
                                                 <h:outputText value="#{i18n.Catalogues_MEDIA_ITEM_ACTION_LABEL}" />
                                             </f:facet>
-                                            <a4j:commandLink reRender="frmCatalogueActionDetails" ajaxSingle="true">
+                                            <a4j:commandLink reRender="frmCatalogueActionDetails" 
+                                                             ajaxSingle="true"
+                                                             oncomplete="#{rich:component('mpCatalogueActionDetails')}.show();">
                                                 <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogueAction}" value="#{action}" />
                                                 <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogueActionDetailsTab}" value="tabCatalogueAction" />
-                                                <rich:componentControl for="mpCatalogueActionDetails" operation="show" event="oncomplete" />
                                                 <h:outputText value="#{action.label}" />
                                             </a4j:commandLink>
                                         </rich:column>
@@ -259,9 +273,8 @@
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSave" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Catalogues.onSave}" reRender="frmPage, pgMediaRepositoryDetails" oncomplete="if (#{converge:isAllValid()}) { Richfaces.hideModalPanel('mpCatalogueDetails'); return false;}" />
                             <a4j:commandLink id="lnkApply" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Catalogues.onSave}" reRender="frmPage, pgMediaRepositoryDetails" />
-                            <a4j:commandLink id="lnkDelete" rendered="#{administrator_Catalogues.editMode}" onclick="if (confirm('#{i18n.Catalogues_MEDIA_REPOSITORY_DELETE_CONFIRM}') != true){ return false; };" actionListener="#{administrator_Catalogues.onDelete}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="frmPage">
-                                <rich:componentControl for="mpCatalogueDetails" operation="hide" event="oncomplete" />
-                            </a4j:commandLink>
+                            <a4j:commandLink id="lnkDelete" rendered="#{administrator_Catalogues.editMode}" onclick="if (confirm('#{i18n.Catalogues_MEDIA_REPOSITORY_DELETE_CONFIRM}') != true){ return false; };" actionListener="#{administrator_Catalogues.onDelete}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="frmPage"
+                                             oncomplete="#{rich:component('mpCatalogueDetails')}.hide();" />
                             <h:commandLink id="lnkCloseDialog" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpCatalogueDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
@@ -366,8 +379,15 @@
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveAction" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Catalogues.onSaveCatalogueAction}" reRender="dtActions" oncomplete="#{rich:component('mpCatalogueActionDetails')}.hide(); return false;" />
                             <a4j:commandLink id="lnkApplyAction" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Catalogues.onSaveCatalogueAction}" reRender="dtActions,pgCatalogueActionDetails" />
-                            <a4j:commandLink id="lnkDeleteAction" ajaxSingle="true" rendered="#{administrator_Catalogues.actionEditMode}" onclick="if (confirm('#{i18n.Catalogues_MEDIA_ITEM_ACTION_REMOVE_CONFIRMATION}') != true){ return false; };" actionListener="#{administrator_Catalogues.onDeleteCatalogueAction}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="dtActions">
-                                <rich:componentControl for="mpCatalogueActionDetails" operation="hide" event="oncomplete" />
+                            <a4j:commandLink id="lnkDeleteAction" 
+                                             ajaxSingle="true" 
+                                             rendered="#{administrator_Catalogues.actionEditMode}" 
+                                             onclick="if (confirm('#{i18n.Catalogues_MEDIA_ITEM_ACTION_REMOVE_CONFIRMATION}') != true){ return false; };" 
+                                             actionListener="#{administrator_Catalogues.onDeleteCatalogueAction}" 
+                                             styleClass="dialogButton" 
+                                             value="#{i18n.Generic_DELETE}" 
+                                             reRender="dtActions"
+                                             oncomplete="#{rich:component('mpCatalogueActionDetails')}.hide();">
                             </a4j:commandLink>
                             <h:commandLink id="lnkCloseActionDetails" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpCatalogueActionDetails')}.hide(); return false;" />
                         </h:panelGroup>

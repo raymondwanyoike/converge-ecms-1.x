@@ -49,6 +49,16 @@ public class Log {
     }
 
     /**
+     * Event handler for removing all log entries.
+     * 
+     * @param event Event that invoked the handler
+     */
+    public void onClearLog(ActionEvent event) {
+        systemFacade.clearAllLogEntries();
+        onRefresh(event);
+    }
+
+    /**
      * Event handler for updating the log listing.
      * <p/>
      * @param event Event that invoked the handler

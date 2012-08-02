@@ -116,8 +116,10 @@
                 </f:facet>
                 <f:facet name="controls">
                     <h:panelGroup>
-                        <h:graphicImage id="imgCloseMediaAttachmentDetails" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" styleClass="link" />
-                        <rich:componentControl for="mpMediaFileUpload" attachTo="imgCloseMediaAttachmentDetails" operation="hide" event="onclick" />
+                        <h:graphicImage id="imgCloseMediaAttachmentDetails" 
+                                        value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                        styleClass="link"
+                                        onclick="#{rich:component('mpMediaFileUpload')}.hide();" />
                     </h:panelGroup>
                 </f:facet>
 
@@ -184,21 +186,50 @@
                                 </h:selectOneMenu>
 
                                 <h:panelGrid id="pgMedia" columnClasses="tabSheet" styleClass="tabSheetGrid">
-
                                     <a4j:outputPanel rendered="#{newsItem.selectedCatalogue != null}">
-                                        <h:outputText value="#{i18n.NewsItem_MEDIA_FILE_UPLOAD_HINT}" style="font-style: italic;" />
-                                        <applet archive="applets/jupload/wjhk.jupload.jar?version=#{common.buildNumber}" style="border: none;" border="0"
-                                                code="wjhk.jupload2.JUploadApplet" height="150" mayscript="true"
-                                                name="JUpload" width="440">
-                                            <param name="postURL" value="#{facesContext.externalContext.request.contextPath}/FileUploadServlet?uploadType=newMediaItem&amp;catalogueId=#{newsItem.selectedCatalogue.id}"/>
-                                            <param name="showLogWindow" value="false" />
-                                            <param name="retryMaxNumberOf" value="50" />
-                                            <param name="nbFilesPerRequest" value="1" />
-                                            <param name="uploadPolicy" value="ConvergePolicy" />
-                                            <param name="maxFileSize" value="#{newsItem.selectedCatalogue.maxFileUploadSize*1024}" />
-                                            <param name="afterUploadURL" value="javascript:onMediaItemUploadComplete('%body%');" />
-                                            Java Runtime 1.5 or higher plugin required.
-                                        </applet>
+
+                                        <rich:tabPanel id="tpNewRendition" switchType="ajax" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+
+                                            <rich:tab id="tabNormalUpload" label="#{i18n.NewsItemModuleMedia_MEDIA_FILE_UPLOAD_NORMAL}">
+                                                <h:panelGrid id="pgRenditionNormalUpload" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                                    <rich:fileUpload id="fuRenditionFile" 
+                                                                     fileUploadListener="#{newsItem.onUploadMediaItem}" 
+                                                                     immediateUpload="true" 
+                                                                     allowFlash="false"
+                                                                     listWidth="400"
+                                                                     listHeight="65"
+                                                                     ajaxSingle="true"
+                                                                     addControlLabel="#{i18n.NewsItemModuleMedia_SELECT_FILE}">
+                                                        <a4j:support event="onuploadcomplete" 
+                                                                     oncomplete="#{rich:component('mpMediaItemSelected')}.show();" 
+                                                                     reRender="pgMediaItemSelected,pgMediaItemUpload" />
+                                                        <f:facet name="label">
+                                                            <h:outputText value="#{i18n.NewsItemModuleMedia_UPLOAD_INDICATOR}" />
+                                                        </f:facet>
+                                                    </rich:fileUpload>
+                                                </h:panelGrid>
+                                            </rich:tab>
+
+                                            <rich:tab id="tabNewRendition" label="#{i18n.NewsItemModuleMedia_MEDIA_FILE_UPLOAD_LARGE}">
+                                                <h:panelGrid id="pgRenditionLargeUpload" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                                    <h:outputText value="#{i18n.NewsItem_MEDIA_FILE_UPLOAD_HINT}" styleClass="media-item-details-upload-hint" />
+                                                    <applet archive="applets/jupload/wjhk.jupload.jar?version=#{common.buildNumber}" style="border: none;" border="0"
+                                                            code="wjhk.jupload2.JUploadApplet" height="150" mayscript="true"
+                                                            name="JUpload" width="440">
+                                                        <param name="postURL" value="#{facesContext.externalContext.request.contextPath}/FileUploadServlet?uploadType=newMediaItem&amp;catalogueId=#{newsItem.selectedCatalogue.id}"/>
+                                                        <param name="showLogWindow" value="false" />
+                                                        <param name="nbFilesPerRequest" value="1" />
+                                                        <param name="retryMaxNumberOf" value="50" />
+                                                        <param name="uploadPolicy" value="ConvergePolicy" />
+                                                        <param name="maxFileSize" value="#{newsItem.selectedCatalogue.maxFileUploadSize*1024}" />
+                                                        <param name="afterUploadURL" value="javascript:onMediaItemUploadComplete('%body%');" />
+                                                        Java Runtime 1.5 or higher plugin required.
+                                                    </applet>
+                                                </h:panelGrid>
+                                            </rich:tab>
+
+                                        </rich:tabPanel>
+
                                     </a4j:outputPanel>
                                 </h:panelGrid>
 

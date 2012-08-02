@@ -469,6 +469,84 @@ public class MediaItem extends ContentItem {
         }
         return selfUpload;
     }
+    
+    /**
+     * Determines if the {@link MediaItem} has reached its 
+     * end state in the workflow.
+     * 
+     * @return {@code true} if the {@link MediaItem} has reached the
+     *         end state of the workflow, otherwise {@code false}
+     */
+    public boolean isEndState() {
+        // NullPointer check
+        if (getCurrentState() == null || getCatalogue() == null || getCatalogue().
+                getWorkflow() == null || getCatalogue().getWorkflow().getEndState()
+                == null) {
+            return false;
+        }
+
+
+        if (getCurrentState().equals(getCatalogue().getWorkflow().getEndState())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Determines if the {@link NewsItem} is at the start state in the 
+     * workflow.
+     * 
+     * @return {@code true} if the {@link NewsItem} is at the start
+     *         state of the workflow, otherwise {@code false}
+     */
+    public boolean isStartState() {
+        // NullPointer check
+        if (getCurrentState() == null || getCatalogue() == null || getCatalogue().
+                getWorkflow() == null || getCatalogue().getWorkflow().getStartState()
+                == null) {
+            return false;
+        }
+
+        if (getCurrentState().equals(getCatalogue().getWorkflow().getStartState())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Determines if the {@link MediaItem} is at the trash state in the 
+     * workflow.
+     * 
+     * @return {@code true} if the {@link MediaItem} is at the trash
+     *         state of the workflow, otherwise {@code false}
+     */
+    public boolean isTrashState() {
+        // NullPointer check
+        if (getCurrentState() == null || getCatalogue() == null || getCatalogue().
+                getWorkflow() == null || getCatalogue().getWorkflow().getTrashState()
+                == null) {
+            return false;
+        }
+
+        if (getCurrentState().equals(getCatalogue().getWorkflow().getTrashState())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Determines if the {@link NewsItem} is an intermediate state in the 
+     * workflow.
+     * 
+     * @return {@code true} if the {@link NewsItem} is at an intermediate
+     *         state of the workflow, otherwise {@code false}
+     */
+    public boolean isIntermediateState() {
+        return !isEndState() && !isTrashState();
+    }    
 
     @Override
     public boolean equals(Object obj) {

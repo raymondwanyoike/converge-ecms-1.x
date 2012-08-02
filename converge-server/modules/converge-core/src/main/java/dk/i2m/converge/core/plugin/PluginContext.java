@@ -20,6 +20,7 @@ import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.Notification;
+import dk.i2m.converge.core.content.ContentItem;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemEditionState;
 import dk.i2m.converge.core.content.NewsItemPlacement;
@@ -37,8 +38,12 @@ import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.workflow.Edition;
+import dk.i2m.converge.core.workflow.JobQueue;
+import dk.i2m.converge.core.workflow.JobQueueParameter;
+import dk.i2m.converge.core.workflow.JobQueueStatus;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.WorkflowState;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -133,11 +138,32 @@ public interface PluginContext {
     /**
      * Indexes a given {@link NewswireItem} in the search engine.
      *
-     * @param item {@link NewswireItem} to index
-     * @throws SearchEngineIndexingException If the {@link NewswireItem} could
-     * not be indexed
+     * @param item 
+     *          {@link NewswireItem} to index
+     * @throws SearchEngineIndexingException 
+     *          If the {@link NewswireItem} could not be indexed
      */
     void index(NewswireItem item) throws SearchEngineIndexingException;
+
+    /**
+     * Indexes a given {@link NewsItem} in the search engine.
+     *
+     * @param item 
+     *          {@link NewsItem} to index
+     * @throws SearchEngineIndexingException 
+     *          If the {@link NewsItem} could not be indexed
+     */
+    void index(NewsItem item) throws SearchEngineIndexingException;
+
+    /**
+     * Indexes a given {@link MediaItem} in the search engine.
+     *
+     * @param item 
+     *          {@link MediaItem} to index
+     * @throws SearchEngineIndexingException 
+     *          If the {@link MediaItem} could not be indexed
+     */
+    void index(MediaItem item) throws SearchEngineIndexingException;
 
     /**
      * Find or create a newswire {@link ContentTag}.
@@ -193,15 +219,6 @@ public interface PluginContext {
      *         {@link WorkflowState} and {@link Outlet}
      */
     List<NewsItem> findNewsItemsByStateAndOutlet(String stateName, Outlet outlet);
-
-    /**
-     * Indexes a given {@link NewsItem} in the search engine.
-     *
-     * @param item {@link NewsItem} to index
-     * @throws SearchEngineIndexingException If the {@link NewsItem} could not
-     * be indexed
-     */
-    void index(NewsItem item) throws SearchEngineIndexingException;
 
     /**
      * Gets a {@link List} of the latest {@link FinancialMarket} values.
@@ -335,4 +352,38 @@ public interface PluginContext {
     NewsItem findNewsItemById(Long id) throws DataNotFoundException;
 
     MediaItem findMediaItemById(Long id) throws DataNotFoundException;
+
+    /**
+     * Finds an existing {@link ContentItem} by its unique identifier.
+     * 
+     * @param id
+     *          Unique identifier of the {@link ContentItem}
+     * @return {@link ContentItem} matching the given {@code id}
+     * @throws DataNotFoundException 
+     *          If a {@link ContentItem} with the given {@code id} does not
+     *          exist
+     */
+    ContentItem findContentItemById(Long id) throws DataNotFoundException;
+
+    /**
+     * Adds an entry in the {@link JobQueue}.
+     * 
+     * @param name
+     *          Name of the job
+     * @param typeName
+     *          Type of item to act on
+     * @param typeId
+     *          Unique identifier of the item to act on
+     * @param pluginConfigurationId
+     *          Unique identifier of the plug-in configuration to execute on the
+     *          type
+     * @param parameters
+     *          Run-time parameters for the plug-in
+     * @return {@link JobQueue} representing the entry in the queue
+     * @throws DataNotFoundException 
+     *          If the {@link PluginConfiguration} does not exist
+     */
+    JobQueue addToJobQueue(String name, String typeName, Long typeId,
+            Long pluginConfigurationId, List<JobQueueParameter> parameters)
+            throws DataNotFoundException;
 }

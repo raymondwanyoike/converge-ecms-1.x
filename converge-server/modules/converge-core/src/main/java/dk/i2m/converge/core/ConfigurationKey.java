@@ -29,6 +29,10 @@ public enum ConfigurationKey implements Serializable {
     VERSION,
     BUILD_TIME,
     APPLICATION_NEWSFEED,
+    /**
+     * Configuration for when the daily timer should be executed.
+     */
+    DAILY_INTERVAL,
     WORKING_DIRECTORY,
     MESSAGE_BUNDLE,
     XML_MESSAGE_PACKAGE,
@@ -79,6 +83,14 @@ public enum ConfigurationKey implements Serializable {
     LDAP_SECURITY_PRINCIPAL,
     LDAP_SECURITY_CREDENTIALS,
     LDAP_SECURITY_AUTHENTICATION,
+    /**
+     * Number of days to keep log entries.
+     */
+    LOG_KEEP,
+    /**
+     * Number of days to keep entries in the activity stream
+     */
+    ACTIVITY_STREAM_KEEP,
     NEWSWIRE_BASKET_INTERVAL,
     NEWSWIRE_BASKET_MAIL,
     CONVERGE_HOME_URL,

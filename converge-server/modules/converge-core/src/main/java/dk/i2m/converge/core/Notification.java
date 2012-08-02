@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -44,38 +44,46 @@ import javax.persistence.Temporal;
 @Table(name = "notification")
 @NamedQueries({
     @NamedQuery(name = Notification.FIND_BY_USERNAME, query = "SELECT n FROM Notification n WHERE n.recipient.username = :username ORDER BY n.added DESC"),
-    @NamedQuery(name = Notification.COUNT_BY_USERNAME, query = "SELECT COUNT(n) FROM Notification n WHERE n.recipient.username = :username")
+    @NamedQuery(name = Notification.COUNT_BY_USERNAME, query = "SELECT COUNT(n) FROM Notification n WHERE n.recipient.username = :username"),
+    @NamedQuery(name = Notification.DELETE_OLD, query = "DELETE FROM Notification n WHERE n.added <= :" + Notification.PARAMETER_DATE)
 })
 public class Notification implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    /** Query for finding all notifications for a particular user by {@code username}. */
+    /**
+     * Query for finding all notifications for a particular user by
+     * {@code username}.
+     */
     public static final String FIND_BY_USERNAME = "Notification.findByUsername";
-
-    /** Query for getting the count of notifications for a particular user by {@code username}. */
+    /**
+     * Query for getting the count of notifications for a particular user by
+     * {@code username}.
+     */
     public static final String COUNT_BY_USERNAME = "Notification.countByUsername";
-
+    /**
+     * Query for deleting old notifications.
+     */
+    public static final String DELETE_OLD = "Notification.deleteOld";
+    /**
+     * Query parameter for specifying the date a notification.
+     */
+    public static final String PARAMETER_DATE = "added";
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
-    @Column(name = "message") @Lob
+    @Column(name = "message")
+    @Lob
     private String message;
-
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "added")
     private Calendar added;
-
     @ManyToOne
     @JoinColumn(name = "recipient_id")
     private UserAccount recipient;
-
     @ManyToOne
     @JoinColumn(name = "sender_id")
     private UserAccount sender;
-
     @Column(name = "link")
     private String link;
 
@@ -88,7 +96,7 @@ public class Notification implements Serializable {
         this.recipient = recipient;
         this.added = Calendar.getInstance();
     }
-    
+
     public Notification(String message, String link, UserAccount recipient, UserAccount sender) {
         this.message = message;
         this.link = link;
@@ -120,7 +128,7 @@ public class Notification implements Serializable {
     public void setLink(String link) {
         this.link = link;
     }
-    
+
     public boolean isLinkSet() {
         if (link == null || link.trim().isEmpty()) {
             return false;

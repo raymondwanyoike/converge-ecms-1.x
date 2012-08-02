@@ -215,6 +215,13 @@ CREATE TABLE IF NOT EXISTS  `plugin_configuration` (
     PRIMARY KEY (`id`)
 );
 
+CREATE TABLE IF NOT EXISTS  `plugin_configuration_oncomplete` (
+    `main_configuration_id` BIGINT NOT NULL,
+    `complete_configuration_id` BIGINT NOT NULL,
+    PRIMARY KEY (`main_configuration_id`, `complete_configuration_id`)
+);
+
+
 CREATE TABLE IF NOT EXISTS  `plugin_configuration_property` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `plugin_configuration_id` BIGINT DEFAULT NULL,

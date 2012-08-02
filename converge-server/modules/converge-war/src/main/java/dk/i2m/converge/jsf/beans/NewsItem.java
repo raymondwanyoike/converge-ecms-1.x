@@ -23,6 +23,8 @@ import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.content.*;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
+import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.metadata.*;
 import dk.i2m.converge.core.plugin.WorkflowValidatorException;
 import dk.i2m.converge.core.search.QueueEntryOperation;
@@ -36,12 +38,14 @@ import dk.i2m.converge.domain.search.SearchResults;
 import dk.i2m.converge.ejb.facades.*;
 import dk.i2m.converge.ejb.services.ConfigurationServiceLocal;
 import dk.i2m.converge.ejb.services.MetaDataServiceLocal;
-import dk.i2m.jsf.JsfUtils;
+import static dk.i2m.jsf.JsfUtils.*;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -50,134 +54,117 @@ import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import org.richfaces.component.html.HtmlTree;
 import org.richfaces.event.NodeSelectedEvent;
+import org.richfaces.event.UploadEvent;
+import org.richfaces.model.UploadItem;
 
 /**
- * Managed backing bean for {@code /NewsItem.jspx}. The backing bean is kept
- * alive by the JSF file. Loading a news item is done by setting the ID of the
- * item using {@link NewsItem#setId(java.lang.Long)}.
+ * View-scoped managed backing bean for {@code /NewsItem.jspx}. Loading a news
+ * item is done by setting the ID of the item using
+ * {@link NewsItem#setId(java.lang.Long)}.
  *
  * @author Allan Lykke Christensen
  */
 public class NewsItem {
 
     private static final Logger LOG = Logger.getLogger(NewsItem.class.getName());
-
-    @EJB private CatalogueFacadeLocal catalogueFacade;
-
-    @EJB private ContentItemFacadeLocal contentItemFacade;
-
-    @EJB private NewsItemFacadeLocal newsItemFacade;
-
-    @EJB private MetaDataFacadeLocal metaDataFacade;
-
-    @EJB private MetaDataServiceLocal metaDataService;
-
-    @EJB private OutletFacadeLocal outletFacade;
-
-    @EJB private UserFacadeLocal userFacade;
-
-    @EJB private SearchEngineLocal searchEngine;
-
-    @EJB private ConfigurationServiceLocal cfgService;
-
+    @EJB
+    private CatalogueFacadeLocal catalogueFacade;
+    @EJB
+    private ContentItemFacadeLocal contentItemFacade;
+    @EJB
+    private NewsItemFacadeLocal newsItemFacade;
+    @EJB
+    private MetaDataFacadeLocal metaDataFacade;
+    @EJB
+    private MetaDataServiceLocal metaDataService;
+    @EJB
+    private OutletFacadeLocal outletFacade;
+    @EJB
+    private UserFacadeLocal userFacade;
+    @EJB
+    private SearchEngineLocal searchEngine;
+    @EJB
+    private ConfigurationServiceLocal cfgService;
     private dk.i2m.converge.core.content.NewsItem selectedNewsItem = null;
-
     private WorkflowStep selectedStep = null;
-
     private WorkflowStateTransition selectedWorkflowStateTransition;
-
     private ContentItemActor selectedActor;
-
     private ContentItemActor newActor = new ContentItemActor();
-
     private Concept selectedMetaDataConcept;
-
     private Long id = 0L;
-
     private DataModel versions = new ListDataModel();
-
     private boolean validWorkflowStep = false;
-
     private String comment = "";
-
     private boolean readOnly = false;
-
     private boolean pullbackAvailable = false;
-
     private ContentItemPermission permission;
-
     private NewsItemMediaAttachment selectedAttachment;
-
     private String keyword = "";
-
     private DataModel searchResults = new ListDataModel();
-
     private Long selectedMediaItemId = null;
-
     private NewsItemMediaAttachment deleteMediaItem = null;
-
     private String newConcept = "";
-
-    /** Map of rights to the media attachments. */
+    /**
+     * Map of rights to the media attachments.
+     */
     private Map<Long, Boolean> currentMediaActors = new HashMap<Long, Boolean>();
-
     /**
      * Dev Note: Could not use a Concept object for direct entry as it is
      * abstract.
      */
     private String newConceptName = "";
-
     /**
      * Dev Note: Could not use a Concept object for direct entry as it is
      * abstract.
      */
     private String newConceptDescription = "";
-
     /**
      * Dev Note: Could not use a Concept object for direct entry as it is
      * abstract.
      */
     private String conceptType = "";
-
     private boolean conceptAdded = false;
-
     private Map<String, Boolean> fieldVisibible = new HashMap<String, Boolean>();
-
     private Date editionDate;
-
     private NewsItemPlacement selectedNewsItemPlacement;
-
     private EditionCandidate editionCandidate;
-
     private Map<String, EditionCandidate> editionCandidates =
             new LinkedHashMap<String, EditionCandidate>();
-
     private Catalogue selectedCatalogue = null;
-
     private boolean showClosedEditions = false;
-
     private Map<String, Concept> suggestedConcepts =
             new LinkedHashMap<String, Concept>();
-
     private List<Concept> selectedConcepts = new ArrayList<Concept>();
-
     private Long uploadedMediaItem = 0L;
 
     /**
-     * Creates a new instance of {@link NewsItem}.
+     * Creates a new instance of {@link NewsItem}. Sets the ID of the
+     * {@link NewsItem} to display if the ID is specified as a request
+     * parameter.
      */
     public NewsItem() {
+        if (getRequestParameterMap().containsKey("id")) {
+            this.id = Long.valueOf(getRequestParameterMap().get("id"));
+        }
     }
 
-    // -------------------------------------------------------------------------
-    // -- EVENT HANDLERS
-    // -------------------------------------------------------------------------
+    /**
+     * Event handler executed after the creation of the page. The initialiser
+     * loads the {@link NewsItem} based on the value if {@link #getId()}.
+     */
+    @PostConstruct
+    public void onInit() {
+        if (this.id != null) {
+            setId(id);
+        }
+    }
+
     public String onSubmit() {
         if (getSelectedStep() == null) {
             try {
                 selectedNewsItem = newsItemFacade.checkin(selectedNewsItem);
             } catch (LockingException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                         Bundle.i18n.name(), "NewsItem_COULD_NOT_SAVE_LOCKED");
                 return null;
             }
@@ -189,7 +176,7 @@ public class NewsItem {
                 comment = "";
                 return "/inbox";
             } catch (WorkflowStateTransitionException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                         Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
                         new Object[]{ex.getMessage()});
                 return null;
@@ -200,28 +187,26 @@ public class NewsItem {
     public void onApply(ActionEvent event) {
         try {
             selectedNewsItem = newsItemFacade.save(selectedNewsItem);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(), "NewsItem_CHANGES_SAVED");
         } catch (LockingException ex) {
             LOG.log(Level.INFO, ex.getMessage());
             LOG.log(Level.FINE, "", ex);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(), "NewsItem_COULD_NOT_SAVE_LOCKED");
         }
     }
 
     /**
-     * Event handler invoked upon executing the periodic auto-save
-     * poller.
+     * Event handler invoked upon executing the periodic auto-save poller.
      *
-     * @param event
-     *          Event that invoked the auto-save
+     * @param event Event that invoked the auto-save
      */
     public void onAutoSave(ActionEvent event) {
         try {
             selectedNewsItem = newsItemFacade.save(selectedNewsItem);
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(), "NewsItem_COULD_NOT_SAVE_LOCKED");
         }
     }
@@ -229,11 +214,11 @@ public class NewsItem {
     public String onSave() {
         try {
             selectedNewsItem = newsItemFacade.checkin(selectedNewsItem);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(), "NewsItem_STORY_SAVED", null);
             return "/inbox";
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(), "NewsItem_COULD_NOT_SAVE_LOCKED");
             return null;
         }
@@ -251,11 +236,11 @@ public class NewsItem {
             selectedNewsItem = null;
             setId(theId);
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(), "NewsItem_COULD_NOT_PULLBACK");
         } catch (WorkflowStateTransitionException ex) {
             LOG.log(Level.SEVERE, "", ex);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(), "NewsItem_COULD_NOT_PULLBACK_X",
                     new Object[]{ex.getMessage()});
         }
@@ -270,10 +255,9 @@ public class NewsItem {
      * {@link dk.i2m.converge.core.metadata.Subject}s are not returned as they
      * are selected through the subject selection dialog.
      *
-     * @param suggestion
-     *          String for which to base the suggestions
+     * @param suggestion String for which to base the suggestions
      * @return {@link List} of suggested {@link Concept}s based on
-     *         {@code suggestion}
+     * {@code suggestion}
      */
     public List<Concept> onConceptSuggestion(Object suggestion) {
         String conceptName = (String) suggestion;
@@ -290,7 +274,7 @@ public class NewsItem {
             Concept concept = metaDataFacade.findConceptByName(newConcept);
             if (!this.selectedNewsItem.getConcepts().contains(concept)) {
                 this.selectedNewsItem.getConcepts().add(concept);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                         Bundle.i18n.name(),
                         "NewsItem_CONCEPT_X_ADDED_TO_NEWS_ITEM_Y",
                         new Object[]{concept.getFullTitle(), selectedNewsItem.
@@ -317,7 +301,7 @@ public class NewsItem {
         } else if ("POI".equalsIgnoreCase(conceptType)) {
             c = new PointOfInterest(newConceptName, newConceptDescription);
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(), "NewsItem_CONCEPT_TYPE_MISSING");
         }
 
@@ -325,7 +309,7 @@ public class NewsItem {
             c = metaDataFacade.create(c);
             if (!this.selectedNewsItem.getConcepts().contains(c)) {
                 this.selectedNewsItem.getConcepts().add(c);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                         Bundle.i18n.name(),
                         "NewsItem_CONCEPT_X_ADDED_TO_NEWS_ITEM_Y",
                         new Object[]{c.getFullTitle(),
@@ -340,7 +324,7 @@ public class NewsItem {
         HtmlTree tree = (HtmlTree) event.getComponent();
         Subject subj = (Subject) tree.getRowData();
         this.selectedNewsItem.getConcepts().add(subj);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+        createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(),
                 "NewsItem_CONCEPT_X_ADDED_TO_NEWS_ITEM_Y",
                 new Object[]{subj.getFullTitle(), selectedNewsItem.getTitle()});
@@ -351,12 +335,12 @@ public class NewsItem {
 //            try {
 //                selectedNewsItem = newsItemFacade.save(selectedNewsItem);
 //                selectedNewsItem = newsItemFacade.removeActorFromNewsItem(selectedActor);
-//                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "The actor has been removed", null);
+//                createMessage("frmPage", FacesMessage.SEVERITY_INFO, false, "The actor has been removed", null);
 //            } catch (LockingException ex) {
-//                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
+//                createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, ex.getMessage(), null);
 //            }
 //        } else {
-//            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Select actor", null);
+//            createMessage("frmPage", FacesMessage.SEVERITY_ERROR, false, "Select actor", null);
 //        }
     }
 
@@ -369,7 +353,7 @@ public class NewsItem {
                 if (nia.getRole().equals(this.newActor.getRole())
                         && nia.getUser().equals(this.newActor.getUser())) {
                     dup = true;
-                    JsfUtils.createMessage("frmPage",
+                    createMessage("frmPage",
                             FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
                             "NewsItem_DUPLICATE_USER_ROLE",
                             new Object[]{this.newActor.getUser().getFullName(),
@@ -386,7 +370,7 @@ public class NewsItem {
                             newsItemFacade.findNewsItemById(selectedNewsItem.
                             getId());
                 } catch (DataNotFoundException ex) {
-                    JsfUtils.createMessage("frmPage",
+                    createMessage("frmPage",
                             FacesMessage.SEVERITY_ERROR,
                             Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
                             new Object[]{ex.getMessage()});
@@ -395,7 +379,7 @@ public class NewsItem {
             this.newActor = new ContentItemActor();
 
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(), "NewsItem_SELECT_USER_AND_ROLE");
         }
     }
@@ -406,12 +390,12 @@ public class NewsItem {
             selectedNewsItem.getConcepts().add(selectedMetaDataConcept);
             selectedNewsItem = newsItemFacade.save(selectedNewsItem);
 
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "NewsItem_META_DATA_X_ADDED_TO_ASSIGNMENT",
                     new Object[]{getSelectedMetaDataConcept().getName()});
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
                     new Object[]{ex.getMessage()});
         }
@@ -423,12 +407,12 @@ public class NewsItem {
             selectedNewsItem.getConcepts().remove(selectedMetaDataConcept);
             selectedNewsItem = newsItemFacade.save(selectedNewsItem);
 
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "NewsItem_META_DATA_X_REMOVED_FROM_ASSIGNMENT",
                     new Object[]{getSelectedMetaDataConcept().getName()});
         } catch (LockingException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
                     new Object[]{ex.getMessage()});
         }
@@ -459,7 +443,7 @@ public class NewsItem {
 
         if (selectedStep == null) {
             this.validWorkflowStep = false;
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(), "NewsItem_VALIDATE_SELECT_OPTION");
         }
 
@@ -481,7 +465,7 @@ public class NewsItem {
 
         if (!isRoleValidated) {
             this.validWorkflowStep = false;
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(),
                     "NewsItem_VALIDATE_MISSING_ROLE", new Object[]{requiredRole.
                         getName()});
@@ -494,7 +478,7 @@ public class NewsItem {
                 workflowValidator.execute(selectedNewsItem, selectedStep,
                         validator);
             } catch (WorkflowValidatorException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                         Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
                         new Object[]{ex.getMessage()});
                 this.validWorkflowStep = false;
@@ -519,7 +503,7 @@ public class NewsItem {
 
             if (realResults.isEmpty()) {
                 searchResults = new ListDataModel(new ArrayList());
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                         Bundle.i18n.name(),
                         "NewsItem_NO_MEDIA_ITEM_MATCHING_X",
                         new Object[]{getKeyword()});
@@ -529,7 +513,7 @@ public class NewsItem {
                     hit.setLink(
                             MessageFormat.format(hit.getLink(),
                             new Object[]{
-                                JsfUtils.getValueOfValueExpression(
+                                getValueOfValueExpression(
                                 "#{facesContext.externalContext.request.contextPath}")}));
                 }
                 searchResults = new ListDataModel(realResults);
@@ -538,9 +522,66 @@ public class NewsItem {
     }
 
     /**
-     * Event handler for attaching a {@link MediaItem} to the 
+     * Event handler for uploading a new {@link MediaItem}.
+     *
+     * @param event Event that invoked the handler
+     * @throws IOException If the file upload could not complete
+     */
+    public void onUploadMediaItem(UploadEvent event) throws IOException {
+        UploadItem item = event.getUploadItem();
+
+        try {
+            // Find the original rendition (assume this is what is being uploaded)
+            Rendition rendition = getSelectedCatalogue().getOriginalRendition();
+
+            // Create MediaItem placeholder
+            MediaItem mediaItem = new MediaItem();
+            mediaItem.setCatalogue(getSelectedCatalogue());
+            mediaItem = catalogueFacade.create(mediaItem);
+
+            // Store MediaItemRendition in Database
+            MediaItemRendition mediaItemRendition = catalogueFacade.create(
+                    item.getFile(),
+                    mediaItem,
+                    rendition,
+                    item.getFileName(),
+                    item.getContentType(),
+                    true);
+
+
+            LOG.log(Level.FINE, "New media item rendition created: {0}",
+                    mediaItemRendition.getId());
+
+            // Progress to Self-upload State
+            WorkflowState selfUp = getSelectedCatalogue().getSelfUploadState();
+            mediaItem = catalogueFacade.step(mediaItem, selfUp.getId(), true);
+            LOG.log(Level.FINE, "MediaItem #{0} transitioned to State #{1}",
+                    new Object[]{mediaItem.getId(), selfUp.getId()});
+
+            this.uploadedMediaItem = mediaItem.getId();
+            setSelectedMediaItemId(this.uploadedMediaItem);
+        } catch (WorkflowStateTransitionException ex) {
+            createMessage("frmPage",
+                    FacesMessage.SEVERITY_FATAL,
+                    Bundle.i18n.name(),
+                    "Generic_AN_ERROR_OCCURRED_X",
+                    new Object[]{ex.getMessage()});
+            LOG.log(Level.SEVERE, "Could not upload media item in NewsStory", ex);
+        } catch (IOException ex) {
+            createMessage("frmPage",
+                    FacesMessage.SEVERITY_FATAL,
+                    Bundle.i18n.name(),
+                    "Generic_AN_ERROR_OCCURRED_X",
+                    new Object[]{ex.getMessage()});
+            LOG.log(Level.SEVERE, "Could not create media item rendition. {0}",
+                    ex.getMessage());
+        }
+    }
+
+    /**
+     * Event handler for attaching a {@link MediaItem} to the
      * {@link dk.i2m.converge.core.content.NewsItem}.
-     * 
+     *
      * @param event Event that invoked the handler
      */
     public void onUseAttachment(ActionEvent event) {
@@ -565,11 +606,11 @@ public class NewsItem {
                 getNextAssetAttachmentDisplayOrder());
         this.selectedAttachment = newsItemFacade.create(selectedAttachment);
         this.selectedNewsItem.getMediaAttachments().add(selectedAttachment);
-        
+
         loadCurrentMediaActor(selectedAttachment.getMediaItem().getId());
 
         onPreAttachMediaFile(event);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+        createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(),
                 "NewsItem_MEDIA_ITEM_ATTACHED_TO_NEWS_ITEM");
     }
@@ -610,7 +651,7 @@ public class NewsItem {
     public void onAddPlacement(ActionEvent event) {
 
         if (getEditionCandidate() == null) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(),
                     "NewsItem_OUTLET_PLACEMENT_SELECT_EDITION");
             return;
@@ -645,7 +686,7 @@ public class NewsItem {
 
     public void onUpdatePlacement(ActionEvent event) {
         if (getEditionCandidate() == null) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(),
                     "NewsItem_OUTLET_PLACEMENT_SELECT_EDITION");
             return;
@@ -681,7 +722,7 @@ public class NewsItem {
 
     public void onSuggestConcepts(ActionEvent event) {
         if (getSelectedNewsItem().getStory().trim().isEmpty()) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(),
                     "NewsItem_CONCEPTS_SUGGEST_FAILED_NO_STORY");
             return;
@@ -692,8 +733,7 @@ public class NewsItem {
                     stripHtml(getSelectedNewsItem().getStory()));
             suggestedConcepts = new LinkedHashMap<String, Concept>();
             this.selectedConcepts = new ArrayList<Concept>();
-            ResourceBundle bundle = JsfUtils.getResourceBundle(
-                    Bundle.i18n.name());
+            ResourceBundle bundle = getResourceBundle(Bundle.i18n.name());
             for (Concept concept : concepts) {
                 String type = bundle.getString("Generic_" + concept.getType()
                         + "_NAME");
@@ -702,13 +742,13 @@ public class NewsItem {
             }
 
             if (suggestedConcepts.isEmpty()) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                         Bundle.i18n.name(),
                         "NewsItem_CONCEPTS_SUGGEST_NO_RESULTS");
             }
 
         } catch (EnrichException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     "i18n", "NewsItem_CONCEPTS_SUGGEST_FAILED", null);
         }
     }
@@ -741,9 +781,9 @@ public class NewsItem {
 
     /**
      * Get the auto-save interval in milliseconds.
-     * 
+     *
      * @return Auto-save interval in milliseconds. A value less than 1 indicates
-     *         that auto-save is disabled
+     * that auto-save is disabled
      */
     public Integer getAutoSaveInterval() {
         return cfgService.getInteger(ConfigurationKey.AUTO_SAVE_INTERVAL);
@@ -751,7 +791,7 @@ public class NewsItem {
 
     /**
      * Determines if auto-save is enabled.
-     * 
+     *
      * @return {@code true} if auto-save is enabled, otherwise {@code false}
      */
     public boolean isAutoSaveEnabled() {
@@ -766,8 +806,7 @@ public class NewsItem {
      * Sets the id of the news item to load. Upon setting the identifier, the
      * news item will be checked-out from the database.
      *
-     * @param id
-     *          Unique identifier of the news item to load
+     * @param id Unique identifier of the news item to load
      */
     public void setId(Long id) {
         LOG.log(Level.FINE, "Setting News Item #{0}", id);
@@ -798,7 +837,7 @@ public class NewsItem {
                 if (!nih.isCheckedOut() && (this.permission
                         == ContentItemPermission.USER || this.permission
                         == ContentItemPermission.ROLE)) {
-                    JsfUtils.createMessage("frmPage",
+                    createMessage("frmPage",
                             FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
                             "NewsItem_OPEN_READ_ONLY",
                             new Object[]{selectedNewsItem.getCheckedOutBy().
@@ -841,8 +880,8 @@ public class NewsItem {
 
     /**
      * Gets a {@link Map} containing the visibility indicators for each field.
-     * The Map key is the name of the news item field,
-     * corresponding to the full name of a {@link NewsItemField}.
+     * The Map key is the name of the news item field, corresponding to the full
+     * name of a {@link NewsItemField}.
      *
      * @return Visibility indicators for the news item fields
      */
@@ -855,10 +894,10 @@ public class NewsItem {
             try {
                 selectedNewsItem.getActors().remove(actor);
                 selectedNewsItem = newsItemFacade.save(selectedNewsItem);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                         Bundle.i18n.name(), "NewsItem_ACTOR_REMOVED");
             } catch (LockingException ex) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                         Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
                         new Object[]{ex.getMessage()});
             }
@@ -867,7 +906,7 @@ public class NewsItem {
 
     public void setUpdateAttachment(NewsItemMediaAttachment attachment) {
         attachment = newsItemFacade.update(attachment);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+        createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(), "NewsItem_MEDIA_ATTACHMENT_UPDATED");
     }
 
@@ -1096,8 +1135,8 @@ public class NewsItem {
     }
 
     /**
-     * Gets a {@link Map} of active sections for the {@link Outlet}
-     * in the selected {@link NewsItemPlacement}.
+     * Gets a {@link Map} of active sections for the {@link Outlet} in the
+     * selected {@link NewsItemPlacement}.
      *
      * @return {@link Map} of active sections
      */
@@ -1111,8 +1150,7 @@ public class NewsItem {
     }
 
     private UserAccount getUser() {
-        return (UserAccount) JsfUtils.getValueOfValueExpression(
-                "#{userSession.user}");
+        return (UserAccount) getValueOfValueExpression("#{userSession.user}");
     }
 
     public String getKeyword() {
@@ -1130,7 +1168,6 @@ public class NewsItem {
     public void setSearchResults(DataModel searchResults) {
         this.searchResults = searchResults;
     }
-
     private SearchResults lastSearch = new SearchResults();
 
     public SearchResults getLastSearch() {
@@ -1342,9 +1379,8 @@ public class NewsItem {
     // -------------------------------------------------------------------------
     // -- HELPERS
     // -------------------------------------------------------------------------
-    
     /**
-     * Loads the rights to attached media item. This method clears the map 
+     * Loads the rights to attached media item. This method clears the map
      * containing the rights before re-iterating over attached media items.
      */
     private void loadCurrentMediaActors() {
@@ -1358,9 +1394,8 @@ public class NewsItem {
     /**
      * Load a single media item rights into the map of rights without clearing
      * the map.
-     * 
-     * @param mediaItemId 
-     *          Unique identifier of the {@link MediaItem}.
+     *
+     * @param mediaItemId Unique identifier of the {@link MediaItem}.
      */
     private void loadCurrentMediaActor(Long mediaItemId) {
         try {
@@ -1382,12 +1417,11 @@ public class NewsItem {
             LOG.log(Level.SEVERE, null, ex);
         }
     }
-    
+
     /**
      * Removes a right from the map of rights without clearing the map.
-     * 
-     * @param mediaItemId 
-     *          Unique identifier of the {@link MediaItem}.
+     *
+     * @param mediaItemId Unique identifier of the {@link MediaItem}.
      */
     private void removeCurrentMediaActor(Long mediaItemId) {
         if (this.currentMediaActors.containsKey(mediaItemId)) {
@@ -1401,7 +1435,6 @@ public class NewsItem {
     public class DiscoveredProperty {
 
         private String property = "";
-
         private String value = "";
 
         public DiscoveredProperty() {

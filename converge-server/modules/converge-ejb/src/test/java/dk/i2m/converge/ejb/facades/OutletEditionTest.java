@@ -26,6 +26,7 @@ import dk.i2m.converge.EjbTestCase;
 import dk.i2m.converge.core.workflow.OutletType;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 /**
  * Unit tests for the outlet edition functionality.
@@ -37,6 +38,7 @@ public class OutletEditionTest extends EjbTestCase {
     public static final String BEAN_INTERFACE = "OutletFacadeBeanLocal";
 
     @Test
+    @Ignore
     public void testObtainBean() throws Exception {
         Object object = getInitialContext().lookup(BEAN_INTERFACE);
         assertNotNull(object);
@@ -44,6 +46,7 @@ public class OutletEditionTest extends EjbTestCase {
     }
 
     @Test
+    @Ignore
     public void testSelectDateForDaily() throws Exception {
         Object object = getInitialContext().lookup(BEAN_INTERFACE);
         OutletFacadeLocal facade = (OutletFacadeLocal) object;
@@ -78,6 +81,7 @@ public class OutletEditionTest extends EjbTestCase {
     }
 
     @Test
+    @Ignore
     public void testSelectDateForRadioMultipleDaily() throws Exception {
         Object object = getInitialContext().lookup(BEAN_INTERFACE);
         OutletFacadeLocal facade = (OutletFacadeLocal) object;
@@ -118,6 +122,7 @@ public class OutletEditionTest extends EjbTestCase {
     }
 
     @Test
+    @Ignore
     public void testClose() throws Exception {
         OutletFacadeLocal facade = (OutletFacadeLocal) getInitialContext().lookup(BEAN_INTERFACE);
 

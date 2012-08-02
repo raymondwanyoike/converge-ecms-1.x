@@ -200,9 +200,7 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
     public ContentItem step(ContentItem contentItem, Long step,
             boolean stateTransition) throws
             WorkflowStateTransitionException {
-        
-        
-        
+
         // Get current user
         String uid = ctx.getCallerPrincipal().getName();
         UserAccount ua = null;
@@ -359,22 +357,22 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
                 throw new WorkflowStateTransitionException(ex);
             }
 
-            // Actions
-            if (!stateTransition) {
-                for (WorkflowStepAction action : transitionStep.getActions()) {
-                    try {
-                        WorkflowAction act = action.getAction();
-                        act.execute(pluginContext, (NewsItem) contentItem,
-                                action,
-                                ua);
-                    } catch (WorkflowActionException ex) {
-                        LOG.log(Level.SEVERE, "Could not execute action {0}",
-                                action.getLabel());
-                    }
-                }
-            }
+
         } else if (contentItem instanceof MediaItem) {
             contentItem = catalogueFacade.update((MediaItem) contentItem);
+        }
+
+        // Actions
+        if (!stateTransition) {
+            for (WorkflowStepAction action : transitionStep.getActions()) {
+                try {
+                    WorkflowAction act = action.getAction();
+                    act.execute(pluginContext, contentItem, action, ua);
+                } catch (WorkflowActionException ex) {
+                    LOG.log(Level.SEVERE, "Could not execute action {0}",
+                            action.getLabel());
+                }
+            }
         }
 
         return contentItem;

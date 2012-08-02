@@ -117,9 +117,8 @@
                     </rich:dataTable>
                     <c:if test="#{mediaItemDetails.currentActor}">
                         <div style="width: 100%; text-align: center;">
-                            <a4j:commandLink ajaxSingle="true" actionListener="#{mediaItemDetails.onActorSelect}" reRender="mpActorSelect">
+                            <a4j:commandLink ajaxSingle="true" actionListener="#{mediaItemDetails.onActorSelect}" reRender="mpActorSelect" oncomplete="#{rich:component('mpActorSelect')}.show();">
                                 <h:outputText value="#{i18n.MediaItemDetails_ACTORS_ADD_REMOVE}" />
-                                <rich:componentControl for="mpActorSelect" operation="show" event="oncomplete" />
                             </a4j:commandLink>
                         </div>
                     </c:if>
@@ -162,7 +161,7 @@
                                                 </a4j:commandLink>
                                             </rich:column>
                                         </rich:dataTable>
-                                        
+
                                         <h:outputText value="#{i18n.MediaItemDetails_ACTORS_NEW_ACTOR}" style="font-weight: bold; margin-top: 5px;" />
                                         <h:panelGrid columns="3">
                                             <h:outputText value="#{i18n.MediaItemDetails_ACTOR_NEW_ROLE}" />
@@ -348,15 +347,19 @@
                         </rich:column>
 
                         <rich:column headerClass="subColumnIcon" styleClass="media-item-rendition-col-icons">
-                            <a4j:commandLink reRender="mpRenditionDetails" ajaxSingle="true" rendered="#{rendition.available &amp;&amp; mediaItemDetails.currentActor}">
+                            <a4j:commandLink reRender="mpRenditionDetails" 
+                                             ajaxSingle="true" 
+                                             rendered="#{rendition.available &amp;&amp; mediaItemDetails.currentActor}"
+                                             oncomplete="#{rich:component('mpRenditionDetails')}.show();">
                                 <f:setPropertyActionListener target="#{mediaItemDetails.selectedRendition}" value="#{rendition.mediaItemRendition}" />
-                                <rich:componentControl for="mpRenditionDetails" operation="show" event="oncomplete" />
                                 <h:graphicImage value="#{i18n.resource_ICON_EDIT}" />
                             </a4j:commandLink>
 
-                            <a4j:commandLink reRender="mpNewRendition" ajaxSingle="true" rendered="#{!rendition.available &amp;&amp; mediaItemDetails.currentActor}">
+                            <a4j:commandLink reRender="mpNewRendition" 
+                                             ajaxSingle="true" 
+                                             rendered="#{!rendition.available &amp;&amp; mediaItemDetails.currentActor}"
+                                             oncomplete="#{rich:component('mpNewRendition')}.show();">
                                 <f:setPropertyActionListener target="#{mediaItemDetails.uploadRendition}" value="#{rendition.rendition}" />
-                                <rich:componentControl for="mpNewRendition" operation="show" event="oncomplete" />
                                 <h:graphicImage value="#{i18n.resource_ICON_RENDITION_NEW}" />
                             </a4j:commandLink>
                         </rich:column>
@@ -607,19 +610,54 @@
                                         <h:inputText value="#{mediaItemDetails.selectedRendition.contentType}" styleClass="text mediumInput" disabled="true" />
 
                                         <h:outputText value="#{i18n.MediaItemDetails_RENDITION_REPLACE}" />
-                                        <h:outputText value="#{i18n.MediaItemDetails_RENDITION_REPLACE_UPLOAD_HINT}" style="font-style: italic;" />
-                                        <applet archive="applets/jupload/wjhk.jupload.jar?version=#{common.buildNumber}" style="border: none;" border="0"
-                                                code="wjhk.jupload2.JUploadApplet" height="150" mayscript="true"
-                                                name="JUpload" width="440">
-                                            <param name="postURL" value="#{facesContext.externalContext.request.contextPath}/FileUploadServlet?uploadType=replaceRendition&amp;mediaItemId=#{mediaItemDetails.selectedMediaItem.id}&amp;renditionId=#{mediaItemDetails.selectedRendition.rendition.id}"/>
-                                            <param name="showLogWindow" value="false" />
-                                            <param name="nbFilesPerRequest" value="1" />
-                                            <param name="retryMaxNumberOf" value="50" />
-                                            <param name="uploadPolicy" value="ConvergePolicy" />
-                                            <param name="maxFileSize" value="#{mediaItemDetails.selectedMediaItem.catalogue.maxFileUploadSize*1024}" />
-                                            <param name="afterUploadURL" value="javascript:onUpdateRenditionUploadComplete();" />
-                                            Java Runtime 1.5 or higher plugin required.
-                                        </applet>
+
+
+                                        <rich:tabPanel id="tpReplaceRendition" switchType="ajax" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+
+                                            <rich:tab id="tabReplaceNormalUpload" label="#{i18n.MediaItemDetails_RENDITION_NORMAL_UPLOAD}">
+                                                <h:panelGrid id="pgReplaceRenditionNormalUpload" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                                    <rich:fileUpload id="fuReplaceRenditionFile" 
+                                                                     listWidth="400"
+                                                                     listHeight="65"
+                                                                     fileUploadListener="#{mediaItemDetails.onUploadReplaceRendition}" 
+                                                                     immediateUpload="true" 
+                                                                     ajaxSingle="true"
+                                                                     allowFlash="false"
+                                                                     addControlLabel="#{i18n.MediaItemDetails_RENDITION_SELECT_FILE}">
+                                                        <a4j:support event="onuploadcomplete" 
+                                                                     oncomplete="#{rich:component('mpRenditionDetails')}.hide();" 
+                                                                     actionListener="#{mediaItemDetails.onReload}" 
+                                                                     reRender="dtRenditions, modulePreview, dtConcepts" />
+                                                        <f:facet name="label">
+                                                            <h:outputText value="#{i18n.MediaItemDetails_RENDITION_UPLOAD_INDICATOR}" />
+                                                        </f:facet>
+                                                    </rich:fileUpload>
+                                                </h:panelGrid>
+                                            </rich:tab>
+
+                                            <rich:tab id="tabReplaceLargeUpload" label="#{i18n.MediaItemDetails_RENDITION_LARGE_UPLOAD}">
+                                                <h:panelGrid id="pgReplaceRenditionLargeUpload" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                                    <h:outputText value="#{i18n.MediaItemDetails_RENDITION_REPLACE_UPLOAD_HINT}" styleClass="media-item-details-upload-hint" />
+                                                    <applet archive="applets/jupload/wjhk.jupload.jar?version=#{common.buildNumber}" style="border: none;" border="0"
+                                                            code="wjhk.jupload2.JUploadApplet" height="150" mayscript="true"
+                                                            name="JUpload" width="440">
+                                                        <param name="postURL" value="#{facesContext.externalContext.request.contextPath}/FileUploadServlet?uploadType=replaceRendition&amp;mediaItemId=#{mediaItemDetails.selectedMediaItem.id}&amp;renditionId=#{mediaItemDetails.selectedRendition.rendition.id}"/>
+                                                        <param name="showLogWindow" value="false" />
+                                                        <param name="nbFilesPerRequest" value="1" />
+                                                        <param name="retryMaxNumberOf" value="50" />
+                                                        <param name="uploadPolicy" value="ConvergePolicy" />
+                                                        <param name="maxFileSize" value="#{mediaItemDetails.selectedMediaItem.catalogue.maxFileUploadSize*1024}" />
+                                                        <param name="afterUploadURL" value="javascript:onUpdateRenditionUploadComplete();" />
+                                                        Java Runtime 1.5 or higher plugin required.
+                                                    </applet>
+                                                </h:panelGrid>
+                                            </rich:tab>
+
+                                        </rich:tabPanel>
+
+
+
+
                                     </h:panelGrid>
                                 </rich:tab>
 
@@ -738,10 +776,31 @@
                         </f:facet>
 
                         <h:panelGrid id="pgNewRendition" style="width: 480px;" rendered="#{mediaItemDetails.uploadRendition != null}">
-                            <rich:tabPanel id="tpNewRendition" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+                            <rich:tabPanel id="tpNewRendition" switchType="ajax" activeTabClass="tabActive" inactiveTabClass="tabInactive">
 
-                                <rich:tab id="tabNewRendition" label="#{i18n.MediaItemDetails_RENDITION_UPLOAD}">
-                                    <h:panelGrid id="pgRenditionUpload" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                <rich:tab id="tabNormalUpload" label="#{i18n.MediaItemDetails_RENDITION_NORMAL_UPLOAD}">
+                                    <h:panelGrid id="pgRenditionNormalUpload" columnClasses="tabSheet" style="padding: 10px; width: 100%">
+                                        <rich:fileUpload id="fuRenditionFile" 
+                                                         fileUploadListener="#{mediaItemDetails.onUploadRendition}" 
+                                                         immediateUpload="true" 
+                                                         allowFlash="false"
+                                                         listWidth="400"
+                                                         listHeight="65"
+                                                         ajaxSingle="true"
+                                                         addControlLabel="#{i18n.MediaItemDetails_RENDITION_SELECT_FILE}">
+                                            <a4j:support event="onuploadcomplete" 
+                                                         oncomplete="#{rich:component('mpNewRendition')}.hide();" 
+                                                         actionListener="#{mediaItemDetails.onReload}" 
+                                                         reRender="dtRenditions, modulePreview, dtConcepts" />
+                                            <f:facet name="label">
+                                                <h:outputText value="#{i18n.MediaItemDetails_RENDITION_UPLOAD_INDICATOR}" />
+                                            </f:facet>
+                                        </rich:fileUpload>
+                                    </h:panelGrid>
+                                </rich:tab>
+
+                                <rich:tab id="tabNewRendition" label="#{i18n.MediaItemDetails_RENDITION_LARGE_UPLOAD}">
+                                    <h:panelGrid id="pgRenditionLargeUpload" columnClasses="tabSheet" style="padding: 10px; width: 100%">
                                         <h:outputText value="#{i18n.MediaItemDetails_RENDITION_UPLOAD_HINT}" style="font-style: italic;" />
                                         <applet archive="applets/jupload/wjhk.jupload.jar?version=#{common.buildNumber}" style="border: none;" border="0"
                                                 code="wjhk.jupload2.JUploadApplet" height="150" mayscript="true"

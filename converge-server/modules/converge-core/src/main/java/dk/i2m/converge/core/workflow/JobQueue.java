@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.core.workflow;
 
+import dk.i2m.converge.core.plugin.PluginAction;
 import java.io.Serializable;
 import java.util.*;
 import javax.persistence.*;

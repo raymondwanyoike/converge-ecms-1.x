@@ -35,7 +35,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.jactiveresource.URLBuilder;
+import dk.i2m.converge.core.utils.URLBuilder;
 
 /**
  * API for handling file uploads and server file management.

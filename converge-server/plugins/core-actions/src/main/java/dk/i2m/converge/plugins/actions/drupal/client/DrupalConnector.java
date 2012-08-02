@@ -32,7 +32,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
-import org.jactiveresource.URLBuilder;
+import dk.i2m.converge.core.utils.URLBuilder;
 
 /**
  * Provides a generic but powerful API for Drupal's Services module REST server.

@@ -17,19 +17,21 @@
 package dk.i2m.converge.jsf.beans;
 
 import dk.i2m.commons.BeanComparator;
-import dk.i2m.converge.core.content.catalogue.*;
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.ContentItemActor;
 import dk.i2m.converge.core.content.ContentItemPermission;
+import dk.i2m.converge.core.content.catalogue.*;
 import dk.i2m.converge.core.metadata.*;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.workflow.WorkflowStep;
 import dk.i2m.converge.ejb.facades.*;
-import dk.i2m.jsf.JsfUtils;
+import static dk.i2m.jsf.JsfUtils.*;
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -37,6 +39,8 @@ import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import org.richfaces.component.html.HtmlTree;
 import org.richfaces.event.NodeSelectedEvent;
+import org.richfaces.event.UploadEvent;
+import org.richfaces.model.UploadItem;
 
 /**
  * Backing bean for {@code /MediaItemDetails.jspx}.
@@ -112,9 +116,25 @@ public class MediaItemDetails {
     private Subject[] topSubjects = null;
 
     /**
-     * Creates a new instance of {@link MediaItemDetails}.
+     * Creates a new instance of {@link MediaItemDetails}. The constructor picks
+     * up the query parameter {@code id} containing the identifier of the 
+     * {@link MediaItem} to display.
      */
     public MediaItemDetails() {
+        if (getRequestParameterMap().containsKey("id")) {
+            this.id = Long.valueOf(getRequestParameterMap().get("id"));
+        }
+    }
+
+    /**
+     * Checks if the {@link MediaItem} identifier was discovered and loads the 
+     * {@link MediaItem}.
+     */
+    @PostConstruct
+    public void onInit() {
+        if (this.id != null) {
+            setId(this.id);
+        }
     }
 
     /**
@@ -181,7 +201,7 @@ public class MediaItemDetails {
     public void onApply(ActionEvent event) {
         try {
             if (!selectedMediaItem.isOriginalAvailable()) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                         Bundle.i18n.name(),
                         "MediaItemDetails_ORIGINAL_RENDITION_X_MISSING",
                         new Object[]{
@@ -192,11 +212,11 @@ public class MediaItemDetails {
             }
 
             selectedMediaItem = catalogueFacade.update(selectedMediaItem);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "MediaItemDetails_MEDIA_ITEM_WAS_SAVED");
         } catch (Exception ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
                     new Object[]{ex.getMessage()});
         }
@@ -207,20 +227,20 @@ public class MediaItemDetails {
             selectedMediaItem = catalogueFacade.step(selectedMediaItem,
                     getSelectedWorkflowStep().
                     getId(), false);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(), "MediaItemDetails_MEDIA_ITEM_SUBMITTED");
             return "/inbox";
         } catch (WorkflowStateTransitionValidationException ex) {
             if (ex.isLocalisedMessage()) {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                         Bundle.i18n.name(), ex.getMessage(), ex.
                         getLocalisationParameters());
             } else {
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+                createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                         ex.getMessage());
             }
         } catch (WorkflowStateTransitionException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, ex.
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR, ex.
                     getMessage());
         }
         return null;
@@ -232,7 +252,7 @@ public class MediaItemDetails {
         this.selectedMediaItem.getConcepts().add(subj);
         this.selectedMediaItem = catalogueFacade.update(selectedMediaItem);
 
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+        createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(),
                 "MediaItemDetails_CONCEPT_X_ADDED_TO_MEDIA_ITEM_Y",
                 new Object[]{subj.getFullTitle(), selectedMediaItem.getTitle()});
@@ -245,7 +265,7 @@ public class MediaItemDetails {
                 this.selectedMediaItem.getConcepts().add(concept);
                 this.selectedMediaItem = catalogueFacade.update(
                         selectedMediaItem);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                         Bundle.i18n.name(),
                         "MediaItemDetails_CONCEPT_X_ADDED_TO_MEDIA_ITEM_Y",
                         new Object[]{concept.getFullTitle(), selectedMediaItem.
@@ -271,7 +291,7 @@ public class MediaItemDetails {
         } else if ("POI".equalsIgnoreCase(conceptType)) {
             c = new PointOfInterest(newConceptName, newConceptDescription);
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(),
                     "MediaItemDetails_CONCEPT_TYPE_MISSING");
         }
@@ -282,7 +302,7 @@ public class MediaItemDetails {
                 this.selectedMediaItem.getConcepts().add(c);
                 this.selectedMediaItem = catalogueFacade.update(
                         selectedMediaItem);
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                         Bundle.i18n.name(),
                         "MediaItemDetails_CONCEPT_X_ADDED_TO_MEDIA_ITEM_Y",
                         new Object[]{c.getFullTitle(), selectedMediaItem.
@@ -375,7 +395,7 @@ public class MediaItemDetails {
         if (actor != null) {
             getSelectedMediaItem().getActors().remove(actor);
             setSelectedMediaItem(catalogueFacade.update(selectedMediaItem));
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(), "MediaItemDetails_ACTOR_REMOVED");
         }
     }
@@ -396,7 +416,7 @@ public class MediaItemDetails {
                 if (cia.getRole().equals(getNewActor().getRole())
                         && cia.getUser().equals(getNewActor().getUser())) {
                     dup = true;
-                    JsfUtils.createMessage("frmPage",
+                    createMessage("frmPage",
                             FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
                             "MediaItemDetails_ACTOR_DUPLICATE_USER_ROLE",
                             new Object[]{getNewActor().getUser().getFullName(),
@@ -411,29 +431,19 @@ public class MediaItemDetails {
                 getSelectedMediaItem().getActors().add(newActor);
                 setSelectedMediaItem(catalogueFacade.update(
                         getSelectedMediaItem()));
-                JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                    Bundle.i18n.name(),
-                    "MediaItemDetails_ACTOR_X_ADDED_AS_Y_TO_ITEM", new Object[]{getNewActor().getUser().getFullName(), getNewActor().getRole().getName()});
+                createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                        Bundle.i18n.name(),
+                        "MediaItemDetails_ACTOR_X_ADDED_AS_Y_TO_ITEM",
+                        new Object[]{getNewActor().getUser().getFullName(),
+                            getNewActor().getRole().getName()});
             }
             this.newActor = new ContentItemActor();
 
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(),
                     "MediaItemDetails_ACTOR_SELECT_USER_AND_ROLE");
         }
-    }
-
-    public MediaItemRendition getSelectedRendition() {
-        return selectedRendition;
-    }
-
-    public void setSelectedRendition(MediaItemRendition selectedRendition) {
-        this.selectedRendition = selectedRendition;
-    }
-
-    public Map<String, Rendition> getRenditions() {
-        return renditions;
     }
 
     public void onNewRendition(ActionEvent event) {
@@ -443,7 +453,7 @@ public class MediaItemDetails {
 
     public void onSaveNewRendition(ActionEvent event) {
         if (renditionUploadFailed) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(),
                     "MediaItemDetails_RENDITION_UPLOAD_SIZE_ERROR",
                     new Object[]{renditionUploadFailedSize});
@@ -457,7 +467,7 @@ public class MediaItemDetails {
         this.selectedMediaItem = null;
         setId(getId());
 
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+        createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(), "MediaItemDetails_RENDITION_CREATED");
     }
 
@@ -473,9 +483,67 @@ public class MediaItemDetails {
         setId(getId());
     }
 
+    /**
+     * Event handler for uploading a new {@link Rendition} to the 
+     * {@link MediaItem}
+     * 
+     * @param event
+     *          Event that invoked the handler
+     * @throws IOException 
+     *          If the file could not be uploaded
+     */
+    public void onUploadRendition(UploadEvent event) throws IOException {
+        UploadItem item = event.getUploadItem();
+        LOG.log(Level.FINE, "Uploading {0}", item.getFileName());
+
+        MediaItemRendition mediaItemRendition;
+        try {
+            mediaItemRendition = catalogueFacade.create(item.getFile(), 
+                    getSelectedMediaItem(),
+                    getUploadRendition(),
+                    item.getFileName(),
+                    item.getContentType(),
+                    true);
+            LOG.log(Level.FINE, "New media item rendition created: {0}", 
+                    mediaItemRendition.getId());
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, "Could not create media item rendition. {0}",
+                    ex.getMessage());
+        }
+    }
+    
+    /**
+     * Event handler for uploading a replacement for an existing 
+     * {@link Rendition}.
+     * 
+     * @param event
+     *          Event that invoked the handler
+     * @throws IOException 
+     *          If the file could not be uploaded
+     */
+    public void onUploadReplaceRendition(UploadEvent event) throws IOException {
+        UploadItem item = event.getUploadItem();
+        LOG.log(Level.FINE, "Uploading {0}", item.getFileName());
+
+        MediaItemRendition mediaItemRendition;
+        try {
+            
+            mediaItemRendition = catalogueFacade.update(item.getFile(), 
+                    item.getFileName(), 
+                    item.getContentType(),
+                    getSelectedRendition(),
+                    true);
+            LOG.log(Level.FINE, "Media item rendition #{0} was updated.", 
+                    mediaItemRendition.getId());
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, "Could not create media item rendition. {0}",
+                    ex.getMessage());
+        }
+    }
+
     public void onSaveRendition(ActionEvent event) {
         if (renditionUploadFailed) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(),
                     "MediaItemDetails_RENDITION_UPLOAD_SIZE_ERROR",
                     new Object[]{renditionUploadFailedSize});
@@ -489,7 +557,7 @@ public class MediaItemDetails {
         Long theId = this.selectedMediaItem.getId();
         this.selectedMediaItem = null;
         setId(theId);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+        createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(), "MediaItemDetails_RENDITION_UPDATED");
     }
 
@@ -497,7 +565,7 @@ public class MediaItemDetails {
         catalogueFacade.deleteMediaItemRenditionById(selectedRendition.getId());
         selectedMediaItem.getRenditions().remove(this.selectedRendition);
         this.availableRenditions = null;
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+        createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(), "MediaItemDetails_RENDITION_DELETED");
     }
 
@@ -509,11 +577,13 @@ public class MediaItemDetails {
                     new ArrayList<AvailableMediaItemRendition>();
             for (Rendition rendition : catalogue.getRenditions()) {
                 try {
-                    availableMediaItemRenditions.add(new AvailableMediaItemRendition(
+                    availableMediaItemRenditions.
+                            add(new AvailableMediaItemRendition(
                             rendition,
                             selectedMediaItem.findRendition(rendition)));
                 } catch (RenditionNotFoundException rnfe) {
-                    availableMediaItemRenditions.add(new AvailableMediaItemRendition(
+                    availableMediaItemRenditions.
+                            add(new AvailableMediaItemRendition(
                             rendition));
                 }
             }
@@ -537,14 +607,26 @@ public class MediaItemDetails {
             this.availableRenditions = null;
             this.selectedMediaItem = null;
             setId(getId());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(), "MediaItemDetails_EXECUTE_HOOK_DONE",
                     new Object[]{instance.getLabel()});
         } catch (DataNotFoundException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(), "MediaItemDetails_EXECUTE_HOOK_FAILED",
                     new Object[]{instance.getLabel()});
         }
+    }
+
+    public MediaItemRendition getSelectedRendition() {
+        return selectedRendition;
+    }
+
+    public void setSelectedRendition(MediaItemRendition selectedRendition) {
+        this.selectedRendition = selectedRendition;
+    }
+
+    public Map<String, Rendition> getRenditions() {
+        return renditions;
     }
 
     public MediaItem getSelectedMediaItem() {
@@ -630,7 +712,7 @@ public class MediaItemDetails {
     public void setNewActor(ContentItemActor newActor) {
         this.newActor = newActor;
     }
-    
+
     public Subject[] getParentSubjects() {
         if (this.topSubjects == null) {
             List<Subject> parents = metaDataFacade.findTopLevelSubjects();
@@ -640,8 +722,7 @@ public class MediaItemDetails {
     }
 
     private UserAccount getUser() {
-        return (UserAccount) JsfUtils.getValueOfValueExpression(
-                "#{userSession.user}");
+        return (UserAccount) getValueOfValueExpression("#{userSession.user}");
     }
 
     public DataModel getDiscovered() {
