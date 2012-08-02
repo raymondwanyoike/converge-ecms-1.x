@@ -27,14 +27,12 @@ import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.OutletEditionAction;
 import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.converge.plugins.actions.drupal.client.*;
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.lang.ArrayUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
 
 /**
  * Plug-in {@link EditionAction} for uploading {@link NewsItem}s to a Drupal instance.
@@ -193,15 +191,33 @@ public class DrupalEditionAction implements EditionAction {
 
                 DrupalMessage nodeMessage = new DrupalMessage();
                 nodeMessage.getFields().put("actor", getActor(newsItem));
-                nodeMessage.getFields().put("converge_id", getConvergeId(newsItem));
                 nodeMessage.getFields().put("body", getBody(newsItem));
+                nodeMessage.getFields().put("converge_id", getConvergeId(
+                        newsItem));
                 nodeMessage.getFields().put("language", nodeLanguage);
+                nodeMessage.getFields().put("promote", getPromoted(nip));
                 nodeMessage.getFields().put("publish_on", getPublishOn());
                 nodeMessage.getFields().put("section", getSection(nip));
                 nodeMessage.getFields().put("status", getStatus());
-                nodeMessage.getFields().put("promote", getPromote(nip));
                 nodeMessage.getFields().put("title", getTitle(newsItem));
                 nodeMessage.getFields().put("type", nodeType);
+
+                List<ImageField> imageFields = getImageFields(newsItem);
+
+                try {
+                    for (ImageField imageField : imageFields) {
+                        FileCreateMessage fcm = fr.create(imageField);
+                        imageField.setFid(fcm.getFid());
+                    }
+                } catch (IOException ex) {
+                    LOG.log(Level.SEVERE,
+                            "> Uploading News Item #{0} image(s) failed",
+                            newsItem.getId());
+
+                    continue;
+                }
+
+                nodeMessage.getFields().put("image", getImage(imageFields));
 
                 NewsItemEditionState status =
                         ctx.addNewsItemEditionState(edition.getId(), newsItem.
@@ -215,14 +231,9 @@ public class DrupalEditionAction implements EditionAction {
                         getId(), SUBMITTED, null);
 
                 try {
-                    List<MediaItemRendition> renditions = getMedia(newsItem);
-
                     LOG.log(Level.INFO,
                             "> Uploading News Item #{0} & {1} image(s)",
-                            new Object[]{newsItem.getId(), renditions.size()});
-
-                    ArrayList<FileCreateMessage> msgs = fr.create(renditions);
-                    nodeMessage.getFields().put("image", getImage(msgs));
+                            new Object[]{newsItem.getId(), imageFields.size()});
 
                     NodeCreateMessage ncm = nr.create(nodeMessage);
 
@@ -538,48 +549,6 @@ public class DrupalEditionAction implements EditionAction {
                 nip.getNewsItem().getId());
 
         return new FieldModule(map);
-    }
-
-    private List<MediaItemRendition> getMedia(NewsItem newsItem) {
-        List<MediaItemRendition> renditions =
-                new ArrayList<MediaItemRendition>();
-
-        for (NewsItemMediaAttachment attachment : newsItem.getMediaAttachments()) {
-            MediaItem item = attachment.getMediaItem();
-
-            // Verify that the item exist and renditions are attached
-            if (item == null || !item.isRenditionsAttached()) {
-                continue;
-            }
-
-            MediaItemRendition rendition;
-
-            try {
-                if (renditionName != null) {
-                    rendition = item.findRendition(renditionName);
-                } else {
-                    rendition = item.getOriginal();
-                }
-            } catch (RenditionNotFoundException ex) {
-                LOG.log(Level.WARNING,
-                        "Rendition ({0}) missing for Media Item #{1}",
-                        new Object[]{renditionName, item.getId()});
-
-                rendition = item.getOriginal();
-            }
-
-            // Check if the file should be excluded
-            if (ArrayUtils.contains(excludeMediaTypes, rendition.
-                    getContentType())) {
-                continue;
-            }
-
-            String filename = newsItem.getId() + "-" + rendition.getId() + "."
-                    + rendition.getExtension();
-            renditions.add(rendition);
-        }
-
-        return renditions;
     }
 
     /**
