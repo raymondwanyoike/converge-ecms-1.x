@@ -535,7 +535,7 @@ public class DrupalEditionAction implements EditionAction {
      */
     private FieldModule getConvergeId(NewsItem newsItem) {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("0", newsItem.getId());
+        map.put("0", new TextField(null, newsItem.getId().toString(), null));
 
         return new FieldModule(map);
     }
