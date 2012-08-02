@@ -47,7 +47,6 @@ public class DrupalEditionAction implements EditionAction {
     private enum Property {
 
         CONNECTION_TIMEOUT,
-        EXCLUDE_MEDIA_TYPES,
         IMAGE_RENDITION,
         NODE_TYPE,
         NODE_LANGUAGE,
@@ -94,8 +93,6 @@ public class DrupalEditionAction implements EditionAction {
 
     private String undisclosedAuthor;
 
-    private String[] excludeMediaTypes;
-
     private Map<Long, Long> sectionMapping;
 
     @Override
@@ -105,8 +102,6 @@ public class DrupalEditionAction implements EditionAction {
 
         String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT.
                 name());
-        String excludeContentTypes =
-                properties.get(Property.EXCLUDE_MEDIA_TYPES.name());
         String mappings = properties.get(Property.SECTION_MAPPING.name());
         String nodeType = properties.get(Property.NODE_TYPE.name());
         String nodeLanguage = properties.get(Property.NODE_LANGUAGE.name());
@@ -341,17 +336,6 @@ public class DrupalEditionAction implements EditionAction {
             Long drupalId = Long.valueOf(value[1].trim());
             sectionMapping.put(convergeId, drupalId);
         }
-    }
-
-    private void setExcludeMediaTypes(String mapping) {
-        if (mapping == null) {
-            return;
-        }
-
-        String[] values = mapping.split(";");
-        excludeMediaTypes = values;
-
-        LOG.log(Level.INFO, "Found {0} excluded media type(s)", values.length);
     }
 
     /**
