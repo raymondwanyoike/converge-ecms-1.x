@@ -30,7 +30,9 @@ public class ImageField {
     private String alt;
 
     private String title;
-    
+
+    private String contentType;
+
     private File file;
 
     /**
@@ -47,10 +49,11 @@ public class ImageField {
      * @param title title
      * @param file file
      */
-    public ImageField(Long id, String alt, String title, File file) {
+    public ImageField(Long id, String alt, String title, String contentType, File file) {
         this.id = id;
         this.alt = alt;
         this.title = title;
+        this.contentType = contentType;
         this.file = file;
     }
 
@@ -94,6 +97,20 @@ public class ImageField {
      */
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    /**
+     * @return the contentType
+     */
+    public String getContentType() {
+        return contentType;
+    }
+
+    /**
+     * @param contentType the contentType to set
+     */
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
     /**
