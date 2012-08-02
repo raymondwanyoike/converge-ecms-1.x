@@ -48,8 +48,8 @@ public class DrupalEditionAction implements EditionAction {
 
         CONNECTION_TIMEOUT,
         IMAGE_RENDITION,
-        NODE_TYPE,
         NODE_LANGUAGE,
+        NODE_TYPE,
         PASSWORD,
         PUBLISH_DELAY,
         PUBLISH_IMMEDIATELY,
@@ -172,11 +172,11 @@ public class DrupalEditionAction implements EditionAction {
         client.setup();
 
         UserResource ur = new UserResource(client);
-        NodeResource nr = new NodeResource(client);
-        FileResource fr = new FileResource(client);
-
         ur.setUsername(username);
         ur.setPassword(password);
+
+        NodeResource nr = new NodeResource(client);
+        FileResource fr = new FileResource(client);
 
         setSectionMapping(mappings);
 
@@ -360,33 +360,34 @@ public class DrupalEditionAction implements EditionAction {
     }
 
     /**
-     * Get <b>Title</b> text value.
+     * Get Title text value.
      * 
-     * @param newsItem NewsItem
-     * @return (< 254 in length) title
+     * @param newsItem {@link NewsItem}
+     * @return
      */
     private String getTitle(NewsItem newsItem) {
+        // < 254 in length
         return truncateString(newsItem.getTitle(), 254);
     }
 
     /**
-     * Get <b>Published</b> checkbox value.
+     * Get Published checkbox value.
      * 
-     * @return 1 = checked, 0 otherwise
+     * @return
      */
     private String getStatus() {
         if (publishImmediately != null) {
             return "1";
+        } else {
+            // see getPublishOn()
+            return "0";
         }
-
-        // Set to unpublished, see getPublishOn()
-        return "0";
     }
 
     /**
-     * Get <b>Publish on</b> text value.
+     * Get Publish on text value.
      * 
-     * @return "YYYY-MM-DD HH:MM:SS", or ""
+     * @return "YYYY-MM-DD HH:MM:SS" or ""
      */
     private String getPublishOn() {
         if (publishImmediately != null) {
@@ -394,21 +395,18 @@ public class DrupalEditionAction implements EditionAction {
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        // Get the post delay property
         Integer amount = Integer.valueOf(publishDelay);
         Calendar calendar = Calendar.getInstance();
-        // Add post delay to current time
         calendar.add(Calendar.HOUR_OF_DAY, amount);
 
-        // Return future time
         return sdf.format(calendar.getTime());
     }
 
     /**
-     * Get <b>Promoted to front page</b> checkbox value.
+     * Get Promoted to front page checkbox value.
      * 
-     * @param placement placement of the {@link NewsItem}
-     * @return 1 = checked, 0 otherwise
+     * @param placement {@link NewsItemPlacement}
+     * @return
      */
     private String getPromoted(NewsItemPlacement placement) {
         if (placement.getStart() == 1) {
@@ -421,26 +419,24 @@ public class DrupalEditionAction implements EditionAction {
     /**
      * Get <b>Image</b> image field.
      * 
-     * @param msgs ?
-     * @return image image field
+     * @param imageFields {@link ImageField}
+     * @return
      */
-    private FieldModule getImage(ArrayList<FileCreateMessage> msgs) {
+    private FieldModule getImage(List<ImageField> imageFields) {
         Map<String, Object> map = new HashMap<String, Object>();
 
-        for (int i = 0; i < msgs.size(); i++) {
-            ImageField imageField = new ImageField(msgs.get(i).
-                    getFid(), 1, "", "");
-            map.put(String.valueOf(i), imageField);
+        for (int i = 0; i < imageFields.size(); i++) {
+            map.put(String.valueOf(i), imageFields.get(i));
         }
 
         return new FieldModule(map);
     }
 
     /**
-     * Get <b>Body</b> text field.
+     * Get Body text field.
      * 
-     * @param newsItem NewsItem
-     * @return body text field
+     * @param newsItem {@link NewsItem}
+     * @return
      */
     private FieldModule getBody(NewsItem newsItem) {
         TextField textField = new TextField(newsItem.getBrief(),
@@ -453,10 +449,10 @@ public class DrupalEditionAction implements EditionAction {
     }
 
     /**
-     * Get <b>Actor</b> text field.
+     * Get Actor text field.
      * 
-     * @param newsItem NewsItem
-     * @return actor text field
+     * @param newsItem {@link NewsItem}
+     * @return
      */
     private FieldModule getActor(NewsItem newsItem) {
         TextField textField;
@@ -465,27 +461,25 @@ public class DrupalEditionAction implements EditionAction {
             textField = new TextField(null, undisclosedAuthor, null);
         } else {
             if (newsItem.getByLine().trim().isEmpty()) {
-                StringBuilder by = new StringBuilder();
+                StringBuilder sb = new StringBuilder();
 
-                // Iterate over all the actors
                 for (NewsItemActor actor : newsItem.getActors()) {
                     boolean firstActor = true;
 
-                    // TODO: Document
+                    // TODO: Document this
                     if (actor.getRole().equals(newsItem.getOutlet().
-                            getWorkflow().
-                            getStartState().getActorRole())) {
+                            getWorkflow().getStartState().getActorRole())) {
                         if (!firstActor) {
-                            by.append(", ");
+                            sb.append(", ");
                         } else {
                             firstActor = false;
                         }
 
-                        by.append(actor.getUser().getFullName());
+                        sb.append(actor.getUser().getFullName());
                     }
                 }
 
-                textField = new TextField(null, by.toString(), null);
+                textField = new TextField(null, sb.toString(), null);
             } else {
                 // Return the "by-line" of the NewsItem
                 textField = new TextField(null, newsItem.getByLine(), null);
@@ -499,10 +493,10 @@ public class DrupalEditionAction implements EditionAction {
     }
 
     /**
-     * Get <b>Converge ID</b> text field.
+     * Get Converge ID text field.
      * 
-     * @param newsItem NewsItem
-     * @return converge_id text field
+     * @param newsItem {@link NewsItem}
+     * @return
      */
     private FieldModule getConvergeId(NewsItem newsItem) {
         Map<String, Object> map = new HashMap<String, Object>();
@@ -510,34 +504,32 @@ public class DrupalEditionAction implements EditionAction {
 
         return new FieldModule(map);
     }
-    
+
     /**
-     * Get <b>Section</b> taxonomy field.
+     * Get Section taxonomy field.
      * 
-     * @param newsItem NewsItemPlacement
-     * @return section taxonomy field
+     * @param nip {@link NewsItemPlacement}
+     * @return 
      */
-    private FieldModule getSection(NewsItemPlacement placement) {
+    private FieldModule getSection(NewsItemPlacement nip) {
         Map<String, Object> map = new HashMap<String, Object>();
+        Section section = nip.getSection();
 
-        Section section = placement.getSection();
-
-        if (section != null) {
-            if (sectionMapping.containsKey(section.getId())) {
-                map.put("0", sectionMapping.get(section.getId()));
+        if (section == null) {
+            // Use the fallback section
+            if (sectionMapping.containsKey(Long.parseLong("0"))) {
+                map.put("0", sectionMapping.get(Long.parseLong("0")));
                 return new FieldModule(map);
             }
         }
 
-        if (sectionMapping.containsKey(Long.parseLong("0"))) {
-            map.put("0", sectionMapping.get(Long.parseLong("0")));
+        if (sectionMapping.containsKey(section.getId())) {
+            map.put("0", sectionMapping.get(section.getId()));
             return new FieldModule(map);
         }
 
-        NewsItem newsItem = placement.getNewsItem();
-
         LOG.log(Level.WARNING, "Section mapping failed for News Item #{0}",
-                newsItem.getId());
+                nip.getNewsItem().getId());
 
         return new FieldModule(map);
     }
@@ -625,10 +617,11 @@ public class DrupalEditionAction implements EditionAction {
 
             String title = mediaItem.getTitle();
             String description = mediaItem.getDescription();
+            String contentType = mir.getContentType();
             File file = new File(mir.getFileLocation());
 
             ImageField imageField = new ImageField(null, description, title,
-                    file);
+                    contentType, file);
 
             imageFields.add(imageField);
         }
