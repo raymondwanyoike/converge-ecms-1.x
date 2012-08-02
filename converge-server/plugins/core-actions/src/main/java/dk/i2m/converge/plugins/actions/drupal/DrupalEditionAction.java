@@ -612,4 +612,56 @@ public class DrupalEditionAction implements EditionAction {
 
         return renditions;
     }
+
+    /**
+     * Get {@link ImageField}s for {@link NewsItem}.
+     * 
+     * @param newsItem NewsItem
+     * @return 
+     */
+    private List<ImageField> getImageFields(NewsItem newsItem) {
+        List<ImageField> imageFields = new ArrayList<ImageField>();
+
+        for (NewsItemMediaAttachment nima : newsItem.getMediaAttachments()) {
+            MediaItem mediaItem = nima.getMediaItem();
+
+            // Verify that the item exist and any renditions are attached
+            if (mediaItem == null || !mediaItem.isRenditionsAttached()) {
+                continue;
+            }
+
+            MediaItemRendition mir;
+
+            try {
+                if (renditionName != null) {
+                    mir = mediaItem.findRendition(renditionName);
+                } else {
+                    mir = mediaItem.getOriginal();
+                }
+            } catch (RenditionNotFoundException ex) {
+                mir = mediaItem.getOriginal();
+
+                LOG.log(Level.SEVERE,
+                        "Rendition ({0}) missing for Media Item #{1} - News Item #{2}",
+                        new Object[]{renditionName, mediaItem.getId(), newsItem.
+                            getId()});
+            }
+
+            // Verify that the item is an image
+            if (!mir.isImage()) {
+                continue;
+            }
+
+            String title = mediaItem.getTitle();
+            String description = mediaItem.getDescription();
+            File file = new File(mir.getFileLocation());
+
+            ImageField imageField = new ImageField(null, description, title,
+                    file);
+
+            imageFields.add(imageField);
+        }
+
+        return imageFields;
+    }
 }
