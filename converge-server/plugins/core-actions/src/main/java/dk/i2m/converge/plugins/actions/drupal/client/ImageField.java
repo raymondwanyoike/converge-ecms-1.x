@@ -16,6 +16,8 @@
  */
 package dk.i2m.converge.plugins.actions.drupal.client;
 
+import java.io.File;
+
 /**
  * Basic image field.
  * 
@@ -23,13 +25,13 @@ package dk.i2m.converge.plugins.actions.drupal.client;
  */
 public class ImageField {
 
-    private Long fid;
-
-    private Integer display;
+    private Long id;
 
     private String alt;
 
     private String title;
+    
+    private File file;
 
     /**
      * Construct an image field.
@@ -40,44 +42,30 @@ public class ImageField {
     /**
      * Construct an image field.
      * 
-     * @param fid file id of the image
-     * @param display display field' checkbox (0 or 1)
-     * @param alt alternate text
+     * @param id id
+     * @param alt alt
      * @param title title
+     * @param file file
      */
-    public ImageField(Long fid, Integer display, String alt, String title) {
-        this.fid = fid;
-        this.display = display;
+    public ImageField(Long id, String alt, String title, File file) {
+        this.id = id;
         this.alt = alt;
         this.title = title;
+        this.file = file;
     }
 
     /**
-     * @return the fid
+     * @return the id
      */
-    public Long getFid() {
-        return fid;
+    public Long getId() {
+        return id;
     }
 
     /**
-     * @param fid the fid to set
+     * @param id the id to set
      */
-    public void setFid(Long fid) {
-        this.fid = fid;
-    }
-
-    /**
-     * @return the display
-     */
-    public Integer getDisplay() {
-        return display;
-    }
-
-    /**
-     * @param display the display to set
-     */
-    public void setDisplay(Integer display) {
-        this.display = display;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     /**
@@ -106,5 +94,19 @@ public class ImageField {
      */
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    /**
+     * @return the file
+     */
+    public File getFile() {
+        return file;
+    }
+
+    /**
+     * @param file the file to set
+     */
+    public void setFile(File file) {
+        this.file = file;
     }
 }
