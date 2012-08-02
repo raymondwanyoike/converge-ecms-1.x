@@ -426,6 +426,12 @@ public class DrupalEditionAction implements EditionAction {
         Map<String, Object> map = new HashMap<String, Object>();
 
         for (int i = 0; i < imageFields.size(); i++) {
+            ImageField imageField = imageFields.get(i);
+            
+            // Null the file and contentType variables
+            imageField.setContentType(null);
+            imageField.setFile(null); // Causes a NPE in JSON if not null
+
             map.put(String.valueOf(i), imageFields.get(i));
         }
 
