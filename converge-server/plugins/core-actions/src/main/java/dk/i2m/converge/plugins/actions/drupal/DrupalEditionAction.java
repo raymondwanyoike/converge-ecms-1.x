@@ -537,17 +537,17 @@ public class DrupalEditionAction implements EditionAction {
         Map<String, Object> map = new HashMap<String, Object>();
         Section section = nip.getSection();
 
-        if (section == null) {
-            // Use the fallback section
+        if (section != null) {
+            if (sectionMapping.containsKey(section.getId())) {
+                map.put("0", sectionMapping.get(section.getId()));
+                return new FieldModule(map);
+            }
+        } else {
+            // Use fallback section
             if (sectionMapping.containsKey(Long.parseLong("0"))) {
                 map.put("0", sectionMapping.get(Long.parseLong("0")));
                 return new FieldModule(map);
             }
-        }
-
-        if (sectionMapping.containsKey(section.getId())) {
-            map.put("0", sectionMapping.get(section.getId()));
-            return new FieldModule(map);
         }
 
         LOG.log(Level.WARNING, "Section mapping failed for News Item #{0}",
