@@ -600,8 +600,8 @@ public class DrupalEditionAction implements EditionAction {
             String contentType = mir.getContentType();
             File file = new File(mir.getFileLocation());
 
-            ImageField imageField = new ImageField(null, description, title,
-                    contentType, file);
+            ImageField imageField = new ImageField(null, truncateString(
+                    description, 511), title, contentType, file);
 
             imageFields.add(imageField);
         }
