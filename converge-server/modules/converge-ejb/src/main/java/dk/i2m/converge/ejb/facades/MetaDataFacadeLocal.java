@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.metadata.Subject;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.metadata.ConceptOutput;
-import dk.i2m.converge.nar.newsml.g2.power.KnowledgeItem;
+import dk.i2m.converge.newsml.g2.power.KnowledgeItem;
 import java.util.List;
 import javax.ejb.Local;
 
