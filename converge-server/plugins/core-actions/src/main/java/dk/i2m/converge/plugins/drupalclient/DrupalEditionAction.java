@@ -64,11 +64,11 @@ public class DrupalEditionAction implements EditionAction {
 
     private static final String UPLOADING = "UPLOADING";
     
-    private static final String NID = "nid";
+    private static final String NID_LABEL = "nid";
 
-    private static final String URI = "uri";
+    private static final String URI_LABEL = "uri";
     
-    private static final String STATUS = "status";
+    private static final String STATUS_LABEL = "status";
 
     private ResourceBundle bundle = ResourceBundle.getBundle("dk.i2m.converge.plugins.drupal.Messages");
 
