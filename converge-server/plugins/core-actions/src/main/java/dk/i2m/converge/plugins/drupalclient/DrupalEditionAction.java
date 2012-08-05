@@ -24,6 +24,7 @@ import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.OutletEditionAction;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -86,7 +87,65 @@ public class DrupalEditionAction implements EditionAction {
     @Override
     public void execute(PluginContext ctx, Edition edition,
             OutletEditionAction action) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Map<String, String> properties = action.getPropertiesAsMap();
+
+        String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT. name());
+        String mappings = properties.get(Property.SECTION_MAPPING.name());
+        String nodeType = properties.get(Property.NODE_TYPE.name());
+        String nodeLanguage = properties.get(Property.NODE_LANGUAGE.name());
+        String password = properties.get(Property.PASSWORD.name());
+        String endpoint = properties.get(Property.SERVICE_ENDPOINT.name());
+        String socketTimeout = properties.get(Property.SOCKET_TIMEOUT.name());
+        String hostname = properties.get(Property.URL.name());
+        String username = properties.get(Property.USERNAME.name());
+
+        publishDelay = properties.get(Property.PUBLISH_DELAY.name());
+        publishImmediately = properties.get(Property.PUBLISH_IMMEDIATELY.name());
+        renditionName = properties.get(Property.IMAGE_RENDITION.name());
+        undisclosedAuthor = properties.get(Property.UNDISCLOSED_AUTHOR.name());
+        sectionMapping = new HashMap<Long, Long>();
+
+        if (hostname == null) {
+            throw new IllegalArgumentException("'hostname' cannot be null");
+        }
+
+        if (endpoint == null) {
+            throw new IllegalArgumentException("'endpoint' cannot be null");
+        }
+
+        if (username == null) {
+            throw new IllegalArgumentException("'username' cannot be null");
+        }
+
+        if (password == null) {
+            throw new IllegalArgumentException("'password' cannot be null");
+        }
+
+        if (nodeType == null) {
+            throw new IllegalArgumentException("'nodeType' cannot be null");
+        }
+
+        if (mappings == null) {
+            throw new IllegalArgumentException("'mappings' cannot be null");
+        }
+
+        if (publishImmediately == null && publishDelay == null) {
+            throw new IllegalArgumentException("'publishImmediately' or 'publishDelay' cannot be null");
+        }
+
+        if (publishImmediately == null && publishDelay != null) {
+            if (Integer.parseInt(publishDelay) <= 0) {
+                throw new IllegalArgumentException("'publishDelay' cannot be <= 0");
+            }
+        }
+
+        if (connectionTimeout == null) {
+            connectionTimeout = "30000"; // 30 seconds
+        }
+
+        if (socketTimeout == null) {
+            socketTimeout = "30000"; // 30 seconds
+        }
     }
 
     @Override
