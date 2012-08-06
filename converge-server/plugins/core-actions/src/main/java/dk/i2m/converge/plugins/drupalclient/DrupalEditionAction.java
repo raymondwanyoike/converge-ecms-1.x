@@ -252,13 +252,12 @@ public class DrupalEditionAction implements EditionAction {
                         }
 
                         File file = new File(mir.getFileLocation());
-                        String title = mediaItem.getTitle();
+                        String title = truncateString(mediaItem.getTitle(), 20);
 
                         FileResponce fileResponce = fr.createRaw(file, title);
 
                         String fid = fileResponce.getId().toString();
-                        String alt = truncateString(mediaItem.getDescription(),
-                                512);
+                        String alt = truncateString(mediaItem.getTitle(), 512);
                         String description = truncateString(mediaItem.
                                 getDescription(), 1024);
 
@@ -482,6 +481,7 @@ public class DrupalEditionAction implements EditionAction {
      * @return
      */
     private String getPromoted(NewsItemPlacement placement) {
+        // TODO: Make value configurable
         if (placement.getStart() == 1) {
             return "1";
         } else {
