@@ -537,7 +537,7 @@ public class DrupalEditionAction implements EditionAction {
 
         if (section != null) {
             if (sectionMapping.containsKey(section.getId())) {
-                return section.getId().toString();
+                return sectionMapping.get(section.getId()).toString();
             }
         } else {
             // Use fallback section
