@@ -54,23 +54,25 @@ public class DrupalEditionAction implements EditionAction {
         USERNAME
     }
 
-    private static final Logger LOG = Logger.getLogger(DrupalEditionAction.class.getName());
+    private static final Logger LOG = Logger.
+            getLogger(DrupalEditionAction.class.getName());
 
-    private static final String SUBMITTED = "SUBMITTED";
-    
+    private static final String SUBMITTED = "submitted";
+
     private static final String FAILED = "FAILED";
 
     private static final String UPLOADED = "UPLOADED";
 
     private static final String UPLOADING = "UPLOADING";
-    
+
     private static final String NID_LABEL = "nid";
 
     private static final String URI_LABEL = "uri";
-    
+
     private static final String STATUS_LABEL = "status";
 
-    private ResourceBundle bundle = ResourceBundle.getBundle("dk.i2m.converge.plugins.drupal.Messages");
+    private ResourceBundle bundle = ResourceBundle.getBundle(
+            "dk.i2m.converge.plugins.drupalclient.Messages");
 
     private Map<String, String> availableProperties;
 
