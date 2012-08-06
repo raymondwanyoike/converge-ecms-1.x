@@ -84,13 +84,13 @@ public class DrupalEditionAction implements EditionAction {
     private static final Logger LOG = Logger.
             getLogger(DrupalEditionAction.class.getName());
 
-    private static final String SUBMITTED = "submitted";
-
-    private static final String FAILED = "FAILED";
+    private static final String UPLOADING = "UPLOADING";
 
     private static final String UPLOADED = "UPLOADED";
 
-    private static final String UPLOADING = "UPLOADING";
+    private static final String FAILED = "FAILED";
+
+    private static final String DATE = "date";
 
     private static final String NID_LABEL = "nid";
 
@@ -238,7 +238,7 @@ public class DrupalEditionAction implements EditionAction {
 
                 try {
                     ImageWrapper imageWrapper = new ImageWrapper("field_image");
-                    
+
                     for (MediaItem mediaItem : mediaItems) {
                         MediaItemRendition mir = mediaItem.getOriginal();
 
@@ -257,13 +257,14 @@ public class DrupalEditionAction implements EditionAction {
                         FileResponce fileResponce = fr.createRaw(file, title);
 
                         String fid = fileResponce.getId().toString();
-                        String alt = truncateString(mediaItem.getDescription(), 512);
+                        String alt = truncateString(mediaItem.getDescription(),
+                                512);
                         String description = truncateString(mediaItem.
                                 getDescription(), 1024);
 
                         imageWrapper.add(new Image(fid, alt, description));
                     }
-                    
+
                     if (!mediaItems.isEmpty()) {
                         fb.add(imageWrapper);
                     }
@@ -291,7 +292,7 @@ public class DrupalEditionAction implements EditionAction {
                         getId(), newsItem.getId(), URI_LABEL, null);
                 NewsItemEditionState submitted = ctx.
                         addNewsItemEditionState(edition.getId(), newsItem.
-                        getId(), SUBMITTED, null);
+                        getId(), DATE, null);
 
                 LOG.log(Level.INFO, "> Uploading NewsItem #{0} & {1} image(s)",
                         new Object[]{newsItem.getId(), mediaItems.size()});
@@ -329,7 +330,7 @@ public class DrupalEditionAction implements EditionAction {
             }
 
             LOG.log(Level.INFO, "Encountered {0} error(s)", errors);
-            
+
             ur.logout();
             dc.shutdown();
         } catch (Exception ex) {
