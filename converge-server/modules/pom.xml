@@ -19,7 +19,6 @@
         <module>converge-ws-client</module>
         <module>converge-war</module>
         <module>converge-ear</module>
-        <module>converge-mobile-server</module>
     </modules>
 
     <dependencies>
