@@ -85,13 +85,14 @@ public class DrupalEditionAction implements EditionAction {
     private String undisclosedAuthor;
 
     private Map<Long, Long> sectionMapping;
-    
+
     @Override
     public void execute(PluginContext ctx, Edition edition,
             OutletEditionAction action) {
         Map<String, String> properties = action.getPropertiesAsMap();
 
-        String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT. name());
+        String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT.
+                name());
         String mappings = properties.get(Property.SECTION_MAPPING.name());
         String nodeType = properties.get(Property.NODE_TYPE.name());
         String nodeLanguage = properties.get(Property.NODE_LANGUAGE.name());
@@ -132,21 +133,34 @@ public class DrupalEditionAction implements EditionAction {
         }
 
         if (publishImmediately == null && publishDelay == null) {
-            throw new IllegalArgumentException("'publishImmediately' or 'publishDelay' cannot be null");
+            throw new IllegalArgumentException(
+                    "'publishImmediately' or 'publishDelay' cannot be null");
         }
 
         if (publishImmediately == null && publishDelay != null) {
-            if (Integer.parseInt(publishDelay) <= 0) {
-                throw new IllegalArgumentException("'publishDelay' cannot be <= 0");
+            if (!isInteger(publishDelay)) {
+                throw new IllegalArgumentException(
+                        "'publishDelay' must be an integer");
+            } else if (Integer.parseInt(publishDelay) <= 0) {
+                throw new IllegalArgumentException(
+                        "'publishDelay' cannot be <= 0");
             }
         }
 
         if (connectionTimeout == null) {
             connectionTimeout = "30000"; // 30 seconds
+        } else if (!isInteger(connectionTimeout)) {
+            throw new IllegalArgumentException(
+                    "'connectionTimeout' must be an integer");
         }
 
         if (socketTimeout == null) {
             socketTimeout = "30000"; // 30 seconds
+        } else if (!isInteger(socketTimeout)) {
+            throw new IllegalArgumentException(
+                    "'socketTimeout' must be an integer");
+        }
+
         }
     }
 
@@ -212,5 +226,14 @@ public class DrupalEditionAction implements EditionAction {
     @Override
     public String getAbout() {
         return bundle.getString("PLUGIN_ABOUT");
+    }
+
+    private boolean isInteger(String input) {
+        try {
+            Integer.parseInt(input);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 }
