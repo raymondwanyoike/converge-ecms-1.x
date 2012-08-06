@@ -220,9 +220,6 @@ public class DrupalEditionAction implements EditionAction {
                 fb
                         .add(new BasicWrapper("title", getTitle(newsItem)))
                         .add(new BasicWrapper("type", nodeType))
-                        .add(new BasicWrapper("status", getStatus()))
-                        .add(new BasicWrapper("promote", getPromoted(nip)))
-                        .add(new BasicWrapper("publish_on", getPublishOn()))
                         .add(new TextWrapper("body", newsItem.getBrief(),
                         newsItem.getStory(), "full_html"))
                         .add(
@@ -230,7 +227,15 @@ public class DrupalEditionAction implements EditionAction {
                         .add(new TextWrapper("field_converge", newsItem.getId().
                         toString()));
 
-                if (!getSection(nip).isEmpty()) {
+                if (getPromoted(nip) != null) {
+                    fb.add(new BasicWrapper("promote", getPromoted(nip)));
+                }
+                
+                if (getPublishOn() != null) {
+                    fb.add(new BasicWrapper("publish_on", getPublishOn()));
+                }
+                
+                if (getSection(nip) != null) {
                     fb.add(new ListWrapper("field_section", getSection(nip)));
                 }
 
@@ -444,27 +449,13 @@ public class DrupalEditionAction implements EditionAction {
     }
 
     /**
-     * Get Published checkbox value.
-     * 
-     * @return
-     */
-    private String getStatus() {
-        if (publishImmediately != null) {
-            return "1";
-        } else {
-            // see getPublishOn()
-            return "0";
-        }
-    }
-
-    /**
      * Get Publish on text value.
      * 
      * @return "YYYY-MM-DD HH:MM:SS" or ""
      */
     private String getPublishOn() {
         if (publishImmediately != null) {
-            return "";
+            return null;
         }
 
         Calendar calendar = Calendar.getInstance();
@@ -485,7 +476,7 @@ public class DrupalEditionAction implements EditionAction {
         if (placement.getStart() == 1) {
             return "1";
         } else {
-            return "0";
+            return null;
         }
     }
 
@@ -549,7 +540,7 @@ public class DrupalEditionAction implements EditionAction {
         LOG.log(Level.WARNING, "Section mapping failed for NewsItem #{0}",
                 nip.getNewsItem().getId());
 
-        return "";
+        return null;
     }
 
     /**
