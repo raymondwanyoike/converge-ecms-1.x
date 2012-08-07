@@ -18,7 +18,6 @@ package dk.i2m.converge.plugins.opencalais;
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.metadata.Concept;
@@ -44,24 +43,24 @@ public class OpenCalaisAction extends PluginAction {
 
         ENRICH_RENDITION
     }
-
     private static final Logger LOG = Logger.getLogger(OpenCalaisAction.class.
             getName());
-
     private List<PluginActionPropertyDefinition> availableProperties = null;
-
     private Map<String, List<String>> instanceProperties =
             new HashMap<String, List<String>>();
-
     private Map<String, List<String>> parameters =
             new HashMap<String, List<String>>();
-
     private PluginContext ctx;
 
     /**
      * Constructs a new instance of {@link OpenCalaisAction}.
      */
     public OpenCalaisAction() {
+        onInit();
+    }
+
+    @Override
+    public void onInit() {
         setBundle("dk.i2m.converge.plugins.opencalais.Messages");
     }
 
@@ -99,10 +98,27 @@ public class OpenCalaisAction extends PluginAction {
             availableProperties.add(new PluginActionPropertyDefinition(
                     PluginActionProperty.ENRICH_RENDITION.name(),
                     "PROPERTY_ENRICH_RENDITION",
-                    "PROPERTY_ENRICH_RENDITION_TOOLTIP", true, "list", true, 1));
+                    "PROPERTY_ENRICH_RENDITION_TOOLTIP",
+                    true,
+                    "rendition",
+                    true, 1));
 
         }
         return availableProperties;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public PluginActionPropertyDefinition findPropertyDefinition(String id)
+            throws PropertyDefinitionNotFoundException {
+        for (PluginActionPropertyDefinition d : getAvailableProperties()) {
+            if (d.getId().equals(id)) {
+                return d;
+            }
+        }
+        throw new PropertyDefinitionNotFoundException(id + " not found");
     }
 
     private void processNewsItem(NewsItem newsItem) {
@@ -111,15 +127,13 @@ public class OpenCalaisAction extends PluginAction {
     /**
      * Enriches a {@link MediaItem} with meta data from OpenCalais. <b>Only
      * documents can be enriched by this plug-in</b>. The PluginConfiguration
-     * should include {@link Parameter#RENDITION} containing the name of
-     * the rendition that should be sent to OpenCalais. If the parameter is not
+     * should include {@link Parameter#RENDITION} containing the name of the
+     * rendition that should be sent to OpenCalais. If the parameter is not
      * passed the original rendition of the {@link MediaItem}s {@link Catalogue}
      * will be sent.
-     * 
-     * @param mediaItem
-     *          {@link MediaItem} to process
-     * @throws PluginActionException 
-     *          If the processing failed
+     *
+     * @param mediaItem {@link MediaItem} to process
+     * @throws PluginActionException If the processing failed
      */
     private void processMediaItem(MediaItem mediaItem) throws
             PluginActionException {

@@ -10,8 +10,17 @@
                 <h:form id="frmPluginConfiguration">
                     <converge:moduleHeader moduleTitle="#{i18n.administrator_Plugins_CONFIGURATIONS}" />
                     <div class="moduleContent">
-
-                        <rich:dataTable id="dtPluginConfigurations" value="#{administrator_Plugins.pluginConfigurations}" var="pluginCfg" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
+                        
+                        <h:panelGroup layout="block" styleClass="info">
+                            <h:outputText value="#{i18n.administrator_Plugins_PAGE_DESCRIPTION}" escape="false" />
+                        </h:panelGroup>
+                        
+                        <rich:dataTable id="dtPluginConfigurations" 
+                                        value="#{administrator_Plugins.pluginConfigurations}" 
+                                        var="pluginCfg" 
+                                        styleClass="table" 
+                                        headerClass="tableHeader" 
+                                        rowClasses="odd, even">
 
                             <rich:column styleClass="columnIcon" headerClass="columnIconHeader">
                                 <f:facet name="header">
@@ -21,19 +30,24 @@
                                         </f:facet>
                                         <f:facet name="stop">
                                             <h:outputLink value="PluginConfigurationDetail.xhtml">
-                                                <h:graphicImage value="#{i18n.resource_ICON_ADD}" width="16" height="16" title="#{i18n.administrator_Plugins_CONFIGURATIONS_CLICK_TO_ADD}" />
+                                                <h:graphicImage value="#{i18n.resource_ICON_ADD}" 
+                                                                width="16" height="16" 
+                                                                title="#{i18n.administrator_Plugins_CONFIGURATIONS_CLICK_TO_ADD}" />
                                             </h:outputLink>
                                         </f:facet>
                                     </a4j:status>
                                 </f:facet>
                                 <h:outputLink value="PluginConfigurationDetail.xhtml?id=#{pluginCfg.id}">
-                                    <h:graphicImage value="#{i18n.resource_ICON_PLUGIN}" title="#{pluginCfg.name}" alt="#{pluginCfg.name}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_PLUGIN}" 
+                                                    title="#{pluginCfg.name}" 
+                                                    alt="#{pluginCfg.name}" />
                                 </h:outputLink>
                             </rich:column>
 
                             <rich:column sortBy="#{pluginCfg.id}" sortOrder="ASCENDING" styleClass="columnId">
                                 <f:facet name="header">
-                                    <h:outputText value="#{i18n.administrator_Plugins_CONFIGURATIONS_ID}" title="#{i18n.administrator_Plugins_CONFIGURATIONS_ID_TOOLTIP}"/>
+                                    <h:outputText value="#{i18n.administrator_Plugins_CONFIGURATIONS_ID}" 
+                                                  title="#{i18n.administrator_Plugins_CONFIGURATIONS_ID_TOOLTIP}"/>
                                 </f:facet>
                                 <h:outputLink value="PluginConfigurationDetail.xhtml?id=#{pluginCfg.id}">
                                     <h:outputText value="#{pluginCfg.id}" />
@@ -43,11 +57,20 @@
 
                             <rich:column sortBy="#{pluginCfg.name}">
                                 <f:facet name="header">
-                                    <h:outputText value="#{i18n.administrator_Plugins_CONFIGURATIONS_NAME}" title="#{i18n.administrator_Plugins_CONFIGURATIONS_NAME_TOOLTIP}"/>
+                                    <h:outputText value="#{i18n.administrator_Plugins_CONFIGURATIONS_NAME}" 
+                                                  title="#{i18n.administrator_Plugins_CONFIGURATIONS_NAME_TOOLTIP}"/>
                                 </f:facet>
                                 <h:outputLink value="PluginConfigurationDetail.xhtml?id=#{pluginCfg.id}">
                                     <h:outputText value="#{pluginCfg.name}" />
                                 </h:outputLink>
+                            </rich:column>
+
+                            <rich:column sortBy="#{pluginCfg.action.name}">
+                                <f:facet name="header">
+                                    <h:outputText value="#{i18n.administrator_Plugins_CONFIGURATIONS_ACTION}" 
+                                                  title="#{i18n.administrator_Plugins_CONFIGURATIONS_ACTION_TOOLTIP}"/>
+                                </f:facet>
+                                <h:outputText value="#{pluginCfg.action.name}" />
                             </rich:column>
 
                         </rich:dataTable>
@@ -56,48 +79,6 @@
             </a4j:region>
             <converge:moduleSpacer />
 
-            <h:form>
-                <converge:moduleHeader moduleTitle="#{i18n.administrator_Plugins_DISCOVERED_PLUGINS}" />
-                <div class="moduleContent">
-
-                    <rich:dataTable id="dtPlugins" value="#{administrator_Plugins.discoveredPlugins}" var="plugin" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
-
-                        <rich:column styleClass="center columnIcon" headerClass="columnIconHeader">
-                            <h:graphicImage title="#{plugin.name}" alt="#{plugin.name}" value="#{i18n.resource_ICON_PLUGIN}" />
-                        </rich:column>
-
-                        <rich:column sortBy="#{plugin.name}" sortOrder="ASCENDING">
-                            <f:facet name="header">
-                                <h:outputText value="#{i18n.administrator_Plugins_DISCOVERED_PLUGINS_NAME}" title="#{i18n.administrator_Plugins_DISCOVERED_PLUGINS_NAME_TOOLTIP}"/>
-                            </f:facet>
-                            <h:outputText value="#{plugin.name}" escape="false" />
-                            <rich:toolTip>
-                                <h:panelGroup>
-                                    <h:outputText value="#{plugin.description}" escape="false" />
-                                </h:panelGroup>
-                            </rich:toolTip>
-                        </rich:column>
-
-                        <rich:column sortBy="#{plugin.vendor}">
-                            <f:facet name="header">
-                                <h:outputText value="#{i18n.administrator_Plugins_DISCOVERED_PLUGINS_VENDOR}" title="#{i18n.administrator_Plugins_DISCOVERED_PLUGINS_VENDOR_TOOLTIP}" />
-                            </f:facet>
-                            <h:outputText value="#{plugin.vendor}" escape="false" />
-                        </rich:column>
-
-                        <rich:column sortBy="#{plugin.date}">
-                            <f:facet name="header">
-                                <h:outputText value="#{i18n.administrator_Plugins_DISCOVERED_PLUGINS_RELEASE_DATE}" title="#{i18n.administrator_Plugins_DISCOVERED_PLUGINS_RELEASE_DATE_TOOLTIP}" />
-                            </f:facet>
-                            <h:outputText value="#{plugin.date}">
-                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
-                            </h:outputText>
-                        </rich:column>
-
-                    </rich:dataTable>
-                </div>
-            </h:form>
-            <converge:moduleSpacer />
         </ui:define>
     </ui:composition>
 </jsp:root>

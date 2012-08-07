@@ -542,4 +542,27 @@ public class SystemFacadeBean implements SystemFacadeLocal {
             PluginConfiguration pluginConfiguration) {
         return daoService.update(pluginConfiguration);
     }
+    
+    /** {@inheritDoc } */
+    @Override
+    public void deletePluginConfigurationById(Long id) {
+        daoService.delete(PluginConfiguration.class, id);
+    }
+    
+    /** {@inheritDoc } */
+    @Override
+    public PluginConfiguration initPluginConfiguration() {
+        PluginConfiguration cfg = new PluginConfiguration();
+        
+        // Set the default action
+        PluginService pluginService = PluginManager.createPluginService();
+        Iterator<PluginAction> plugins = pluginService.getPlugins();
+        if (!plugins.hasNext()) {
+            throw new RuntimeException("No plugin actions found. Aborting");
+        }
+        PluginAction firstAction = plugins.next();
+        cfg.setActionClass(firstAction.getClass().getName());
+        
+        return cfg;
+    }
 }

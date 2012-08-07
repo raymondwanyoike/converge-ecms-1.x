@@ -81,6 +81,11 @@ http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"
             <redirect/>
         </navigation-case>
         <navigation-case>
+            <from-outcome>/administration/plugins_discovered</from-outcome>
+            <to-view-id>/administrator/PluginsDiscovered.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
             <from-outcome>/administration/outlets</from-outcome>
             <to-view-id>/administrator/Outlets.xhtml</to-view-id>
             <redirect/>

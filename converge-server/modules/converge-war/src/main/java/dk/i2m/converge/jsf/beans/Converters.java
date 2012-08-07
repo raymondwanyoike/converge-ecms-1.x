@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.jsf.beans;
 
+import dk.i2m.converge.jsf.converters.PluginConfigurationConverter;
 import dk.i2m.converge.core.calendar.EventCategory;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.security.UserAccount;
@@ -238,5 +239,9 @@ public class Converters {
 
     public Converter getNewswireServiceConverter() {
         return new NewswireServiceConverter(newswireService);
+    }
+    
+    public Converter getPluginConfigurationConverter() {
+        return new PluginConfigurationConverter(systemFacade);
     }
 }

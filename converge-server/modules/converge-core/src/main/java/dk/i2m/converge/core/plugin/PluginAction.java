@@ -27,27 +27,24 @@ import java.util.*;
  */
 public abstract class PluginAction implements Plugin {
 
-    /** 
+    /**
      * Bundle containing localised plug-in messages. Note, this property must be
-     * set in the constructor of implementations. 
+     * set in the constructor of implementations.
      */
     protected ResourceBundle bundle;
-    
+
+    public abstract void onInit();
+
     /**
      * Executes the {@link JobQueueAction}.
      *
-     * @param ctx
-     *          PluginContext for accessing services
-     * @param itemType
-     *          Type of item to process
-     * @param itemId
-     *          Identifier of item to process
-     * @param pluginConfiguration
-     *          {@link PluginConfiguration} to be executed
-     * @param variables
-     *          Variables for assisting the execution
-     * @throws PluginActionException
-     *          If the {@link PluginAction} failed executing
+     * @param ctx PluginContext for accessing services
+     * @param itemType Type of item to process
+     * @param itemId Identifier of item to process
+     * @param pluginConfiguration {@link PluginConfiguration} to be executed
+     * @param variables Variables for assisting the execution
+     * @throws PluginActionException If the {@link PluginAction} failed
+     * executing
      */
     public abstract void execute(PluginContext ctx, String itemType, Long itemId,
             PluginConfiguration cfg, Map<String, List<String>> variables) throws
@@ -61,40 +58,69 @@ public abstract class PluginAction implements Plugin {
     public abstract List<PluginActionPropertyDefinition> getAvailableProperties();
 
     /**
-     * Initialise the bundle used by the plugin.
-     * 
-     * @param name 
-     *          Full class name of the bundle
+     * Find a {@link PluginActionPropertyDefinition} among the available
+     * properties based on its id.
+     *
+     * @param id Unique identifier of the {@link PluginActionPropertyDefinition}
+     * @return {@link PluginActionPropertyDefinition} matching the given
+     * {@code id}
+     * @throws PropertyDefinitionNotFoundException If a property definition was
+     * not found with the given {@code id}
+     */
+    public abstract PluginActionPropertyDefinition findPropertyDefinition(String id) throws PropertyDefinitionNotFoundException;
+
+    /**
+     * Initialise the bundle used by the plug-in.
+     *
+     * @param name Full class name of the bundle
      */
     protected void setBundle(String name) {
         this.bundle = ResourceBundle.getBundle(name);
     }
-    
-    /** {@inheritDoc } */
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public ResourceBundle getBundle() {
+        return bundle;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String getName() {
         return bundle.getString("PLUGIN_NAME");
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String getAbout() {
         return bundle.getString("PLUGIN_ABOUT");
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String getDescription() {
         return bundle.getString("PLUGIN_DESCRIPTION");
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String getVendor() {
         return bundle.getString("PLUGIN_VENDOR");
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Date getDate() {
         try {
@@ -106,20 +132,12 @@ public abstract class PluginAction implements Plugin {
         }
     }
 
-    /** {@inheritDoc } */
-    @Override
-    public ResourceBundle getBundle() {
-        return bundle;
-    }
-
     /**
      * Obtain an object from the name of a class.
-     * 
-     * @param className
-     *          Full name of the class
+     *
+     * @param className Full name of the class
      * @return Instantiated object of type {@code className}
-     * @throws PluginActionException 
-     *          If the class could not be instantiated
+     * @throws PluginActionException If the class could not be instantiated
      */
     public Object getObjectFromClassName(String className) throws
             PluginActionException {

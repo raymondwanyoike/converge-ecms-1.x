@@ -20,8 +20,8 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 /**
- * Property of a {@link PluginConfiguration}. A property defines a setting for
- * a {@link PluginConfiguration} and must be one of the properties defined in
+ * Property of a {@link PluginConfiguration}. A property defines a setting for a
+ * {@link PluginConfiguration} and must be one of the properties defined in
  * {@link PluginAction#getAvailableProperties()}.
  *
  * @author Allan Lykke Christensen
@@ -34,15 +34,13 @@ public class PluginConfigurationProperty implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "plugin_configuration_id")
     private PluginConfiguration actionConfiguration;
-
     @Column(name = "property_key")
     private String key;
-
-    @Column(name = "property_value") @Lob
+    @Column(name = "property_value")
+    @Lob
     private String value;
 
     /**
@@ -53,7 +51,7 @@ public class PluginConfigurationProperty implements Serializable {
 
     /**
      * Gets the unique identifier of the {@link PluginConfigurationProperty}.
-     * 
+     *
      * @return Unique identifier of the {@link PluginConfigurationProperty}
      */
     public Long getId() {
@@ -89,6 +87,9 @@ public class PluginConfigurationProperty implements Serializable {
         this.actionConfiguration = actionConfiguration;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -106,10 +107,22 @@ public class PluginConfigurationProperty implements Serializable {
         return true;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public int hashCode() {
         int hash = 5;
         hash = 13 * hash + (this.id != null ? this.id.hashCode() : 0);
         return hash;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public String toString() {
+        return getClass().getName() + "[id=" + id + ", actionConfiguration="
+                + actionConfiguration + ", key=" + key + ", value=" + value + "]";
     }
 }

@@ -16,12 +16,14 @@
  */
 package dk.i2m.converge.core.plugin;
 
+import java.io.Serializable;
+
 /**
  * Definition of a property for a plug-in action.
  *
  * @author Allan Lykke Christensen
  */
-public class PluginActionPropertyDefinition {
+public class PluginActionPropertyDefinition implements Serializable {
 
     private String id;
 

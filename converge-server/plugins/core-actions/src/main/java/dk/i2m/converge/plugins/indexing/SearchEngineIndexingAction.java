@@ -22,10 +22,11 @@ import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.plugin.PluginAction;
 import dk.i2m.converge.core.plugin.PluginActionException;
-import dk.i2m.converge.core.plugin.PluginContext;
-import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.plugin.PluginActionPropertyDefinition;
 import dk.i2m.converge.core.plugin.PluginConfiguration;
+import dk.i2m.converge.core.plugin.PluginContext;
+import dk.i2m.converge.core.plugin.PropertyDefinitionNotFoundException;
+import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,11 @@ public class SearchEngineIndexingAction extends PluginAction {
     private PluginContext ctx;
 
     public SearchEngineIndexingAction() {
+        onInit();
+    }
+    
+    @Override
+    public void onInit() {
         setBundle("dk.i2m.converge.plugins.indexing.Messages");
     }
 
@@ -97,5 +103,19 @@ public class SearchEngineIndexingAction extends PluginAction {
     @Override
     public List<PluginActionPropertyDefinition> getAvailableProperties() {
         return Collections.EMPTY_LIST;
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public PluginActionPropertyDefinition findPropertyDefinition(String id)
+            throws PropertyDefinitionNotFoundException {
+        for (PluginActionPropertyDefinition d : getAvailableProperties()) {
+            if (d.getId().equals(id)) {
+                return d;
+            }
+        }
+        throw new PropertyDefinitionNotFoundException(id + " not found");
     }
 }

@@ -17,43 +17,51 @@
 package dk.i2m.converge.jsf.beans.administrator;
 
 import dk.i2m.converge.core.DataNotFoundException;
+import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.plugin.PluginAction;
 import dk.i2m.converge.core.plugin.PluginActionPropertyDefinition;
 import dk.i2m.converge.core.plugin.PluginConfiguration;
 import dk.i2m.converge.core.plugin.PluginConfigurationProperty;
+import dk.i2m.converge.core.plugin.PropertyDefinitionNotFoundException;
 import dk.i2m.converge.core.workflow.WorkflowActionException;
+import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
+import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.jsf.JsfUtils;
+import static dk.i2m.jsf.JsfUtils.*;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
 import javax.faces.event.ActionEvent;
 
 /**
  * Backing bean for {@code /administrator/PluginConfigurationDetail.jspx}.
- * 
+ *
  * @author Allan Lykke Christensen
  */
 public class PluginConfigurationDetail {
 
-    private static final Logger LOG =
-            Logger.getLogger(PluginConfigurationDetail.class.getName());
-
+    private static final Logger LOG = Logger.getLogger(PluginConfigurationDetail.class.getName());
     @EJB
     private SystemFacadeLocal systemFacade;
-
+    @EJB
+    private CatalogueFacadeLocal catalogueFacade;
     private PluginConfiguration pluginConfiguration;
-
-    private PluginConfigurationProperty property =
-            new PluginConfigurationProperty();
-
+    private PluginConfiguration eventPluginConfiguration;
+    private PluginConfigurationProperty property = new PluginConfigurationProperty();
     private Long selectedId;
-
     private Map<String, String> pluginActions = null;
+    private ResourceBundle bundle;
+    private PluginActionPropertyDefinition propertyDefinition;
 
     /**
      * Creates a new instance of {@link PluginConfigurationDetail}.
@@ -62,15 +70,19 @@ public class PluginConfigurationDetail {
     }
 
     /**
-     * Prepares the backing bean by obtaining the existing 
+     * Prepares the backing bean by obtaining the existing
      * {@link PluginConfiguration} if the bean should be used for updating.
      */
     @PostConstruct
     public void onInit() {
-        LOG.log(Level.INFO, "Initialising PluginConfiguration");
-        this.selectedId = Long.valueOf(JsfUtils.getRequestParameterMap().get("id"));
+        LOG.log(Level.FINE, "Initialising PluginConfiguration");
+        if (getRequestParameterMap().containsKey("id")) {
+            LOG.log(Level.FINE, "Loading existing PluginConfiguration");
+            this.selectedId = Long.valueOf(getRequestParameterMap().get("id"));
+        }
+
         if (this.selectedId == null) {
-            this.pluginConfiguration = new PluginConfiguration();
+            this.pluginConfiguration = systemFacade.initPluginConfiguration();
         } else {
             try {
                 this.pluginConfiguration = systemFacade.
@@ -97,23 +109,95 @@ public class PluginConfigurationDetail {
 
         return "/administration/plugins";
     }
+    
+    public String onDelete() {
+        systemFacade.deletePluginConfigurationById(this.pluginConfiguration.getId());
+        return "/administration/plugins";
+    }
+
+    public void onPrepareAddProperty(ActionEvent event) {
+        this.property = new PluginConfigurationProperty();
+        this.property.setWorkflowStepAction(getPluginConfiguration());
+        this.propertyDefinition = null;
+    }
 
     public void onAddProperty(ActionEvent event) {
         LOG.log(Level.INFO, "Adding Property");
-        this.property = new PluginConfigurationProperty();
+        if (this.property.getId() == null) {
+            this.property.setKey(getPropertyDefinition().getId());
+            getPluginConfiguration().getProperties().add(property);
+        }
+        onSave();
+    }
+    
+    public void onUpdateProperty(ActionEvent event) {
+        
     }
 
-    public void onRemoveProperty(ActionEvent event) {
-        LOG.log(Level.INFO, "Remove Property");
-        String propertyId =
-                JsfUtils.getRequestParameterMap().get("propertyId");
-        LOG.log(Level.INFO, "{0}", propertyId);
+    public void removeProperty(PluginConfigurationProperty property) {
+        boolean removed = getPluginConfiguration().getProperties().remove(property);
+        LOG.log(Level.INFO, "Removing {0}", removed);
+    }
+
+    public String convertPropertyValue(PluginConfigurationProperty property) {
+        try {
+            PluginActionPropertyDefinition def = getPluginConfiguration().getAction().findPropertyDefinition(property.getKey());
+
+            if (def.getType().equalsIgnoreCase("rendition")) {
+                Rendition rendition = catalogueFacade.findRenditionById(Long.valueOf(property.getValue()));
+                return rendition.getLabel();
+            } else {
+                return property.getValue();
+            }
+
+        } catch (WorkflowActionException ex) {
+            LOG.log(Level.SEVERE, ex.getMessage());
+            return property.getValue();
+        } catch (PropertyDefinitionNotFoundException ex) {
+            LOG.log(Level.SEVERE, ex.getMessage());
+            return property.getValue();
+        } catch (DataNotFoundException ex) {
+            LOG.log(Level.SEVERE, ex.getMessage());
+            return property.getValue();
+        }
+    }
+    
+    public void onPrepareAddPluginConfiguration(ActionEvent event) {
+        this.eventPluginConfiguration = null;
+    }
+    
+    public Map<String, PluginConfiguration> getExistingPluginConfigurations() {
+        List<PluginConfiguration> cfgs = systemFacade.findPluginConfigurations();
+        Map<String, PluginConfiguration> cfgMap = new LinkedHashMap<String, PluginConfiguration>();
+        for (PluginConfiguration cfg : cfgs) {
+            cfgMap.put(cfg.getName(), cfg);
+        }
+        
+        return cfgMap;
+    }
+
+    public PluginConfiguration getEventPluginConfiguration() {
+        return eventPluginConfiguration;
+    }
+
+    public void setEventPluginConfiguration(PluginConfiguration eventPluginConfiguration) {
+        this.eventPluginConfiguration = eventPluginConfiguration;
+    }
+    
+    public void onAddEventPluginConfiguration(ActionEvent event) {
+        getPluginConfiguration().getOnCompletePluginConfiguration().add(getEventPluginConfiguration());
+        onSave();
+    }
+    
+    public void removeEventPluginConfiguration(PluginConfiguration cfg) {
+        getPluginConfiguration().getOnCompletePluginConfiguration().remove(cfg);
+        onSave();
     }
 
     /**
      * Gets the {@link PluginConfiguration} being updated or created.
-     * 
-     * @see #isNew() 
+     *
+     * @see #isNew()
      * @return {@link PluginConfiguration} being updated or created
      */
     public PluginConfiguration getPluginConfiguration() {
@@ -123,9 +207,9 @@ public class PluginConfigurationDetail {
     /**
      * Determine if the backing bean should be used for the creation of a new
      * {@link PluginConfiguration}.
-     * 
+     *
      * @return {@code true} if the backing bean should be used for the creation
-     *         of a new {@link PluginConfiguration}
+     * of a new {@link PluginConfiguration}
      */
     public boolean isNew() {
         if (getPluginConfiguration().getId() == null) {
@@ -147,7 +231,7 @@ public class PluginConfigurationDetail {
      * Constructs a {@link Map} of discovered {@link PluginAction} with the name
      * of the {@link PluginAction} as the key and the full class name of the
      * {@link PluginAction} as the value.
-     * 
+     *
      * @return {@link Map} of discovered {@link PluginAction}
      */
     public Map<String, String> getPluginsActions() {
@@ -159,16 +243,56 @@ public class PluginConfigurationDetail {
                 this.pluginActions.put(pa.getName(), pa.getClass().getName());
             }
         }
+
         return this.pluginActions;
     }
 
+    /**
+     * Gets the {@link ResourceBundle} of the {@link PluginAction}. If the
+     * bundle could not be fetched, the JSF resource bundle will be returned.
+     *
+     * @return {@link ResourceBundle} of the {@link PluginAction}
+     */
+    public ResourceBundle getPluginActionBundle() {
+        if (this.bundle == null) {
+            try {
+                this.bundle = getPluginConfiguration().getAction().getBundle();
+            } catch (WorkflowActionException ex) {
+                LOG.log(Level.SEVERE, "Could not instantiate PluginAction for "
+                        + "PluginConfiguration #{0}",
+                        getPluginConfiguration().getId());
+                LOG.log(Level.FINEST, "", ex);
+                this.bundle = JsfUtils.getResourceBundle(Bundle.i18n.name());
+            }
+        }
+        if (this.bundle == null) {
+            LOG.log(Level.SEVERE, "Bundle is null ({0})", new Object[]{getPluginConfiguration().getActionClass()});
+        }
+
+        return this.bundle;
+    }
+
+    /**
+     * Gets a {@link Map} of available properties for the selected
+     * {@link PluginAction}.
+     *
+     * @return {@link Map} of available properties for the selected
+     * {@link PluginAction}.
+     */
     public Map<String, PluginActionPropertyDefinition> getAvailableProperties() {
         Map<String, PluginActionPropertyDefinition> availableProperties =
                 new LinkedHashMap<String, PluginActionPropertyDefinition>();
+
         try {
             for (PluginActionPropertyDefinition p : getPluginConfiguration().
                     getAction().getAvailableProperties()) {
-                availableProperties.put(p.getLabel(), p);
+
+                String lbl = p.getLabel();
+                if (getPluginActionBundle().containsKey(p.getLabel())) {
+                    lbl = getPluginActionBundle().getString(p.getLabel());
+                }
+
+                availableProperties.put(lbl, p);
             }
 
         } catch (WorkflowActionException ex) {
@@ -177,9 +301,68 @@ public class PluginConfigurationDetail {
         return availableProperties;
     }
 
+    public Map<String, String> getRenditions() {
+        Map<String, String> renditions = new LinkedHashMap<String, String>();
+
+        List<Rendition> results = catalogueFacade.findRenditions();
+
+        for (Rendition rendition : results) {
+            renditions.put(rendition.getLabel(), "" + rendition.getId());
+        }
+
+        return renditions;
+    }
+
+    /**
+     * JSF {@link Converter} for obtaining the selected
+     * {@link PluginActionPropertyDefinition}. Implemented as an anonymous inner
+     * class to be able to access the selected {@link PluginConfiguration}.
+     *
+     * @return {@link Converter} for converting
+     * {@link PluginActionPropertyDefinition}s
+     */
+    public Converter getPluginActionPropertyDefinition() {
+        return new Converter() {
+            @Override
+            public Object getAsObject(FacesContext context, UIComponent component, String value) {
+                try {
+                    PluginAction action = getPluginConfiguration().getAction();
+                    List<PluginActionPropertyDefinition> availableProperties = action.getAvailableProperties();
+                    for (PluginActionPropertyDefinition def : availableProperties) {
+                        if (def.getId().equals(value)) {
+                            return def;
+                        }
+                    }
+                } catch (WorkflowActionException ex) {
+                    LOG.log(Level.SEVERE, "Could not instantiate PluginAction "
+                            + "from PluginConfiguration {0}",
+                            getPluginConfiguration());
+                }
+                return null;
+            }
+
+            @Override
+            public String getAsString(FacesContext context, UIComponent component, Object value) {
+                if (value == null) {
+                    return "";
+                }
+                return ((PluginActionPropertyDefinition) value).getId();
+            }
+        };
+
+    }
+
+    public PluginActionPropertyDefinition getPropertyDefinition() {
+        return this.propertyDefinition;
+    }
+
+    public void setPropertyDefinition(PluginActionPropertyDefinition propertyDefinition) {
+        this.propertyDefinition = propertyDefinition;
+    }
+
     /**
      * Gets the property being updated or added.
-     * 
+     *
      * @return Property being updated or added
      */
     public PluginConfigurationProperty getProperty() {
@@ -188,11 +371,21 @@ public class PluginConfigurationDetail {
 
     /**
      * Sets the property being updated or added.
-     * 
-     * @param property
-     *          Property being updated or added
+     *
+     * @param property Property being updated or added
      */
     public void setProperty(PluginConfigurationProperty property) {
+        LOG.log(Level.INFO, "Setting property: {0}", property);
         this.property = property;
+        try {
+            PluginAction action = getPluginConfiguration().getAction();
+            setPropertyDefinition(action.findPropertyDefinition(this.property.getKey()));
+        } catch (WorkflowActionException ex) {
+            LOG.log(Level.SEVERE, "Could not instantiate PluginAction");
+            LOG.log(Level.FINEST, "", ex);
+        } catch (PropertyDefinitionNotFoundException ex) {
+            LOG.log(Level.SEVERE, "Property definition could not be found for property");
+            LOG.log(Level.FINEST, "", ex);
+        }
     }
 }

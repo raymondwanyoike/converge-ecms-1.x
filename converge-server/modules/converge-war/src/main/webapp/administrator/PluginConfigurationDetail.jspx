@@ -4,24 +4,37 @@
         <ui:define name="title">#{i18n.administrator_Plugins_PAGE_TITLE}</ui:define>
         <ui:define name="body">
 
-            <a4j:keepAlive beanName="administrator_PluginConfigurationDetail" />
-
             <h:form id="frmEntry">
 
                 <converge:moduleHeader moduleTitle="#{i18n.administrator_PluginConfigurationDetail_CONFIGURATION}" />
                 <div class="moduleContent">
-                    <h:panelGroup>
-                        <h:commandLink styleClass="button" action="#{administrator_PluginConfigurationDetail.onSave}" value="#{i18n.Generic_SAVE}" />
+                    <h:panelGroup styleClass="module-buttons" layout="block">
+                        <h:commandLink styleClass="textButton" action="#{administrator_PluginConfigurationDetail.onSave}" value="#{i18n.Generic_SAVE}" />
+                        <h:commandLink styleClass="textButton" action="#{administrator_PluginConfigurationDetail.onDelete}" value="#{i18n.Generic_DELETE}" />
                     </h:panelGroup>
-                    <h:panelGrid>
-                        <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_NAME}" />
-                        <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_PluginConfigurationDetail.pluginConfiguration.name}" required="true" requiredMessage="#{i18n.administrator_PluginConfigurationDetail_NAME_REQUIRED}"/>
+                    <h:panelGrid style="width: 100%;">
+                        <h:outputText styleClass="form-field-label" value="#{i18n.administrator_PluginConfigurationDetail_NAME}" />
+                        <h:inputText id="txtName" 
+                                     styleClass="text form-field" 
+                                     value="#{administrator_PluginConfigurationDetail.pluginConfiguration.name}" 
+                                     required="true" 
+                                     requiredMessage="#{i18n.administrator_PluginConfigurationDetail_NAME_REQUIRED}"  />
 
-                        <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_DESCRIPTION}" />
-                        <h:inputTextarea id="txtDescription" styleClass="text mediumInput" value="#{administrator_PluginConfigurationDetail.pluginConfiguration.description}" />
+                        <h:outputText value="&#160;" />
+                        <h:outputText styleClass="form-field-label" value="#{i18n.administrator_PluginConfigurationDetail_DESCRIPTION}" />
+                        <h:inputTextarea id="txtDescription" styleClass="text mediumInput form-field" value="#{administrator_PluginConfigurationDetail.pluginConfiguration.description}" />
 
-                        <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_FOR}" />
-                        <h:selectOneMenu value="#{administrator_PluginConfigurationDetail.pluginConfiguration.actionClass}" disabled="#{!administrator_PluginConfigurationDetail.new}">
+                        <h:outputText value="&#160;" />
+                        <h:column>
+                            <h:outputText styleClass="form-field-label" 
+                                          value="#{i18n.administrator_PluginConfigurationDetail_FOR}" />
+                            <h:outputText styleClass="field-note" 
+                                          value="#{i18n.administrator_PluginConfigurationDetail_FOR_NOTE}"
+                                          rendered="#{!administrator_PluginConfigurationDetail.new}"/>
+                        </h:column>
+                        <h:selectOneMenu value="#{administrator_PluginConfigurationDetail.pluginConfiguration.actionClass}" 
+                                         disabled="#{!administrator_PluginConfigurationDetail.new}"
+                                         styleClass="form-field">
                             <f:selectItems value="#{administrator_PluginConfigurationDetail.pluginsActions}" />
                             <a4j:support event="onchange" reRender="regProperties" ajaxSingle="true" />
                         </h:selectOneMenu>
@@ -29,59 +42,256 @@
                     </h:panelGrid>
                 </div>
                 <converge:moduleSpacer />
-                <a4j:region id="regProperties">
-                    <converge:moduleHeader moduleTitle="#{i18n.administrator_PluginConfigurationDetail_CONFIGURATION_PROPERTIES}" />
+
+                <a4j:region id="regComplete">
+                    <converge:moduleHeader moduleTitle="#{i18n.administrator_PluginConfigurationDetail_EVENTS}" />
                     <div class="moduleContent">
+                        <rich:dataTable value="#{administrator_PluginConfigurationDetail.pluginConfiguration.onCompletePluginConfiguration}" 
+                                        var="pluginCfg">
 
-                        <h:panelGrid columns="3">
-
-                            <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_PROPERTY_INPUT}" />
-                            <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_PROPERTY_INPUT_VALUE}" />
-                            <h:panelGroup id="colHelp">
-                                <c:set var="help_key" value="#{administrator_PluginConfigurationDetail.property.key}_HELP" />
-                                <c:set var="help_text" value="#{converge:message(administrator_PluginConfigurationDetail.pluginConfiguration.action.bundle, help_key)}" />
-                                <h:graphicImage url="#{i18n.resource_ICON_HELP}" title="#{help_text}" rendered="#{help_text != ''}" />
-                                <h:outputText value="&#160;" rendered="#{help_text == ''}" />
-                            </h:panelGroup>
-                            
-                            <h:selectOneMenu id="somActionProperties" value="#{administrator_PluginConfigurationDetail.property.key}" styleClass="text mediumInput">
-                                <f:selectItem itemLabel="#{i18n.administrator_PluginConfigurationDetail_SELECT_PROPERTY}" />
-                                <f:selectItems value="#{administrator_PluginConfigurationDetail.availableProperties}" />
-                                <a4j:support event="onchange" reRender="colHelp" />
-                            </h:selectOneMenu>
-                            <h:inputText styleClass="text mediumInput" value="#{administrator_PluginConfigurationDetail.property.value}" />
-                            <a4j:commandButton id="btnAdd" value="#{i18n.Generic_ADD}" actionListener="#{administrator_PluginConfigurationDetail.onAddProperty}" reRender="regProperties" styleClass="button dynamicButton" />
-                        </h:panelGrid>
-
-                        <rich:dataTable value="#{administrator_PluginConfigurationDetail.pluginConfiguration.properties}" var="property" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
-                            <rich:column sortBy="#{property.key}" sortOrder="ASCENDING">
+                            <rich:column styleClass="columnIcon" 
+                                         headerClass="columnIconHeader">
                                 <f:facet name="header">
-                                    <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_CONFIGURATION_PROPERTIES_PROPERTY}" />
+                                    <a4j:commandLink reRender="frmProperty"
+                                                     actionListener="#{administrator_PluginConfigurationDetail.onPrepareAddPluginConfiguration}"
+                                                     oncomplete="#{rich:component('mpAddPluginConfiguration')}.show()">
+                                        <h:graphicImage value="#{i18n.resource_ICON_ADD}" 
+                                                        width="16" height="16" />
+                                    </a4j:commandLink>
                                 </f:facet>
-                                <c:set var="help_key" value="#{property.key}_HELP" />
-                                <h:outputText value="#{converge:message(administrator_PluginConfigurationDetail.pluginConfiguration.action.bundle, property.key)}" title="#{converge:message(administrator_PluginConfigurationDetail.pluginConfiguration.action.bundle, help_key)}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_PLUGIN}" 
+                                                title="#{pluginCfg.name}" 
+                                                alt="#{pluginCfg.name}" />
                             </rich:column>
 
-                            <rich:column sortyBy="#{property.value}">
+                            <rich:column>
                                 <f:facet name="header">
-                                    <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_CONFIGURATION_PROPERTIES_VALUE}" />
+                                    <h:outputText value="Event" />
                                 </f:facet>
-                                <rich:inplaceInput required="true" value="#{property.value}" viewClass="propertyInplace" viewHoverClass="propertyInplaceHover" />
+                                <h:outputText value="On complete" />
+                            </rich:column>
+
+                            <rich:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Execute" />
+                                </f:facet>
+                                <h:outputText value="#{pluginCfg.name}" />
+                            </rich:column>
+                            <rich:column>
+                                <h:outputText value="##{pluginCfg.id}" />
                             </rich:column>
 
                             <rich:column styleClass="center columnIcon">
-                                <a4j:commandLink id="lnkRemoveActionProperty" reRender="regProperties" ajaxSingle="true" actionListener="#{administrator_PluginConfigurationDetail.onRemoveProperty}">
-                                    <f:param name="propertyId" value="#{property.id}" />
-                                    <h:graphicImage value="#{i18n.resource_ICON_DELETE}" alt="#{i18n.Generic_DELETE}" title="#{i18n.Generic_DELETE}" />
+                                <f:facet name="header">
+                                </f:facet>
+                                <a4j:commandLink id="lnkRemoveEventPluginConfiguration" 
+                                                 reRender="frmEntry" 
+                                                 ajaxSingle="true" 
+                                                 actionListener="#{administrator_PluginConfigurationDetail.removeEventPluginConfiguration(pluginCfg)}">
+                                    <h:graphicImage value="#{i18n.resource_ICON_DELETE}" 
+                                                    alt="#{i18n.Generic_DELETE}" 
+                                                    title="#{i18n.Generic_DELETE}" />
                                 </a4j:commandLink>
                             </rich:column>
 
+                            <f:facet name="footer" >
+                                <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_NO_EVENTS}" 
+                                              rendered="#{empty administrator_PluginConfigurationDetail.pluginConfiguration.onCompletePluginConfiguration}" />
+                            </f:facet>
                         </rich:dataTable>
 
                     </div>
                 </a4j:region>
 
+                <a4j:region id="regProperties">
+                    <converge:moduleHeader moduleTitle="#{i18n.administrator_PluginConfigurationDetail_CONFIGURATION_PROPERTIES}" />
+                    <div class="moduleContent">
+
+                        <rich:dataTable value="#{administrator_PluginConfigurationDetail.pluginConfiguration.properties}" 
+                                        var="property">
+
+                            <rich:column styleClass="columnIcon" 
+                                         headerClass="columnIconHeader">
+                                <f:facet name="header">
+                                    <a4j:commandLink reRender="frmProperty"
+                                                     actionListener="#{administrator_PluginConfigurationDetail.onPrepareAddProperty}"
+                                                     oncomplete="#{rich:component('mpProperty')}.show()">
+                                        <h:graphicImage value="#{i18n.resource_ICON_ADD}" 
+                                                        width="16" height="16" />
+                                    </a4j:commandLink>
+                                </f:facet>
+                                <a4j:commandLink reRender="frmProperty"
+                                                 oncomplete="#{rich:component('mpProperty')}.show()">
+                                    <f:setPropertyActionListener target="#{administrator_PluginConfigurationDetail.property}" value="#{property}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_PLUGIN}" />
+                                </a4j:commandLink>
+                            </rich:column>
+
+                            <rich:column sortBy="#{property.key}" sortOrder="ASCENDING">
+                                <f:facet name="header">
+                                    <h:outputText value="Property" />
+                                </f:facet>
+                                <c:set var="help_key" value="PROPERTY_#{property.key}_TOOLTIP" />
+                                <c:set var="title_key" value="PROPERTY_#{property.key}" />
+                                <h:outputText value="#{converge:message(administrator_PluginConfigurationDetail.pluginActionBundle, title_key)}" 
+                                              title="#{converge:message(administrator_PluginConfigurationDetail.pluginActionBundle, help_key)}" />
+                            </rich:column>
+
+                            <rich:column sortyBy="#{property.value}">
+                                <f:facet name="header">
+                                    <h:outputText value="Value" />
+                                </f:facet>
+                                <a4j:commandLink reRender="frmProperty"
+                                                 oncomplete="#{rich:component('mpProperty')}.show()">
+                                    <f:setPropertyActionListener target="#{administrator_PluginConfigurationDetail.property}" value="#{property}" />
+                                    <h:outputText value="#{administrator_PluginConfigurationDetail.convertPropertyValue(property)}" />
+                                </a4j:commandLink>
+                            </rich:column>
+
+                            <rich:column styleClass="center columnIcon">
+                                <a4j:commandLink id="lnkRemoveActionProperty" 
+                                                 reRender="frmEntry" 
+                                                 ajaxSingle="true" 
+                                                 actionListener="#{administrator_PluginConfigurationDetail.removeProperty(property)}">
+                                    <h:graphicImage value="#{i18n.resource_ICON_DELETE}" 
+                                                    alt="#{i18n.Generic_DELETE}" 
+                                                    title="#{i18n.Generic_DELETE}" />
+                                </a4j:commandLink>
+                            </rich:column>
+
+                            <f:facet name="footer">
+                                <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_NO_PROPERTIES}" 
+                                              rendered="#{empty administrator_PluginConfigurationDetail.pluginConfiguration.properties}" />
+                            </f:facet>
+
+                        </rich:dataTable>
+
+                    </div>
+                </a4j:region>
             </h:form>
+
+            <h:form id="frmProperty">
+                <rich:modalPanel id="mpProperty" 
+                                 autosized="true" 
+                                 domElementAttachment="parent" 
+                                 rendered="#{administrator_PluginConfigurationDetail.property != null}">
+
+                    <f:facet name="header">
+                        <h:panelGroup>
+                            <h:outputText value="New Property" />
+                        </h:panelGroup>
+                    </f:facet>
+
+                    <h:panelGrid>
+                        <rich:tabPanel switchType="client" 
+                                       activeTabClass="tabActive" 
+                                       inactiveTabClass="tabInactive">
+
+
+                            <rich:tab label="Property">
+                                <h:panelGrid id="propertySheet" columnClasses="tabSheet" 
+                                             styleClass="tabSheetGrid">
+                                    <h:selectOneMenu id="somAvailableProperties" 
+                                                     value="#{administrator_PluginConfigurationDetail.propertyDefinition}" 
+                                                     styleClass="text mediumInput"
+                                                     converter="#{administrator_PluginConfigurationDetail.pluginActionPropertyDefinition}">
+                                        <f:selectItem itemLabel="#{i18n.administrator_PluginConfigurationDetail_SELECT_PROPERTY}" />
+                                        <f:selectItems value="#{administrator_PluginConfigurationDetail.availableProperties}" />
+                                        <a4j:support event="onchange" ajaxSingle="true" reRender="propertySheet" />
+                                    </h:selectOneMenu>
+
+                                    <h:outputText escape="false" 
+                                                  value="#{converge:message(administrator_PluginConfigurationDetail.pluginActionBundle, administrator_PluginConfigurationDetail.propertyDefinition.tooltip)}" />
+
+                                    <ui:fragment rendered="#{administrator_PluginConfigurationDetail.propertyDefinition.type == 'rendition'}">
+                                        <h:selectOneMenu value="#{administrator_PluginConfigurationDetail.property.value}">
+                                            <f:selectItems value="#{administrator_PluginConfigurationDetail.renditions}" />
+                                        </h:selectOneMenu>
+                                    </ui:fragment>
+
+                                </h:panelGrid>
+                            </rich:tab>
+                        </rich:tabPanel>
+
+                        <h:panelGroup styleClass="dialogueButtons">
+                            <a4j:commandLink id="lnkSave" 
+                                             styleClass="dialogButton" 
+                                             value="#{i18n.Generic_SAVE}" 
+                                             actionListener="#{administrator_PluginConfigurationDetail.onAddProperty}" 
+                                             reRender="frmEntry"
+                                             oncomplete="#{rich:component('mpProperty')}.hide()" />
+                            <a4j:commandLink id="lnkDelete" 
+                                             rendered="#{administrator_Renditions.editMode}" 
+                                             onclick="if (confirm('#{i18n.Renditions_DELETE_CONFIRM}') != true){ return false; };" 
+                                             actionListener="#{administrator_PluginConfigurationDetail.onDeleteProperty}" 
+                                             styleClass="dialogButton" 
+                                             value="#{i18n.Generic_DELETE}" 
+                                             reRender="frmEntry"
+                                             oncomplete="#{rich:component('mpProperty')}.hide()">
+                            </a4j:commandLink>
+                            <h:commandLink id="lnkClosePropertyForm" 
+                                           styleClass="dialogButton" 
+                                           value="#{i18n.Generic_CANCEL}" 
+                                           onclick="#{rich:component('mpProperty')}.hide(); return false;" />
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                </rich:modalPanel>
+            </h:form>
+
+
+            <h:form id="frmAddPluginConfiguration">
+                <rich:modalPanel id="mpAddPluginConfiguration" 
+                                 autosized="true" 
+                                 domElementAttachment="parent">
+
+                    <f:facet name="header">
+                        <h:panelGroup>
+                            <h:outputText value="Add Plug-in Configuration" />
+                        </h:panelGroup>
+                    </f:facet>
+
+                    <h:panelGrid>
+                        <rich:tabPanel switchType="client" 
+                                       activeTabClass="tabActive" 
+                                       inactiveTabClass="tabInactive">
+
+                            <rich:tab label="Plug-in Configuration">
+                                <h:panelGrid id="pluginConfigSheet" columnClasses="tabSheet" 
+                                             styleClass="tabSheetGrid">
+                                    <h:selectOneMenu id="somAvailableProperties" 
+                                                     value="#{administrator_PluginConfigurationDetail.eventPluginConfiguration}" 
+                                                     styleClass="text mediumInput"
+                                                     converter="#{converters.pluginConfigurationConverter}">
+                                        <f:selectItem itemLabel="-- Select Existing Plugin Configuration --" />
+                                        <f:selectItems value="#{administrator_PluginConfigurationDetail.existingPluginConfigurations}" />
+                                        <a4j:support event="onchange" ajaxSingle="true" reRender="pluginConfigSheet" />
+                                    </h:selectOneMenu>
+
+                                    <h:outputText escape="false" 
+                                                  value="#{administrator_PluginConfigurationDetail.eventPluginConfiguration.description}" />
+                                </h:panelGrid>
+                            </rich:tab>
+                        </rich:tabPanel>
+
+                        <h:panelGroup styleClass="dialogueButtons">
+                            <a4j:commandLink id="lnkSaveEventPluginConfiguratoon" 
+                                             styleClass="dialogButton" 
+                                             value="#{i18n.Generic_SAVE}" 
+                                             actionListener="#{administrator_PluginConfigurationDetail.onAddEventPluginConfiguration}" 
+                                             reRender="frmEntry"
+                                             oncomplete="#{rich:component('mpAddPluginConfiguration')}.hide()" />
+                            <h:commandLink id="lnkCloseEventPluginConfiguration" 
+                                           styleClass="dialogButton" 
+                                           value="#{i18n.Generic_CANCEL}" 
+                                           onclick="#{rich:component('mpAddPluginConfiguration')}.hide(); return false;" />
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                </rich:modalPanel>
+            </h:form>
+
+
 
 
         </ui:define>

@@ -31,8 +31,7 @@ import javax.faces.model.ListDataModel;
  */
 public class Plugins {
 
-    protected static final Logger LOG =
-            Logger.getLogger(Plugins.class.getName());
+    private static final Logger LOG = Logger.getLogger(Plugins.class.getName());
 
     @EJB private SystemFacadeLocal systemFacade;
 

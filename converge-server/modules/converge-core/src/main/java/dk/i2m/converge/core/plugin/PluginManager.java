@@ -34,29 +34,23 @@ import org.scannotation.AnnotationDB;
  */
 public final class PluginManager {
 
-    /** Singleton instance of the PluginManager. */
+    /**
+     * Singleton instance of the PluginManager.
+     */
     private static PluginManager instance = null;
-
     private static final Class[] parameters = new Class[]{URL.class};
-
     private static final Logger LOG = Logger.getLogger(PluginManager.class.
             getName());
-
     private Map<String, NewswireDecoder> newswireDecoders =
             new HashMap<String, NewswireDecoder>();
-
     private Map<String, WorkflowAction> workflowActions =
             new HashMap<String, WorkflowAction>();
-
     private Map<String, EditionAction> outletActions =
             new HashMap<String, EditionAction>();
-
     private Map<String, WorkflowValidator> workflowValidators =
             new HashMap<String, WorkflowValidator>();
-
     private Map<String, CatalogueHook> catalogueActions =
             new HashMap<String, CatalogueHook>();
-
     private Map<String, NewsItemAction> newsItemActions =
             new HashMap<String, NewsItemAction>();
 
@@ -91,9 +85,9 @@ public final class PluginManager {
     }
 
     /**
-     * Gets a {@link Map} of all discovered plugins where the key is the name
-     * of the {@link Plugin} and the value is the instance of the {@link Plugin}
-     * 
+     * Gets a {@link Map} of all discovered plugins where the key is the name of
+     * the {@link Plugin} and the value is the instance of the {@link Plugin}
+     *
      * @return {@link Map} of discovered plugins
      */
     public Map<String, Plugin> getPlugins() {
@@ -219,34 +213,35 @@ public final class PluginManager {
     }
 
     /**
-     * Adds the JAR files in the given directory to the classpath of the 
+     * Adds the JAR files in the given directory to the classpath of the
      * application.
-     * 
-     * @param directory
-     *          Directory to add to the classpath
-     * @throws IOException
-     *          If the directory could not be added to the classpath
+     *
+     * @param directory Directory to add to the classpath
+     * @throws IOException If the directory could not be added to the classpath
      */
     public static void addDirToClasspath(File directory) throws IOException {
         if (directory.exists()) {
+            LOG.log(Level.FINE, "Adding directory \"{0}\" to plugin classpath", new Object[]{directory.getAbsoluteFile().getName()});
             File[] files = directory.listFiles();
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
                 addURL(file.toURI().toURL());
             }
         } else {
-            LOG.log(Level.WARNING, "The directory \"{0}\" does not exist!",
-                    directory);
+            LOG.log(Level.WARNING, "The plug-in directory \"{0}\" does not "
+                    + "exist!", new Object[]{directory.getAbsoluteFile().getName()});
+            directory.mkdirs();
+            LOG.log(Level.WARNING, "Plug-in directory \"{0}\" created", 
+                    new Object[]{directory.getAbsoluteFile()});
+
         }
     }
 
     /**
      * Adds a URL to the classpath.
-     * 
-     * @param u
-     *          URL to add to the classpath
-     * @throws IOException 
-     *          If the URL could not be added to the classpath
+     *
+     * @param u URL to add to the classpath
+     * @throws IOException If the URL could not be added to the classpath
      */
     public static void addURL(URL u) throws IOException {
         URLClassLoader sysLoader = (URLClassLoader) ClassLoader.

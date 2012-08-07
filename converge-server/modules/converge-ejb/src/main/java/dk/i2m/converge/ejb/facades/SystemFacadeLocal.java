@@ -238,6 +238,13 @@ public interface SystemFacadeLocal {
     PluginConfiguration createPluginConfiguration(PluginConfiguration pluginConfiguration);
 
     /**
+     * Initialises a new {@link PluginConfiguration}.
+     *
+     * @return Default {@link PluginConfiguration}
+     */
+    PluginConfiguration initPluginConfiguration();
+
+    /**
      * Updates an existing {@link PluginConfiguration}.
      *
      * @param pluginConfiguration {@link PluginConfiguration} to update
@@ -262,4 +269,6 @@ public interface SystemFacadeLocal {
      * the application configuration.
      */
     void clearOldLogEntries();
+
+    void deletePluginConfigurationById(Long id);
 }

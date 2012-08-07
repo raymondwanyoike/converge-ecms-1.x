@@ -16,8 +16,6 @@
  */
 package dk.i2m.converge.core.plugin;
 
-import dk.i2m.converge.core.plugin.PluginAction;
-import dk.i2m.converge.core.plugin.WorkflowAction;
 import dk.i2m.converge.core.workflow.WorkflowActionException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.*;
+import org.eclipse.persistence.annotations.PrivateOwned;
 
 /**
  * Configuration of a {@link PluginAction}. A {@link PluginConfiguration} can be
@@ -40,32 +39,33 @@ public class PluginConfiguration implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
     @Column(name = "name")
     private String name = "";
-
     @Column(name = "description")
     @Lob
     private String description = "";
-
     @Column(name = "action_class")
     private String actionClass = null;
-
-    @OneToMany(mappedBy = "actionConfiguration")
+    @OneToMany(mappedBy = "actionConfiguration", cascade = CascadeType.ALL)
+    @PrivateOwned
     private List<PluginConfigurationProperty> properties =
             new ArrayList<PluginConfigurationProperty>();
-
-    /** List of PluginConfigurations to executed upon completion of this configuration. */
-    @ManyToMany
+    /**
+     * List of PluginConfigurations to executed upon completion of this
+     * configuration.
+     */
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "plugin_configuration_oncomplete",
-    joinColumns = @JoinColumn(name = "main_configuration_id",
-    referencedColumnName = "id"),
-    inverseJoinColumns = @JoinColumn(name = "complete_configuration_id",
-    referencedColumnName = "id"))
+    joinColumns =
+    @JoinColumn(name = "main_configuration_id", referencedColumnName = "id"),
+    inverseJoinColumns =
+    @JoinColumn(name = "complete_configuration_id", referencedColumnName = "id"))
     private List<PluginConfiguration> completeCfg =
             new ArrayList<PluginConfiguration>();
-
-    /** List of PluginConfigurations that execute this configuration upon completion. */
+    /**
+     * List of PluginConfigurations that execute this configuration upon
+     * completion.
+     */
     @ManyToMany(mappedBy = "completeCfg")
     private List<PluginConfiguration> mainCfg =
             new ArrayList<PluginConfiguration>();
@@ -78,7 +78,7 @@ public class PluginConfiguration implements Serializable {
 
     /**
      * Gets the unique identifier of the {@link PluginConfiguration}.
-     * 
+     *
      * @return Unique identifier of the {@link PluginConfiguration}
      */
     public Long getId() {
@@ -87,9 +87,8 @@ public class PluginConfiguration implements Serializable {
 
     /**
      * Sets the unique identifier of the {@link PluginConiguration}.
-     * 
-     * @param id 
-     *          Unique identifier of the {@link PluginConfiguration}
+     *
+     * @param id Unique identifier of the {@link PluginConfiguration}
      */
     public void setId(Long id) {
         this.id = id;
@@ -97,7 +96,7 @@ public class PluginConfiguration implements Serializable {
 
     /**
      * Gets the name of the configuration for identification purposes.
-     * 
+     *
      * @return Name of the configuration for identification purposes
      */
     public String getName() {
@@ -106,9 +105,8 @@ public class PluginConfiguration implements Serializable {
 
     /**
      * Sets the name of the configuration for identification purposes.
-     * 
-     * @param name
-     *          Name of the configuration for identification purposes
+     *
+     * @param name Name of the configuration for identification purposes
      */
     public void setName(String name) {
         this.name = name;
@@ -116,7 +114,7 @@ public class PluginConfiguration implements Serializable {
 
     /**
      * Gets the description of the configuration for documentation purposes.
-     * 
+     *
      * @return Description of the configuration for documentation purposes
      */
     public String getDescription() {
@@ -125,9 +123,9 @@ public class PluginConfiguration implements Serializable {
 
     /**
      * Sets the description of the configuration for documentation purposes.
-     * 
-     * @param description
-     *          Description of the configuration for documentation purposes
+     *
+     * @param description Description of the configuration for documentation
+     * purposes
      */
     public void setDescription(String description) {
         this.description = description;
@@ -135,9 +133,9 @@ public class PluginConfiguration implements Serializable {
 
     /**
      * Gets the name of the {@link PluginAction} class of the configuration.
-     * 
-     * @return Class name of the {@link PluginAction} that is subject of this 
-     *         configuration
+     *
+     * @return Class name of the {@link PluginAction} that is subject of this
+     * configuration
      */
     public String getActionClass() {
         return actionClass;
@@ -145,33 +143,31 @@ public class PluginConfiguration implements Serializable {
 
     /**
      * Sets the name of the {@link PluginAction} class of the configuration.
-     * 
-     * @param actionClass
-     *          Class name of the {@link PluginAction} that is subject of this 
-     *          configuration
+     *
+     * @param actionClass Class name of the {@link PluginAction} that is subject
+     * of this configuration
      */
     public void setActionClass(String actionClass) {
         this.actionClass = actionClass;
     }
 
     /**
-     * Gets a {@link List} of the properties making up the configuration of the 
+     * Gets a {@link List} of the properties making up the configuration of the
      * action.
-     * 
-     * @return {@link List} of the properties making up the configuration of the 
-     *         action 
+     *
+     * @return {@link List} of the properties making up the configuration of the
+     * action
      */
     public List<PluginConfigurationProperty> getProperties() {
         return properties;
     }
 
     /**
-     * Sets a {@link List} of the properties making up the configuration of the 
+     * Sets a {@link List} of the properties making up the configuration of the
      * action.
-     * 
-     * @param properties
-     *          {@link List} of the properties making up the configuration of the 
-     *          action 
+     *
+     * @param properties {@link List} of the properties making up the
+     * configuration of the action
      */
     public void setProperties(
             List<PluginConfigurationProperty> properties) {
@@ -182,13 +178,13 @@ public class PluginConfiguration implements Serializable {
      * Creates an instance of the action specified in {@link #getActionClass()}.
      *
      * @return Instance of the action
-     * @throws WorkflowActionException
-     *          If the action could not be instantiated
+     * @throws WorkflowActionException If the action could not be instantiated
      */
     public PluginAction getAction() throws WorkflowActionException {
         try {
             Class c = Class.forName(getActionClass());
             PluginAction action = (PluginAction) c.newInstance();
+            action.onInit();
             return action;
         } catch (ClassNotFoundException ex) {
             throw new WorkflowActionException("Could not find PluginAction: "
@@ -209,7 +205,7 @@ public class PluginConfiguration implements Serializable {
      * properties name as the key, and a {@link List} to contain the values for
      * the property. In many cases the {@link List} will only contain a single
      * value.
-     * 
+     *
      * @return {@link Map} containing the properties.
      */
     public Map<String, List<String>> getPropertiesMap() {
@@ -226,33 +222,34 @@ public class PluginConfiguration implements Serializable {
     }
 
     /**
-     * Gets a {@link List} of {@link PluginConfiguration}s that should be 
-     * executed after this {@link PluginConfiguration} has completed 
+     * Gets a {@link List} of {@link PluginConfiguration}s that should be
+     * executed after this {@link PluginConfiguration} has completed
      * successfully.
-     * 
-     * @return {@link List} of {@link PluginConfiguration}s that should be 
-     *         executed after this {@link PluginConfiguration} has completed 
-     *         successfully.
+     *
+     * @return {@link List} of {@link PluginConfiguration}s that should be
+     * executed after this {@link PluginConfiguration} has completed
+     * successfully.
      */
     public List<PluginConfiguration> getOnCompletePluginConfiguration() {
         return completeCfg;
     }
 
     /**
-     * Sets a {@link List} of {@link PluginConfiguration}s that should be 
-     * executed after this {@link PluginConfiguration} has completed 
+     * Sets a {@link List} of {@link PluginConfiguration}s that should be
+     * executed after this {@link PluginConfiguration} has completed
      * successfully.
-     * 
-     * @param completeCfg
-     *          {@link List} of {@link PluginConfiguration}s that should be 
-     *          executed after this {@link PluginConfiguration} has completed 
-     *          successfully.
+     *
+     * @param completeCfg {@link List} of {@link PluginConfiguration}s that
+     * should be executed after this {@link PluginConfiguration} has completed
+     * successfully.
      */
     public void setOnCompletePluginConfiguration(List<PluginConfiguration> completeCfg) {
         this.completeCfg = completeCfg;
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public int hashCode() {
         int hash = 0;
@@ -260,7 +257,9 @@ public class PluginConfiguration implements Serializable {
         return hash;
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof PluginConfiguration)) {
@@ -274,7 +273,9 @@ public class PluginConfiguration implements Serializable {
         return true;
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String toString() {
         return getClass().getName() + "[id=" + id + "]";
