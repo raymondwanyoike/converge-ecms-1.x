@@ -83,8 +83,11 @@
                             </div>
                         </h:commandLink>
 
-                        <a4j:commandLink styleClass="subheader_link" reRender="pgWikiPage,pgWikiPageTitle,frmWikiPageEdit" ajaxSingle="true" rendered="#{menuItem.wikiPage}">
-                            <rich:componentControl event="oncomplete" for="mpWikiPage" operation="show" />
+                        <a4j:commandLink styleClass="subheader_link" 
+                                         reRender="pgWikiPage,pgWikiPageTitle,frmWikiPageEdit" 
+                                         ajaxSingle="true" 
+                                         rendered="#{menuItem.wikiPage}"
+                                         oncomplete="#{rich:component('mpWikiPage')}.show();">
                             <f:setPropertyActionListener target="#{userSession.loadWikiPage}" value="#{menuItem.navigationAction}" />
                             <div class="subheader_tabs #{menuItem.style != '' ? menuItem.style : ''}" style="z-index: 2;">
                                 <div class="left"></div>
@@ -138,23 +141,29 @@
                 <rich:modalPanel id="mpWikiPage" width="800" height="600" zindex="2000" domElementAttachment="parent">
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <a4j:commandLink reRender="pgWikiPageEdit,pgWikiPageEditHeader" actionListener="#{userSession.onCreateWikiPage}" ajaxSingle="true" rendered="#{userSession.privileged['MANAGE_WIKI_PAGE']}" title="#{i18n.wiki_EDIT_BUTTON_TOOLTIP}">
+                            <a4j:commandLink reRender="pgWikiPageEdit,pgWikiPageEditHeader" 
+                                             actionListener="#{userSession.onCreateWikiPage}" 
+                                             ajaxSingle="true" 
+                                             rendered="#{userSession.privileged['MANAGE_WIKI_PAGE']}" 
+                                             title="#{i18n.wiki_EDIT_BUTTON_TOOLTIP}"
+                                             oncomplete="#{rich:component('mpWikiPageEdit')}.show();">
                                 <h:graphicImage value="#{i18n.resource_ICON_ADD}"  />
-                                <rich:componentControl for="mpWikiPageEdit" operation="show" event="oncomplete" />
                             </a4j:commandLink>
 
-                            <a4j:commandLink reRender="pgWikiPageEdit,pgWikiPageEditHeader" ajaxSingle="true" rendered="#{userSession.privileged['MANAGE_WIKI_PAGE']}">
+                            <a4j:commandLink reRender="pgWikiPageEdit,pgWikiPageEditHeader" 
+                                             ajaxSingle="true" 
+                                             rendered="#{userSession.privileged['MANAGE_WIKI_PAGE']}"
+                                             oncomplete="#{rich:component('mpWikiPageEdit')}.show();">
                                 <h:graphicImage value="#{i18n.resource_ICON_EDIT}" />
-                                <rich:componentControl for="mpWikiPageEdit" operation="show" event="oncomplete" />
                             </a4j:commandLink>
 
                             <h:commandLink actionListener="#{userSession.onDeleteWikiPage}" rendered="#{userSession.privileged['MANAGE_WIKI_PAGE']}" title="#{i18n.wiki_DELETE_BUTTON_TOOLTIP}" onclick="if (confirm('#{i18n.wiki_DELETE_CONFIRM}') != true){ return false; };">
                                 <h:graphicImage value="#{i18n.resource_ICON_DELETE}"  />
                             </h:commandLink>
 
-                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}">
-                                <rich:componentControl for="mpWikiPage" operation="hide" event="onclick"/>
-                            </h:graphicImage>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}"
+                                            onclick="#{rich:component('mpWikiPage')}.hide();" />
+
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgWikiPageTitle">
@@ -180,9 +189,8 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}">
-                                <rich:componentControl for="mpWikiPageEdit" operation="hide" event="onclick"/>
-                            </h:graphicImage>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}"
+                                            onclick="#{rich:component('mpWikiPageEdit')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgWikiPageEdit">

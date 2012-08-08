@@ -28,9 +28,10 @@
                             <rich:column styleClass="center columnIcon">
                                 <f:facet name="header"></f:facet>
 
-                                <a4j:commandLink ajaxSingle="true" reRender="frmAssignmentDetails">
+                                <a4j:commandLink ajaxSingle="true" 
+                                                 reRender="frmAssignmentDetails"
+                                                 oncomplete="#{rich:component('mpAssignmentDetails')}.show();">
                                     <f:setPropertyActionListener target="#{planning.selectedAssignment}" value="#{ni}" />
-                                    <rich:componentControl for="mpAssignmentDetails" operation="show" event="oncomplete" />
                                     <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" rendered="#{!ni.locked}" title="#{ni.currentState.name}" alt="#{ni.currentState.name}"  />
                                     <h:graphicImage value="#{i18n.resource_ICON_LOCK}" rendered="#{ni.locked}" title="This item was checked-out by #{ni.checkedOutBy.fullName} on #{ni.checkedOut.time}" />
                                 </a4j:commandLink>
@@ -41,9 +42,10 @@
                                 <f:facet name="header">
                                     <h:outputText value="#{i18n.Generic_TITLE}" />
                                 </f:facet>
-                                <a4j:commandLink ajaxSingle="true" reRender="frmAssignmentDetails">
+                                <a4j:commandLink ajaxSingle="true" 
+                                                 reRender="frmAssignmentDetails"
+                                                 oncomplete="#{rich:component('mpAssignmentDetails')}.show();">
                                     <f:setPropertyActionListener value="#{ni}" target="#{planning.selectedAssignment}" />
-                                    <rich:componentControl for="mpAssignmentDetails" operation="show" event="oncomplete" />
                                     <h:outputText value="#{ni.title}" />
                                 </a4j:commandLink>
                                 <rich:toolTip styleClass="tooltip" style="width: 400px;">
@@ -98,9 +100,10 @@
                                 <f:facet name="header"></f:facet>
                                 <a4j:commandLink id="lnkBriefing" ajaxSingle="true">
                                     <f:setPropertyActionListener value="#{ni}" target="#{planning.selectedAssignment}" />
-                                    <a4j:support event="oncomplete" reRender="frmAssignmentDetails" actionListener="#{planning.onShowBriefing}">
-                                        <rich:componentControl for="mpAssignmentDetails" operation="show" event="oncomplete" />
-                                    </a4j:support>
+                                    <a4j:support event="oncomplete" 
+                                                 reRender="frmAssignmentDetails" 
+                                                 actionListener="#{planning.onShowBriefing}"
+                                                 oncomplete="#{rich:component('mpAssignmentDetails')}.show();" />
 
                                     <h:graphicImage value="#{i18n.resource_ICON_BRIEFING_EXIST}" alt="#{i18n.Assignments_BRIEFING_EXIST}" title="#{i18n.Assignments_BRIEFING_EXIST}" rendered="#{ni.assignmentBriefing != ''}" />
                                     <h:graphicImage value="#{i18n.resource_ICON_BRIEFING_NOT_EXIST}" alt="#{i18n.Assignments_BRIEFING_NOT_EXIST}" title="#{i18n.Assignments_BRIEFING_NOT_EXIST}" rendered="#{ni.assignmentBriefing == ''}" />
@@ -109,9 +112,11 @@
 
                             <rich:column styleClass="center columnIcon">
                                 <f:facet name="header"></f:facet>
-                                <a4j:commandLink id="lnkUpdateAssignment" ajaxSingle="true" reRender="frmAssignmentDetails">
+                                <a4j:commandLink id="lnkUpdateAssignment" 
+                                                 ajaxSingle="true" 
+                                                 reRender="frmAssignmentDetails"
+                                                 oncomplete="#{rich:component('mpAssignmentDetails')}.show();">
                                     <f:setPropertyActionListener value="#{ni}" target="#{planning.selectedAssignment}" />
-                                    <rich:componentControl for="mpAssignmentDetails" operation="show" event="oncomplete" />
                                     <h:graphicImage value="#{i18n.resource_ICON_EDIT}" alt="#{i18n.Generic_UPDATE}" title="#{i18n.Generic_UPDATE}" />
                                 </a4j:commandLink>
                             </rich:column>

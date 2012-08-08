@@ -218,13 +218,23 @@
                         <h:panelGroup styleClass="dialogueButtons" id="grpAssignmentDetailsButtons">
                             <a4j:commandLink id="lnkSaveAssignment" styleClass="dialogButton #{!bean.editable ? 'disabledTextButton' : ''}" value="#{msgs.SAVE}" disabled="#{!bean.editable}" actionListener="#{bean.onSaveAssignment}" reRender="frmPage" oncomplete="if (#{converge:isAllValid()}){ #{rich:component('mpAssignmentDetails')}.hide(); return false; }" />
                             <a4j:commandLink id="lnkApplyAssignment" styleClass="dialogButton #{!bean.editable ? 'disabledTextButton' : ''}" value="#{msgs.APPLY}" disabled="#{!bean.editable}" actionListener="#{bean.onApplyAssignment}" reRender="frmPage, pgAssignmentDetails" />
-                            <a4j:commandLink id="lnkDeleteAssignment" rendered="#{bean.editMode}" disabled="#{!bean.editable}" onclick="if (confirm('#{msgs.planning_ASSIGNMENT_PROMPT_DELETE}') != true){ return false; };" actionListener="#{bean.onDeleteAssignment}" styleClass="dialogButton #{!bean.editable ? 'disabledTextButton' : ''}" ajaxSingle="true" value="#{msgs.DELETE}" reRender="frmPage" >
-                                <rich:componentControl for="mpAssignmentDetails" operation="hide" event="oncomplete" />
-                            </a4j:commandLink>
+                            <a4j:commandLink id="lnkDeleteAssignment" 
+                                             rendered="#{bean.editMode}" 
+                                             disabled="#{!bean.editable}" 
+                                             onclick="if (confirm('#{msgs.planning_ASSIGNMENT_PROMPT_DELETE}') != true){ return false; };" 
+                                             actionListener="#{bean.onDeleteAssignment}" 
+                                             styleClass="dialogButton #{!bean.editable ? 'disabledTextButton' : ''}" 
+                                             ajaxSingle="true" 
+                                             value="#{msgs.DELETE}" 
+                                             reRender="frmPage" 
+                                             oncomplete="#{rich:component('mpAssignmentDetails')}.hide();" />
                             <a4j:commandLink id="lnkRemoveEvent" title="#{msgs.planning_REMOVE_EVENT_TOOLTIP}" disabled="#{!bean.editable}" styleClass="dialogButton #{!bean.editable ? 'disabledTextButton' : ''}" value="#{msgs.planning_REMOVE_EVENT}" reRender="pgEvent, grpAssignmentDetailsButtons" rendered="#{enableRemoveEvent &amp;&amp; bean.assignment.event != null}" ajaxSingle="true" actionListener="#{bean.onRemoveEventFromAssignment}" />
-                            <a4j:commandLink id="lnkCloseAssignmentDetails" styleClass="dialogButton" value="#{msgs.CANCEL}" actionListener="#{bean.onCancelAssignment}" immediate="true">
-                                <rich:componentControl for="mpAssignmentDetails" operation="hide" event="oncomplete" />
-                            </a4j:commandLink>
+                            <a4j:commandLink id="lnkCloseAssignmentDetails" 
+                                             styleClass="dialogButton" 
+                                             value="#{msgs.CANCEL}" 
+                                             actionListener="#{bean.onCancelAssignment}" 
+                                             immediate="true"
+                                             oncomplete="#{rich:component('mpAssignmentDetails')}.hide();" />
                         </h:panelGroup>
                     </h:panelGrid>
 

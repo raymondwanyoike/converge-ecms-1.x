@@ -35,11 +35,8 @@
                                                value="#{i18n.Concepts_SAME_AS}"
                                                actionListener="#{concepts.onSelectMetaDataSameAs}"
                                                reRender="ajaxPage"
-                                               rendered="#{concepts.updatingConcept}">
-                                <rich:componentControl for="mpMetaDataSelect"
-                                                       operation="show"
-                                                       event="oncomplete"/>
-                            </a4j:commandButton>
+                                               rendered="#{concepts.updatingConcept}"
+                                               oncomplete="#{rich:component('mpMetaDataSelect')}.show();" />
 
                             <a4j:commandButton id="btnPickRelated"
                                                styleClass="button dynamicButton"
@@ -47,11 +44,8 @@
                                                value="#{i18n.Concepts_RELATED}"
                                                actionListener="#{concepts.onSelectMetaDataRelated}"
                                                reRender="ajaxPage"
-                                               rendered="#{concepts.updatingConcept}">
-                                <rich:componentControl for="mpMetaDataSelect"
-                                                       operation="show"
-                                                       event="oncomplete"/>
-                            </a4j:commandButton>
+                                               rendered="#{concepts.updatingConcept}"
+                                               oncomplete="#{rich:component('mpMetaDataSelect')}.show();" />
 
                             <a4j:commandButton id="btnPickBroader"
                                                styleClass="button dynamicButton"
@@ -59,11 +53,8 @@
                                                value="#{i18n.Concepts_BROADER}"
                                                actionListener="#{concepts.onSelectMetaDataBroader}"
                                                reRender="ajaxPage"
-                                               rendered="#{concepts.updatingConcept}">
-                                <rich:componentControl for="mpMetaDataSelect"
-                                                       operation="show"
-                                                       event="oncomplete"/>
-                            </a4j:commandButton>
+                                               rendered="#{concepts.updatingConcept}"
+                                               oncomplete="#{rich:component('mpMetaDataSelect')}.show();" />
 
                             <a4j:commandButton id="btnPickNarrower"
                                                styleClass="button dynamicButton"
@@ -71,11 +62,8 @@
                                                value="#{i18n.Concepts_NARROWER}"
                                                actionListener="#{concepts.onSelectMetaDataNarrower}"
                                                reRender="ajaxPage"
-                                               rendered="#{concepts.updatingConcept}">
-                                <rich:componentControl for="mpMetaDataSelect"
-                                                       operation="show"
-                                                       event="oncomplete"/>
-                            </a4j:commandButton>
+                                               rendered="#{concepts.updatingConcept}"
+                                               oncomplete="#{rich:component('mpMetaDataSelect')}.show();" />
 
                             <a4j:commandButton id="btnDeleteConcept"
                                                styleClass="button dynamicButton"
@@ -88,7 +76,6 @@
                                                rendered="#{concepts.updatingConcept}">
                                 <a4j:support event="oncomplete" reRender="ajaxPage" />
                             </a4j:commandButton>
-
 
                             <a4j:commandButton id="btnSaveConcept"
                                                style="margin-left: 5px;"
@@ -479,11 +466,8 @@
                         <h:panelGroup>
                             <h:graphicImage id="imgCloseDialogue"
                                             value="#{i18n.resource_ICON_DIALOGUE_CLOSE}"
-                                            style="link" />
-                            <rich:componentControl for="mpImport"
-                                                   attachTo="imgCloseDialogue"
-                                                   operation="hide"
-                                                   event="onclick"/>
+                                            styleClass="link"
+                                            onclick="#{rich:component('mpImport')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
 
@@ -514,10 +498,8 @@
                                              actionListener="#{concepts.onImport}"
                                              styleClass="dialogButton"
                                              value="#{i18n.Concepts_SUBJECTS_IMPORT}"
-                                             reRender="ajaxPage">
-                                <rich:componentControl for="mpImport"
-                                                       operation="hide"
-                                                       event="oncomplete" />
+                                             reRender="ajaxPage"
+                                             oncomplete="#{rich:component('mpImport')}.hide();">
                             </a4j:commandLink>
 
 
@@ -541,11 +523,8 @@
                         <h:panelGroup>
                             <h:graphicImage id="imgCloseConceptDetails"
                                             value="#{i18n.resource_ICON_DIALOGUE_CLOSE}"
-                                            style="link" />
-                            <rich:componentControl for="mpConceptDetails"
-                                                   attachTo="imgCloseConceptDetails"
-                                                   operation="hide"
-                                                   event="onclick"/>
+                                            style="link"
+                                            onclick="#{rich:component('mpConceptDetails')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid id="pgMetaDataSelect" columnClasses="tabSheet" style="padding: 10px; width: 100%">
@@ -592,11 +571,8 @@
                         <h:panelGroup>
                             <h:graphicImage id="imgCloseMetaDataSelect"
                                             value="#{i18n.resource_ICON_DIALOGUE_CLOSE}"
-                                            style="link" />
-                            <rich:componentControl for="mpMetaDataSelect"
-                                                   attachTo="imgCloseMetaDataSelect"
-                                                   operation="hide"
-                                                   event="onclick"/>
+                                            style="link" 
+                                            onclick="#{rich:component('mpMetaDataSelect')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
 

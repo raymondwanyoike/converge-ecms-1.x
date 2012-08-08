@@ -18,9 +18,11 @@
         </rich:dataTable>
         <c:if test="#{value.currentActor &amp;&amp; !value.readOnly}">
             <div style="width: 100%; text-align: center;">
-                <a4j:commandLink ajaxSingle="true" actionListener="#{value.onActorSelect}" reRender="mpActorSelect">
+                <a4j:commandLink ajaxSingle="true" 
+                                 actionListener="#{value.onActorSelect}" 
+                                 reRender="mpActorSelect"
+                                 oncomplete="#{rich:component('mpActorSelect')}.show();">
                     <h:outputText value="#{msgs.newsitem_ADD_REMOVE}" />
-                    <rich:componentControl for="mpActorSelect" operation="show" event="oncomplete" />
                 </a4j:commandLink>
             </div>
         </c:if>
@@ -36,8 +38,10 @@
             </f:facet>
             <f:facet name="controls">
                 <h:panelGroup>
-                    <h:graphicImage id="imgCloseActorSelect" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                    <rich:componentControl for="mpActorSelect" attachTo="imgCloseActorSelect" operation="hide" event="onclick"/>
+                    <h:graphicImage id="imgCloseActorSelect" 
+                                    value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                    styleClass="link"
+                                    onclick="#{rich:component('mpActorSelect')}.hide();" />
                 </h:panelGroup>
             </f:facet>
 

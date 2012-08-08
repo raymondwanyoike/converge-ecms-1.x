@@ -68,10 +68,10 @@
                                 <f:facet name="header">
                                     <h:outputText value="#{i18n.ReportActivity_REPORT_NAME}" />
                                 </f:facet>
-                                <a4j:commandLink ajaxSingle="true" reRender="frmNewsItems">
+                                <a4j:commandLink ajaxSingle="true" reRender="frmNewsItems"
+                                                 oncomplete="#{rich:component('mpNewsItem')}.show();">
                                     <h:outputText value="#{report.user.fullName} (#{report.user.username})" />
                                     <f:setPropertyActionListener target="#{reportActivity.selectedUserActivity}" value="#{report}" />
-                                    <rich:componentControl for="mpNewsItems" operation="show" event="oncomplete" />
                                 </a4j:commandLink>
                             </rich:column>
 

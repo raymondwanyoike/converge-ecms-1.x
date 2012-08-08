@@ -70,8 +70,10 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseLanguageDetails" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                            <rich:componentControl for="mpLanguageDetails" attachTo="imgCloseLanguageDetails" operation="hide" event="onclick"/>
+                            <h:graphicImage id="imgCloseLanguageDetails" 
+                                            value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                            styleClass="link"
+                                            onclick="#{rich:component('mpLanguageDetails')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
 
@@ -92,9 +94,14 @@
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveLanguageDetails" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Languages.onSave}" reRender="pgLanguageDetails,dtLanguages" oncomplete="if (#{converge:isAllValid()}) { Richfaces.hideModalPanel('mpLanguageDetails'); return false;}" />
                             <a4j:commandLink id="lnkApplyLanguageDetails" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" reRender="pgLanguageDetails,dtLanguages" actionListener="#{administrator_Languages.onSave}" />
-                            <a4j:commandLink id="lnkDeleteLanguageDetails" rendered="#{administrator_Languages.editMode}" onclick="if (confirm('#{i18n.Language_DELETE_PROMPT}') != true){ return false; };" actionListener="#{administrator_Languages.onDelete}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="frmLanguageDetails,dtLanguages">
-                                <rich:componentControl for="mpLanguageDetails" operation="hide" event="oncomplete" />
-                            </a4j:commandLink>
+                            <a4j:commandLink id="lnkDeleteLanguageDetails" 
+                                             rendered="#{administrator_Languages.editMode}" 
+                                             onclick="if (confirm('#{i18n.Language_DELETE_PROMPT}') != true){ return false; };" 
+                                             actionListener="#{administrator_Languages.onDelete}" 
+                                             styleClass="dialogButton" 
+                                             value="#{i18n.Generic_DELETE}" 
+                                             reRender="frmLanguageDetails,dtLanguages"
+                                             oncomplete="#{rich:component('mpLanguageDetails')}.hide();" />
                             <h:commandLink id="lnkCancelLanguageDetails" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpLanguageDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>

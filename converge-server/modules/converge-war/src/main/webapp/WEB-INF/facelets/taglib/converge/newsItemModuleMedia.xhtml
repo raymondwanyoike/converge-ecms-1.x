@@ -164,9 +164,12 @@
                                         </rich:column>
 
                                         <rich:column>
-                                            <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.NewsItem_MEDIA_ITEM_SEARCH_RESULT_SELECT}" reRender="pgMediaItemSelected" ajaxSingle="true">
+                                            <a4j:commandButton styleClass="button dynamicButton" 
+                                                               value="#{i18n.NewsItem_MEDIA_ITEM_SEARCH_RESULT_SELECT}" 
+                                                               reRender="pgMediaItemSelected" 
+                                                               ajaxSingle="true"
+                                                               oncomplete="#{rich:component('mpMediaItemSelected')}.show();">
                                                 <f:setPropertyActionListener target="#{newsItem.selectedMediaItemId}" value="#{item.id}" />
-                                                <rich:componentControl for="mpMediaItemSelected" operation="show" event="oncomplete" />
                                             </a4j:commandButton>
                                         </rich:column>
 
@@ -233,9 +236,11 @@
                                     </a4j:outputPanel>
                                 </h:panelGrid>
 
-                                <a4j:jsFunction name="onMediaItemUploadComplete" reRender="pgMediaItemSelected,pgMediaItemUpload" ajaxSingle="true">
+                                <a4j:jsFunction name="onMediaItemUploadComplete" 
+                                                reRender="pgMediaItemSelected,pgMediaItemUpload" 
+                                                ajaxSingle="true"
+                                                oncomplete="#{rich:component('mpMediaItemSelected')}.show();">
                                     <a4j:actionparam name="response" assignTo="#{newsItem.uploadedMediaItem}"/>
-                                    <rich:componentControl for="mpMediaItemSelected" operation="show" event="oncomplete" />
                                 </a4j:jsFunction>
                             </h:panelGrid>
                         </rich:tab>
@@ -257,8 +262,10 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseMediaItemSelected" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" styleClass="link" />
-                            <rich:componentControl for="mpMediaItemSelected" attachTo="imgCloseMediaItemSelected" operation="hide" event="onclick" />
+                            <h:graphicImage id="imgCloseMediaItemSelected" 
+                                            value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                            styleClass="link"
+                                            onclick="#{rich:component('mpMediaItemSelected')}.hide();" />
                         </h:panelGroup>
 
                     </f:facet>

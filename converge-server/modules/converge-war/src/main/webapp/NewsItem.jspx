@@ -81,9 +81,9 @@
                         </f:facet>
                         <f:facet name="controls">
                             <h:panelGroup>
-                                <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" styleClass="link">
-                                    <rich:componentControl for="mpPlacement" operation="hide" event="onclick" />
-                                </h:graphicImage>
+                                <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                                styleClass="link"
+                                                onclick="#{rich:component('mpPlacement')}.hide();" />
                             </h:panelGroup>
                         </f:facet>
                         <h:panelGrid style="width: 450px;" id="pgPlacement" rendered="#{newsItem.selectedNewsItemPlacement != null}">

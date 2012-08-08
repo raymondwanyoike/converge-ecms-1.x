@@ -15,9 +15,10 @@
             </rich:column>
 
             <rich:column styleClass="center columnIcon">
-                <a4j:commandLink ajaxSingle="true" reRender="mpShowWorkflowStateTransition">
+                <a4j:commandLink ajaxSingle="true" 
+                                 reRender="mpShowWorkflowStateTransition"
+                                 oncomplete="#{rich:component('mpShowWorkflowStateTransition')}.show();">
                     <f:setPropertyActionListener value="#{history}" target="#{newsItem.selectedWorkflowStateTransition}" />
-                    <rich:componentControl event="oncomplete" for="mpShowWorkflowStateTransition" operation="show" />
                     <h:graphicImage title="#{msgs.ARTICLE_VIEW_PREVIOUS_VERSION_TOOLTIP}" alt="#{msgs.ARTICLE_VIEW_PREVIOUS_VERSION_TOOLTIP}" value="/images/template/icons/examine.gif" />
                 </a4j:commandLink>
             </rich:column>
@@ -31,8 +32,10 @@
             </f:facet>
             <f:facet name="controls">
                 <h:panelGroup>
-                    <h:graphicImage id="imgCloseShowWorkflowTransitionState" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                    <rich:componentControl for="mpShowWorkflowStateTransition" attachTo="imgCloseShowWorkflowTransitionState" operation="hide" event="onclick" />
+                    <h:graphicImage id="imgCloseShowWorkflowTransitionState" 
+                                    value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                    styleClass="link"
+                                    onclick="#{rich:component('mpShowWorkflowStateTransition')}.hide();"/>
                 </h:panelGroup>
             </f:facet>
 

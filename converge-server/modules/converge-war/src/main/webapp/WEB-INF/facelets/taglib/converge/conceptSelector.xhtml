@@ -10,8 +10,9 @@
                 </f:facet>
                 <f:facet name="controls">
                     <h:panelGroup>
-                        <h:graphicImage id="imgCloseMetaDataSelect" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                        <rich:componentControl for="mpConceptSelector" attachTo="imgCloseMetaDataSelect" operation="hide" event="onclick"/>
+                        <h:graphicImage id="imgCloseMetaDataSelect" 
+                                        value="#{i18n.resource_ICON_DIALOGUE_CLOSE}"
+                                        onclick="#{rich:component('mpConceptSelector')}.hide();"/>
                     </h:panelGroup>
                 </f:facet>
 

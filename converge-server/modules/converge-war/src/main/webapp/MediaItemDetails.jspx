@@ -134,8 +134,10 @@
                         </f:facet>
                         <f:facet name="controls">
                             <h:panelGroup>
-                                <h:graphicImage id="imgCloseActorSelect" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                                <rich:componentControl for="mpActorSelect" attachTo="imgCloseActorSelect" operation="hide" event="onclick"/>
+                                <h:graphicImage id="imgCloseActorSelect" 
+                                                value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                                style="link"
+                                                onclick="#{rich:component('mpActorSelect')}.hide();"/>
                             </h:panelGroup>
                         </f:facet>
 
@@ -249,13 +251,17 @@
                 <v:message />
             </a4j:outputPanel>
 
-            <a4j:jsFunction name="onNewRenditionUploadComplete" actionListener="#{mediaItemDetails.onReload}" ajaxSingle="true" reRender="dtRenditions, modulePreview, dtConcepts">
-                <rich:componentControl for="mpNewRendition" operation="hide" event="oncomplete" />
-            </a4j:jsFunction>
+            <a4j:jsFunction name="onNewRenditionUploadComplete" 
+                            actionListener="#{mediaItemDetails.onReload}" 
+                            ajaxSingle="true" 
+                            reRender="dtRenditions, modulePreview, dtConcepts"
+                            oncomplete="#{rich:component('mpNewRendition')}.hide();" />
 
-            <a4j:jsFunction name="onUpdateRenditionUploadComplete" actionListener="#{mediaItemDetails.onReload}" ajaxSingle="true" reRender="dtRenditions, dtConcepts, modulePreview">
-                <rich:componentControl for="mpRenditionDetails" operation="hide" event="oncomplete" />
-            </a4j:jsFunction>
+            <a4j:jsFunction name="onUpdateRenditionUploadComplete" 
+                            actionListener="#{mediaItemDetails.onReload}" 
+                            ajaxSingle="true" 
+                            reRender="dtRenditions, dtConcepts, modulePreview"
+                            oncomplete="#{rich:component('mpRenditionDetails')}.hide();" />
 
             <c:if test="#{!mediaItemDetails.authorized}">
                 <h:panelGrid>
@@ -537,8 +543,10 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseNewConcept" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                            <rich:componentControl for="mpNewConcept" attachTo="imgCloseNewConcept" operation="hide" event="onclick"/>
+                            <h:graphicImage id="imgCloseNewConcept" 
+                                            value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                            style="link"
+                                            onclick="#{rich:component('mpNewConcept')}.hide();"/>
                         </h:panelGroup>
                     </f:facet>
 
@@ -583,8 +591,10 @@
                         </f:facet>
                         <f:facet name="controls">
                             <h:panelGroup>
-                                <h:graphicImage id="imgCloseRenditionDetails" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                                <rich:componentControl for="mpRenditionDetails" attachTo="imgCloseRenditionDetails" operation="hide" event="onclick"/>
+                                <h:graphicImage id="imgCloseRenditionDetails" 
+                                                value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                                style="link"
+                                                onclick="#{rich:component('mpRenditionDetails')}.hide();" />
                             </h:panelGroup>
                         </f:facet>
 
@@ -770,8 +780,10 @@
                         </f:facet>
                         <f:facet name="controls">
                             <h:panelGroup>
-                                <h:graphicImage id="imgCloseNewRendition" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                                <rich:componentControl for="mpNewRendition" attachTo="imgCloseNewRendition" operation="hide" event="onclick"/>
+                                <h:graphicImage id="imgCloseNewRendition" 
+                                                value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                                style="link" 
+                                                onclick="#{rich:component('mpNewRendition')}.hide();"/>
                             </h:panelGroup>
                         </f:facet>
 

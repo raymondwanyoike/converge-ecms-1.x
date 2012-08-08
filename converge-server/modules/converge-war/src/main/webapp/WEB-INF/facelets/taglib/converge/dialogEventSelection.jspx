@@ -89,9 +89,10 @@
                                     <rich:column styleClass="columnIcon center">
                                         <a4j:commandLink id="lnkUseEvent">
                                             <f:setPropertyActionListener value="#{event}" target="#{bean.event}" />
-                                            <a4j:support event="oncomplete" actionListener="#{bean.onSelectEvent}" reRender="#{reRenderOnSelect}">
-                                                <rich:componentControl for="mpEventSelection" operation="hide" event="oncomplete" />
-                                            </a4j:support>
+                                            <a4j:support event="oncomplete" 
+                                                         actionListener="#{bean.onSelectEvent}" 
+                                                         reRender="#{reRenderOnSelect}"
+                                                         oncomplete="#{rich:component('mpEventSelection')}.hide();" />
                                             <h:graphicImage alt="#{msgs.planning_SELECT}" title="#{msgs.planning_SELECT}" value="#{res.ASSIGNMENT_ICON}"/>
                                         </a4j:commandLink>
                                     </rich:column>
