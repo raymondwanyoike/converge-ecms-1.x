@@ -43,7 +43,6 @@ import javax.persistence.*;
     @NamedQuery(name = NewsItem.FIND_BY_OUTLET, query = "SELECT n FROM NewsItem AS n WHERE n.outlet = :outlet ORDER BY n.created DESC"),
     @NamedQuery(name = NewsItem.FIND_CURRENT_ASSIGNMENTS, query = "SELECT DISTINCT n FROM NewsItem n JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
     @NamedQuery(name = NewsItem.VIEW_CURRENT_ASSIGNMENTS, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.CurrentAssignment(n.id, n.title, n.targetWordCount, n.deadline, n.assignmentBriefing, n.checkedOut, cob.fullName) FROM NewsItem n LEFT JOIN n.checkedOutBy cob JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
-    @NamedQuery(name = NewsItem.VIEW_INBOX, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing, n.thumbnailLink) FROM NewsItem n LEFT JOIN n.checkedOutBy cob JOIN n.actors a WHERE n.currentState.showInInbox = true AND n.currentState.workflow.endState <> n.currentState AND n.currentState.workflow.trashState <> n.currentState AND (( a.user = :user AND a.role = n.currentState.actorRole) OR (n.currentState.permission = :permission AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.created DESC"),
     @NamedQuery(name = NewsItem.VIEW_OUTLET_BOX, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing, n.thumbnailLink) FROM NewsItem n, ContentItemActor a JOIN a.contentItem ci LEFT JOIN n.checkedOutBy cob WHERE n.id=ci.id AND (( a.user = :user) OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF n.currentState.actorRole.userAccounts)) AND n.currentState.workflow.endState <> n.currentState AND n.outlet = :outlet ORDER BY n.updated DESC"),
     @NamedQuery(name = NewsItem.VIEW_OUTLET_BOX_STATE, query = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.slugline, n.targetWordCount, n.precalculatedWordCount, n.precalculatedCurrentActor, n.currentState.name, n.outlet.title, n.deadline,n.updated,n.checkedOut, cob.fullName, n.assignmentBriefing, n.thumbnailLink) FROM NewsItem AS n JOIN n.actors AS a LEFT JOIN n.checkedOutBy cob WHERE n.outlet = :outlet AND n.currentState = :state AND (( a.user = :user) OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :user MEMBER OF n.currentState.actorRole.userAccounts)) ORDER BY n.updated DESC"),
     @NamedQuery(name = NewsItem.FIND_CHECKED_IN_NEWS_ITEM, query = "SELECT n FROM NewsItem AS n WHERE n.id = :id AND n.checkedOut IS NULL"),
@@ -59,152 +58,159 @@ import javax.persistence.*;
     @NamedQuery(name = NewsItem.FIND_BY_USER_USER_ROLE_AND_DATE, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.user = :user AND a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.state = :state) ORDER BY ni.updated DESC"),
     @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (h.user = :user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC"),
     @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_PASSIVE_USER, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.user = :user AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC"),
-    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER_ROLE, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC")
+    @NamedQuery(name = NewsItem.FIND_SUBMITTED_BY_USER_ROLE, query = "SELECT DISTINCT ni FROM NewsItem AS ni JOIN ni.actors AS a JOIN ni.history AS h WHERE (a.role = :userRole AND h.timestamp >= :startDate AND h.timestamp <= :endDate AND h.submitted = true) ORDER BY ni.updated DESC"),
+    @NamedQuery(name = NewsItem.COUNT_BY_USER_AND_OUTLET_AND_WORKFLOW_STATE, query = "SELECT COUNT(DISTINCT ci) FROM ContentItem AS ci, NewsItem AS n LEFT JOIN n.actors AS a WHERE n.id=ci.id AND n.outlet = :" + NewsItem.PARAM_OUTLET + " AND n.currentState = :" + NewsItem.PARAM_WORKFLOW_STATE + " AND (( a.user = :" + NewsItem.PARAM_USER + ") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :" + NewsItem.PARAM_USER + " MEMBER OF n.currentState.actorRole.userAccounts))"),
+    @NamedQuery(name = NewsItem.COUNT_BY_USER_AND_OUTLET, query = "SELECT COUNT(DISTINCT ci) FROM ContentItem AS ci, NewsItem AS n LEFT JOIN n.actors AS a WHERE n.id=ci.id AND n.outlet = :" + NewsItem.PARAM_OUTLET + " AND (( a.user = :" + NewsItem.PARAM_USER + ") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :" + NewsItem.PARAM_USER + " MEMBER OF n.currentState.actorRole.userAccounts))"),
+    @NamedQuery(name = NewsItem.COUNT_INBOX, query = "SELECT COUNT(DISTINCT ci) FROM ContentItem ci LEFT JOIN ci.actors a WHERE ci.currentState.showInInbox = true AND ci.currentState.workflow.endState <> ci.currentState AND ci.currentState.workflow.trashState <> ci.currentState AND (( a.user = :" + NewsItem.PARAM_USER + " AND a.role = ci.currentState.actorRole) OR (ci.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :" + NewsItem.PARAM_USER + " MEMBER OF ci.currentState.actorRole.userAccounts))"),
 })
 public class NewsItem extends ContentItem {
 
     private static final long serialVersionUID = 3L;
-
     public static final String VIEW_CURRENT_ASSIGNMENTS = "NewsItem.view.currentAssignments";
-
-    public static final String VIEW_INBOX = "NewsItem.view.inbox";
-
     public static final String VIEW_OUTLET_BOX = "NewsItem.view.outlet.inbox";
-
     public static final String VIEW_OUTLET_BOX_STATE = "NewsItem.view.outlet.inbox.state";
-
     public static final String FIND_CURRENT_ASSIGNMENTS = "NewsItem.findCurrentAssignments";
-
     public static final String FIND_BY_OUTLET = "NewsItem.findByOutlet";
-
     public static final String FIND_ASSIGNMENTS_BY_OUTLET = "NewsItem.findAssignmentsByOutlet";
-
     public static final String FIND_BY_OUTLET_AND_STATE = "NewsItem.findByOutletAndState";
-
     public static final String FIND_BY_OUTLET_AND_STATE_NAME = "NewsItem.findByOutletAndStateName";
-
     public static final String FIND_BY_OUTLET_STATE_AND_USER = "NewsItem.findByOutletStateAndUser";
-
-    /** Query for finding all the versions of a given news item arranged by the date they were updated. */
+    /**
+     * Query for finding all the versions of a given news item arranged by the
+     * date they were updated.
+     */
     public static final String FIND_VERSIONS = "NewsItem.findVersions";
-
-    /** Query for finding all the news item in the trash. */
+    /**
+     * Query for finding all the news item in the trash.
+     */
     public static final String FIND_TRASH = "NewsItem.findTrash";
-
-    /** Query for finding a news item that is checked-in by its unique identifier. */
+    /**
+     * Query for finding a news item that is checked-in by its unique
+     * identifier.
+     */
     public static final String FIND_CHECKED_IN_NEWS_ITEM = "NewsItem.findCheckedInNewsItem";
-
     public static final String FIND_BY_USER_USER_ROLE_AND_DATE = "NewsItem.findByUserUserRoleAndDate";
-
     public static final String FIND_SUBMITTED_BY_USER = "NewsItem.findBySubmittedUser";
-
     public static final String FIND_SUBMITTED_BY_PASSIVE_USER = "NewsItem.findBySubmittedPassveUser";
-
     public static final String FIND_SUBMITTED_BY_USER_ROLE = "NewsItem.findBySubmittedAndUserRole";
-
-    /** Query for revoking the lock of a news item. */
+    /**
+     * Query for revoking the lock of a news item.
+     */
     public static final String REVOKE_LOCK = "NewsItem.revokeLock";
-
-    /** Query for revoking the locks of all news item checked out by a given user. */
+    /**
+     * Query for revoking the locks of all news item checked out by a given
+     * user.
+     */
     public static final String REVOKE_LOCKS = "NewsItem.revokeLocks";
-
-    /** Query for revoking the locks of all news item checked out. */
+    /**
+     * Query for revoking the locks of all news item checked out.
+     */
     public static final String REVOKE_ALL_LOCKS = "NewsItem.revokeAllLocks";
-
+    /**
+     * Query for counting the results from finding items in a given catalogue
+     * with a given state for a given user.
+     */
+    public static final String COUNT_BY_USER_AND_OUTLET_AND_WORKFLOW_STATE = "NewsItem.countByUserAndOutletAndWorkflowState";
+    /**
+     * Query for counting the results from finding items in a given catalogue
+     * for a given user.
+     */
+    public static final String COUNT_BY_USER_AND_OUTLET = "NewsItem.countByUserAndOutlet";
+    /**
+     * Query for counting the items in the inbox.
+     */
+    public static final String COUNT_INBOX = "NewsItem.countInbox";
+    /**
+     * Query parameter used to specify the user.
+     */
+    public static final String PARAM_USER = "user";
+    /**
+     * Query parameter used to specify the catalogue.
+     */
+    public static final String PARAM_OUTLET = "outlet";
+    /**
+     * Query parameter used to specify the workflow state.
+     */
+    public static final String PARAM_WORKFLOW_STATE = "workflowState";
     @Column(name = "slugline")
     private String slugline = "";
 
-    @Column(name = "title")
-    private String title = "";
-
     @Column(name = "by_line")
     private String byLine = "";
-
-    @Column(name = "brief") @Lob
+    @Column(name = "brief")
+    @Lob
     private String brief = "";
-
-    @Column(name = "story") @Lob
+    @Column(name = "story")
+    @Lob
     private String story = "";
-
     @ManyToOne
     @JoinColumn(name = "language_id")
     private Language language;
-
     @ManyToOne
     @JoinColumn(name = "assignment_id")
     private Assignment assignment;
-
     @Column(name = "assigned")
     private boolean assigned = false;
-
     @ManyToOne
     @JoinColumn(name = "assigned_by")
     private UserAccount assignedBy;
-
-    @Column(name = "assignment_briefing") @Lob
+    @Column(name = "assignment_briefing")
+    @Lob
     private String assignmentBriefing = "";
-
     @Column(name = "undisclosed")
     private boolean undisclosedAuthor = false;
-
     @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "version_news_item_id")
     private NewsItem versionOf;
-
     @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "outlet_id")
     private Outlet outlet;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "news_item_related",
-    joinColumns = {@JoinColumn(referencedColumnName = "id", name = "news_item_id", nullable = false)},
-    inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "related_news_item_id", nullable = false)})
+    joinColumns = {
+        @JoinColumn(referencedColumnName = "id", name = "news_item_id", nullable = false)},
+    inverseJoinColumns = {
+        @JoinColumn(referencedColumnName = "id", name = "related_news_item_id", nullable = false)})
     private List<NewsItem> related = new ArrayList<NewsItem>();
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "news_item_concept",
-    joinColumns = {@JoinColumn(referencedColumnName = "id", name =
+    joinColumns = {
+        @JoinColumn(referencedColumnName = "id", name =
         "news_item_id", nullable = false)},
-    inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name =
+    inverseJoinColumns = {
+        @JoinColumn(referencedColumnName = "id", name =
         "concept_id", nullable = false)})
     private List<Concept> concepts = new ArrayList<Concept>();
-
     @Column(name = "deadline")
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar deadline = null;
-
     @ManyToOne(optional = true)
     @JoinColumn(name = "event_id")
     private Event event;
-
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "checked_out")
     private Calendar checkedOut;
-
     @ManyToOne
     @JoinColumn(name = "checked_out_by")
     private UserAccount checkedOutBy;
-
     @Column(name = "target_word_count")
     private Integer targetWordCount = 0;
-
     @Column(name = "precalc_word_count")
     private Long precalculatedWordCount = 0L;
-
     @javax.persistence.Version
     @Column(name = "opt_lock")
     private int versionIdentifier;
-
     @OneToMany(mappedBy = "newsItem", fetch = FetchType.LAZY)
     private List<NewsItemMediaAttachment> mediaAttachments =
             new ArrayList<NewsItemMediaAttachment>();
-
     @OneToMany(mappedBy = "newsItem", fetch = FetchType.EAGER, cascade =
     CascadeType.ALL)
     private List<NewsItemPlacement> placements =
             new ArrayList<NewsItemPlacement>();
-
-    /** Contains properties of the {@link NewsItem} that may be system or user-related. */
+    /**
+     * Contains properties of the {@link NewsItem} that may be system or
+     * user-related.
+     */
     @OneToMany(mappedBy = "newsItem")
     private List<NewsItemProperty> properties =
             new ArrayList<NewsItemProperty>();
@@ -217,7 +223,7 @@ public class NewsItem extends ContentItem {
 
     /**
      * Gets the slugline of the story.
-     * 
+     *
      * @return Slugline of the story
      */
     public String getSlugline() {
@@ -226,9 +232,8 @@ public class NewsItem extends ContentItem {
 
     /**
      * Sets the slugline of the story.
-     * 
-     * @param slugline
-     *          Slugline of the story
+     *
+     * @param slugline Slugline of the story
      */
     public void setSlugline(String slugline) {
         this.slugline = slugline;
@@ -271,24 +276,6 @@ public class NewsItem extends ContentItem {
     }
 
     /**
-     * Gets the title of the {@link NewsItem}.
-     *
-     * @return Title of the {@link NewsItem}.
-     */
-    public String getTitle() {
-        return title;
-    }
-
-    /**
-     * Sets the title of the {@link NewsItem}.
-     *
-     * @param title Title of the {@link NewsItem}.
-     */
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    /**
      * Gets the "by-line" of the story.
      *
      * @return "by-line" of the story
@@ -300,8 +287,7 @@ public class NewsItem extends ContentItem {
     /**
      * Sets the "by-line" of the story.
      *
-     * @param byLine
-     *          "by-line" of the story
+     * @param byLine "by-line" of the story
      */
     public void setByLine(String byLine) {
         this.byLine = byLine;
@@ -310,7 +296,7 @@ public class NewsItem extends ContentItem {
     /**
      * Gets the {@link List} of related {@link NewsItem}s.
      *
-     * @return  {@link List} of related {@link NewsItem}s.
+     * @return {@link List} of related {@link NewsItem}s.
      */
     public List<NewsItem> getRelated() {
         return related;
@@ -327,7 +313,8 @@ public class NewsItem extends ContentItem {
 
     /**
      * Gets the user who assigned the news item. If the news item is
-     * self-assigned, <code>null</code> is returned.
+     * self-assigned,
+     * <code>null</code> is returned.
      *
      * @return User who assigned the news item
      */
@@ -337,10 +324,10 @@ public class NewsItem extends ContentItem {
 
     /**
      * Sets the user who assigned the news item. If the news item is
-     * self-assigned, this value should be <code>null</code>.
+     * self-assigned, this value should be
+     * <code>null</code>.
      *
-     * @param assignedBy
-     *          User who assigned the news item
+     * @param assignedBy User who assigned the news item
      */
     public void setAssignedBy(UserAccount assignedBy) {
         this.assignedBy = assignedBy;
@@ -350,7 +337,7 @@ public class NewsItem extends ContentItem {
      * Gets the date and time when the {@link NewsItem} was checked out.
      *
      * @return Date and time when the {@link NewsItem} was checked out. If the
-     *         {@link NewsItem} is not checked out, {@code null} is returned.
+     * {@link NewsItem} is not checked out, {@code null} is returned.
      */
     public Calendar getCheckedOut() {
         return checkedOut;
@@ -359,9 +346,9 @@ public class NewsItem extends ContentItem {
     /**
      * Sets the check-out date and time of the {@link NewsItem}.
      *
-     * @param checkedOut
-     *          Date and time when the {@link NewsItem} was checked out. If the
-     *          {@link NewsItem} is not checked out, {@code null} should be set
+     * @param checkedOut Date and time when the {@link NewsItem} was checked
+     * out. If the {@link NewsItem} is not checked out, {@code null} should be
+     * set
      */
     public void setCheckedOut(Calendar checkedOut) {
         this.checkedOut = checkedOut;
@@ -387,8 +374,7 @@ public class NewsItem extends ContentItem {
     /**
      * Sets the {@link Language} of the {@link NewsItem}.
      *
-     * @param language
-     *          {@link Language} of the {@link NewsItem}
+     * @param language {@link Language} of the {@link NewsItem}
      */
     public void setLanguage(Language language) {
         this.language = language;
@@ -398,7 +384,7 @@ public class NewsItem extends ContentItem {
      * Determines if the {@link NewsItem} is checked out.
      *
      * @return {@code true} if the {@link NewsItem} is checked out, otherwise
-     *         {@code false}
+     * {@code false}
      */
     public boolean isLocked() {
         if (getCheckedOut() == null) {
@@ -415,7 +401,6 @@ public class NewsItem extends ContentItem {
     public void setOutlet(Outlet outlet) {
         this.outlet = outlet;
     }
-
 
     public boolean isUndisclosedAuthor() {
         return undisclosedAuthor;
@@ -437,15 +422,15 @@ public class NewsItem extends ContentItem {
     /**
      * Sets the {@link NewsItem} that this {@link NewsItem} is a version of.
      *
-     * @param versionOf
-     *          {@link NewsItem} that this is a version of.
+     * @param versionOf {@link NewsItem} that this is a version of.
      */
     public void setVersionOf(NewsItem versionOf) {
         this.versionOf = versionOf;
     }
 
     /**
-     * Gets the {@link List} of {@link Concept}s related to the {@link NewsItem}.
+     * Gets the {@link List} of {@link Concept}s related to the
+     * {@link NewsItem}.
      *
      * @return {@link List} of {@link Concept}s related to the {@link NewsItem}.
      */
@@ -454,10 +439,11 @@ public class NewsItem extends ContentItem {
     }
 
     /**
-     * Sets the {@link List} of {@link Concept}s related to the {@link NewsItem}.
+     * Sets the {@link List} of {@link Concept}s related to the
+     * {@link NewsItem}.
      *
-     * @param concepts
-     *          {@link List} of {@link Concept}s related to the {@link NewsItem}
+     * @param concepts {@link List} of {@link Concept}s related to the
+     * {@link NewsItem}
      */
     public void setConcepts(List<Concept> concepts) {
         this.concepts = concepts;
@@ -475,7 +461,7 @@ public class NewsItem extends ContentItem {
     /**
      * Gets the target word count of the story. The target word count is set by
      * the assignment creator to guide the writer of the story.
-     * 
+     *
      * @return Target word count of the story
      */
     public Integer getTargetWordCount() {
@@ -485,8 +471,7 @@ public class NewsItem extends ContentItem {
     /**
      * Sets the target word count of the story.
      *
-     * @param targetWordCount
-     *          Target number of words for the story
+     * @param targetWordCount Target number of words for the story
      */
     public void setTargetWordCount(Integer targetWordCount) {
         this.targetWordCount = targetWordCount;
@@ -503,8 +488,9 @@ public class NewsItem extends ContentItem {
     }
 
     /**
-     * Gets the deadline of the {@link NewsItem} for the journalist. This
-     * value is <code>null</code> if a deadline has not been set.
+     * Gets the deadline of the {@link NewsItem} for the journalist. This value
+     * is
+     * <code>null</code> if a deadline has not been set.
      *
      * @return Deadline of the {@link NewsItem} for the journalist
      */
@@ -516,8 +502,7 @@ public class NewsItem extends ContentItem {
      * Sets the deadline of the {@link NewsItem}. Setting the deadline to
      * <code>null</code> will remove the deadline.
      *
-     * @param deadline
-     *          Deadline to set
+     * @param deadline Deadline to set
      */
     public void setDeadline(Calendar deadline) {
         this.deadline = deadline;
@@ -527,7 +512,7 @@ public class NewsItem extends ContentItem {
      * Determines if a deadline has been set.
      *
      * @return <code>true</code> if the deadline has been set, otherwise
-     *         <code>false</code>
+     * <code>false</code>
      */
     public boolean isDeadlineSet() {
         return deadline == null;
@@ -551,7 +536,7 @@ public class NewsItem extends ContentItem {
      * self-assigned.
      *
      * @param assigned
-     * 
+     *
      */
     public void setAssigned(boolean assigned) {
         this.assigned = assigned;
@@ -567,9 +552,9 @@ public class NewsItem extends ContentItem {
 
     /**
      * Gets a {@link List} of sorted asset attachments.
-     * 
-     * @return {@link List} of attached assets sorted by 
-     *         {@link NewsItemMediaAttachment#getDisplayOrder()}
+     *
+     * @return {@link List} of attached assets sorted by
+     * {@link NewsItemMediaAttachment#getDisplayOrder()}
      */
     public List<NewsItemMediaAttachment> getMediaAttachments() {
         Collections.sort(mediaAttachments, new BeanComparator("displayOrder"));
@@ -591,7 +576,7 @@ public class NewsItem extends ContentItem {
 
     /**
      * Gets a {@link List} of all placements for this {@link NewsItem}.
-     * 
+     *
      * @return {@link List} of all placements for this {@link NewsItem}
      */
     public List<NewsItemPlacement> getPlacements() {
@@ -600,19 +585,18 @@ public class NewsItem extends ContentItem {
 
     /**
      * Sets a {@link List} of all placements for this {@link NewsItem}.
-     * 
-     * @param placements
-     *          {@link List} of all placements for this {@link NewsItem}
+     *
+     * @param placements {@link List} of all placements for this
+     * {@link NewsItem}
      */
     public void setPlacements(List<NewsItemPlacement> placements) {
         this.placements = placements;
     }
 
     /**
-     * Gets a {@link Integer} containing the precalculated word count.
-     * The word count is precalculated everytime the {@link NewsItem}
-     * is saved.
-     * 
+     * Gets a {@link Integer} containing the precalculated word count. The word
+     * count is precalculated everytime the {@link NewsItem} is saved.
+     *
      * @return {@link Integer} containing the precalculated word count
      */
     public Long getPrecalculatedWordCount() {
@@ -624,9 +608,9 @@ public class NewsItem extends ContentItem {
     }
 
     /**
-     * Gets a {@link List} of properties that has been stored for this 
+     * Gets a {@link List} of properties that has been stored for this
      * {@link NewsItem}.
-     * 
+     *
      * @return {@link List} of related properties
      */
     public List<NewsItemProperty> getProperties() {
@@ -635,9 +619,9 @@ public class NewsItem extends ContentItem {
 
     /**
      * Sets the properties of the {@link NewsItem}.
-     * 
-     * @param properties
-     *          {@link List} of properties related to the {@link NewsItem}
+     *
+     * @param properties {@link List} of properties related to the
+     * {@link NewsItem}
      */
     public void setProperties(List<NewsItemProperty> properties) {
         this.properties = properties;
@@ -652,13 +636,13 @@ public class NewsItem extends ContentItem {
     public int getVersionIdentifier() {
         return versionIdentifier;
     }
-    
+
     /**
-     * Determines if the {@link NewsItem} has reached its 
-     * end state in the workflow.
-     * 
-     * @return {@code true} if the {@link NewsItem} has reached the
-     *         end state of the workflow, otherwise {@code false}
+     * Determines if the {@link NewsItem} has reached its end state in the
+     * workflow.
+     *
+     * @return {@code true} if the {@link NewsItem} has reached the end state of
+     * the workflow, otherwise {@code false}
      */
     public boolean isEndState() {
         // NullPointer check
@@ -677,11 +661,10 @@ public class NewsItem extends ContentItem {
     }
 
     /**
-     * Determines if the {@link NewsItem} is at the start state in the 
-     * workflow.
-     * 
-     * @return {@code true} if the {@link NewsItem} is at the start
-     *         state of the workflow, otherwise {@code false}
+     * Determines if the {@link NewsItem} is at the start state in the workflow.
+     *
+     * @return {@code true} if the {@link NewsItem} is at the start state of the
+     * workflow, otherwise {@code false}
      */
     public boolean isStartState() {
         // NullPointer check
@@ -699,11 +682,10 @@ public class NewsItem extends ContentItem {
     }
 
     /**
-     * Determines if the {@link NewsItem} is at the trash state in the 
-     * workflow.
-     * 
-     * @return {@code true} if the {@link NewsItem} is at the trash
-     *         state of the workflow, otherwise {@code false}
+     * Determines if the {@link NewsItem} is at the trash state in the workflow.
+     *
+     * @return {@code true} if the {@link NewsItem} is at the trash state of the
+     * workflow, otherwise {@code false}
      */
     public boolean isTrashState() {
         // NullPointer check
@@ -721,21 +703,21 @@ public class NewsItem extends ContentItem {
     }
 
     /**
-     * Determines if the {@link NewsItem} is an intermediate state in the 
+     * Determines if the {@link NewsItem} is an intermediate state in the
      * workflow.
-     * 
-     * @return {@code true} if the {@link NewsItem} is at an intermediate
-     *         state of the workflow, otherwise {@code false}
+     *
+     * @return {@code true} if the {@link NewsItem} is at an intermediate state
+     * of the workflow, otherwise {@code false}
      */
     public boolean isIntermediateState() {
         return !isEndState() && !isTrashState();
     }
 
     /**
-     * Gets the next available Display Order for attached assets.
-     * The next available display order is the highest display
-     * order of existing attachments plus one.
-     * 
+     * Gets the next available Display Order for attached assets. The next
+     * available display order is the highest display order of existing
+     * attachments plus one.
+     *
      * @return Next available Display Order for an attached asset.
      */
     public int getNextAssetAttachmentDisplayOrder() {
@@ -751,13 +733,12 @@ public class NewsItem extends ContentItem {
     }
 
     /**
-     * A {@link NewsItem} is equal to this {@link NewsItem} if their 
+     * A {@link NewsItem} is equal to this {@link NewsItem} if their
      * {@link #id}s are equal.
-     * 
-     * @param obj
-     *          {@link Object} to determine if equal to this {@link NewsItem}
-     * @return {@code true} if {@link Object} is a {@link NewsItem} with the 
-     *         same {@link #id} as this {@link NewsItem}
+     *
+     * @param obj {@link Object} to determine if equal to this {@link NewsItem}
+     * @return {@code true} if {@link Object} is a {@link NewsItem} with the
+     * same {@link #id} as this {@link NewsItem}
      */
     @Override
     public boolean equals(Object obj) {
@@ -775,7 +756,9 @@ public class NewsItem extends ContentItem {
         return true;
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -783,7 +766,9 @@ public class NewsItem extends ContentItem {
         return hash;
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String toString() {
         return getClass().getName() + "[id=" + getId() + "]";

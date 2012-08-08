@@ -16,22 +16,21 @@
  */
 package dk.i2m.converge.jsf.beans;
 
-import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.AssignmentType;
 import dk.i2m.converge.core.content.ContentItem;
-import dk.i2m.converge.core.content.ContentItemPermission;
-import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.ContentItemActor;
-import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.content.ContentItemPermission;
 import dk.i2m.converge.core.content.ContentResultSet;
+import dk.i2m.converge.core.content.NewsItem;
+import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.core.views.InboxView;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.WorkflowState;
+import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
 import dk.i2m.converge.ejb.facades.*;
 import dk.i2m.converge.jsf.components.tags.DialogSelfAssignment;
 import dk.i2m.jsf.CookieNotFoundException;
@@ -62,68 +61,47 @@ public class Inbox {
 
     private enum ResultType {
 
-        CATALOGUE, CATALOGUE_WITH_STATE, OUTLET, OUTLET_WITH_STATE
+        CATALOGUE, CATALOGUE_WITH_STATE, OUTLET, OUTLET_WITH_STATE, MY_ASSIGNMENT
     }
-
     private static final Logger LOG = Logger.getLogger(Inbox.class.getName());
-
     private static final int ONE_YEAR = 31276800;
-
     private static final int PAGE_SIZE = 25;
-
-    private Catalogue selectedCatalogue;
-
-    private WorkflowState selectedWorkflowState;
-
-    @EJB private NewsItemFacadeLocal newsItemFacade;
-
-    @EJB private CatalogueFacadeLocal catalogueFacade;
-    
-    @EJB private ContentItemFacadeLocal contentItemFacade;
-
-    /** Placeholder for the selected  {@link ContentItem}. */
+    @EJB
+    private NewsItemFacadeLocal newsItemFacade;
+    @EJB
+    private CatalogueFacadeLocal catalogueFacade;
+    @EJB
+    private ContentItemFacadeLocal contentItemFacade;
+    /**
+     * Placeholder for the selected {@link ContentItem}.
+     */
     private ContentItem selectedContentItem;
-    
-    /** Placeholder for the permissions for {@link #selectedContentItem}. */
+    /**
+     * Placeholder for the permissions for {@link #selectedContentItem}.
+     */
     private ContentItemPermission selectedContentItemPermission = ContentItemPermission.UNAUTHORIZED;
-
     private NewsItem selectedNewsItem;
-
     private MediaItem selectedMediaItem;
-
     private ContentResultSet resultSet;
-
     private DataModel newsItems = null;
-
     private DataModel mediaItems = null;
-
     private TreeNode outletsNode = null;
-
     private TreeNode cataloguesNode = null;
-
     private String inboxTitle = "";
-
     private NewsItem duplicateNewsItem;
-
     private DialogSelfAssignment newAssignment;
-
     private boolean showNewsItem = true;
-
     private String newAssignmentType = "tabStory";
-
     private String createdItemLink;
-
     private int pagingStart;
-
     private int pagingRows;
-
     private String sortBy = "updated";
-
     private String sortDirection = "desc";
-
     private ResultType resultType;
-
     private String contentView;
+    private Outlet selectedOutlet;
+    private Catalogue selectedCatalogue;
+    private WorkflowState selectedWorkflowState;
 
     /**
      * Creates a new instance of {@link Inbox}.
@@ -146,16 +124,10 @@ public class Inbox {
         }
     }
 
-    private void resetPaging() {
-        this.pagingRows = PAGE_SIZE;
-        this.pagingStart = 0;
-    }
-
     /**
      * Action listeners for preparing the creation of a new assignment.
      *
-     * @param event
-     *          {@link ActionEvent} that invoked the listener.
+     * @param event {@link ActionEvent} that invoked the listener.
      */
     public void onNewAssignment(ActionEvent event) {
 
@@ -203,18 +175,17 @@ public class Inbox {
     }
 
     /**
-     * Event handler for changing the workflow of the selected 
+     * Event handler for changing the workflow of the selected
      * {@link ContentItem}.
-     * 
-     * @param event 
-     *          Event that invoked the handler
+     *
+     * @param event Event that invoked the handler
      */
     public void onContentItemWorkflowSelection(ActionEvent event) {
         String wsi = getRequestParameterMap().get("workflow_step_id");
         if (wsi == null) {
             return;
         }
-        
+
         Long wsId;
         try {
             wsId = Long.valueOf(wsi);
@@ -223,7 +194,7 @@ public class Inbox {
             return;
         }
         try {
-            catalogueFacade.step((MediaItem)getSelectedContentItem(), wsId, false);
+            catalogueFacade.step((MediaItem) getSelectedContentItem(), wsId, false);
             createMessage("frmInbox", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(), "MediaItemDetails_MEDIA_ITEM_SUBMITTED");
             loadContentResultSet();
@@ -241,12 +212,11 @@ public class Inbox {
                     getMessage());
         }
     }
-    
+
     /**
      * Event handler for creating a new assignment.
-     * 
-     * @param event 
-     *          Event that invoked the handler
+     *
+     * @param event Event that invoked the handler
      */
     public void onAddAssignment(ActionEvent event) {
 
@@ -340,8 +310,7 @@ public class Inbox {
     /**
      * Action Listener for removing articles marked as deleted.
      *
-     * @param event 
-     *          {@link ActionEvent} that invoked the listener
+     * @param event {@link ActionEvent} that invoked the listener
      */
     public void onEmptyTrash(ActionEvent event) {
         int deleted = newsItemFacade.emptyTrash(getUser().getUsername());
@@ -355,74 +324,54 @@ public class Inbox {
     /**
      * Event handler for showing the current assignments of the user.
      *
-     * @param event
-     *          Event that invoked the handler
+     * @param event Event that invoked the handler
      */
     public void onShowMyAssignments(ActionEvent event) {
         resetSelectedCookies();
+        resetPaging();
 
         showNewsItem = true;
-
-        List<InboxView> inboxView = newsItemFacade.findInbox(getUser().
-                getUsername());
-        this.newsItems = new ListDataModel(inboxView);
-        this.inboxTitle = getMessage(Bundle.i18n.name(),
-                "Inbox_MY_ASSIGNMENTS_X_ITEMS", new Object[]{newsItems.
-                    getRowCount()});
+        
+        this.resultType = ResultType.MY_ASSIGNMENT;
+        loadContentResultSet();
+        fetchViewPreferenceFromCookies();
+        storeSelectedInCookies();
     }
 
     /**
-     * Event handler for handling selection of an {@link Outlet} or 
+     * Event handler for handling selection of an {@link Outlet} or
      * {@link Catalogue} folder.
      *
-     * @param event 
-     *          Event that invoked the handler
+     * @param event Event that invoked the handler
      */
     public void onOutletFolderSelect(NodeSelectedEvent event) {
-        final int MAX_STATE_ITEMS = 100;
-        showNewsItem = true;
-        mediaItems = new ListDataModel();
+        LOG.log(Level.FINE, "Selecting outlet folder");
+
+        this.showNewsItem = true;
+        this.newsItems = new ListDataModel();
 
         HtmlTree tree = (HtmlTree) event.getComponent();
         OutletNode node = (OutletNode) tree.getRowData();
 
+        resetPaging();
+
         if (node.getData() instanceof Outlet) {
-
-            Outlet outlet = (Outlet) node.getData();
-            newsItems = new ListDataModel(newsItemFacade.findOutletBox(getUser().
-                    getUsername(), outlet));
-
-            inboxTitle = getMessage(Bundle.i18n.name(),
-                    "Inbox_OUTLET_STATUS_CURRENT", new Object[]{
-                        outlet.getTitle(),
-                        newsItems.getRowCount()});
+            this.resultType = ResultType.OUTLET;
+            this.selectedOutlet = (Outlet) node.getData();
         } else if (node.getData() instanceof WorkflowState) {
-            showNewsItem = true;
-            mediaItems = new ListDataModel();
-            WorkflowState state = (WorkflowState) node.getData();
-            Outlet outlet = (Outlet) node.getParentData();
-
-            if (state.equals(outlet.getWorkflow().getEndState())) {
-                newsItems =
-                        new ListDataModel(newsItemFacade.findOutletBox(getUser().
-                        getUsername(), outlet, state, 0, MAX_STATE_ITEMS));
-            } else {
-                newsItems =
-                        new ListDataModel(newsItemFacade.findOutletBox(getUser().
-                        getUsername(), outlet, state));
-            }
-
-            inboxTitle = getMessage(Bundle.i18n.name(),
-                    "Inbox_OUTLET_STATUS", new Object[]{outlet.getTitle(),
-                        state.getName(), newsItems.getRowCount()});
+            this.resultType = ResultType.OUTLET_WITH_STATE;
+            this.selectedOutlet = (Outlet) node.getParentData();
+            this.selectedWorkflowState = (WorkflowState) node.getData();
         }
+        loadContentResultSet();
+        fetchViewPreferenceFromCookies();
+        storeSelectedInCookies();
     }
 
     /**
      * Event handler for handling selection of a {@link Catalogue} folder.
      *
-     * @param event 
-     *          Event that invoked the handler
+     * @param event Event that invoked the handler
      */
     public void onCatalogueFolderSelect(NodeSelectedEvent event) {
         this.showNewsItem = false;
@@ -448,9 +397,8 @@ public class Inbox {
 
     /**
      * Event handler for changing the view of the {@link ContentResultSet}.
-     * 
-     * @param event 
-     *          Event that invoked the handler
+     *
+     * @param event Event that invoked the handler
      */
     public void onChangeView(ActionEvent event) {
         this.contentView = getRequestParameterMap().get("view");
@@ -458,11 +406,10 @@ public class Inbox {
     }
 
     /**
-     * Event handler for changing the page of the current 
+     * Event handler for changing the page of the current
      * {@link ContentResultSet}.
-     * 
-     * @param event 
-     *          Event that invoked the handler
+     *
+     * @param event Event that invoked the handler
      */
     public void onChangePage(ActionEvent event) {
         String changePage = getRequestParameterMap().get("changePage");
@@ -476,11 +423,10 @@ public class Inbox {
     }
 
     /**
-     * Event handler for changing the sort order and direction of 
+     * Event handler for changing the sort order and direction of
      * {@link ContentResultSet}.
-     * 
-     * @param event 
-     *          Event that invoked the handler
+     *
+     * @param event Event that invoked the handler
      */
     public void onChangeSorting(ActionEvent event) {
         String newSortBy = getRequestParameterMap().get("sortField");
@@ -541,9 +487,9 @@ public class Inbox {
 
     /**
      * Property containing the selected {@link MediaItem}.
-     * 
+     *
      * @return Selected {@link MediaItem} or {@code null} if no item was
-     *         selected
+     * selected
      */
     public MediaItem getSelectedMediaItem() {
         return selectedMediaItem;
@@ -551,10 +497,9 @@ public class Inbox {
 
     /**
      * Property containing the selected {@link MediaItem}.
-     * 
-     * @param selectedMediaItem
-     *          Selected {@link MediaItem} or {@code null} if no item was
-     *          selected
+     *
+     * @param selectedMediaItem Selected {@link MediaItem} or {@code null} if no
+     * item was selected
      */
     public void setSelectedMediaItem(MediaItem selectedMediaItem) {
         this.selectedMediaItem = selectedMediaItem;
@@ -590,7 +535,7 @@ public class Inbox {
     /**
      * Gets a {@link TreeNode} containing the {@link Outlet}s privileged to the
      * current {@link UserAccount}.
-     * 
+     *
      * @return {@link TreeNode} of privileged {@link Outlet}s
      */
     public TreeNode getOutletsNode() {
@@ -624,9 +569,9 @@ public class Inbox {
     }
 
     /**
-     * Gets a {@link TreeNode} containing the {@link Catalogue}s privileged to 
+     * Gets a {@link TreeNode} containing the {@link Catalogue}s privileged to
      * the current {@link UserAccount}.
-     * 
+     *
      * @return {@link TreeNode} of privileged {@link Catalogue}s
      */
     public TreeNode getCataloguesNode() {
@@ -664,8 +609,7 @@ public class Inbox {
      * Event handler for updating the state of an {@link MediaItem} from the
      * list of {@link MediaItem}s in a {@link Catalogue} folder.
      *
-     * @param item 
-     *          {@link MediaItem} to update
+     * @param item {@link MediaItem} to update
      */
     public void setUpdateMediaItem(MediaItem item) {
         // The media item must be removed and added to keep its version 
@@ -706,23 +650,22 @@ public class Inbox {
     // -------------------------------------------------------------------------
     // -- PROPERTIES
     // -------------------------------------------------------------------------
-
     /**
      * Gets the permissions for the selected {@link ContentItem} for the current
      * user.
-     * 
+     *
      * @return Permissions for the selected {@link ContentItem}
      */
     public ContentItemPermission getSelectedContentItemPermission() {
         return selectedContentItemPermission;
     }
-    
+
     /**
      * Determines if the user is among the current users of the selected
      * {@link ContentItem}.
-     * 
-     * @return {@code true} if the user is among the current users of the 
-     *         selected {@link ContentItem}
+     *
+     * @return {@code true} if the user is among the current users of the
+     * selected {@link ContentItem}
      */
     public boolean isCurrentUserOfSelectedContentItem() {
         switch (this.selectedContentItemPermission) {
@@ -733,12 +676,12 @@ public class Inbox {
                 return false;
         }
     }
-    
+
     /**
      * Gets the selected {@link ContentItem}.
-     * 
-     * @return Selected {@link ContentItem} or {@code null} if a 
-     *         {@link ContentItem} is not selected
+     *
+     * @return Selected {@link ContentItem} or {@code null} if a
+     * {@link ContentItem} is not selected
      */
     public ContentItem getSelectedContentItem() {
         return selectedContentItem;
@@ -746,21 +689,19 @@ public class Inbox {
 
     /**
      * Sets the selected {@link ContentItem}.
-     * 
-     * @param selectedContentItem
-     *          Selected {@link ContentItem} or {@code null} if a 
-     *          {@link ContentItem} is not selected
+     *
+     * @param selectedContentItem Selected {@link ContentItem} or {@code null}
+     * if a {@link ContentItem} is not selected
      */
     public void setSelectedContentItem(ContentItem selectedContentItem) {
         this.selectedContentItem = selectedContentItem;
     }
-    
+
     /**
-     * Sets the ID of the {@link ContentItem} to select. Upon setting the ID
-     * the selected {@link ContentItem} will be set.
-     * 
-     * @param id 
-     *          Unique identifier of the {@link ContentItem} to set
+     * Sets the ID of the {@link ContentItem} to select. Upon setting the ID the
+     * selected {@link ContentItem} will be set.
+     *
+     * @param id Unique identifier of the {@link ContentItem} to set
      */
     public void setSelectedContentItemId(Long id) {
         try {
@@ -770,7 +711,7 @@ public class Inbox {
             LOG.log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public DialogSelfAssignment getNewAssignment() {
         return newAssignment;
     }
@@ -835,7 +776,7 @@ public class Inbox {
     // -- HELPERS
     // -------------------------------------------------------------------------
     /**
-     * Loads the {@link ContentResultSet} into the view based on the state 
+     * Loads the {@link ContentResultSet} into the view based on the state
      * properties.
      */
     private void loadContentResultSet() {
@@ -868,6 +809,57 @@ public class Inbox {
                             this.selectedWorkflowState.getName(),
                             this.resultSet.getNumberOfResults(), this.resultSet.
                             getSearchTimeInSeconds()});
+                break;
+            case OUTLET:
+                this.resultSet =
+                        newsItemFacade.findNewsItemsByOutlet(
+                        getUser().getUsername(), 
+                        this.selectedOutlet,
+                        this.pagingStart,
+                        this.pagingRows, 
+                        this.sortBy, 
+                        this.sortDirection);
+                this.newsItems = new ListDataModel(this.resultSet.getHits());
+                        //newsItemFacade.findOutletBox(getUser().getUsername(), this.selectedOutlet));
+                this.inboxTitle = getMessage(Bundle.i18n.name(),
+                        "Inbox_OUTLET_STATUS_CURRENT",
+                        new Object[]{
+                            this.selectedOutlet.getTitle(),
+                            this.resultSet.getNumberOfResults(),
+                            this.resultSet.getSearchTimeInSeconds()});
+                break;
+            case OUTLET_WITH_STATE:
+                this.resultSet =
+                        newsItemFacade.findNewsItemsByWorkflowState(
+                        getUser().getUsername(), 
+                        this.selectedOutlet,
+                        this.selectedWorkflowState,
+                        this.pagingStart,
+                        this.pagingRows, 
+                        this.sortBy, 
+                        this.sortDirection);
+                this.newsItems = new ListDataModel(this.resultSet.getHits());
+                        //newsItemFacade.findOutletBox(getUser().getUsername(), this.selectedOutlet));
+                this.inboxTitle = getMessage(Bundle.i18n.name(),
+                        "Inbox_OUTLET_STATUS",
+                        new Object[]{
+                            this.selectedOutlet.getTitle(),
+                            this.selectedWorkflowState.getName(),
+                            this.resultSet.getNumberOfResults(),
+                            this.resultSet.getSearchTimeInSeconds()});
+                break;
+            case MY_ASSIGNMENT:
+                this.resultSet = newsItemFacade.findInbox(
+                        getUser().getUsername(), 
+                        this.pagingStart,
+                        this.pagingRows, 
+                        this.sortBy, 
+                        this.sortDirection);
+                this.newsItems = new ListDataModel(this.resultSet.getHits());
+                this.inboxTitle = getMessage(Bundle.i18n.name(),
+                    "Inbox_MY_ASSIGNMENTS_X_ITEMS", new Object[]{
+                        this.resultSet.getNumberOfResults(),
+                        this.resultSet.getSearchTimeInSeconds()});
                 break;
             default:
                 LOG.log(Level.INFO, "Unknown page");
@@ -905,11 +897,14 @@ public class Inbox {
     }
 
     /**
-     * Fetches the view preference from the cookies stored in the client 
+     * Fetches the view preference from the cookies stored in the client
      * browser.
      */
     private void fetchViewPreferenceFromCookies() {
         try {
+            if (this.selectedCatalogue == null) {
+                return;
+            }
             String catViewCookie = getCookieValue("view-catalogue-"
                     + this.selectedCatalogue.getId());
             if (catViewCookie.equalsIgnoreCase("grid")) {
@@ -925,9 +920,9 @@ public class Inbox {
     /**
      * Fetches the <em>selected-</em> cookies from the client browser and
      * initialises the necessary properties on the bean.
-     * 
+     *
      * @return {@code true} if preferences were fetched from the client browser,
-     *         otherwise {@code false}
+     * otherwise {@code false}
      */
     private boolean fetchSelectedFromCookies() {
         try {
@@ -955,12 +950,20 @@ public class Inbox {
 
     /**
      * Fetches the current user from the {@code userSession} bean.
-     * 
+     *
      * @return {@link UserAccount} of the current user
      */
     private UserAccount getUser() {
         final String valueExpression = "#{userSession.user}";
         return (UserAccount) getValueOfValueExpression(valueExpression);
+    }
+
+    /**
+     * Resets the paging panel.
+     */
+    private void resetPaging() {
+        this.pagingRows = PAGE_SIZE;
+        this.pagingStart = 0;
     }
 
     // -------------------------------------------------------------------------
@@ -970,9 +973,7 @@ public class Inbox {
     public class OutletNode {
 
         private Object data;
-
         private Object parentData;
-
         private String type;
 
         public OutletNode(Object data, Object parentData, String type) {
@@ -1032,9 +1033,7 @@ public class Inbox {
     public class MediaRepositoryNode {
 
         private Object data;
-
         private Object parentData;
-
         private String type;
 
         public MediaRepositoryNode(Object data, Object parentData, String type) {

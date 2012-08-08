@@ -135,6 +135,12 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
         }
 
         updateThumbnail(contentItem);
+        
+         if (contentItem instanceof MediaItem) {
+            contentItem.setLocation(((MediaItem)contentItem).getCatalogue().getName());
+        } else if (contentItem instanceof NewsItem) {
+            contentItem.setLocation(((NewsItem)contentItem).getOutlet().getTitle());
+        }
 
         try {
             Calendar now = Calendar.getInstance();

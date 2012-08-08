@@ -16,7 +16,6 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.*;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
@@ -38,6 +37,7 @@ import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.ejb.*;
 import javax.persistence.OptimisticLockException;
+import javax.persistence.Query;
 
 /**
  * Enterprise session bean providing a facade to working with {@link NewsItem}s.
@@ -49,28 +49,30 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
 
     private static final Logger LOG = Logger.getLogger(NewsItemFacadeBean.class.
             getName());
+    @EJB
+    private ConfigurationServiceLocal cfgService;
+    @EJB
+    private DaoServiceLocal daoService;
+    @EJB
+    private UserFacadeLocal userFacade;
+    @EJB
+    private UserServiceLocal userService;
+    @EJB
+    private NotificationServiceLocal notificationService;
+    @EJB
+    private OutletFacadeLocal outletFacade;
+    @EJB
+    private SearchEngineLocal searchEngine;
+    @EJB
+    private PluginContextBeanLocal pluginContext;
+    @EJB
+    private ContentItemServiceLocal contentItemService;
+    @Resource
+    private SessionContext ctx;
 
-    @EJB private ConfigurationServiceLocal cfgService;
-
-    @EJB private DaoServiceLocal daoService;
-
-    @EJB private UserFacadeLocal userFacade;
-
-    @EJB private UserServiceLocal userService;
-
-    @EJB private NotificationServiceLocal notificationService;
-
-    @EJB private OutletFacadeLocal outletFacade;
-
-    @EJB private SearchEngineLocal searchEngine;
-
-    @EJB private PluginContextBeanLocal pluginContext;
-
-    @EJB private ContentItemServiceLocal contentItemService;
-
-    @Resource private SessionContext ctx;
-
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public NewsItem start(NewsItem newsItem) throws
@@ -78,14 +80,18 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         return (NewsItem) contentItemService.start(newsItem);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NewsItem step(NewsItem newsItem, Long step, String comment) throws
             WorkflowStateTransitionException {
         return (NewsItem) contentItemService.step(newsItem, step, false);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NewsItem step(NewsItem newsItem, WorkflowState state, String comment)
             throws WorkflowStateTransitionException {
@@ -133,8 +139,7 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     /**
      * Finds the current assignments of a given user.
      * <p/>
-     * @param username
-     * Username of the user
+     * @param username Username of the user
      * @return {@link List} of current assignments
      */
     @Override
@@ -154,49 +159,27 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     /**
      * Gets items in the inbox for a particular user.
      * <p/>
-     * @param username
-     * Username of the {@link UserAccount}
-     * @param start
-     * First record to retrieve
-     * @param limit
-     * Number of records to retrieve
+     * @param username Username of the {@link UserAccount}
+     * @param start First record to retrieve
+     * @param limit Number of records to retrieve
      * @return
      */
-    @Override
-    public List<InboxView> findInbox(String username, int start, int limit) {
-        try {
-            UserAccount ua = userFacade.findById(username);
-            Map params = QueryBuilder.with("user", ua).and("permission",
-                    WorkflowStatePermission.GROUP).parameters();
-            return daoService.findWithNamedQuery(NewsItem.VIEW_INBOX, params,
-                    start, limit);
-        } catch (DataNotFoundException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-            return Collections.EMPTY_LIST;
-        }
-    }
-
+//    @Override
+//    public List<InboxView> findInbox(String username, int start, int limit) {
+//        try {
+//            UserAccount ua = userFacade.findById(username);
+//            Map params = QueryBuilder.with("user", ua).and("permission",
+//                    WorkflowStatePermission.GROUP).parameters();
+//            return daoService.findWithNamedQuery(NewsItem.VIEW_INBOX, params,
+//                    start, limit);
+//        } catch (DataNotFoundException ex) {
+//            LOG.log(Level.SEVERE, null, ex);
+//            return Collections.EMPTY_LIST;
+//        }
+//    }
     /**
-     * Gets items in the inbox for a particular user.
-     * <p/>
-     * @param username
-     * Username of the {@link UserAccount}
-     * @return {@link List} of inbox items
+     * {@inheritDoc }
      */
-    @Override
-    public List<InboxView> findInbox(String username) {
-        try {
-            UserAccount ua = userFacade.findById(username);
-            Map params = QueryBuilder.with("user", ua).and("permission",
-                    WorkflowStatePermission.GROUP).parameters();
-            return daoService.findWithNamedQuery(NewsItem.VIEW_INBOX, params);
-        } catch (DataNotFoundException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-            return Collections.EMPTY_LIST;
-        }
-    }
-
-    /** {@inheritDoc } */
     @Override
     public List<NewsItem> findByActiveUser(String username) {
         List<NewsItem> items = new ArrayList<NewsItem>();
@@ -327,12 +310,13 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
     }
 
     /**
-     * Determine if the given user is the original owner of the
-     * given {@link NewsItem}.
+     * Determine if the given user is the original owner of the given
+     * {@link NewsItem}.
      * <p/>
-     * @param item     {@link NewsItem} to check
+     * @param item {@link NewsItem} to check
      * @param username Username of the {@link UserAccount} to check
-     * @return {@code true} if {@code username} is the original owner of {@code item}
+     * @return {@code true} if {@code username} is the original owner of
+     * {@code item}
      */
     private boolean isOriginalOwner(NewsItem item, String username) {
         WorkflowState start = item.getOutlet().getWorkflow().getStartState();
@@ -353,7 +337,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         return false;
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public List<NewsItem> findByStateAndOutlet(WorkflowState state,
             Outlet outlet) {
@@ -363,7 +349,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
                 params);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public List<NewsItem> findByStateAndOutlet(String stateName, Outlet outlet) {
         Map params = QueryBuilder.with("outlet", outlet).and("stateName",
@@ -372,7 +360,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
                 NewsItem.FIND_BY_OUTLET_AND_STATE_NAME, params);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public List<NewsItem> findByStateAndOutlet(WorkflowState state,
             Outlet outlet, int start, int results) {
@@ -382,7 +372,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
                 params, start, results);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public boolean isNewsItemPublished(final Long newsItemId) throws
             DataNotFoundException {
@@ -396,7 +388,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public List<NewsItem> findAssignmentsByOutlet(Outlet selectedOutlet) {
         Map<String, Object> params = QueryBuilder.with("outlet", selectedOutlet).
@@ -405,7 +399,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
                 params);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public boolean deleteNewsItem(Long id) {
         try {
@@ -427,7 +423,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public boolean deleteNewsItem(Long id, boolean safe) {
         if (safe) {
@@ -449,13 +447,17 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ContentItemActor addActorToNewsItem(ContentItemActor actor) {
         return daoService.create(actor);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NewsItem removeActorFromNewsItem(ContentItemActor actor) {
         Long newsItemId = actor.getContentItem().getId();
@@ -468,7 +470,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ContentItemPermission getPermission(Long newsItemId, String username) {
         try {
@@ -530,7 +534,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         return ContentItemPermission.UNAUTHORIZED;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<NewsItem> findVersions(Long newsItemId) {
         try {
@@ -548,7 +554,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         return daoService.findWithNamedQuery(NewsItem.FIND_VERSIONS, parameters);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public NewsItem save(NewsItem newsItem) throws LockingException {
         try {
@@ -562,7 +570,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public NewsItem findNewsItemById(Long id) throws DataNotFoundException {
         return daoService.findById(NewsItem.class, id);
@@ -574,14 +584,18 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         return daoService.findById(NewsItemPlacement.class, id);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public boolean isCheckedOut(Long id) {
         return !daoService.findWithNamedQuery(NewsItem.FIND_CHECKED_IN_NEWS_ITEM,
                 QueryBuilder.with("id", id).parameters()).isEmpty();
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public NewsItem checkin(NewsItem newsItem) throws LockingException {
 
@@ -666,8 +680,10 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
      * Checks-out a {@link NewsItem} from the database.
      *
      * @param id Unique identifier of the {@link NewsItem}
-     * @return Checked-out {@link NewsItem} in a {@link NewsItemHolder} matching the given {@code id}
-     * @throws DataNotFoundException If no {@link NewsItem} could be found with the given {@code id}
+     * @return Checked-out {@link NewsItem} in a {@link NewsItemHolder} matching
+     * the given {@code id}
+     * @throws DataNotFoundException If no {@link NewsItem} could be found with
+     * the given {@code id}
      */
     @Override
     public NewsItemHolder checkout(Long id) throws DataNotFoundException {
@@ -763,7 +779,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
                 checkedOut, pullbackAvailable, fieldVisibility);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public boolean revokeLock(final Long id) {
         int affected = daoService.executeQuery(NewsItem.REVOKE_LOCK,
@@ -776,7 +794,9 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public int revokeLocks(final String username) {
         try {
@@ -792,13 +812,17 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public int revokeAllLocks() {
         return daoService.executeQuery(NewsItem.REVOKE_ALL_LOCKS);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void pullback(Long id) throws LockingException,
             WorkflowStateTransitionException {
@@ -866,32 +890,42 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
         }
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public MediaItem create(MediaItem mediaItem) {
         mediaItem.setCreated(java.util.Calendar.getInstance().getTime());
         return daoService.create(mediaItem);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public NewsItemMediaAttachment create(NewsItemMediaAttachment attachment) {
         return daoService.create(attachment);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public NewsItemMediaAttachment update(NewsItemMediaAttachment attachment) {
         return daoService.update(attachment);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void deleteMediaAttachmentById(Long id) {
         daoService.delete(NewsItemMediaAttachment.class, id);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public NewsItem findNewsItemFromArchive(Long id) throws
             DataNotFoundException {
@@ -969,5 +1003,151 @@ public class NewsItemFacadeBean implements NewsItemFacadeLocal {
             ni.setPrecalculatedCurrentActor(ni.getCurrentActor());
             ni.setPrecalculatedWordCount(ni.getWordCount());
         }
+    }
+
+    @Override
+    public ContentResultSet findNewsItemsByWorkflowState(String username,
+            Outlet outlet, WorkflowState state, int start, int rows,
+            String sortField, String sortDirection) {
+        long startTime = Calendar.getInstance().getTimeInMillis();
+
+        UserAccount ua;
+        try {
+            ua = userFacade.findById(username);
+        } catch (DataNotFoundException ex) {
+            LOG.log(Level.WARNING, ex.getMessage(), ex);
+            ua = null;
+        }
+
+        ContentResultSet resultSet = new ContentResultSet();
+        resultSet.setResultsPerPage(rows);
+        resultSet.setStart(start);
+
+        Map<String, Object> params =
+                QueryBuilder.with(NewsItem.PARAM_USER, ua).and(
+                NewsItem.PARAM_OUTLET, outlet).and(
+                NewsItem.PARAM_WORKFLOW_STATE, state).parameters();
+
+        Number count =
+                daoService.executeNamedQuery(Number.class,
+                NewsItem.COUNT_BY_USER_AND_OUTLET_AND_WORKFLOW_STATE, params);
+        resultSet.setNumberOfResults(count.longValue());
+
+        Query q = daoService.getEntityManager().createQuery(
+                "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(ci.id, ci.contentType, ci.title, ci.precalculatedCurrentActor, ci.currentState.name, ci.location, ci.updated, ci.thumbnailLink) "
+                + "FROM ContentItem AS ci, NewsItem AS n LEFT JOIN ci.actors AS a "
+                + "WHERE ci.id=n.id AND n.outlet = :"
+                + NewsItem.PARAM_OUTLET + " AND ci.currentState = :"
+                + NewsItem.PARAM_WORKFLOW_STATE + " AND (( a.user = :"
+                + NewsItem.PARAM_USER
+                + ") OR (ci.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"
+                + NewsItem.PARAM_USER
+                + " MEMBER OF ci.currentState.actorRole.userAccounts)) "
+                + "ORDER BY ci." + sortField + " " + sortDirection);
+
+        resultSet.setHits(daoService.findWithQuery(q, params, start, rows));
+
+        long endTime = Calendar.getInstance().getTimeInMillis();
+        resultSet.setSearchTime(endTime - startTime);
+
+        return resultSet;
+    }
+
+    @Override
+    public ContentResultSet findNewsItemsByOutlet(String username, Outlet outlet, int pagingStart, int pagingRows, String sortField, String sortDirection) {
+        long startTime = Calendar.getInstance().getTimeInMillis();
+
+        UserAccount ua;
+        try {
+            ua = userFacade.findById(username);
+        } catch (DataNotFoundException ex) {
+            LOG.log(Level.WARNING, ex.getMessage(), ex);
+            ua = null;
+        }
+
+        ContentResultSet resultSet = new ContentResultSet();
+        resultSet.setResultsPerPage(pagingRows);
+        resultSet.setStart(pagingStart);
+
+        Map<String, Object> params =
+                QueryBuilder.with(NewsItem.PARAM_USER, ua).and(
+                NewsItem.PARAM_OUTLET, outlet).parameters();
+
+        Number count = daoService.executeNamedQuery(Number.class,
+                NewsItem.COUNT_BY_USER_AND_OUTLET, params);
+        resultSet.setNumberOfResults(count.longValue());
+
+        // DevNote: This is not very effecient but the old way to do dynamic
+        //          sorting in JPA1. In JPA2 the order can be added using the 
+        //          Criteria object
+        String findSql = ""
+                + "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(ci.id, ci.contentType, ci.title, ci.precalculatedCurrentActor, ci.currentState.name, ci.location, ci.updated, ci.thumbnailLink) "
+                + "FROM ContentItem AS ci, NewsItem AS n LEFT JOIN ci.actors AS a "
+                + "WHERE ci.id=n.id AND n.outlet = :"
+                + NewsItem.PARAM_OUTLET + " AND (( a.user = :"
+                + NewsItem.PARAM_USER
+                + ") OR (ci.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"
+                + MediaItem.PARAM_USER
+                + " MEMBER OF ci.currentState.actorRole.userAccounts)) "
+                + "ORDER BY ci." + sortField + " " + sortDirection;
+
+        Query q = daoService.getEntityManager().createQuery(findSql);
+
+        List results = daoService.findWithQuery(q, params, pagingStart,
+                pagingRows);
+        resultSet.setHits(results);
+
+        long endTime = Calendar.getInstance().getTimeInMillis();
+        resultSet.setSearchTime(endTime - startTime);
+
+        return resultSet;
+    }
+
+
+    @Override
+    public ContentResultSet findInbox(java.lang.String username, int pagingStart, int pagingRows, String sortField, String sortDirection) {
+        long startTime = Calendar.getInstance().getTimeInMillis();
+        
+        ContentResultSet resultSet = new ContentResultSet();
+        resultSet.setResultsPerPage(pagingRows);
+        resultSet.setStart(pagingStart);
+        
+        UserAccount ua;
+        try {
+            ua = userFacade.findById(username);
+        } catch (DataNotFoundException ex) {
+            LOG.log(Level.WARNING, "Unknown user: {0}", username);
+            LOG.log(Level.FINEST, "", ex);
+            resultSet.setNumberOfResults(0);
+            resultSet.setHits(Collections.EMPTY_LIST);
+            return resultSet;
+        }
+        
+        Map<String, Object> params =
+                QueryBuilder.with(NewsItem.PARAM_USER, ua).parameters();
+
+        Number count = daoService.executeNamedQuery(Number.class,
+                NewsItem.COUNT_INBOX, params);
+        resultSet.setNumberOfResults(count.longValue());
+
+        // DevNote: This is not very effecient but the old way to do dynamic
+        //          sorting in JPA1. In JPA2 the order can be added using the 
+        //          Criteria object
+        String findSql = ""
+                + "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(ci.id, ci.contentType, ci.title, ci.precalculatedCurrentActor, ci.currentState.name, ci.location, ci.updated, ci.thumbnailLink) "
+                + "FROM ContentItem ci LEFT JOIN ci.actors a " 
+                +" WHERE ci.currentState.showInInbox = true AND ci.currentState.workflow.endState <> ci.currentState AND ci.currentState.workflow.trashState <> ci.currentState AND (( a.user = :" + NewsItem.PARAM_USER + " AND a.role = ci.currentState.actorRole) OR (ci.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :" + NewsItem.PARAM_USER + " MEMBER OF ci.currentState.actorRole.userAccounts)) "
+                + "ORDER BY ci." + sortField + " " + sortDirection;
+                
+        Query q = daoService.getEntityManager().createQuery(findSql);
+
+        List results = daoService.findWithQuery(q, params, pagingStart,
+                pagingRows);
+        resultSet.setHits(results);
+
+        long endTime = Calendar.getInstance().getTimeInMillis();
+        resultSet.setSearchTime(endTime - startTime);
+
+        return resultSet;
     }
 }

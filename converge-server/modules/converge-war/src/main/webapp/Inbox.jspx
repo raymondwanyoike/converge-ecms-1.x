@@ -29,21 +29,35 @@
 
                 <div class="moduleContent">
 
-                    <rich:dataTable id="dtInbox" value="#{inbox.newsItems}" var="item" styleClass="table" headerClass="tableHeader" rowClasses="odd, even" rendered="#{inbox.showNewsItem}" rows="20">
+                    <rich:dataTable id="dtInbox" 
+                                    value="#{inbox.newsItems}" 
+                                    var="item" 
+                                    styleClass="table" 
+                                    headerClass="tableHeader" 
+                                    rowClasses="odd, even" 
+                                    rendered="#{inbox.showNewsItem &amp;&amp; inbox.contentView == 'list'}">
                         <rich:column styleClass="center columnIcon">
                             <f:facet name="header">
                                 <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                             </f:facet>
                             <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
-                                <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" rendered="#{!item.locked}" title="#{item.status}" alt="#{item.status}"  />
-                                <h:graphicImage value="#{i18n.resource_ICON_LOCK}" rendered="#{item.locked}" 
-                                                title="#{converge:messagePattern('i18n', 'Inbox_ITEM_LOCKED', item.checkedOutBy, item.checkedOut, null, null, null)}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" 
+                                                rendered="#{item.contentType == 'news_item'}" 
+                                                title="" alt=""  />
+                                <h:graphicImage value="#{i18n.resource_ICON_MEDIA_ITEM}" 
+                                                rendered="#{item.contentType == 'media_item'}" 
+                                                title="" alt="" />
                             </h:outputLink>
                         </rich:column>
 
-                        <rich:column sortBy="#{item.id}" sortOrder="DESCENDING" styleClass="right columnId">
+                        <rich:column styleClass="right columnId">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.Inbox_ID}" />
+                                <a4j:commandLink ajaxSingle="true" actionListener="#{inbox.onChangeSorting}" reRender="frmInbox" styleClass="#{inbox.sortBy == 'id' ? 'sort-field-activate' : 'sort-field'}">
+                                    <f:param name="sortField" value="id" />
+                                    <h:outputText value="#{i18n.Inbox_ID}" />
+                                </a4j:commandLink>
+
+
                             </f:facet>
                             <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
                                 <h:outputText value="#{item.id}">
@@ -52,50 +66,91 @@
                             </h:outputLink>
                         </rich:column>
 
-                        <rich:column sortBy="#{item.title}" styleClass="left">
+                        <rich:column styleClass="left">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.Inbox_TITLE}" />
+                                <a4j:commandLink ajaxSingle="true" actionListener="#{inbox.onChangeSorting}" reRender="frmInbox" styleClass="#{inbox.sortBy == 'title' ? 'sort-field-activate' : 'sort-field'}">
+                                    <f:param name="sortField" value="title" />
+                                    <h:outputText value="#{i18n.Inbox_TITLE}" />
+                                </a4j:commandLink>
                             </f:facet>
                             <h:panelGrid>
-                                <h:outputText value="#{item.slugline}" title="#{item.title}" rendered="#{item.slugline != null || item.slugline != ''}" />
-                                <h:outputText value="#{item.title}" rendered="#{item.slugline == null || item.slugline == ''}" />
+                                <h:outputText value="#{item.title}" />
                             </h:panelGrid>
                         </rich:column>
 
-                        <rich:column sortBy="#{item.actor}" styleClass="left">
+                        <rich:column styleClass="left">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.Inbox_ACTOR}" />
+                                <a4j:commandLink ajaxSingle="true" actionListener="#{inbox.onChangeSorting}" reRender="frmInbox" styleClass="#{inbox.sortBy == 'precalculatedCurrentActor' ? 'sort-field-activate' : 'sort-field'}">
+                                    <f:param name="sortField" value="precalculatedCurrentActor" />
+                                    <h:outputText value="#{i18n.Inbox_ACTOR}" />
+                                </a4j:commandLink>
                             </f:facet>
                             <h:outputText value="#{item.actor}" title="" />
                         </rich:column>
 
-                        <rich:column styleClass="left" sortBy="#{item.status}">
+                        <rich:column styleClass="left">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.Inbox_STATUS}" />
+                                <a4j:commandLink ajaxSingle="true" actionListener="#{inbox.onChangeSorting}" reRender="frmInbox" styleClass="#{inbox.sortBy == 'currentState.name' ? 'sort-field-activate' : 'sort-field'}">
+                                    <f:param name="sortField" value="currentState.name" />
+                                    <h:outputText value="#{i18n.Inbox_STATUS}" />
+                                </a4j:commandLink>
                             </f:facet>
-                            <h:outputText value="#{item.status}" />
+                            <a4j:commandLink reRender="frmUpdateItem" oncomplete="#{rich:component('mpUpdateItem')}.show();" ajaxSingle="true">
+                                <f:setPropertyActionListener target="#{inbox.selectedContentItemId}" value="#{item.id}" />
+                                <h:outputText value="#{item.status}" />
+                            </a4j:commandLink>
                         </rich:column>
 
-                        <rich:column styleClass="left" sortBy="#{item.outlet}">
+                        <rich:column styleClass="left">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.Inbox_LOCATION}" />
+                                <a4j:commandLink ajaxSingle="true" actionListener="#{inbox.onChangeSorting}" reRender="frmInbox" styleClass="#{inbox.sortBy == 'location' ? 'sort-field-activate' : 'sort-field'}">
+                                    <f:param name="sortField" value="location" />
+                                    <h:outputText value="#{i18n.Inbox_LOCATION}" />
+                                </a4j:commandLink>
                             </f:facet>
                             <h:panelGrid>
                                 <h:outputText value="#{item.outlet}" />
                             </h:panelGrid>
                         </rich:column>
 
-                        <rich:column sortBy="#{item.updated}" styleClass="columnDateTime">
+                        <rich:column styleClass="columnDateTime">
                             <f:facet name="header">
-                                <h:outputText value="#{i18n.Inbox_UPDATED}" title="#{i18n.Inbox_ARTICLE_UPDATED_TOOLTIP}" />
+                                <a4j:commandLink ajaxSingle="true" actionListener="#{inbox.onChangeSorting}" reRender="frmInbox" styleClass="#{inbox.sortBy == 'updated' ? 'sort-field-activate' : 'sort-field'}">
+                                    <f:param name="sortField" value="updated" />
+                                    <h:outputText value="#{i18n.Inbox_UPDATED}" />
+                                </a4j:commandLink>
                             </f:facet>
                             <h:outputText value="#{item.updated}">
-                                <f:convertDateTime type="both" pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime type="both" 
+                                                   pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" 
+                                                   timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
                         </rich:column>
 
                     </rich:dataTable>
-                    <rich:datascroller id="scNewsItems" for="dtInbox" align="center" maxPages="30" renderIfSinglePage="false" reRender="scNewsItems" rendered="#{inbox.showNewsItem}"  />
+
+                    <!-- NewsItem - Grid View //-->
+                    <rich:dataGrid id="dgInbox" 
+                                   value="#{inbox.newsItems}" 
+                                   var="item" 
+                                   styleClass="grid-view" 
+                                   columnClasses="grid-cell"
+                                   columns="5" 
+                                   rendered="#{inbox.showNewsItem &amp;&amp; inbox.contentView == 'grid'}">
+                        <h:panelGrid rowClasses="grid-image, grid-title, grid-status">
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
+                                <h:graphicImage value="#{item.thumbnailLink}" />
+                            </h:outputLink>
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
+                                <h:outputText value="#{item.title}" title="#{item.id}"  />
+                            </h:outputLink>
+                            <a4j:commandLink reRender="frmUpdateItem" oncomplete="#{rich:component('mpUpdateItem')}.show();">
+                                <f:setPropertyActionListener target="#{inbox.selectedContentItemId}" value="#{item.id}" />
+                                <h:outputText value="#{item.status}" title="#{item.actor}" />
+                            </a4j:commandLink>
+                        </h:panelGrid>
+                    </rich:dataGrid>
+
 
                     <!-- MediaItem - List View //-->
                     <rich:dataTable id="dtInboxMedia" value="#{inbox.mediaItems}" var="item"
@@ -169,7 +224,7 @@
 
                         <rich:column styleClass="left">
                             <f:facet name="header">
-                                <a4j:commandLink ajaxSingle="true" actionListener="#{inbox.onChangeSorting}" reRender="frmInbox" styleClass="#{inbox.sortBy == 'catalogue.title' ? 'sort-field-activate' : 'sort-field'}">
+                                <a4j:commandLink ajaxSingle="true" actionListener="#{inbox.onChangeSorting}" reRender="frmInbox" styleClass="#{inbox.sortBy == 'location' ? 'sort-field-activate' : 'sort-field'}">
                                     <f:param name="sortField" value="catalogue.title" />
                                     <h:outputText value="#{i18n.Inbox_LOCATION}" />
                                 </a4j:commandLink>

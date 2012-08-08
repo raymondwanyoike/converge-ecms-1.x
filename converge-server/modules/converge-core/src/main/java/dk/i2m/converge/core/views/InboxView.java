@@ -27,6 +27,8 @@ import java.util.Date;
 public class InboxView {
 
     private Long id;
+    
+    private String contentType;
 
     private String title;
 
@@ -81,9 +83,10 @@ public class InboxView {
         this.thumbnailLink = thumbnailLink;
     }
 
-    public InboxView(Long id, String title, String actor, String status,
+    public InboxView(Long id, String contentType, String title, String actor, String status,
             String location, Date updated, String thumbnailLink) {
         this.id = id;
+        this.contentType = contentType;
         this.title = title;
         this.actor = actor;
         this.status = status;
@@ -92,6 +95,14 @@ public class InboxView {
         this.thumbnailLink = thumbnailLink;
     }
 
+    public String getContentType() {
+        return this.contentType;
+    }
+    
+    public void setContentType(String contentType){
+        this.contentType = contentType;
+    }
+    
     public String getActor() {
         return actor;
     }

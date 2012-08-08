@@ -2101,6 +2101,19 @@ a.sort-field-activate, a.sort-field-activate:visited, a.sort-field-activate:hove
     border: none;
 }
 
+.grid-view .rich-table-row {
+    border: 0px;
+}
+
+.dashboardAnnouncementTable .rich-table-row .odd,
+.dashboardAnnouncementTable .rich-table-row .even,
+.grid-view .rich-table-row .odd,
+.grid-view .rich-table-row .even {
+    border: 0px;
+}
+
+.dashboardAnnouncementTable
+
 .media-item-attachment-grid {
     border: none;
 }

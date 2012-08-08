@@ -41,6 +41,17 @@ public abstract class ContentItem implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private Long id;
+    
+    /** Title of the {@link ContentItem}. */
+    @Column(name = "title") @Lob
+    private String title = "";
+    
+    @Column(name="content_type")
+    private String contentType;
+    
+    /** Location of the {@link ContentItem}. */
+    @Column(name = "location")
+    private String location = "";
 
     /** Workflow transition history of the {@link ContentItem}. */
     @OneToMany(mappedBy = "contentItem", cascade = CascadeType.ALL, fetch =
@@ -96,7 +107,47 @@ public abstract class ContentItem implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
+    
+    /**
+     * Gets the title of the {@link ContentItem}.
+     *
+     * @return Title of the {@link ContentItem}.
+     */
+    public String getTitle() {
+        return title;
+    }
 
+    /**
+     * Sets the title of the {@link ContentItem}.
+     *
+     * @param title Title of the {@link ContentItem}.
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    
+    public String getContentType() {
+        return this.contentType;
+    }
+
+    /**
+     * Gets the location of the {@link ContentItem}.
+     *
+     * @return Location of the {@link ContentItem}.
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
+     * Sets the location of the {@link ContentItem}.
+     *
+     * @param location Location of the {@link ContentItem}.
+     */
+    public void setLocation(String location) {
+        this.location = location;
+    }
+    
     /**
      * Gets the date and time when the {@link ContentItem} was created.
      *

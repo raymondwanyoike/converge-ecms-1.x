@@ -83,9 +83,6 @@ public class MediaItem extends ContentItem {
     @Column(name = "editorial_note")
     private String editorialNote = "";
 
-    @Column(name = "title") @Lob
-    private String title = "";
-
     @Column(name = "description") @Lob
     private String description = "";
 
@@ -118,14 +115,6 @@ public class MediaItem extends ContentItem {
      * Creates a new instance of {@link MediaItem}.
      */
     public MediaItem() {
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getDescription() {

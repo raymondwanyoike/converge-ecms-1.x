@@ -808,10 +808,10 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         resultSet.setNumberOfResults(count.longValue());
 
         Query q = daoService.getEntityManager().createQuery(
-                "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.precalculatedCurrentActor, n.currentState.name, n.catalogue.name, n.updated, n.thumbnailLink) "
+                "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(ci.id, ci.contentType, ci.title, ci.precalculatedCurrentActor, ci.currentState.name, ci.location, ci.updated, ci.thumbnailLink) "
                 + "FROM ContentItem AS ci, MediaItem AS n "
                 + "WHERE ci.id=n.id AND n.catalogue = :"
-                + MediaItem.PARAM_CATALOGUE + " AND n.currentState = :"
+                + MediaItem.PARAM_CATALOGUE + " AND ci.currentState = :"
                 + MediaItem.PARAM_WORKFLOW_STATE + " "
                 + "ORDER BY n." + sortField + " " + sortDirection);
 
@@ -855,16 +855,16 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         resultSet.setNumberOfResults(count.longValue());
 
         Query q = daoService.getEntityManager().createQuery(
-                "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.precalculatedCurrentActor, n.currentState.name, n.catalogue.name, n.updated, n.thumbnailLink) "
-                + "FROM ContentItem AS ci, MediaItem AS n LEFT JOIN n.actors AS a "
+                "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(ci.id, ci.contentType, ci.title, ci.precalculatedCurrentActor, ci.currentState.name, ci.location, ci.updated, ci.thumbnailLink) "
+                + "FROM ContentItem AS ci, MediaItem AS n LEFT JOIN ci.actors AS a "
                 + "WHERE ci.id=n.id AND n.catalogue = :"
-                + MediaItem.PARAM_CATALOGUE + " AND n.currentState = :"
+                + MediaItem.PARAM_CATALOGUE + " AND ci.currentState = :"
                 + MediaItem.PARAM_WORKFLOW_STATE + " AND (( a.user = :"
                 + MediaItem.PARAM_USER
-                + ") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"
+                + ") OR (ci.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"
                 + MediaItem.PARAM_USER
-                + " MEMBER OF n.currentState.actorRole.userAccounts)) "
-                + "ORDER BY n." + sortField + " " + sortDirection);
+                + " MEMBER OF ci.currentState.actorRole.userAccounts)) "
+                + "ORDER BY ci." + sortField + " " + sortDirection);
 
         resultSet.setHits(daoService.findWithQuery(q, params, start, rows));
 
@@ -906,15 +906,15 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
         // DevNote: This is not very effecient but the old way to do dynamic
         //          sorting in JPA1. In JPA2 the order can be added using the 
         //          Criteria object
-        String findSql = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(n.id, n.title, n.precalculatedCurrentActor, n.currentState.name, n.catalogue.name, n.updated, n.thumbnailLink) "
-                + "FROM ContentItem AS ci, MediaItem AS n LEFT JOIN n.actors AS a "
+        String findSql = "SELECT DISTINCT NEW dk.i2m.converge.core.views.InboxView(ci.id, ci.contentType, ci.title, ci.precalculatedCurrentActor, ci.currentState.name, ci.location, ci.updated, ci.thumbnailLink) "
+                + "FROM ContentItem AS ci, MediaItem AS n LEFT JOIN ci.actors AS a "
                 + "WHERE ci.id=n.id AND n.catalogue = :"
                 + MediaItem.PARAM_CATALOGUE + " AND (( a.user = :"
                 + MediaItem.PARAM_USER
-                + ") OR (n.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"
+                + ") OR (ci.currentState.permission = dk.i2m.converge.core.workflow.WorkflowStatePermission.GROUP AND :"
                 + MediaItem.PARAM_USER
-                + " MEMBER OF n.currentState.actorRole.userAccounts)) "
-                + "ORDER BY n." + sortField + " " + sortDirection;
+                + " MEMBER OF ci.currentState.actorRole.userAccounts)) "
+                + "ORDER BY ci." + sortField + " " + sortDirection;
 
         Query q = daoService.getEntityManager().createQuery(findSql);
 

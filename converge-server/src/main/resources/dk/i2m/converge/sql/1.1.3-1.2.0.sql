@@ -44,6 +44,7 @@ CREATE PROCEDURE proc_1_2_0_content_item_migration()
 BEGIN
     CREATE TABLE IF NOT EXISTS `content_item` (
         `id` BIGINT NOT NULL AUTO_INCREMENT,
+        `title` TEXT,
         `created` datetime DEFAULT NULL,
         `updated` datetime DEFAULT NULL,
         `current_state_id` BIGINT(20) DEFAULT NULL,
@@ -68,7 +69,14 @@ BEGIN
         KEY `FK_catalogue_role_role_id` (`role_id`)
     );	
 
-    INSERT INTO `content_item` (`id`, `created`, `updated`, `current_state_id`, `content_type`) SELECT `id`, `created`, `updated`, `current_state_id`, 'news_item' FROM `news_item`;
+    INSERT INTO `content_item` (`id`, `title`, `created`, `updated`, `current_state_id`, `content_type`) SELECT `id`, `title`, `created`, `updated`, `current_state_id`, 'news_item' FROM `news_item`;
+    UPDATE content_item c, news_item n, outlet o SET c.location=o.title WHERE n.outlet_id=o.id AND c.id=n.id;
+
+    call proc_drop_column('news_item', 'current_state_id');
+    call proc_drop_column('news_item', 'created');
+    call proc_drop_column('news_item', 'title');
+    call proc_drop_column('news_item', 'updated');
+
 END //
 
 
@@ -156,7 +164,9 @@ BEGIN
         DELETE FROM media_item WHERE status IS NULL;
 
         -- Copy media items into content item table
-        INSERT INTO `content_item` (`id`, `created`, `updated`, `current_state_id`, `content_type`) SELECT `id`, `created`, `updated`, `current_state_id`, 'media_item' FROM `media_item`;
+        INSERT INTO `content_item` (`id`, `title`, `created`, `updated`, `current_state_id`, `content_type`) SELECT `id`, `title`, `created`, `updated`, `current_state_id`, 'media_item' FROM `media_item`;
+        UPDATE content_item c, media_item m, catalogue t SET c.location=t.name WHERE m.catalogue_id=t.id AND c.id=m.id;
+        call proc_drop_column('media_item', 'title');        
         call proc_drop_column('media_item', 'current_state_id');
         call proc_drop_column('media_item', 'status');
         call proc_drop_column('media_item', 'created');

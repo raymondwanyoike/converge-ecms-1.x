@@ -158,11 +158,12 @@ public class NewsItemService {
             LOG.log(Level.WARNING, "User is not authenticated");
             return output;
         }
-
+        
         String username = context.getUserPrincipal().getName();
         LOG.log(Level.INFO, "Fetching assignments for {0}", username);
 
-        List<InboxView> assignments = newsItemFacade.findInbox(username);
+//        List<InboxView> assignments = newsItemFacade.findInbox(username);
+        List<InboxView> assignments = java.util.Collections.EMPTY_LIST;
         LOG.log(Level.INFO, "{0} items for {1}", new Object[]{assignments.size(),
                     username});
 
