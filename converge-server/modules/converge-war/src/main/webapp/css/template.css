@@ -2105,6 +2105,7 @@ a.sort-field-activate, a.sort-field-activate:visited, a.sort-field-activate:hove
     border: 0px;
 }
 
+.noborder .rich-table-row,
 .noborder .rich-table-row .odd,
 .noborder .rich-table-row .even,
 .dashboardAnnouncementTable .rich-table-row .odd,
@@ -2112,6 +2113,10 @@ a.sort-field-activate, a.sort-field-activate:visited, a.sort-field-activate:hove
 .grid-view .rich-table-row .odd,
 .grid-view .rich-table-row .even {
     border: 0px;
+}
+
+.noborder .rich-table-row:hover {
+    background: white;
 }
 
 .media-item-attachment-grid {
