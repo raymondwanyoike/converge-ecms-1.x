@@ -87,7 +87,7 @@
                                     <h:panelGrid id="pgSubjects" columnClasses="tabSheet" style="padding: 10px; width: 100%">
                                         <h:panelGroup styleClass="scrollableContent" layout="block">
                                             <rich:tree switchType="ajax" ajaxSingle="true" ajaxSubmitSelection="true" nodeSelectListener="#{newsItem.onSelectSubject}" reRender="dtConcepts">
-                                                <rich:recursiveTreeNodesAdaptor roots="#{common.parentSubjects}" var="item" nodes="#{item.narrower}" >
+                                                <rich:recursiveTreeNodesAdaptor roots="#{newsItem.parentSubjects}" var="item" nodes="#{item.narrower}" >
                                                     <rich:treeNode>
                                                         <h:outputText value=" #{item.name}" />
                                                         <rich:toolTip style="width: 350px;" styleClass="tooltip" showDelay="1000">

@@ -767,6 +767,15 @@ public class NewsItem {
     public void onToggleShowClosedEditions(ActionEvent event) {
         setEditionDate(editionDate);
     }
+    
+    private Subject[] topSubjects = null;
+    public Subject[] getParentSubjects() {
+        if (this.topSubjects == null) {
+            List<Subject> parents = metaDataFacade.findTopLevelSubjects();
+            this.topSubjects = parents.toArray(new Subject[parents.size()]);
+        }
+        return this.topSubjects;
+    }
 
     // -------------------------------------------------------------------------
     // -- PROPERTIES
