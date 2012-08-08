@@ -2105,6 +2105,8 @@ a.sort-field-activate, a.sort-field-activate:visited, a.sort-field-activate:hove
     border: 0px;
 }
 
+.noborder .rich-table-row .odd,
+.noborder .rich-table-row .even,
 .dashboardAnnouncementTable .rich-table-row .odd,
 .dashboardAnnouncementTable .rich-table-row .even,
 .grid-view .rich-table-row .odd,
@@ -2112,10 +2114,16 @@ a.sort-field-activate, a.sort-field-activate:visited, a.sort-field-activate:hove
     border: 0px;
 }
 
-.dashboardAnnouncementTable
-
 .media-item-attachment-grid {
     border: none;
+    width: auto;
+}
+
+.media-item-attachment-grid .rich-table-row .odd,
+.media-item-attachment-grid .rich-table-row .even,
+.media-item-attachment-grid .rich-table-row
+{
+    background: none;
 }
 
 .media-item-details-upload-hint {
