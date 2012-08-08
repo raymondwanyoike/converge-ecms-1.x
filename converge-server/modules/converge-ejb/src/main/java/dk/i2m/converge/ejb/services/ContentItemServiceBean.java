@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.ejb.services;
 
+import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.ContentItem;
 import dk.i2m.converge.core.content.ContentItemActor;
@@ -49,20 +50,22 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
 
     private static final Logger LOG =
             Logger.getLogger(ContentItemServiceBean.class.getName());
+    @EJB
+    private DaoServiceLocal daoService;
+    @EJB
+    private UserServiceLocal userService;
+    @EJB
+    private PluginContextBeanLocal pluginContext;
+    @EJB
+    private NewsItemFacadeLocal newsItemFacade;
+    @EJB
+    private CatalogueFacadeLocal catalogueFacade;
+    @Resource
+    private SessionContext ctx;
 
-    @EJB private DaoServiceLocal daoService;
-
-    @EJB private UserServiceLocal userService;
-
-    @EJB private PluginContextBeanLocal pluginContext;
-
-    @EJB private NewsItemFacadeLocal newsItemFacade;
-
-    @EJB private CatalogueFacadeLocal catalogueFacade;
-
-    @Resource private SessionContext ctx;
-
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public ContentItem start(ContentItem contentItem) throws
@@ -195,7 +198,9 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ContentItem step(ContentItem contentItem, Long step,
             boolean stateTransition) throws
@@ -208,8 +213,13 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
             ua = userService.findById(uid);
             pluginContext.setCurrentUserAccount(ua);
         } catch (Exception ex) {
-            throw new WorkflowStateTransitionException(
-                    "Could not resolve transition initator", ex);
+            try {
+                // Workflow step was executed by Converge
+                ua = userService.findById("converge");
+            } catch (Exception ex2) {
+                throw new WorkflowStateTransitionException(
+                        "Could not resolve transition initator", ex);
+            }
         }
 
         Calendar now = Calendar.getInstance();
@@ -378,7 +388,9 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
         return contentItem;
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void generateThumbnailLinks() {
         final int BATCH_SIZE = 50;
@@ -415,7 +427,7 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
 
     /**
      * Gets a default <em>MediaItem</em> icon, or if a preview exist.
-     * 
+     *
      * @return default <em>NewsItem</em> icon, or if a preview exist
      */
     private String getThumbnailLinkFromMediaItem(MediaItem mediaItem) {
@@ -441,9 +453,9 @@ public class ContentItemServiceBean implements ContentItemServiceLocal {
     /**
      * Gets a default <em>NewsItem</em> icon, or if a preview exist for one of
      * the media attachments.
-     * 
+     *
      * @return default <em>NewsItem</em> icon, or if a preview exist for one of
-     *         the media attachments.
+     * the media attachments.
      */
     private String getThumbnailLinkFromNewsItem(NewsItem newsItem) {
         String defaultLink = "/images/type-news-item.png";

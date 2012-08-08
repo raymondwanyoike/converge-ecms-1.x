@@ -197,7 +197,7 @@
             <web-resource-name>Administrator restricted pages</web-resource-name>
             <description/>
             <url-pattern>/administrator/*</url-pattern>
-            <url-pattern>/administrator*</url-pattern>
+            <url-pattern>/administrator</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>ADMINISTRATOR</role-name>

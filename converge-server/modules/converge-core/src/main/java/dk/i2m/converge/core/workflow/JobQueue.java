@@ -36,51 +36,40 @@ import javax.persistence.*;
 public class JobQueue implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    /** Update query for removing all completed items from the JobQueue. */
+    /**
+     * Update query for removing all completed items from the JobQueue.
+     */
     public static final String REMOVE_COMPLETED = "JobQueue.RemoveCompleted";
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
     @Column(name = "name")
     private String name;
-
     @Column(name = "type_class")
     @Lob
     private String typeClass;
-
     @Column(name = "type_class_id")
     private Long typeClassId;
-
     @Column(name = "plugin_action_class")
     private String pluginAction;
-
     @Column(name = "plugin_configuration_id")
     private Long pluginConfiguration;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private JobQueueStatus status = JobQueueStatus.WAITING;
-
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "execution_time")
     private Date executionTime;
-
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "started")
     private Date started;
-
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "finished")
     private Date finished;
-
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "added")
     private Date added;
-
     @OneToMany(mappedBy = "jobQueue")
     private List<JobQueueParameter> parameters =
             new ArrayList<JobQueueParameter>();
@@ -178,7 +167,7 @@ public class JobQueue implements Serializable {
 
     /**
      * Gets the {@link List} of parameters for the {@link JobQueue} item.
-     * 
+     *
      * @return {@link List} of parameters to set for the {@link JobQueue} item
      */
     public List<JobQueueParameter> getParameters() {
@@ -187,9 +176,9 @@ public class JobQueue implements Serializable {
 
     /**
      * Sets the {@link List} of parameters for the {@link JobQueue} item.
-     * 
-     * @param parameters
-     *          {@link List} of parameters to set for the {@link JobQueue} item
+     *
+     * @param parameters {@link List} of parameters to set for the
+     * {@link JobQueue} item
      */
     public void setParameters(List<JobQueueParameter> parameters) {
         this.parameters = parameters;
@@ -200,7 +189,7 @@ public class JobQueue implements Serializable {
      * parameter name as the key, and a {@link List} to contain the values for
      * the parameter. In many cases the {@link List} will only contain a single
      * value.
-     * 
+     *
      * @return {@link Map} containing the parameters.
      */
     public Map<String, List<String>> getParametersMap() {
@@ -218,11 +207,9 @@ public class JobQueue implements Serializable {
 
     /**
      * Adds a parameter to the {@link JobQueue} item.
-     * 
-     * @param name
-     *          Name of the parameter
-     * @param value 
-     *          Value of the parameter
+     *
+     * @param name Name of the parameter
+     * @param value Value of the parameter
      */
     public void addParameter(String name, String value) {
         JobQueueParameter param = new JobQueueParameter(name, value, this);
@@ -233,8 +220,7 @@ public class JobQueue implements Serializable {
      * Creates an instance of the action specified in {@link #getQueueAction()}.
      *
      * @return Instance of the action
-     * @throws WorkflowActionException
-     *          If the action could not be instantiated
+     * @throws WorkflowActionException If the action could not be instantiated
      */
     public PluginAction getAction() throws JobQueueActionException {
         try {
@@ -276,7 +262,9 @@ public class JobQueue implements Serializable {
         return end.getTimeInMillis() - start.getTimeInMillis();
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public int hashCode() {
         int hash = 0;
@@ -285,13 +273,13 @@ public class JobQueue implements Serializable {
     }
 
     /**
-     * A {@link JobQueue} is equal to this {@link JobQueue} if their 
+     * A {@link JobQueue} is equal to this {@link JobQueue} if their
      * {@link #id}s are equal.
-     * 
-     * @param object
-     *          {@link Object} to determine if equal to this {@link JobQueue}
+     *
+     * @param object {@link Object} to determine if equal to this
+     * {@link JobQueue}
      * @return {@code true} if the {@code object} is a {@link JobQueue} with the
-     *         same {@link #id} as this {@link JobQueue}
+     * same {@link #id} as this {@link JobQueue}
      */
     @Override
     public boolean equals(Object object) {
@@ -306,9 +294,12 @@ public class JobQueue implements Serializable {
         return true;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
-        return getClass().getName() + "[id=" + id + "]";
+        return getClass().getName() + "[id=" + id + ", name=" + name + ", "
+                + "executionTime=" + executionTime + "]";
     }
 }

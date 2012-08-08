@@ -16,6 +16,8 @@
  */
 package dk.i2m.converge.ejb.facades;
 
+import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
+
 /**
  * {@link WorkflowStateTransitionException} thrown if validation failed prior
  * to executing the workflow state transition.

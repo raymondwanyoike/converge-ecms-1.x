@@ -204,7 +204,6 @@
                 </rich:modalPanel>
             </h:form>
 
-
             <h:form id="frmWorkflowStateDetails">
                 <rich:modalPanel id="mpWorkflowStateDetails" autosized="true" domElementAttachment="parent" >
                     <f:facet name="header">
@@ -216,7 +215,7 @@
                         <h:panelGroup>
                             <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
                                             style="link"
-                                            oncomplete="#{rich:component('mpWorkflowStateDetails')}.hide()" />
+                                            onclick="#{rich:component('mpWorkflowStateDetails')}.hide()" />
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid rendered="#{administrator_Workflows.selectedWorkflowState != null}" id="pgWorkflowStateDetails">

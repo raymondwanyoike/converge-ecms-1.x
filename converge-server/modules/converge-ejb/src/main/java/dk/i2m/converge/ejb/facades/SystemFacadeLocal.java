@@ -27,6 +27,7 @@ import dk.i2m.converge.core.plugin.PluginConfiguration;
 import dk.i2m.converge.core.workflow.JobQueue;
 import dk.i2m.converge.core.workflow.JobQueueParameter;
 import dk.i2m.converge.domain.Property;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import javax.ejb.Local;
@@ -196,12 +197,13 @@ public interface SystemFacadeLocal {
      * @param pluginConfigurationId Unique identifier of the plug-in
      * configuration to execute on the type
      * @param parameters Run-time parameters for the plug-in
+     * @param scheduled Date when the item should be executed
      * @return {@link JobQueue} representing the entry in the queue
      * @throws DataNotFoundException If the {@link PluginConfiguration} does not
      * exist
      */
     JobQueue addToJobQueue(String name, String typeName, Long typeId,
-            Long pluginConfigurationId, List<JobQueueParameter> parameters)
+            Long pluginConfigurationId, List<JobQueueParameter> parameters, Date scheduled)
             throws DataNotFoundException;
 
     /**

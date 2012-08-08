@@ -103,7 +103,7 @@
                     </div>
                 </a4j:region>
 
-                <a4j:region id="regProperties">
+                    <a4j:region id="regProperties" rendered="#{!empty administrator_PluginConfigurationDetail.pluginConfiguration.action.availableProperties}">
                     <converge:moduleHeader moduleTitle="#{i18n.administrator_PluginConfigurationDetail_CONFIGURATION_PROPERTIES}" />
                     <div class="moduleContent">
 
@@ -206,6 +206,12 @@
                                     <ui:fragment rendered="#{administrator_PluginConfigurationDetail.propertyDefinition.type == 'rendition'}">
                                         <h:selectOneMenu value="#{administrator_PluginConfigurationDetail.property.value}">
                                             <f:selectItems value="#{administrator_PluginConfigurationDetail.renditions}" />
+                                        </h:selectOneMenu>
+                                    </ui:fragment>
+                                    
+                                    <ui:fragment rendered="#{administrator_PluginConfigurationDetail.propertyDefinition.type == 'workflow_state_step'}">
+                                        <h:selectOneMenu value="#{administrator_PluginConfigurationDetail.property.value}">
+                                            <f:selectItems value="#{administrator_PluginConfigurationDetail.workflowStateSteps}" />
                                         </h:selectOneMenu>
                                     </ui:fragment>
 

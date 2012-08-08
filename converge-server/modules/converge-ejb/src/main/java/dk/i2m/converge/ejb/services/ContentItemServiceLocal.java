@@ -17,7 +17,7 @@
 package dk.i2m.converge.ejb.services;
 
 import dk.i2m.converge.core.content.ContentItem;
-import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
+import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
 import javax.ejb.Local;
 
 /**

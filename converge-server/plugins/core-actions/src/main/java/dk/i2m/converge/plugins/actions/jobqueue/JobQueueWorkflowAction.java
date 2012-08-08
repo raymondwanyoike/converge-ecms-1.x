@@ -19,11 +19,11 @@ package dk.i2m.converge.plugins.actions.jobqueue;
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.ContentItem;
 import dk.i2m.converge.core.logging.LogSeverity;
+import dk.i2m.converge.core.plugin.PluginConfiguration;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.plugin.WorkflowAction;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.workflow.JobQueue;
-import dk.i2m.converge.core.plugin.PluginConfiguration;
 import dk.i2m.converge.core.workflow.WorkflowStepAction;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,7 +37,7 @@ import java.util.*;
 public class JobQueueWorkflowAction implements WorkflowAction {
 
     private ResourceBundle bundle = ResourceBundle.getBundle(
-            "dk.i2m.converge.plugins.actions.jobqueue.Messages");
+            "dk.i2m.converge.plugins.actions.jobqueue.WorkflowActionMessages");
 
     private Map<String, String> availableProperties = null;
 
@@ -76,7 +76,7 @@ public class JobQueueWorkflowAction implements WorkflowAction {
         try {
             ctx.addToJobQueue(getName() + " #" + item.getId(), item.getClass().
                     getName(), item.getId(), this.pluginConfigurationId,
-                    Collections.EMPTY_LIST);
+                    Collections.EMPTY_LIST, Calendar.getInstance().getTime());
         } catch (DataNotFoundException ex) {
             log(LogSeverity.WARNING, ex.getMessage());
         }

@@ -20,6 +20,7 @@ import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
+import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.plugin.*;
 import java.util.*;
@@ -138,16 +139,31 @@ public class OpenCalaisAction extends PluginAction {
     private void processMediaItem(MediaItem mediaItem) throws
             PluginActionException {
 
+        LOG.log(Level.FINE, "Processing Media Item");
         try {
             String enrichRendition = mediaItem.getCatalogue().
                     getOriginalRendition().
                     getName();
+            LOG.log(Level.FINE, "Default rendition to use for enrichment: {0}", enrichRendition);
 
             if (instanceProperties.containsKey(PluginActionProperty.ENRICH_RENDITION.
                     name())) {
                 enrichRendition =
                         instanceProperties.get(PluginActionProperty.ENRICH_RENDITION.
                         name()).iterator().next();
+                LOG.log(Level.FINE, "Rendition #{0} specified in the PluginConfiguration", enrichRendition);
+                Long renditionId = 0L;
+                try {
+                    renditionId = Long.valueOf(enrichRendition);
+                    Rendition rendition = ctx.findRenditionById(renditionId);
+                    enrichRendition = rendition.getName();
+                } catch (NumberFormatException ex) {
+                    LOG.log(Level.WARNING, "Invalid value specified for Rendition in PluginConfiguration: {0}", enrichRendition);
+                    throw new PluginActionException(ex);
+                } catch (DataNotFoundException ex) {
+                    LOG.log(Level.WARNING, "Unknown  Rendition specified in PluginConfiguration: {0}", renditionId);
+                    throw new PluginActionException(ex);
+                }
             };
 
 

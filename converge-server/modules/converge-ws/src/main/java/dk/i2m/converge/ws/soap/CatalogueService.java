@@ -23,7 +23,7 @@ import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
-import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
+import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;

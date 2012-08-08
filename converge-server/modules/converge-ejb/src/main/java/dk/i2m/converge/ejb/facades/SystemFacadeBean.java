@@ -50,18 +50,18 @@ public class SystemFacadeBean implements SystemFacadeLocal {
 
     private static final Logger LOG = Logger.getLogger(SystemFacadeBean.class.
             getName());
-
-    @EJB private UserServiceLocal userService;
-
-    @EJB private ConfigurationServiceLocal cfgService;
-
-    @EJB private DaoServiceLocal daoService;
-
-    @EJB private NewsItemFacadeLocal newsItemFacade;
-
-    @EJB private TimerServiceLocal timerService;
-
-    @EJB private PluginContextBeanLocal pluginContext;
+    @EJB
+    private UserServiceLocal userService;
+    @EJB
+    private ConfigurationServiceLocal cfgService;
+    @EJB
+    private DaoServiceLocal daoService;
+    @EJB
+    private NewsItemFacadeLocal newsItemFacade;
+    @EJB
+    private TimerServiceLocal timerService;
+    @EJB
+    private PluginContextBeanLocal pluginContext;
 
     /**
      * Creates a new instance of {@link SystemFacadeBean}.
@@ -72,7 +72,8 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     /**
      * Conducts a sanity check of the system.
      *
-     * @return {@code true} if the sanity of the system is OK, otherwise {@code false}
+     * @return {@code true} if the sanity of the system is OK, otherwise
+     * {@code false}
      */
     @Override
     public boolean sanityCheck() {
@@ -405,20 +406,26 @@ public class SystemFacadeBean implements SystemFacadeLocal {
             daoService.delete(LogEntry.class, entry.getId());
         }
     }
-    
-    /** {@inheritDoc } */
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void clearAllLogEntries() {
         daoService.executeQuery(LogEntry.DELETE_ALL);
     }
-    
-    /** {@inheritDoc } */
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void clearOldLogEntries(Date date) {
         daoService.executeQuery(LogEntry.DELETE_OLD, QueryBuilder.with(LogEntry.PARAMETER_DATE, date));
     }
-    
-    /** {@inheritDoc } */
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void clearOldLogEntries() {
         int daysToKeep = cfgService.getInteger(ConfigurationKey.LOG_KEEP);
@@ -426,29 +433,39 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         now.roll(Calendar.DAY_OF_MONTH, -daysToKeep);
         clearOldLogEntries(now.getTime());
     }
-    
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<JobQueue> findJobQueue() {
         return daoService.findAll(JobQueue.class, "executionTime", true);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeJobQueue(Long id) {
         daoService.delete(JobQueue.class, id);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JobQueue addToJobQueue(String name, String typeName, Long typeId,
-            Long pluginConfigurationId, List<JobQueueParameter> parameters)
+            Long pluginConfigurationId, List<JobQueueParameter> parameters, Date scheduled)
             throws DataNotFoundException {
 
         JobQueue q = new JobQueue();
         q.setAdded(Calendar.getInstance().getTime());
         q.setName(name);
+        if (scheduled == null) {
+            q.setExecutionTime(Calendar.getInstance().getTime());
+        } else {
+            q.setExecutionTime(scheduled);
+        }
         q.setParameters(parameters);
         q.setStatus(JobQueueStatus.WAITING);
         q.setPluginConfiguration(pluginConfigurationId);
@@ -461,20 +478,25 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         return daoService.create(q);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void executeJobQueue() {
         List<JobQueue> queue = findJobQueue();
         Calendar now = Calendar.getInstance();
         for (JobQueue item : queue) {
             try {
-                if (item.getStatus().equals(JobQueueStatus.WAITING) && item.
-                        getExecutionTime().after(now.getTime())) {
+                LOG.log(Level.FINE, "Examining {0} {1}", new Object[]{item.getId(), item.getName()});
+                if (item.getStatus().equals(JobQueueStatus.WAITING) && now.getTime().after(
+                        item.getExecutionTime())) {
+                    LOG.log(Level.FINE, "{0} {1} is ready for execution", new Object[]{item.getId(), item.getName()});
                     item.setStatus(JobQueueStatus.READY);
                 }
 
                 if (item.getStatus().equals(JobQueueStatus.READY) || item.
                         getStatus().equals(JobQueueStatus.FAILED)) {
+                    LOG.log(Level.FINE, "Starting execution of {0} {1}", new Object[]{item.getId(), item.getName()});
                     item.setStatus(JobQueueStatus.EXECUTION);
                     item.setStarted(Calendar.getInstance().getTime());
                     daoService.update(item);
@@ -490,7 +512,15 @@ public class SystemFacadeBean implements SystemFacadeLocal {
 
                         item.setFinished(Calendar.getInstance().getTime());
                         item.setStatus(JobQueueStatus.COMPLETED);
+
+                        LOG.log(Level.FINE, "PluginConfiguratione executed successfully");
+                        LOG.log(Level.FINE, "Adding  'oncomplete' PluginConfigurations to JobQueue");
+                        for (PluginConfiguration completeCfg : cfg.getOnCompletePluginConfiguration()) {
+                            LOG.log(Level.FINE, "+ {1} {0}", new Object[]{completeCfg.getName(), completeCfg.getId()});
+                            addToJobQueue(completeCfg.getName(), item.getTypeClass(), item.getTypeClassId(), completeCfg.getId(), item.getParameters(), Calendar.getInstance().getTime());
+                        }
                     } catch (DataNotFoundException ex) {
+                        LOG.log(Level.FINE, "Failed execution of {0} {1}. " + ex.getMessage(), new Object[]{item.getId(), item.getName()});
                         item.setStatus(JobQueueStatus.FAILED_COMPLETED);
                         item.setFinished(Calendar.getInstance().getTime());
                     } catch (PluginActionException ex) {
@@ -499,6 +529,7 @@ public class SystemFacadeBean implements SystemFacadeLocal {
                         } else {
                             item.setStatus(JobQueueStatus.FAILED);
                         }
+                        LOG.log(Level.FINE, "Failed execution of {0} {1}. " + ex.getMessage(), new Object[]{item.getId(), item.getName()});
 
                         item.setFinished(Calendar.getInstance().getTime());
                     }
@@ -516,44 +547,56 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         return daoService.executeQuery(NewswireService.RESET_PROCESSING);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public List<PluginConfiguration> findPluginConfigurations() {
         return daoService.findAll(PluginConfiguration.class);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public PluginConfiguration findPluginConfigurationById(Long id) throws
             DataNotFoundException {
         return daoService.findById(PluginConfiguration.class, id);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public PluginConfiguration createPluginConfiguration(
             PluginConfiguration pluginConfiguration) {
         return daoService.create(pluginConfiguration);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public PluginConfiguration updatePluginConfiguration(
             PluginConfiguration pluginConfiguration) {
         return daoService.update(pluginConfiguration);
     }
-    
-    /** {@inheritDoc } */
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void deletePluginConfigurationById(Long id) {
         daoService.delete(PluginConfiguration.class, id);
     }
-    
-    /** {@inheritDoc } */
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public PluginConfiguration initPluginConfiguration() {
         PluginConfiguration cfg = new PluginConfiguration();
-        
+
         // Set the default action
         PluginService pluginService = PluginManager.createPluginService();
         Iterator<PluginAction> plugins = pluginService.getPlugins();
@@ -562,7 +605,7 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         }
         PluginAction firstAction = plugins.next();
         cfg.setActionClass(firstAction.getClass().getName());
-        
+
         return cfg;
     }
 }

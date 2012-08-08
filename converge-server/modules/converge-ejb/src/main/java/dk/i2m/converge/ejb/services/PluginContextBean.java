@@ -42,7 +42,7 @@ import dk.i2m.converge.ejb.facades.*;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -84,6 +84,10 @@ public class PluginContextBean implements PluginContextBeanLocal {
     @EJB private OutletFacadeLocal outletFacade;
 
     @EJB private ContentItemFacadeLocal contentItemFacade;
+    
+    @EJB private ContentItemServiceLocal contentItemService;
+    
+    @EJB private WorkflowFacadeLocal workflowFacade;
 
     private UserAccount currentUserAccount = null;
 
@@ -215,6 +219,23 @@ public class PluginContextBean implements PluginContextBeanLocal {
         } catch (DataNotFoundException ex) {
             return null;
         }
+    }
+    
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public Rendition findRenditionById(Long id) throws DataNotFoundException {
+         return catalogueFacade.findRenditionById(id);
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public WorkflowStep findWorkflowStep(Long id) throws DataNotFoundException {
+        return workflowFacade.findWorkflowStepById(id); 
     }
 
     @Override
@@ -371,9 +392,16 @@ public class PluginContextBean implements PluginContextBeanLocal {
     /** {@inheritDoc} */
     @Override
     public JobQueue addToJobQueue(String name, String typeName, Long typeId,
-            Long pluginConfigurationId, List<JobQueueParameter> parameters)
+            Long pluginConfigurationId, List<JobQueueParameter> parameters, 
+            Date scheduled)
             throws DataNotFoundException {
         return systemFacade.addToJobQueue(name, typeName, typeId,
-                pluginConfigurationId, parameters);
+                pluginConfigurationId, parameters, scheduled);
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public ContentItem step(ContentItem ci, Long stepId, boolean stateTransition) throws WorkflowStateTransitionException {
+        return contentItemService.step(ci, stepId, stateTransition);
     }
 }

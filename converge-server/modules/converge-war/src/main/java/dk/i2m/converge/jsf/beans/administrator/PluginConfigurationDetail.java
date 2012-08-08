@@ -23,9 +23,13 @@ import dk.i2m.converge.core.plugin.PluginActionPropertyDefinition;
 import dk.i2m.converge.core.plugin.PluginConfiguration;
 import dk.i2m.converge.core.plugin.PluginConfigurationProperty;
 import dk.i2m.converge.core.plugin.PropertyDefinitionNotFoundException;
+import dk.i2m.converge.core.workflow.Workflow;
 import dk.i2m.converge.core.workflow.WorkflowActionException;
+import dk.i2m.converge.core.workflow.WorkflowState;
+import dk.i2m.converge.core.workflow.WorkflowStep;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
+import dk.i2m.converge.ejb.facades.WorkflowFacadeLocal;
 import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.jsf.JsfUtils;
 import static dk.i2m.jsf.JsfUtils.*;
@@ -55,6 +59,8 @@ public class PluginConfigurationDetail {
     private SystemFacadeLocal systemFacade;
     @EJB
     private CatalogueFacadeLocal catalogueFacade;
+    @EJB
+    private WorkflowFacadeLocal workflowFacade;
     private PluginConfiguration pluginConfiguration;
     private PluginConfiguration eventPluginConfiguration;
     private PluginConfigurationProperty property = new PluginConfigurationProperty();
@@ -146,6 +152,9 @@ public class PluginConfigurationDetail {
             if (def.getType().equalsIgnoreCase("rendition")) {
                 Rendition rendition = catalogueFacade.findRenditionById(Long.valueOf(property.getValue()));
                 return rendition.getLabel();
+            } else if (def.getType().equalsIgnoreCase("workflow_state_step")) {
+                WorkflowStep step = workflowFacade.findWorkflowStepById(Long.valueOf(property.getValue()));
+                return step.getName();
             } else {
                 return property.getValue();
             }
@@ -311,6 +320,28 @@ public class PluginConfigurationDetail {
         }
 
         return renditions;
+    }
+    
+    public Map<String, String> getWorkflowStateSteps() {
+        Map<String, String> steps = new LinkedHashMap<String, String>();
+
+        List<Workflow> results = workflowFacade.findAllWorkflows();
+
+        for (Workflow workflow : results) {
+            for (WorkflowState state : workflow.getStates()) {
+                for (WorkflowStep step : state.getNextStates()) {
+                    StringBuilder label = new StringBuilder();
+                    label.append(workflow.getName())
+                            .append(" : ")
+                            .append(state.getName())
+                            .append(" : ")
+                            .append(step.getName());
+                    steps.put(label.toString(), "" + step.getId());
+                }
+            }
+        }
+
+        return steps;
     }
 
     /**

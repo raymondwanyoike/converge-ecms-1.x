@@ -88,7 +88,7 @@ public class JobQueueAction implements EditionAction {
         try {
             ctx.addToJobQueue(getName() + " #" + ni.getId(), ni.getClass().
                     getName(), ni.getId(), this.pluginConfigurationId,
-                    Collections.EMPTY_LIST);
+                    Collections.EMPTY_LIST, Calendar.getInstance().getTime());
         } catch (DataNotFoundException ex) {
             log(LogSeverity.WARNING, ex.getMessage());
         }

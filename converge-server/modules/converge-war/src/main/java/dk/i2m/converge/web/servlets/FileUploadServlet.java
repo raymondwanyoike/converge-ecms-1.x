@@ -27,7 +27,7 @@ import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
-import dk.i2m.converge.ejb.facades.WorkflowStateTransitionException;
+import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

@@ -44,7 +44,7 @@ public class SearchEngineIndexingAction extends PluginAction {
     public SearchEngineIndexingAction() {
         onInit();
     }
-    
+
     @Override
     public void onInit() {
         setBundle("dk.i2m.converge.plugins.indexing.Messages");
@@ -56,31 +56,34 @@ public class SearchEngineIndexingAction extends PluginAction {
             Map<String, List<String>> variables) throws PluginActionException {
         this.ctx = ctx;
 
-        if (itemType.equals(ContentItem.class.getName())) {
-            ContentItem ci;
-            try {
-                ci = ctx.findContentItemById(itemId);
-            } catch (DataNotFoundException ex) {
-                throw new PluginActionException("ContentItem #" + itemId
-                        + " does not exist", ex, true);
-            }
 
-            // Type processing
-            try {
-                if (ci instanceof NewsItem) {
-                    indexNewsItem((NewsItem) ci);
-                } else if (ci instanceof MediaItem) {
-                    indexMediaItem((MediaItem) ci);
-                }
-            } catch (SearchEngineIndexingException ex) {
-                throw new PluginActionException(ex.getMessage(), ex, false);
-            }
+        Object obj = getObjectFromClassName(itemType);
 
-        } else {
+        if (!(obj instanceof ContentItem)) {
             throw new PluginActionException(getName()
                     + " only supports processing of " + ContentItem.class.
                     getName(), true);
         }
+
+        ContentItem ci;
+        try {
+            ci = ctx.findContentItemById(itemId);
+        } catch (DataNotFoundException ex) {
+            throw new PluginActionException("ContentItem #" + itemId
+                    + " does not exist", ex, true);
+        }
+
+        // Type processing
+        try {
+            if (ci instanceof NewsItem) {
+                indexNewsItem((NewsItem) ci);
+            } else if (ci instanceof MediaItem) {
+                indexMediaItem((MediaItem) ci);
+            }
+        } catch (SearchEngineIndexingException ex) {
+            throw new PluginActionException(ex.getMessage(), ex, false);
+        }
+
     }
 
     private void indexNewsItem(NewsItem newsItem) throws
@@ -97,14 +100,14 @@ public class SearchEngineIndexingAction extends PluginAction {
 
     /**
      * The plug-in does not have any properties.
-     * 
+     *
      * @return Empty {@link List}
      */
     @Override
     public List<PluginActionPropertyDefinition> getAvailableProperties() {
         return Collections.EMPTY_LIST;
     }
-    
+
     /**
      * {@inheritDoc }
      */

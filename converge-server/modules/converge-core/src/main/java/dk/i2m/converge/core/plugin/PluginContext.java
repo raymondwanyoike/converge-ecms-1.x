@@ -43,7 +43,10 @@ import dk.i2m.converge.core.workflow.JobQueueParameter;
 import dk.i2m.converge.core.workflow.JobQueueStatus;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.WorkflowState;
+import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
+import dk.i2m.converge.core.workflow.WorkflowStep;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -229,7 +232,7 @@ public interface PluginContext {
 
     /**
      * Gets a {@link List} of the latest forex {@Link Rate}s.
-     * <p/>
+     *
      * @return {@link List} of the latest forex {@Link Rate}s
      */
     List<Rate> findForexListing();
@@ -239,6 +242,25 @@ public interface PluginContext {
     Catalogue findCatalogue(Long catalogueId);
 
     Rendition findRenditionByName(String name);
+    
+    /**
+     * Finds an existing {@link Rendition} by its unique identifier.
+     * 
+     * @param id Unique identifier of the {@link Rendition}
+     * @return {@link Rendition} matching the given {@code id}
+     * @throws DataNotFound If no {@link Rendition} was found to match the given {@code id}
+     */
+    Rendition findRenditionById(Long id) throws DataNotFoundException;
+    
+    /**
+     * Finds an existing {@link WorkflowStep} by its unique identifier.
+     * 
+     * @param id Unique identifier of the {@link WorkflowStep}
+     * @return {@link WorkflowStep} matching the given {@code id}
+     * @throws DataNotFoundException If no {@link WorkflowStep} was found to match the given {@code id}
+     */
+    WorkflowStep findWorkflowStep(Long id) throws DataNotFoundException;
+    
 
     /**
      * Archives a {@link File} in a {@link dk.i2m.converge.core.content.catalogue.Catalogue}.
@@ -368,22 +390,28 @@ public interface PluginContext {
     /**
      * Adds an entry in the {@link JobQueue}.
      * 
-     * @param name
-     *          Name of the job
-     * @param typeName
-     *          Type of item to act on
-     * @param typeId
-     *          Unique identifier of the item to act on
-     * @param pluginConfigurationId
-     *          Unique identifier of the plug-in configuration to execute on the
-     *          type
-     * @param parameters
-     *          Run-time parameters for the plug-in
+     * @param name Name of the job
+     * @param typeName Type of item to act on
+     * @param typeId Unique identifier of the item to act on
+     * @param pluginConfigurationId Unique identifier of the plug-in configuration to execute on the type
+     * @param parameters Run-time parameters for the plug-in
+     * @param scheduled Date when the item should be executed
      * @return {@link JobQueue} representing the entry in the queue
-     * @throws DataNotFoundException 
-     *          If the {@link PluginConfiguration} does not exist
+     * @throws DataNotFoundException If the {@link PluginConfiguration} does not exist
      */
     JobQueue addToJobQueue(String name, String typeName, Long typeId,
-            Long pluginConfigurationId, List<JobQueueParameter> parameters)
-            throws DataNotFoundException;
+            Long pluginConfigurationId, List<JobQueueParameter> parameters, 
+            Date scheduled) throws DataNotFoundException;
+    
+    
+    /**
+     * Promotes the {@link ContentItem} in the workflow.
+     *
+     * @param contentItem {@link ContentItem} to promote
+     * @param step Unique identifier of the next step
+     * @param stateTransition  Is the step a state transition (skipping the WorkflowOption) or is it a WorkflowOption transition. A state transition can be used to move from one state to another by-passing declared workflow options
+     * @return Promoted {@link ContentItem}
+     * @throws WorkflowStateTransitionException If the next state is not legal or if the step failed
+     */
+    ContentItem step(ContentItem ci, Long stepId, boolean stateTransition) throws WorkflowStateTransitionException;
 }
