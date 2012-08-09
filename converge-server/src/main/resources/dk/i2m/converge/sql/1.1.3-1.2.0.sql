@@ -50,6 +50,7 @@ BEGIN
         `current_state_id` BIGINT(20) DEFAULT NULL,
         `precalc_current_actor` VARCHAR(255) DEFAULT '',
         `content_type` VARCHAR(255) DEFAULT '',
+        `location` VARCHAR(255) DEFAULT '',
         `thumbnail_link` TEXT,
         PRIMARY KEY (`id`)
     );
