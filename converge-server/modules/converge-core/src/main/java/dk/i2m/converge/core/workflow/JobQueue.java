@@ -255,7 +255,7 @@ public class JobQueue implements Serializable {
         Calendar start = Calendar.getInstance();
         start.setTime(started);
 
-        if (end != null) {
+        if (finished != null) {
             end.setTime(finished);
         }
 
