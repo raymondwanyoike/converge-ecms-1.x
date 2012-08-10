@@ -40,12 +40,14 @@
                             <f:facet name="header">
                                 <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                             </f:facet>
-                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}"
+                                          rendered="#{item.contentType == 'news_item'}">
                                 <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" 
-                                                rendered="#{item.contentType == 'news_item'}" 
                                                 title="" alt=""  />
+                            </h:outputLink>
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{item.id}"
+                                          rendered="#{item.contentType == 'media_item'}">
                                 <h:graphicImage value="#{i18n.resource_ICON_MEDIA_ITEM}" 
-                                                rendered="#{item.contentType == 'media_item'}" 
                                                 title="" alt="" />
                             </h:outputLink>
                         </rich:column>
@@ -59,7 +61,16 @@
 
 
                             </f:facet>
-                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{item.id}"
+                                          rendered="#{item.contentType == 'media_item'}">
+                                <h:outputText value="#{item.id}">
+                                    <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
+                                </h:outputText>
+                            </h:outputLink>
+
+
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}"
+                                          rendered="#{item.contentType == 'news_item'}">
                                 <h:outputText value="#{item.id}">
                                     <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
                                 </h:outputText>
@@ -138,12 +149,26 @@
                                    columns="5" 
                                    rendered="#{inbox.showNewsItem &amp;&amp; inbox.contentView == 'grid'}">
                         <h:panelGrid rowClasses="grid-image, grid-title, grid-status">
-                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{item.id}"
+                                          rendered="#{item.contentType == 'media_item'}">
                                 <h:graphicImage value="#{item.thumbnailLink}" />
                             </h:outputLink>
-                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}">
+                            
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}"
+                                          rendered="#{item.contentType == 'news_item'}">
+                                <h:graphicImage value="#{item.thumbnailLink}" />
+                            </h:outputLink>
+                            
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{item.id}"
+                                          rendered="#{item.contentType == 'media_item'}">
                                 <h:outputText value="#{item.title}" title="#{item.id}"  />
                             </h:outputLink>
+                            
+                            <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml?id=#{item.id}"
+                                          rendered="#{item.contentType == 'news_item'}">
+                                <h:outputText value="#{item.title}" title="#{item.id}"  />
+                            </h:outputLink>
+                            
                             <a4j:commandLink reRender="frmUpdateItem" oncomplete="#{rich:component('mpUpdateItem')}.show();">
                                 <f:setPropertyActionListener target="#{inbox.selectedContentItemId}" value="#{item.id}" />
                                 <h:outputText value="#{item.status}" title="#{item.actor}" />
