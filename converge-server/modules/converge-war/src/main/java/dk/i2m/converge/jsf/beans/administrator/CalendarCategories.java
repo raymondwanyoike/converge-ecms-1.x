@@ -33,31 +33,46 @@ import javax.faces.model.ListDataModel;
  */
 public class CalendarCategories {
 
-    @EJB private CalendarFacadeLocal calendarFacade;
-
+    @EJB
+    private CalendarFacadeLocal calendarFacade;
     private DataModel categories = null;
-
     private EventCategory selectedCategory;
 
+    /**
+     * Event handler for saving a new or existing {@link EventCategory}
+     *
+     * @param event Event that invoked the handler
+     */
     public void onSave(ActionEvent event) {
-        if (event.getComponent().getId().equalsIgnoreCase("lnkSaveEventCategoryDetails")) {
+
+        if (isAddMode()) {
             selectedCategory = calendarFacade.create(selectedCategory);
-            JsfUtils.createMessage("frmEventCategories", 
-                    FacesMessage.SEVERITY_INFO, Bundle.i18n.name(), 
+            JsfUtils.createMessage("frmEventCategories",
+                    FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
                     "administrator_CalendarCategories_EVENT_CATEGORY_CREATED");
         } else {
             selectedCategory = calendarFacade.update(selectedCategory);
-            JsfUtils.createMessage("frmEventCategories", 
-                    FacesMessage.SEVERITY_INFO, Bundle.i18n.name(), 
+            JsfUtils.createMessage("frmEventCategories",
+                    FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
                     "administrator_CalendarCategories_EVENT_CATEGORY_UPDATED");
         }
         categories = null;
     }
 
+    /**
+     * Event handler for preparing the creation of a new {@link EventCategory}
+     *
+     * @param event Event that invoked the handler
+     */
     public void onNew(ActionEvent event) {
         selectedCategory = new EventCategory();
     }
 
+    /**
+     * Event handler for deleting an existing {@link EventCategory}
+     *
+     * @param event Event that invoked the handler
+     */
     public void onDelete(ActionEvent event) {
         if (selectedCategory != null) {
             calendarFacade.deleteEventCategory(selectedCategory.getId());
@@ -65,6 +80,13 @@ public class CalendarCategories {
         categories = null;
     }
 
+    /**
+     * Gets a {@link DataModel} of available
+     * {@link EventCategories EventCategory}
+     *
+     * @return {@link DataModel} of available
+     * {@link EventCategories EventCategory}
+     */
     public DataModel getCategories() {
         if (categories == null) {
             categories = new ListDataModel(calendarFacade.findAllCategories());
@@ -72,14 +94,30 @@ public class CalendarCategories {
         return categories;
     }
 
+    /**
+     * Gets the currently selected {@link EventCategory}
+     *
+     * @return Currently selected {@link EventCategory}
+     */
     public EventCategory getSelectedCategory() {
         return selectedCategory;
     }
 
+    /**
+     * Sets the currently selected {@link EventCategory}
+     *
+     * @param selectedCategory Currently selected {@link EventCategory}
+     */
     public void setSelectedCategory(EventCategory selectedCategory) {
         this.selectedCategory = selectedCategory;
     }
 
+    /**
+     * Determine if the selected {@link EventCategory} is being edited.
+     *
+     * @return {@code true} if the {@link EventCategory} is being edited and
+     * {@code false} if the {@link EventCategory} is being new
+     */
     public boolean isEditMode() {
         if (selectedCategory == null || selectedCategory.getId() == null) {
             return false;
@@ -88,8 +126,13 @@ public class CalendarCategories {
         }
     }
 
+    /**
+     * Determine if the selected {@link EventCategory} is being added.
+     *
+     * @return {@code true} if the {@link EventCategory} is being added and
+     * {@code false} if the {@link EventCategory} is being edited
+     */
     public boolean isAddMode() {
         return !isEditMode();
     }
-
 }
