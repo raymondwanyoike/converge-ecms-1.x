@@ -119,7 +119,7 @@
                                                rowClasses="odd, even"
                                                sortPriority="#{converge:createList('colPosition,colPriority')}">
                                     <rich:column>
-                                        <h:graphicImage value="#{res.NEWS_ITEM_ICON}" alt="#{i18n.Planning_NEWS_ITEM}" title="#{i18n.Planning_NEWS_ITEM}" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" alt="#{i18n.Planning_NEWS_ITEM}" title="#{i18n.Planning_NEWS_ITEM}" />
                                     </rich:column>
 
                                     <rich:column>

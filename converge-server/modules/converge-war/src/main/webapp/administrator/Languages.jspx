@@ -36,7 +36,7 @@
                             </f:facet>
                             <a4j:commandLink reRender="pgLanguageDetails" oncomplete="#{rich:component('mpLanguageDetails')}.show(); #{rich:element('frmLanguageDetails:txtName')}.focus()">
                                 <f:setPropertyActionListener value="#{language}" target="#{administrator_Languages.selectedLanguage}" />
-                                <h:graphicImage alt="#{i18n.Language_LANGUAGE}" title="#{i18n.Language_LANGUAGE}" value="#{res.LANGUAGE_ICON}" />
+                                <h:graphicImage alt="#{i18n.Language_LANGUAGE}" title="#{i18n.Language_LANGUAGE}" value="#{i18n.resource_ICON_LANGUAGE}" />
                             </a4j:commandLink>
                         </rich:column>
 

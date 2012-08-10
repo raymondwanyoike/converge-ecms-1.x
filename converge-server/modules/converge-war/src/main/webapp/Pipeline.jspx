@@ -49,8 +49,8 @@
 
                             <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItem.xhtml">
                                 <f:param value="#{ni.id}" name="id" />
-                                <h:graphicImage value="#{res.NEWS_ITEM_ICON}" rendered="#{!ni.locked}" title="#{ni.currentState.name}" alt="#{ni.currentState.name}"  />
-                                <h:graphicImage value="#{res.LOCK_ICON}" rendered="#{ni.locked}" title="This item was checked-out by #{ni.checkedOutBy.fullName} on #{ni.checkedOut.time}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" rendered="#{!ni.locked}" title="#{ni.currentState.name}" alt="#{ni.currentState.name}"  />
+                                <h:graphicImage value="#{i18n.resource_ICON_LOCK}" rendered="#{ni.locked}" title="This item was checked-out by #{ni.checkedOutBy.fullName} on #{ni.checkedOut.time}" />
                             </h:outputLink>
 
                         </rich:column>
@@ -119,8 +119,8 @@
                                              reRender="frmAssignmentDetails" 
                                              actionListener="#{planning.onShowBriefing}"
                                              oncomplete="#{rich:component('mpAssignmentDetails')}.show();" />
-                                <h:graphicImage value="#{res.BRIEFING_EXIST_ICON}" alt="#{i18n.Pipeline_BRIEFING_EXIST}" title="#{i18n.Pipeline_BRIEFING_EXIST}" rendered="#{ni.assignmentBriefing != ''}" />
-                                <h:graphicImage value="#{res.BRIEFING_NOT_EXIST_ICON}" alt="#{i18n.Pipeline_BRIEFING_NOT_EXIST}" title="#{i18n.Pipeline_BRIEFING_NOT_EXIST}" rendered="#{ni.assignmentBriefing == ''}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_BRIEFING_EXIST}" alt="#{i18n.Pipeline_BRIEFING_EXIST}" title="#{i18n.Pipeline_BRIEFING_EXIST}" rendered="#{ni.assignmentBriefing != ''}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_BRIEFING_NOT_EXIST}" alt="#{i18n.Pipeline_BRIEFING_NOT_EXIST}" title="#{i18n.Pipeline_BRIEFING_NOT_EXIST}" rendered="#{ni.assignmentBriefing == ''}" />
                             </a4j:commandLink>
                         </rich:column>
 
@@ -132,7 +132,7 @@
                                              reRender="frmAssignmentDetails" 
                                              actionListener="#{planning.onShowAssignment}"
                                              oncomplete="#{rich:component('mpAssignmentDetails')}.show();" />
-                                <h:graphicImage value="#{res.UPDATE_ICON}" alt="#{i18n.Generic_UPDATE}" title="#{i18n.Generic_UPDATE}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_UPDATE}" alt="#{i18n.Generic_UPDATE}" title="#{i18n.Generic_UPDATE}" />
                             </a4j:commandLink>
                         </rich:column>
 

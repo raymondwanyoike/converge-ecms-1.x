@@ -141,8 +141,8 @@
 
                                         <rich:column styleClass="columnIcon center">
                                             <f:facet name="header"></f:facet>
-                                            <h:graphicImage value="#{res.EDITION_OPEN_ICON}" title="#{msgs.EDITION_OPEN}" alt="#{msgs.EDITION_OPEN}" rendered="#{placement.edition.open}"  />
-                                            <h:graphicImage value="#{res.EDITION_CLOSED_ICON}" title="#{msgs.EDITION_CLOSED}" alt="#{msgs.EDITION_CLOSED}" rendered="#{!placement.edition.open}"  />
+                                            <h:graphicImage value="#{i18n.resource_ICON_EDITION_OPEN}" title="#{msgs.EDITION_OPEN}" alt="#{msgs.EDITION_OPEN}" rendered="#{placement.edition.open}"  />
+                                            <h:graphicImage value="#{i18n.resource_ICON_EDITION_CLOSED}" title="#{msgs.EDITION_CLOSED}" alt="#{msgs.EDITION_CLOSED}" rendered="#{!placement.edition.open}"  />
                                         </rich:column>
 
                                         <rich:column sortBy="#{placement.outlet.title}">

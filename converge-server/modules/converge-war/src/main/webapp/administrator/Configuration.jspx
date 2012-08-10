@@ -19,7 +19,7 @@
                                 <f:facet name="header">
                                     <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                                 </f:facet>
-                                <h:graphicImage title="#{i18n.Configuration_PROPERTY}" alt="#{i18n.Configuration_PROPERTY}" value="#{res.PROPERTY_ICON}" />
+                                <h:graphicImage title="#{i18n.Configuration_PROPERTY}" alt="#{i18n.Configuration_PROPERTY}" value="#{i18n.resource_ICON_PROPERTY}" />
                             </rich:column>
                             <rich:column>
                                 <f:facet name="header">

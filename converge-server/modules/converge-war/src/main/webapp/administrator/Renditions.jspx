@@ -28,7 +28,7 @@
                             <a4j:commandLink reRender="frmMediaItemVersionLabelDetails" ajaxSingle="true"
                                              oncomplete="#{rich:component('mpMediaItemVersionLabelDetails')}.show();">
                                 <f:setPropertyActionListener target="#{administrator_Renditions.selectedLabel}" value="#{label}" />
-                                <h:graphicImage alt="#{i18n.Renditions_RENDITION}" title="#{i18n.Renditions_RENDITION}" value="#{res.RENDITION_ICON}" />
+                                <h:graphicImage alt="#{i18n.Renditions_RENDITION}" title="#{i18n.Renditions_RENDITION}" value="#{i18n.resource_ICON_RENDITION}" />
                             </a4j:commandLink>
                         </rich:column>
 

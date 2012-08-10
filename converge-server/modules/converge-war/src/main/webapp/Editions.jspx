@@ -61,12 +61,12 @@
                                                              rendered="#{edition.id != null}"
                                                              oncomplete="#{rich:component('mpEditionDetails')}.show();">
                                                 <f:setPropertyActionListener target="#{planning.selectedEditionView}" value="#{edition}" />
-                                                <h:graphicImage value="#{res.PROPERTIES_ICON}" title="#{i18n.Editions_PROPERTIES_TOOLTIP}" alt="#{i18n.Editions_PROPERTIES_TOOLTIP}"  />
+                                                <h:graphicImage value="#{i18n.resource_ICON_PROPERTIES}" title="#{i18n.Editions_PROPERTIES_TOOLTIP}" alt="#{i18n.Editions_PROPERTIES_TOOLTIP}"  />
                                             </a4j:commandLink>
 
                                             <a4j:commandLink reRender="frmPage" rendered="#{edition.id == null &amp;&amp; edition.open}">
                                                 <f:setPropertyActionListener target="#{planning.createEdition}" value="#{edition}" />
-                                                <h:graphicImage value="#{res.ADD_ICON}" title="#{i18n.Editions_CREATE_TOOLTIP}" alt="#{msg.planning_EDITION_CREATE_TOOLTIP}"  />
+                                                <h:graphicImage value="#{i18n.resource_ICON_ADD}" title="#{i18n.Editions_CREATE_TOOLTIP}" alt="#{msg.planning_EDITION_CREATE_TOOLTIP}"  />
                                             </a4j:commandLink>
                                         </h:panelGroup>
 
@@ -75,8 +75,8 @@
                                     <a4j:commandLink reRender="frmNewsItemPlacementDetails, frmPage"
                                                      oncomplete="#{rich:component('mpNewsItemPlacementDetails')}.show();">
                                         <f:setPropertyActionListener target="#{planning.selectedNewsItemPlacementId}" value="#{assignment.placementId}" />
-                                        <h:graphicImage value="#{res.NEWS_ITEM_ICON}" rendered="#{!assignment.locked}" title="#{assignment.status} #{assignment.placementId}" alt="#{assignment.status} #{assignment.placementId}"  />
-                                        <h:graphicImage value="#{res.LOCK_ICON}" rendered="#{assignment.locked}" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" rendered="#{!assignment.locked}" title="#{assignment.status} #{assignment.placementId}" alt="#{assignment.status} #{assignment.placementId}"  />
+                                        <h:graphicImage value="#{i18n.resource_ICON_LOCK}" rendered="#{assignment.locked}" />
                                     </a4j:commandLink>
 
                                     <rich:toolTip styleClass="lockTooltip" rendered="#{assignment.locked}">
@@ -235,7 +235,7 @@
 
                                             <rich:column styleClass="columnIcon center">
                                                 <f:facet name="header">&#160;</f:facet>
-                                                <h:graphicImage value="#{res.WORKFLOW_STEP_ACTION_ICON}" />
+                                                <h:graphicImage value="#{i18n.resource_ICON_WORKFLOW_STEP_ACTION}" />
                                             </rich:column>
 
                                             <rich:column>
@@ -263,13 +263,13 @@
                                             <rich:column styleClass="columnIcon center">
                                                 <f:facet name="header">
                                                     <a4j:commandLink id="lnkExecuteAll" title="#{i18n.Editions_ACTION_EXECUTE_ALL}" actionListener="#{planning.onExecuteAllActions}" reRender="frmPage" >
-                                                        <h:graphicImage value="#{res.RUN_ALL_ICON}" />
+                                                        <h:graphicImage value="#{i18n.resource_ICON_RUN_ALL}" />
                                                     </a4j:commandLink>
                                                 </f:facet>
 
                                                 <a4j:commandLink ajaxSingle="true" title="#{i18n.Editions_ACTION_EXECUTE}">
                                                     <f:setPropertyActionListener target="#{planning.executeAction}" value="#{action.id}" />
-                                                    <h:graphicImage value="#{res.RUN_ICON}" />
+                                                    <h:graphicImage value="#{i18n.resource_ICON_RUN}" />
                                                 </a4j:commandLink>
                                             </rich:column>
 

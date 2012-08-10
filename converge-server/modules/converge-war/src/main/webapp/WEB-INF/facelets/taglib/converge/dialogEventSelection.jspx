@@ -93,7 +93,7 @@
                                                          actionListener="#{bean.onSelectEvent}" 
                                                          reRender="#{reRenderOnSelect}"
                                                          oncomplete="#{rich:component('mpEventSelection')}.hide();" />
-                                            <h:graphicImage alt="#{msgs.planning_SELECT}" title="#{msgs.planning_SELECT}" value="#{res.ASSIGNMENT_ICON}"/>
+                                            <h:graphicImage alt="#{msgs.planning_SELECT}" title="#{msgs.planning_SELECT}" value="#{i18n.resource_ICON_ASSIGNMENT}"/>
                                         </a4j:commandLink>
                                     </rich:column>
 

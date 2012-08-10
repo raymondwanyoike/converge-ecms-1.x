@@ -39,7 +39,7 @@
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>
-                            <h:graphicImage value="#{res.USER_ICON}" />
+                            <h:graphicImage value="#{i18n.resource_ICON_USER}" />
                         </rich:column>
 
                         <rich:column styleClass="left" sortBy="#{contact.updated.time}">
@@ -107,7 +107,7 @@
                                              reRender="frmContactDetails"
                                              oncomplete="#{rich:component('mpContactDetails')}.show();">
                                 <f:setPropertyActionListener value="#{contact}" target="#{contacts.selectedContact}" />
-                                <h:graphicImage alt="#{i18n.Generic_UPDATE}" title="#{i18n.Generic_UPDATE}" value="#{res.UPDATE_ICON}"/>
+                                <h:graphicImage alt="#{i18n.Generic_UPDATE}" title="#{i18n.Generic_UPDATE}" value="#{i18n.resource_ICON_UPDATE}"/>
                             </a4j:commandLink>
                         </rich:column>
 
@@ -187,7 +187,7 @@
                                             <a4j:commandLink ajaxSingle="true">
                                                 <f:setPropertyActionListener value="#{phone}" target="#{contacts.moveContactPhone}" />
                                                 <a4j:support event="oncomplete" actionListener="#{contacts.onMoveContactPhoneUp}" reRender="dtContactPhones" ajaxSingle="true" />
-                                                <h:graphicImage alt="#{i18n.Contacts_MOVE_UP}" title="#{i18n.Contacts_MOVE_UP}" value="#{res.MOVE_UP_ICON}"/>
+                                                <h:graphicImage alt="#{i18n.Contacts_MOVE_UP}" title="#{i18n.Contacts_MOVE_UP}" value="#{i18n.resource_ICON_MOVE_UP}"/>
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -195,7 +195,7 @@
                                             <a4j:commandLink ajaxSingle="true">
                                                 <f:setPropertyActionListener value="#{phone}" target="#{contacts.moveContactPhone}" />
                                                 <a4j:support event="oncomplete" actionListener="#{contacts.onMoveContactPhoneDown}" reRender="dtContactPhones" ajaxSingle="true" />
-                                                <h:graphicImage alt="#{i18n.Contacts_MOVE_DOWN}" title="#{i18n.Contacts_MOVE_DOWN}" value="#{res.MOVE_DOWN_ICON}"/>
+                                                <h:graphicImage alt="#{i18n.Contacts_MOVE_DOWN}" title="#{i18n.Contacts_MOVE_DOWN}" value="#{i18n.resource_ICON_MOVE_DOWN}"/>
                                             </a4j:commandLink>
                                         </rich:column>
 

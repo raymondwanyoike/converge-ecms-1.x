@@ -49,7 +49,7 @@
                             <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                         </f:facet>
                         <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItemArchive.xhtml?id=#{usage.newsItemId}">
-                            <h:graphicImage value="#{res.NEWS_ITEM_ICON}" />
+                            <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" />
                         </h:outputLink>
                     </rich:column>
 

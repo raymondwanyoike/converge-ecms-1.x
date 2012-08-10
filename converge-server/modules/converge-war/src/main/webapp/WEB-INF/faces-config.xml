@@ -11,14 +11,10 @@ http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"
             <default-locale>en</default-locale>
             <supported-locale>da</supported-locale>
         </locale-config>
-        <message-bundle>dk.i2m.converge.i18n.Messages</message-bundle>
+        <message-bundle>dk.i2m.converge.i18n.WebUI</message-bundle>
         <resource-bundle>
             <base-name>dk.i2m.converge.i18n.Messages</base-name>
             <var>msgs</var>
-        </resource-bundle>
-        <resource-bundle>
-            <base-name>dk.i2m.converge.i18n.jsf.Resources</base-name>
-            <var>res</var>
         </resource-bundle>
         <resource-bundle>
             <base-name>dk.i2m.converge.i18n.WebUI</base-name>

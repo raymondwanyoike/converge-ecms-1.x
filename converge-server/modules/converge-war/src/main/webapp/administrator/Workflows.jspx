@@ -566,7 +566,7 @@
                                                              oncomplete="#{rich:component('mpWorkflowStepActionDetails')}.show()">
                                                 <f:setPropertyActionListener target="#{administrator_Workflows.selectedWorkflowStepAction}" value="#{action}" />
                                                 <f:setPropertyActionListener target="#{administrator_Workflows.selectedWorkflowStepActionTab}" value="tabWorkflowStepAction" />
-                                                <h:graphicImage value="#{res.WORKFLOW_STEP_ACTION_ICON}" alt="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION}" title="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION}" />
+                                                <h:graphicImage value="#{i18n.resource_ICON_WORKFLOW_STEP_ACTION}" alt="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION}" title="#{i18n.administrator_Workflows_WORKFLOW_STEP_ACTION}" />
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -667,7 +667,7 @@
                                             <h:panelGroup id="colHelp">
                                                 <c:set var="help_key" value="#{administrator_Workflows.selectedWorkflowStepActionProperty.key}_HELP" />
                                                 <c:set var="help_text" value="#{converge:message(administrator_Workflows.selectedWorkflowStepAction.action.bundle, help_key)}" />
-                                                <h:graphicImage url="#{res.HELP_ICON}" title="#{help_text}" rendered="#{help_text != ''}" />
+                                                <h:graphicImage url="#{i18n.resource_ICON_HELP}" title="#{help_text}" rendered="#{help_text != ''}" />
                                                 <h:outputText value="&#160;" rendered="#{help_text == ''}" />
                                             </h:panelGroup>
 
@@ -778,7 +778,7 @@
                                             <h:panelGroup id="colHelp">
                                                 <c:set var="help_key" value="#{administrator_Workflows.selectedWorkflowStepValidatorProperty.key}_HELP" />
                                                 <c:set var="help_text" value="#{converge:message(administrator_Workflows.selectedWorkflowStepValidator.validator.bundle, help_key)}" />
-                                                <h:graphicImage url="#{res.HELP_ICON}" title="#{help_text}" rendered="#{help_text != ''}" />
+                                                <h:graphicImage url="#{i18n.resource_ICON_HELP}" title="#{help_text}" rendered="#{help_text != ''}" />
                                                 <h:outputText value="&#160;" rendered="#{help_text == ''}" />
                                             </h:panelGroup>
 

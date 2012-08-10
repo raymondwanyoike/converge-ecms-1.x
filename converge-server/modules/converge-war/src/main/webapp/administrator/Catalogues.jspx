@@ -228,7 +228,7 @@
                                                              oncomplete="#{rich:component('mpCatalogueActionDetails')}.show();">
                                                 <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogueAction}" value="#{action}" />
                                                 <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogueActionDetailsTab}" value="tabCatalogueAction" />
-                                                <h:graphicImage value="#{res.ADDON_ACTION_ICON}" />
+                                                <h:graphicImage value="#{i18n.resource_ICON_ADDON_ACTION}" />
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -255,12 +255,12 @@
                                         <rich:column styleClass="columnIcon center">
                                             <f:facet name="header">
                                                 <a4j:commandLink id="lnkBatch" title="#{i18n.administrator_Catalogues_ACTIONS_BATCH_ALL}" actionListener="#{administrator_Catalogues.onActionBatchAll}" reRender="frmPage" >
-                                                    <h:graphicImage value="#{res.RUN_ALL_ICON}" />
+                                                    <h:graphicImage value="#{i18n.resource_ICON_RUN_ALL}" />
                                                 </a4j:commandLink>
                                             </f:facet>
                                             <a4j:commandLink ajaxSingle="true" title="#{i18n.administrator_Catalogues_ACTIONS_BATCH}" rendered="#{action.hook.supportBatch}">
                                                 <f:setPropertyActionListener target="#{administrator_Catalogues.actionBatch}" value="#{action}" />
-                                                <h:graphicImage value="#{res.RUN_ICON}" />
+                                                <h:graphicImage value="#{i18n.resource_ICON_RUN}" />
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -337,7 +337,7 @@
                                             <h:panelGroup id="colHelp">
                                                 <c:set var="help_key" value="#{administrator_Catalogues.selectedCatalogueActionProperty.key}_HELP" />
                                                 <c:set var="help_text" value="#{converge:message(administrator_Catalogues.selectedCatalogueAction.hook.bundle, help_key)}" />
-                                                <h:graphicImage url="#{res.HELP_ICON}" title="#{help_text}" rendered="#{help_text != ''}" />
+                                                <h:graphicImage url="#{i18n.resource_ICON_HELP}" title="#{help_text}" rendered="#{help_text != ''}" />
                                                 <h:outputText value="&#160;" rendered="#{help_text == ''}" />
                                             </h:panelGroup>
 
