@@ -21,6 +21,7 @@ import java.util.List;
 import javax.ejb.EJB;
 
 /**
+ * Backing bean for {@code /administrator/JobQueue.jspx}.
  *
  * @author Allan Lykke Christensen
  */
@@ -28,9 +29,17 @@ public class JobQueue {
 
     @EJB private SystemFacadeLocal systemFacade;
 
+    /**
+     * Creates a new instance of {@link JobQueue}.
+     */
     public JobQueue() {
     }
 
+    /**
+     * Gets a {@link List} of the items in the {@link JobQueue}.
+     * 
+     * @return {@link List} of items in the {@link JobQueue}
+     */
     public List<dk.i2m.converge.core.workflow.JobQueue> getJobQueue() {
         return systemFacade.findJobQueue();
     }
