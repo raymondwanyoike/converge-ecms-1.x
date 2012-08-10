@@ -15,16 +15,29 @@
             <h:form id="frmPage">
                 <converge:moduleHeader moduleTitle="#{i18n.administrator_Workflows_PAGE_TITLE}" />
                 <div class="moduleContent">
-                    <h:panelGrid columns="1" columnClasses="right" style="width: 100%">
-                        <a4j:commandButton id="btnNewWorkflow" actionListener="#{administrator_Workflows.onNewWorkflow}" reRender="mpWorkflowDetails" ajaxSingle="true" styleClass="button dynamicButton" value="#{i18n.administrator_Workflows_WORKFLOW_NEW}" title="#{i18n.administrator_Workflows_WORKFLOW_NEW_TOOLTIP}" oncomplete="#{rich:component('mpWorkflowDetails')}.show()">
-                            <f:setPropertyActionListener target="#{administrator_Workflows.selectedTab}" value="tabWorkflow" />
-                        </a4j:commandButton>
-                    </h:panelGrid>
-
-                    <rich:dataTable id="dtWorkflows" value="#{administrator_Workflows.workflows}" var="workflow" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
+                
+                    <rich:dataTable id="dtWorkflows" 
+                                    value="#{administrator_Workflows.workflows}" 
+                                    var="workflow" 
+                                    styleClass="table" 
+                                    headerClass="tableHeader" 
+                                    rowClasses="odd, even">
 
                         <rich:column styleClass="center columnIcon">
-                            <f:facet name="header">&#160;</f:facet>
+                            <f:facet name="header">&#160;
+
+                                <a4j:commandLink id="lnkNewWorkflow" 
+                                                 actionListener="#{administrator_Workflows.onNewWorkflow}" 
+                                                 reRender="mpWorkflowDetails" 
+                                                 ajaxSingle="true"                                                  
+                                                 oncomplete="#{rich:component('mpWorkflowDetails')}.show()">
+                                    <f:setPropertyActionListener target="#{administrator_Workflows.selectedTab}" value="tabWorkflow" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_ADD}" 
+                                                    width="16" height="16" 
+                                                    title="#{i18n.administrator_Workflows_WORKFLOW_NEW_TOOLTIP}" />
+                                </a4j:commandLink>
+
+                            </f:facet>
                             <a4j:commandLink reRender="mpWorkflowDetails" ajaxSingle="true" oncomplete="#{rich:component('mpWorkflowDetails')}.show()">
                                 <f:setPropertyActionListener target="#{administrator_Workflows.selectedTab}" value="tabWorkflow" />
                                 <f:setPropertyActionListener value="#{workflow}" target="#{administrator_Workflows.selected}" />
