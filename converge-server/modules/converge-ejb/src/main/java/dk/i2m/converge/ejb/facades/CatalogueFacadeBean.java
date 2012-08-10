@@ -16,7 +16,6 @@
  */
 package dk.i2m.converge.ejb.facades;
 
-import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.ContentItem;
 import dk.i2m.converge.core.content.ContentItemActor;
@@ -34,6 +33,7 @@ import dk.i2m.converge.core.search.QueueEntryType;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.utils.StringUtils;
 import dk.i2m.converge.core.workflow.WorkflowState;
+import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
 import dk.i2m.converge.ejb.services.*;
 import java.io.File;
 import java.io.IOException;
@@ -463,9 +463,7 @@ public class CatalogueFacadeBean implements CatalogueFacadeLocal {
     @Override
     public MediaItem update(MediaItem mediaItem) {
         mediaItem.setUpdated(Calendar.getInstance().getTime());
-        LOG.log(Level.INFO, "Thumbnail B: {0}", mediaItem.getThumbnailLink());
         contentItemService.updateThumbnail(mediaItem);
-        LOG.log(Level.INFO, "Thumbnail A: {0}", mediaItem.getThumbnailLink());
         mediaItem = daoService.update(mediaItem);
         return mediaItem;
     }
