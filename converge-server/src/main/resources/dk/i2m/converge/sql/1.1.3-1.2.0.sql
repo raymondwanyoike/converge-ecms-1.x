@@ -187,7 +187,7 @@ BEGIN
 
 INSERT INTO `user_account` (`id`, `username`, `user_status`, `time_zone`, `dn`, `lang`, `employment_type`, `fee_type`, `full_name`, `given_name`, `surname`, `job_title`, `organisation`, `email`, `phone`, `mobile`, `default_outlet`, `default_section`, `default_assignment_type`, `default_media_repository`, `default_add_next_edition`, `default_search_engine_tags`, `default_search_results_order_by`, `default_search_results_order`, `default_work_day`)
 VALUES
-	(0, 'converge', '', NULL, NULL, 'EN', 'UNKNOWN', 'UNKNOWN', 'Converge', 'Converge', '', '', '', 'noreply@getconverge.com', NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, NULL, 0, 1);
+	(0, 'converge', '', NULL, NULL, 'en', 'UNKNOWN', 'UNKNOWN', 'Converge', 'Converge', '', '', '', 'noreply@getconverge.com', NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, NULL, 0, 1);
 
 CREATE TABLE IF NOT EXISTS  `news_item_property` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
