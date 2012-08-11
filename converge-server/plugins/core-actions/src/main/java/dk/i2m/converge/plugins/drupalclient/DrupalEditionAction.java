@@ -67,6 +67,7 @@ public class DrupalEditionAction implements EditionAction {
     private enum Property {
 
         CONNECTION_TIMEOUT,
+        FRONTPAGE_PLACEMENT,
         IMAGE_RENDITION,
         NODE_LANGUAGE,
         NODE_TYPE,
@@ -111,6 +112,8 @@ public class DrupalEditionAction implements EditionAction {
 
     private String undisclosedAuthor;
 
+    private String frontpagePlacement;
+
     private Map<Long, Long> sectionMapping;
 
     @Override
@@ -133,6 +136,7 @@ public class DrupalEditionAction implements EditionAction {
         publishImmediately = properties.get(Property.PUBLISH_IMMEDIATELY.name());
         renditionName = properties.get(Property.IMAGE_RENDITION.name());
         undisclosedAuthor = properties.get(Property.UNDISCLOSED_AUTHOR.name());
+        frontpagePlacement = properties.get(Property.FRONTPAGE_PLACEMENT.name());
         sectionMapping = new HashMap<Long, Long>();
 
         if (hostname == null) {
@@ -172,6 +176,11 @@ public class DrupalEditionAction implements EditionAction {
                 throw new IllegalArgumentException(
                         "'publishDelay' cannot be <= 0");
             }
+        }
+
+        if (frontpagePlacement != null && !isInteger(frontpagePlacement)) {
+            throw new IllegalArgumentException(
+                    "'frontpagePlacement' must be an integer");
         }
 
         if (connectionTimeout == null) {
@@ -230,11 +239,11 @@ public class DrupalEditionAction implements EditionAction {
                 if (getPromoted(nip) != null) {
                     fb.add(new BasicWrapper("promote", getPromoted(nip)));
                 }
-                
+
                 if (getPublishOn() != null) {
                     fb.add(new BasicWrapper("publish_on", getPublishOn()));
                 }
-                
+
                 if (getSection(nip) != null) {
                     fb.add(new ListWrapper("field_section", getSection(nip)));
                 }
@@ -472,8 +481,11 @@ public class DrupalEditionAction implements EditionAction {
      * @return
      */
     private String getPromoted(NewsItemPlacement placement) {
-        // TODO: Make value configurable
-        if (placement.getStart() == 1) {
+        if (frontpagePlacement == null) {
+            return null;
+        }
+
+        if (placement.getStart() == Integer.parseInt(frontpagePlacement)) {
             return "1";
         } else {
             return null;
