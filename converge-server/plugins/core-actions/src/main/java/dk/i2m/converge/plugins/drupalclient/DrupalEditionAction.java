@@ -289,7 +289,7 @@ public class DrupalEditionAction implements EditionAction {
 
                     errors++;
 
-                    if (errors > 5) {
+                    if (errors > 4) {
                         break;
                     } else {
                         continue;
@@ -329,7 +329,7 @@ public class DrupalEditionAction implements EditionAction {
 
                     errors++;
 
-                    if (errors > 5) {
+                    if (errors > 4) {
                         break;
                     } else {
                         continue;
