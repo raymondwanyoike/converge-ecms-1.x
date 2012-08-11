@@ -233,7 +233,9 @@ public class DrupalEditionAction implements EditionAction {
                         newsItem.getStory(), "full_html"))
                         .add(
                         new TextWrapper("field_author", getAuthor(newsItem)))
-                        .add(new TextWrapper("field_converge", newsItem.getId().
+                        .add(new TextWrapper("field_newsitem", newsItem.getId().
+                        toString()))
+                        .add(new TextWrapper("field_edition", edition.getId().
                         toString()));
 
                 if (getPromoted(nip) != null) {
@@ -246,6 +248,16 @@ public class DrupalEditionAction implements EditionAction {
 
                 if (getSection(nip) != null) {
                     fb.add(new ListWrapper("field_section", getSection(nip)));
+                }
+
+                if (nip.getStart() != null) {
+                    fb.add(new TextWrapper("field_placement_start", nip.
+                            getStart().toString()));
+                }
+
+                if (nip.getPosition() != null) {
+                    fb.add(new TextWrapper("field_placement_position", nip.
+                            getPosition().toString()));
                 }
 
                 List<MediaItem> mediaItems = getMediaItems(newsItem);
