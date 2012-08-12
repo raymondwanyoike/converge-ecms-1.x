@@ -131,7 +131,7 @@ BEGIN
             INSERT INTO `workflow_step` (`name`, `description`, `from_state_id`, `to_state_id`, `submitted`, `display_order`) VALUES ('Reject', 'Reject the submitted item', @submitted_id, @trash_id, 0, 3);
             INSERT INTO `workflow_step` (`name`, `description`, `from_state_id`, `to_state_id`, `submitted`, `display_order`) VALUES ('Return for revision', 'Return the self-uploaded item to submitter', @selfupload_id, @unsubmitted_id, 0, 1);	    
 	    INSERT INTO `workflow_step` (`name`, `description`, `from_state_id`, `to_state_id`, `submitted`, `display_order`) VALUES ('Approve', 'Approve the self-uploaded item for archiving in the catalogue', @selfupload_id, @approved_id, 0, 2);
-	    INSERT INTO `workflow_step` (`name`, `description`, `from_state_id`, `to_state_id`, `submitted`, `display_order`) VALUES ('Reject', 'Reject the self-uploaded item', @submitted_id, @selfupload_id, 0, 3);
+	    INSERT INTO `workflow_step` (`name`, `description`, `from_state_id`, `to_state_id`, `submitted`, `display_order`) VALUES ('Reject', 'Reject the self-uploaded item', @selfupload_id, @submitted_id, 0, 3);
 	    INSERT INTO `workflow_step` (`name`, `description`, `from_state_id`, `to_state_id`, `submitted`, `display_order`) VALUES ('Return for revision', 'Return the submitted item to submitter', @approved_id, @unsubmitted_id, 0, 1);
 	    INSERT INTO `workflow_step` (`name`, `description`, `from_state_id`, `to_state_id`, `submitted`, `display_order`) VALUES ('Reject', 'Reject the submitted item', @approved_id, @trash_id, 0, 3);
 	    
@@ -144,6 +144,14 @@ BEGIN
             UPDATE media_item SET current_state_id = @submitted_id WHERE catalogue_id=cat_id AND status LIKE 'SUBMITTED';
             UPDATE media_item SET current_state_id = @approved_id WHERE catalogue_id=cat_id AND status LIKE 'APPROVED';
             UPDATE media_item SET current_state_id = @trash_id WHERE catalogue_id=cat_id AND status LIKE 'REJECTED';
+
+            UPDATE catalogue SET self_upload_state = @selfupload_id WHERE id=cat_id;
+
+            DELETE FROM catalogue_role WHERE catalogue_id = cat_id AND role_id = cat_user_role_id;
+            INSERT INTO catalogue_role (catalogue_id, role_id) VALUES (cat_id, cat_user_role_id);
+            
+            DELETE FROM catalogue_role WHERE catalogue_id = cat_id AND role_id = cat_editor_role_id;
+            INSERT INTO catalogue_role (catalogue_id, role_id) VALUES (cat_id, cat_editor_role_id);
 
             INSERT INTO content_item_workflow_transition (content_item_id, transition_timestamp, state_id, user_account_id)
                 SELECT `id`, `created`, @unsubmitted_id, `owner` FROM media_item WHERE catalogue_id=cat_id;
