@@ -24,6 +24,7 @@ import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.plugin.WorkflowAction;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.workflow.JobQueue;
+import dk.i2m.converge.core.workflow.JobQueueParameter;
 import dk.i2m.converge.core.workflow.WorkflowStepAction;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -74,9 +75,13 @@ public class JobQueueWorkflowAction implements WorkflowAction {
         }
 
         try {
+            List<JobQueueParameter> params = new ArrayList<JobQueueParameter>();
+            params.add(new JobQueueParameter("workflow_step_action", "" + stepAction.getId()));
+            params.add(new JobQueueParameter("initiator", user.getUsername()));
+            
             ctx.addToJobQueue(getName() + " #" + item.getId(), item.getClass().
                     getName(), item.getId(), this.pluginConfigurationId,
-                    Collections.EMPTY_LIST, Calendar.getInstance().getTime());
+                    params, Calendar.getInstance().getTime());
         } catch (DataNotFoundException ex) {
             log(LogSeverity.WARNING, ex.getMessage());
         }

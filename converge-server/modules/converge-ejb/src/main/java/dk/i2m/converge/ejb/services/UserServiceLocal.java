@@ -149,7 +149,7 @@ public interface UserServiceLocal {
      *          Unique identifier of the role
      * @return  {@link List} of {@link UserAccount} with the given role
      */
-    java.util.List<dk.i2m.converge.core.security.UserAccount> getRoleMembers(java.lang.Long roleId);
+    List<UserAccount> getRoleMembers(Long roleId);
 
-    public java.util.List<dk.i2m.converge.core.security.UserAccount> getDirectoryMembers() throws javax.naming.NamingException;
+    List<UserAccount> getDirectoryMembers() throws NamingException;
 }

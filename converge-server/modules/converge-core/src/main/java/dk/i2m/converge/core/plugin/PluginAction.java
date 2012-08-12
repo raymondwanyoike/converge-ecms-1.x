@@ -26,13 +26,16 @@ import java.util.*;
  * @author Allan Lykke Christensen
  */
 public abstract class PluginAction implements Plugin {
-
+    
     /**
      * Bundle containing localised plug-in messages. Note, this property must be
      * set in the constructor of implementations.
      */
     protected ResourceBundle bundle;
 
+    /**
+     * Executed upon initialisation of the {@link PluginAction}
+     */
     public abstract void onInit();
 
     /**

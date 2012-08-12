@@ -59,36 +59,38 @@ import javax.ejb.Stateless;
 @Stateless
 public class PluginContextBean implements PluginContextBeanLocal {
 
-    @EJB private SystemFacadeLocal systemFacade;
-
-    @EJB private ConfigurationServiceLocal cfgService;
-
-    @EJB private NewswireServiceLocal newswireService;
-
-    @EJB private NotificationServiceLocal notificationService;
-
-    @EJB private UserServiceLocal userService;
-
-    @EJB private NewsItemFacadeLocal newsItemFacade;
-
-    @EJB private SearchEngineLocal searchEngine;
-
-    @EJB private ListingFacadeLocal listingFacade;
-
-    @EJB private DaoServiceLocal daoService;
-
-    @EJB private CatalogueFacadeLocal catalogueFacade;
-
-    @EJB private MetaDataServiceLocal metaDataService;
-
-    @EJB private OutletFacadeLocal outletFacade;
-
-    @EJB private ContentItemFacadeLocal contentItemFacade;
-    
-    @EJB private ContentItemServiceLocal contentItemService;
-    
-    @EJB private WorkflowFacadeLocal workflowFacade;
-
+    @EJB
+    private SystemFacadeLocal systemFacade;
+    @EJB
+    private ConfigurationServiceLocal cfgService;
+    @EJB
+    private NewswireServiceLocal newswireService;
+    @EJB
+    private NotificationServiceLocal notificationService;
+    @EJB
+    private UserServiceLocal userService;
+    @EJB
+    private UserFacadeLocal userFacade;
+    @EJB
+    private NewsItemFacadeLocal newsItemFacade;
+    @EJB
+    private SearchEngineLocal searchEngine;
+    @EJB
+    private ListingFacadeLocal listingFacade;
+    @EJB
+    private DaoServiceLocal daoService;
+    @EJB
+    private CatalogueFacadeLocal catalogueFacade;
+    @EJB
+    private MetaDataServiceLocal metaDataService;
+    @EJB
+    private OutletFacadeLocal outletFacade;
+    @EJB
+    private ContentItemFacadeLocal contentItemFacade;
+    @EJB
+    private ContentItemServiceLocal contentItemService;
+    @EJB
+    private WorkflowFacadeLocal workflowFacade;
     private UserAccount currentUserAccount = null;
 
     @Override
@@ -140,32 +142,74 @@ public class PluginContextBean implements PluginContextBeanLocal {
         return notificationService.create(notifcation);
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public List<UserAccount> findUserAccountsByRole(String roleName) {
         return userService.findUserAccountsByUserRoleName(roleName);
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public List<UserAccount> findUserAccountsByRole(Long roleId) {
+        return userService.getRoleMembers(roleId);
+    }
+
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public UserAccount findUserAccountByUsername(String username) throws DataNotFoundException {
+        return userFacade.findById(username);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public UserAccount findSystemUserAccount() {
+        try {
+            return userFacade.findById("converge");
+        } catch (DataNotFoundException ex) {
+            // This should never happen!
+            return null;
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public List<NewsItem> findNewsItemsByStateAndOutlet(String stateName,
             Outlet outlet) {
         return newsItemFacade.findByStateAndOutlet(stateName, outlet);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void index(NewsItem item) throws SearchEngineIndexingException {
         searchEngine.addToIndexQueue(QueueEntryType.NEWS_ITEM, item.getId(),
                 QueueEntryOperation.UPDATE);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void index(MediaItem item) throws SearchEngineIndexingException {
         searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, item.getId(),
                 QueueEntryOperation.UPDATE);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void index(NewswireItem item) throws SearchEngineIndexingException {
         newswireService.index(item);
@@ -220,22 +264,21 @@ public class PluginContextBean implements PluginContextBeanLocal {
             return null;
         }
     }
-    
-    
+
     /**
      * {@inheritDoc }
      */
     @Override
     public Rendition findRenditionById(Long id) throws DataNotFoundException {
-         return catalogueFacade.findRenditionById(id);
+        return catalogueFacade.findRenditionById(id);
     }
-    
+
     /**
      * {@inheritDoc }
      */
     @Override
     public WorkflowStep findWorkflowStep(Long id) throws DataNotFoundException {
-        return workflowFacade.findWorkflowStepById(id); 
+        return workflowFacade.findWorkflowStepById(id);
     }
 
     @Override
@@ -314,38 +357,50 @@ public class PluginContextBean implements PluginContextBeanLocal {
         systemFacade.log(severity, message, subjects);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Outlet findOutletById(Long id) throws DataNotFoundException {
         return outletFacade.findOutletById(id);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Edition findNextEdition(Long id) throws DataNotFoundException {
         Outlet outlet = outletFacade.findOutletById(id);
         return outletFacade.findNextEdition(outlet);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Edition updateEdition(Edition edition) {
         return outletFacade.updateEdition(edition);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Edition createEdition(Edition edition) {
         return outletFacade.createEdition(edition);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NewsItemPlacement createPlacement(NewsItemPlacement placement) {
         return newsItemFacade.createPlacement(placement);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NewsItemEditionState addNewsItemEditionState(Long editionId,
             Long newsItemId,
@@ -366,7 +421,9 @@ public class PluginContextBean implements PluginContextBeanLocal {
         return new NewsItemEditionState();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NewsItemEditionState updateNewsItemEditionState(
             NewsItemEditionState newsItemEditionState) {
@@ -383,23 +440,29 @@ public class PluginContextBean implements PluginContextBeanLocal {
         return catalogueFacade.findMediaItemById(id);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ContentItem findContentItemById(Long id) throws DataNotFoundException {
         return contentItemFacade.findContentItemById(id);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JobQueue addToJobQueue(String name, String typeName, Long typeId,
-            Long pluginConfigurationId, List<JobQueueParameter> parameters, 
+            Long pluginConfigurationId, List<JobQueueParameter> parameters,
             Date scheduled)
             throws DataNotFoundException {
         return systemFacade.addToJobQueue(name, typeName, typeId,
                 pluginConfigurationId, parameters, scheduled);
     }
-    
-    /** {@inheritDoc} */
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ContentItem step(ContentItem ci, Long stepId, boolean stateTransition) throws WorkflowStateTransitionException {
         return contentItemService.step(ci, stepId, stateTransition);

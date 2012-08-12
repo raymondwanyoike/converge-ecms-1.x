@@ -45,11 +45,7 @@ public class UserFacadeBean implements UserFacadeLocal {
 
     @EJB private UserServiceLocal userService;
 
-    @EJB private CatalogueFacadeLocal catalogueFacade;
-
     @EJB private DaoServiceLocal daoService;
-
-    @EJB private ConfigurationServiceLocal cfgService;
 
     /** {@inheritDoc} */
     @Override

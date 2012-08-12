@@ -17,7 +17,7 @@
 
         <body>
             <!-- Global Notification -->
-            <h:panelGroup id="globalMessage" layout="div" style="display:none">
+            <h:panelGroup id="globalMessage" layout="block" style="display:none">
                 <h:panelGroup id="globalMessageText"></h:panelGroup>
                 <a href="#" class="close-notify" onclick="closeNotice()">X</a>
             </h:panelGroup>
@@ -107,7 +107,9 @@
             <script type="text/javascript">
                 A4J.AJAX.onError = function(req,status,message){
                     window.status = "#{i18n.Generic_CONNECTION_ERROR_ERROR}: " + message;
-                    openNotice(message);
+                    if (status != 0) {
+                        openNotice(message);
+                    }
                     return false;
                 }
 

@@ -21,11 +21,12 @@ import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.plugin.EditionAction;
+import dk.i2m.converge.core.plugin.PluginConfiguration;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.JobQueue;
+import dk.i2m.converge.core.workflow.JobQueueParameter;
 import dk.i2m.converge.core.workflow.OutletEditionAction;
-import dk.i2m.converge.core.plugin.PluginConfiguration;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -86,9 +87,17 @@ public class JobQueueAction implements EditionAction {
             Edition edition, OutletEditionAction action) {
         NewsItem ni = placement.getNewsItem();
         try {
-            ctx.addToJobQueue(getName() + " #" + ni.getId(), ni.getClass().
-                    getName(), ni.getId(), this.pluginConfigurationId,
-                    Collections.EMPTY_LIST, Calendar.getInstance().getTime());
+            List<JobQueueParameter> params = new ArrayList<JobQueueParameter>();
+            params.add(new JobQueueParameter("newsItemPlacement", "" + placement.getId()));
+            
+            ctx.addToJobQueue(
+                    getName() + " #" + ni.getId(), 
+                    ni.getClass().getName(), 
+                    ni.getId(), 
+                    this.pluginConfigurationId,
+                    params,
+                    Calendar.getInstance().getTime());
+            
         } catch (DataNotFoundException ex) {
             log(LogSeverity.WARNING, ex.getMessage());
         }

@@ -21,8 +21,11 @@
                                      requiredMessage="#{i18n.administrator_PluginConfigurationDetail_NAME_REQUIRED}"  />
 
                         <h:outputText value="&#160;" />
-                        <h:outputText styleClass="form-field-label" value="#{i18n.administrator_PluginConfigurationDetail_DESCRIPTION}" />
-                        <h:inputTextarea id="txtDescription" styleClass="text mediumInput form-field" value="#{administrator_PluginConfigurationDetail.pluginConfiguration.description}" />
+                        <h:outputText styleClass="form-field-label" 
+                                      value="#{i18n.administrator_PluginConfigurationDetail_DESCRIPTION}" />
+                        <h:inputTextarea id="txtDescription" 
+                                         styleClass="text mediumInput form-field" 
+                                         value="#{administrator_PluginConfigurationDetail.pluginConfiguration.description}" />
 
                         <h:outputText value="&#160;" />
                         <h:column>
@@ -66,18 +69,21 @@
 
                             <rich:column>
                                 <f:facet name="header">
-                                    <h:outputText value="Event" />
+                                    <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_EVENTS_EVENT}" />
                                 </f:facet>
-                                <h:outputText value="On complete" />
+                                <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_EVENTS_EVENT_ON_COMPLETE}" />
                             </rich:column>
 
                             <rich:column>
                                 <f:facet name="header">
-                                    <h:outputText value="Execute" />
+                                    <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_EVENTS_EXECUTE}" />
                                 </f:facet>
                                 <h:outputText value="#{pluginCfg.name}" />
                             </rich:column>
                             <rich:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_EVENTS_ID}" />
+                                </f:facet>
                                 <h:outputText value="##{pluginCfg.id}" />
                             </rich:column>
 
@@ -103,7 +109,7 @@
                     </div>
                 </a4j:region>
 
-                    <a4j:region id="regProperties" rendered="#{!empty administrator_PluginConfigurationDetail.pluginConfiguration.action.availableProperties}">
+                <a4j:region id="regProperties" rendered="#{!empty administrator_PluginConfigurationDetail.pluginConfiguration.action.availableProperties}">
                     <converge:moduleHeader moduleTitle="#{i18n.administrator_PluginConfigurationDetail_CONFIGURATION_PROPERTIES}" />
                     <div class="moduleContent">
 
@@ -129,7 +135,7 @@
 
                             <rich:column sortBy="#{property.key}" sortOrder="ASCENDING">
                                 <f:facet name="header">
-                                    <h:outputText value="Property" />
+                                    <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_CONFIGURATION_PROPERTIES_PROPERTY}" />
                                 </f:facet>
                                 <c:set var="help_key" value="PROPERTY_#{property.key}_TOOLTIP" />
                                 <c:set var="title_key" value="PROPERTY_#{property.key}" />
@@ -139,7 +145,7 @@
 
                             <rich:column sortyBy="#{property.value}">
                                 <f:facet name="header">
-                                    <h:outputText value="Value" />
+                                    <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_CONFIGURATION_PROPERTIES_VALUE}" />
                                 </f:facet>
                                 <a4j:commandLink reRender="frmProperty"
                                                  oncomplete="#{rich:component('mpProperty')}.show()">
@@ -178,7 +184,7 @@
 
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="New Property" />
+                            <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_CONFIGURATION_PROPERTIES_PROPERTY}" />
                         </h:panelGroup>
                     </f:facet>
 
@@ -188,7 +194,7 @@
                                        inactiveTabClass="tabInactive">
 
 
-                            <rich:tab label="Property">
+                            <rich:tab label="#{i18n.administrator_PluginConfigurationDetail_CONFIGURATION_PROPERTIES_PROPERTY}">
                                 <h:panelGrid id="propertySheet" columnClasses="tabSheet" 
                                              styleClass="tabSheetGrid">
                                     <h:selectOneMenu id="somAvailableProperties" 
@@ -208,11 +214,22 @@
                                             <f:selectItems value="#{administrator_PluginConfigurationDetail.renditions}" />
                                         </h:selectOneMenu>
                                     </ui:fragment>
-                                    
+
                                     <ui:fragment rendered="#{administrator_PluginConfigurationDetail.propertyDefinition.type == 'workflow_state_step'}">
                                         <h:selectOneMenu value="#{administrator_PluginConfigurationDetail.property.value}">
                                             <f:selectItems value="#{administrator_PluginConfigurationDetail.workflowStateSteps}" />
                                         </h:selectOneMenu>
+                                    </ui:fragment>
+                                    
+                                    <ui:fragment rendered="#{administrator_PluginConfigurationDetail.propertyDefinition.type == 'user_role'}">
+                                        <h:selectOneMenu value="#{administrator_PluginConfigurationDetail.property.value}">
+                                            <f:selectItems value="#{administrator_PluginConfigurationDetail.userRoles}" />
+                                        </h:selectOneMenu>
+                                    </ui:fragment>
+                                    
+                                    <ui:fragment rendered="#{administrator_PluginConfigurationDetail.propertyDefinition.type == 'textarea'}">
+                                        <h:inputTextarea value="#{administrator_PluginConfigurationDetail.property.value}"
+                                                         styleClass="textarea mediumTextArea"/>
                                     </ui:fragment>
 
                                 </h:panelGrid>
@@ -253,7 +270,7 @@
 
                     <f:facet name="header">
                         <h:panelGroup>
-                            <h:outputText value="Add Plug-in Configuration" />
+                            <h:outputText value="#{i18n.administrator_PluginConfigurationDetail_PLUG_IN_CONFIGURATION_ADD}" />
                         </h:panelGroup>
                     </f:facet>
 
@@ -262,14 +279,14 @@
                                        activeTabClass="tabActive" 
                                        inactiveTabClass="tabInactive">
 
-                            <rich:tab label="Plug-in Configuration">
+                            <rich:tab label="#{i18n.administrator_PluginConfigurationDetail_PLUG_IN_CONFIGURATION}">
                                 <h:panelGrid id="pluginConfigSheet" columnClasses="tabSheet" 
                                              styleClass="tabSheetGrid">
                                     <h:selectOneMenu id="somAvailableProperties" 
                                                      value="#{administrator_PluginConfigurationDetail.eventPluginConfiguration}" 
                                                      styleClass="text mediumInput"
                                                      converter="#{converters.pluginConfigurationConverter}">
-                                        <f:selectItem itemLabel="-- Select Existing Plugin Configuration --" />
+                                        <f:selectItem itemLabel="#{i18n.administrator_PluginConfigurationDetail_PLUG_IN_CONFIGURATION_SELECT}" />
                                         <f:selectItems value="#{administrator_PluginConfigurationDetail.existingPluginConfigurations}" />
                                         <a4j:support event="onchange" ajaxSingle="true" reRender="pluginConfigSheet" />
                                     </h:selectOneMenu>
@@ -296,9 +313,6 @@
 
                 </rich:modalPanel>
             </h:form>
-
-
-
 
         </ui:define>
     </ui:composition>

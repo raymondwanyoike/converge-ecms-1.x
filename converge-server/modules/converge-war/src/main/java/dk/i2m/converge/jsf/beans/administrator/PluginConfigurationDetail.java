@@ -23,12 +23,14 @@ import dk.i2m.converge.core.plugin.PluginActionPropertyDefinition;
 import dk.i2m.converge.core.plugin.PluginConfiguration;
 import dk.i2m.converge.core.plugin.PluginConfigurationProperty;
 import dk.i2m.converge.core.plugin.PropertyDefinitionNotFoundException;
+import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.workflow.Workflow;
 import dk.i2m.converge.core.workflow.WorkflowActionException;
 import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.core.workflow.WorkflowStep;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
+import dk.i2m.converge.ejb.facades.UserFacadeLocal;
 import dk.i2m.converge.ejb.facades.WorkflowFacadeLocal;
 import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.jsf.JsfUtils;
@@ -61,6 +63,8 @@ public class PluginConfigurationDetail {
     private CatalogueFacadeLocal catalogueFacade;
     @EJB
     private WorkflowFacadeLocal workflowFacade;
+    @EJB
+    private UserFacadeLocal userFacade;
     private PluginConfiguration pluginConfiguration;
     private PluginConfiguration eventPluginConfiguration;
     private PluginConfigurationProperty property = new PluginConfigurationProperty();
@@ -115,7 +119,7 @@ public class PluginConfigurationDetail {
 
         return "/administration/plugins";
     }
-    
+
     public String onDelete() {
         systemFacade.deletePluginConfigurationById(this.pluginConfiguration.getId());
         return "/administration/plugins";
@@ -135,9 +139,8 @@ public class PluginConfigurationDetail {
         }
         onSave();
     }
-    
+
     public void onUpdateProperty(ActionEvent event) {
-        
     }
 
     public void removeProperty(PluginConfigurationProperty property) {
@@ -155,6 +158,9 @@ public class PluginConfigurationDetail {
             } else if (def.getType().equalsIgnoreCase("workflow_state_step")) {
                 WorkflowStep step = workflowFacade.findWorkflowStepById(Long.valueOf(property.getValue()));
                 return step.getName();
+            } else if (def.getType().equalsIgnoreCase("user_role")) {
+                UserRole userRole = userFacade.findUserRoleById(Long.valueOf(property.getValue()));
+                return userRole.getName();
             } else {
                 return property.getValue();
             }
@@ -170,18 +176,18 @@ public class PluginConfigurationDetail {
             return property.getValue();
         }
     }
-    
+
     public void onPrepareAddPluginConfiguration(ActionEvent event) {
         this.eventPluginConfiguration = null;
     }
-    
+
     public Map<String, PluginConfiguration> getExistingPluginConfigurations() {
         List<PluginConfiguration> cfgs = systemFacade.findPluginConfigurations();
         Map<String, PluginConfiguration> cfgMap = new LinkedHashMap<String, PluginConfiguration>();
         for (PluginConfiguration cfg : cfgs) {
             cfgMap.put(cfg.getName(), cfg);
         }
-        
+
         return cfgMap;
     }
 
@@ -192,12 +198,12 @@ public class PluginConfigurationDetail {
     public void setEventPluginConfiguration(PluginConfiguration eventPluginConfiguration) {
         this.eventPluginConfiguration = eventPluginConfiguration;
     }
-    
+
     public void onAddEventPluginConfiguration(ActionEvent event) {
         getPluginConfiguration().getOnCompletePluginConfiguration().add(getEventPluginConfiguration());
         onSave();
     }
-    
+
     public void removeEventPluginConfiguration(PluginConfiguration cfg) {
         getPluginConfiguration().getOnCompletePluginConfiguration().remove(cfg);
         onSave();
@@ -321,7 +327,7 @@ public class PluginConfigurationDetail {
 
         return renditions;
     }
-    
+
     public Map<String, String> getWorkflowStateSteps() {
         Map<String, String> steps = new LinkedHashMap<String, String>();
 
@@ -342,6 +348,23 @@ public class PluginConfigurationDetail {
         }
 
         return steps;
+    }
+
+    public Map<String, String> getUserRoles() {
+        Map<String, String> roles = new LinkedHashMap<String, String>();
+
+        List<UserRole> results = userFacade.getUserRoles();
+
+        for (UserRole role : results) {
+            String lbl = role.getName();
+                    
+            if (roles.containsKey(role.getName())) {
+                lbl = role.getName() + " (#" + role.getId() + ")";
+            }
+            roles.put(lbl, "" + role.getId());
+        }
+
+        return roles;
     }
 
     /**

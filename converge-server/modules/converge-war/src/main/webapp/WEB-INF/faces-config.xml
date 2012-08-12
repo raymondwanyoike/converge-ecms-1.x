@@ -565,6 +565,11 @@ http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"
             <renderer-class>dk.i2m.converge.jsf.components.message.MessageRenderer</renderer-class>
         </renderer>
     </render-kit>
-
+    <managed-bean>
+        <description>Backing bean for Error.jspx</description>
+        <managed-bean-name>Error</managed-bean-name>
+        <managed-bean-class>dk.i2m.converge.jsf.beans.Error</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
 </faces-config>
 

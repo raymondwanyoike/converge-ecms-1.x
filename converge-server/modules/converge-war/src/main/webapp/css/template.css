@@ -1934,7 +1934,12 @@ div.black h2 {
 .invalidOutlet { color: red; font-weight: bold; }
 
 .activityStream { border: 0px; border-spacing: 0px; width: 100% }
-.activityStreamSender, .activityStreamMessage { border: 0px; border-bottom: 1px solid #cccccc; }
+.activityStreamSender, 
+.activityStreamMessage { 
+    border: 0px; 
+    border-bottom: 1px solid #cccccc;
+}
+
 .activityStreamSenderName { color: #7D7D7D; font-weight: bold; }
 .activityStreamMessageText {}
 .activityStreamTime { color: #7D7D7D; text-transform: uppercase; font-size: 0.8em; }
@@ -2112,6 +2117,9 @@ a.sort-field-activate, a.sort-field-activate:visited, a.sort-field-activate:hove
     border: 0px;
 }
 
+.activityStream .rich-table-row,
+.activityStream .rich-table-row .odd,
+.activityStream .rich-table-row .even,
 .noborder .rich-table-row,
 .noborder .rich-table-row .odd,
 .noborder .rich-table-row .even,

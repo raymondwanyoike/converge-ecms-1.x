@@ -32,10 +32,16 @@ import dk.i2m.converge.core.workflow.JobQueueStatus;
 import dk.i2m.converge.domain.Property;
 import dk.i2m.converge.ejb.services.*;
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -62,6 +68,10 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     private TimerServiceLocal timerService;
     @EJB
     private PluginContextBeanLocal pluginContext;
+    @EJB
+    private NotificationServiceLocal notificationService;
+    @Resource
+    private SessionContext ctx;
 
     /**
      * Creates a new instance of {@link SystemFacadeBean}.
@@ -430,7 +440,7 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     public void clearOldLogEntries() {
         int daysToKeep = cfgService.getInteger(ConfigurationKey.LOG_KEEP);
         Calendar now = Calendar.getInstance();
-        now.roll(Calendar.DAY_OF_MONTH, -daysToKeep);
+        now.add(Calendar.DAY_OF_MONTH, -daysToKeep);
         clearOldLogEntries(now.getTime());
     }
 
@@ -475,6 +485,7 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         q.setPluginAction(pluginCfg.getActionClass());
         q.setTypeClass(typeName);
         q.setTypeClassId(typeId);
+
         return daoService.create(q);
     }
 
@@ -485,6 +496,7 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     public void executeJobQueue() {
         List<JobQueue> queue = findJobQueue();
         Calendar now = Calendar.getInstance();
+        boolean itemsAddedDuringExecution = false;
         for (JobQueue item : queue) {
             try {
                 LOG.log(Level.FINE, "Examining {0} {1}", new Object[]{item.getId(), item.getName()});
@@ -514,10 +526,11 @@ public class SystemFacadeBean implements SystemFacadeLocal {
                         item.setStatus(JobQueueStatus.COMPLETED);
 
                         LOG.log(Level.FINE, "PluginConfiguratione executed successfully");
-                        LOG.log(Level.FINE, "Adding  'oncomplete' PluginConfigurations to JobQueue");
+                        LOG.log(Level.FINE, "Adding 'oncomplete' PluginConfigurations to JobQueue");
                         for (PluginConfiguration completeCfg : cfg.getOnCompletePluginConfiguration()) {
                             LOG.log(Level.FINE, "+ {1} {0}", new Object[]{completeCfg.getName(), completeCfg.getId()});
                             addToJobQueue(completeCfg.getName(), item.getTypeClass(), item.getTypeClassId(), completeCfg.getId(), item.getParameters(), Calendar.getInstance().getTime());
+                            itemsAddedDuringExecution = true;
                         }
                     } catch (DataNotFoundException ex) {
                         LOG.log(Level.FINE, "Failed execution of {0} {1}. " + ex.getMessage(), new Object[]{item.getId(), item.getName()});
@@ -541,6 +554,12 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         }
 
         daoService.executeQuery(JobQueue.REMOVE_COMPLETED);
+
+        // If items were added to the job queue during the execution, process the queue again
+        if (itemsAddedDuringExecution) {
+            executeJobQueue();
+        }
+
     }
 
     private int removeAllNewswireProcessing() {
@@ -607,5 +626,71 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         cfg.setActionClass(firstAction.getClass().getName());
 
         return cfg;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void submitErrorReport(String errorDescription, String stacktrace, String browserData) {
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("<table border=\"1\">");
+        sb.append("    <tr>");
+        sb.append("        <td><b>Message</b>:</td>");
+        sb.append("        <td>");
+        sb.append(errorDescription);
+        sb.append("        </td>");
+        sb.append("    </tr>");
+        sb.append("    <tr>");
+        sb.append("        <td><b>Time</b>:</td>");
+        sb.append("        <td>");
+        sb.append(df.format(Calendar.getInstance().getTime()));
+        sb.append("        </td>");
+        sb.append("    </tr>");
+        sb.append("    <tr>");
+        sb.append("        <td><b>Server IP address</b>:</td>");
+        sb.append("        <td>");
+        try {
+            InetAddress addr = InetAddress.getLocalHost();
+            sb.append(addr.getHostAddress());
+        } catch (UnknownHostException e) {
+            sb.append("Unknown");
+        }
+        sb.append("        </td>");
+        sb.append("    </tr>");
+        sb.append("    <tr>");
+        sb.append("        <td><b>Version</b>:</td>");
+        sb.append("        <td>");
+        sb.append(getApplicationVersion());
+        sb.append("        </td>");
+        sb.append("    </tr>");
+        sb.append("    <tr>");
+        sb.append("        <td><b>User</b>:</td>");
+        sb.append("        <td>");
+        sb.append(ctx.getCallerPrincipal().getName());
+        sb.append("        </td>");
+        sb.append("    </tr>");
+        sb.append("    <tr>");
+        sb.append("        <td><b>Request</b>:</td>");
+        sb.append("        <td><pre>");
+        sb.append(browserData);
+        sb.append("        </pre></td>");
+        sb.append("    </tr>");
+        sb.append("    <tr>");
+        sb.append("        <td><b>Stacktrace</b>:</td>");
+        sb.append("        <td><pre>");
+        sb.append(stacktrace);
+        sb.append("        </pre></td>");
+        sb.append("    </tr>");
+        sb.append("<table>");
+
+        // TODO: Add e-mails to configuration
+        notificationService.dispatchMail("errorreport.converge@i2m.dk",
+                "converge@i2m.dk",
+                "Error report",
+                sb.toString(), "");
     }
 }

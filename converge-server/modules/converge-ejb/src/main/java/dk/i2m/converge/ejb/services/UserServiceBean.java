@@ -298,7 +298,7 @@ public class UserServiceBean implements UserServiceLocal {
                 parameters());
 
         if (matches.size() == 1) {
-            return ua = matches.iterator().next();
+            return matches.iterator().next();
         } else {
             LOG.log(Level.FINE, "No user account found for {0} in database", id);
             ua = new UserAccount();

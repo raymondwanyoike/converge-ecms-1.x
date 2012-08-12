@@ -44,6 +44,7 @@ import javax.mail.internet.MimeMultipart;
 @Stateless
 public class NotificationServiceBean implements NotificationServiceLocal {
 
+    private static final Logger LOG = Logger.getLogger(NotificationServiceBean.class.getName());
     @EJB
     private ConfigurationServiceLocal cfgService;
     @EJB
@@ -71,22 +72,16 @@ public class NotificationServiceBean implements NotificationServiceLocal {
 
             Transport.send(message);
         } catch (AddressException e) {
-            Logger.getLogger(NotificationServiceBean.class.getName()).log(Level.SEVERE, e.getMessage());
-            Logger.getLogger(NotificationServiceBean.class.getName()).log(Level.FINE, "", e);
+            LOG.log(Level.SEVERE, e.getMessage());
+            LOG.log(Level.FINE, "", e);
         } catch (MessagingException e) {
-            Logger.getLogger(NotificationServiceBean.class.getName()).log(Level.SEVERE, e.getMessage());
-            Logger.getLogger(NotificationServiceBean.class.getName()).log(Level.FINE, "", e);
+            LOG.log(Level.SEVERE, e.getMessage());
+            LOG.log(Level.FINE, "", e);
         }
     }
 
     /**
-     * Dispatches an e-mail with both HTML and plain text content.
-     *
-     * @param to E-mail address of the recipient
-     * @param from E-mail address of the sender
-     * @param subject Subject of the e-mail
-     * @param htmlContent HTML content of the e-mail
-     * @param plainContent Plain content of the e-mail
+     * {@inheritDoc }
      */
     @Override
     public void dispatchMail(String to, String from, String subject, String htmlContent, String plainContent) {
@@ -112,11 +107,11 @@ public class NotificationServiceBean implements NotificationServiceLocal {
 
             Transport.send(message);
         } catch (AddressException e) {
-            Logger.getLogger(NotificationServiceBean.class.getName()).log(Level.SEVERE, e.getMessage());
-            Logger.getLogger(NotificationServiceBean.class.getName()).log(Level.FINE, "", e);
+            LOG.log(Level.SEVERE, e.getMessage());
+            LOG.log(Level.FINE, "", e);
         } catch (MessagingException e) {
-            Logger.getLogger(NotificationServiceBean.class.getName()).log(Level.SEVERE, e.getMessage());
-            Logger.getLogger(NotificationServiceBean.class.getName()).log(Level.FINE, "", e);
+            LOG.log(Level.SEVERE, e.getMessage());
+            LOG.log(Level.FINE, "", e);
         }
     }
 
@@ -150,8 +145,9 @@ public class NotificationServiceBean implements NotificationServiceLocal {
      */
     @Override
     public void deleteOld(Date date) {
-        daoService.executeQuery(Notification.DELETE_OLD,
+        int deleted = daoService.executeQuery(Notification.DELETE_OLD,
                 QueryBuilder.with(Notification.PARAMETER_DATE, date));
+        LOG.log(Level.FINE, "{0} deleted activity stream notifications", deleted);
     }
 
     /**
@@ -161,7 +157,7 @@ public class NotificationServiceBean implements NotificationServiceLocal {
     public void deleteOld() {
         int keep = cfgService.getInteger(ConfigurationKey.ACTIVITY_STREAM_KEEP);
         Calendar now = Calendar.getInstance();
-        now.roll(Calendar.DAY_OF_MONTH, -keep);
+        now.add(Calendar.DAY_OF_MONTH, -keep);
         deleteOld(now.getTime());
     }
 }

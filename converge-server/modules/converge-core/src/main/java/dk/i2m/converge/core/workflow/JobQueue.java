@@ -20,6 +20,7 @@ import dk.i2m.converge.core.plugin.PluginAction;
 import java.io.Serializable;
 import java.util.*;
 import javax.persistence.*;
+import org.eclipse.persistence.annotations.PrivateOwned;
 
 /**
  * Item in the {@link JobQueue} for execution of an action at a given time.
@@ -29,13 +30,11 @@ import javax.persistence.*;
 @Entity
 @Table(name = "job_queue")
 @NamedQueries({
-    @NamedQuery(name = JobQueue.REMOVE_COMPLETED,
-    query =
-    "DELETE FROM JobQueue j WHERE j.status = dk.i2m.converge.core.workflow.JobQueueStatus.COMPLETED")
+    @NamedQuery(name = JobQueue.REMOVE_COMPLETED, query = "DELETE FROM JobQueue j WHERE j.status = dk.i2m.converge.core.workflow.JobQueueStatus.COMPLETED")
 })
 public class JobQueue implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
     /**
      * Update query for removing all completed items from the JobQueue.
      */
@@ -70,9 +69,9 @@ public class JobQueue implements Serializable {
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "added")
     private Date added;
-    @OneToMany(mappedBy = "jobQueue")
-    private List<JobQueueParameter> parameters =
-            new ArrayList<JobQueueParameter>();
+    @OneToMany(mappedBy = "jobQueue", cascade = CascadeType.ALL)
+    @PrivateOwned
+    private List<JobQueueParameter> parameters = new ArrayList<JobQueueParameter>();
 
     public JobQueue() {
     }
@@ -175,12 +174,17 @@ public class JobQueue implements Serializable {
     }
 
     /**
-     * Sets the {@link List} of parameters for the {@link JobQueue} item.
+     * Sets the {@link List} of parameters for the {@link JobQueue} item. While
+     * setting the parameters, all the parameters set their {@link JobQueue}
+     * reference to this {@link JobQueue}
      *
      * @param parameters {@link List} of parameters to set for the
      * {@link JobQueue} item
      */
     public void setParameters(List<JobQueueParameter> parameters) {
+        for (JobQueueParameter p : parameters) {
+            p.setJobQueue(this);
+        }
         this.parameters = parameters;
     }
 

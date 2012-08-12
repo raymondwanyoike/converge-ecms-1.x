@@ -54,7 +54,7 @@ public class PluginConfiguration implements Serializable {
      * List of PluginConfigurations to executed upon completion of this
      * configuration.
      */
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "plugin_configuration_oncomplete",
     joinColumns =
     @JoinColumn(name = "main_configuration_id", referencedColumnName = "id"),

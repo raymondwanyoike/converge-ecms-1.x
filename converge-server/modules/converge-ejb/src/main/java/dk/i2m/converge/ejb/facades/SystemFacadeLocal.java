@@ -273,4 +273,13 @@ public interface SystemFacadeLocal {
     void clearOldLogEntries();
 
     void deletePluginConfigurationById(Long id);
+
+    /**
+     * Submits an error report.
+     * 
+     * @param errorDescription Description of the error
+     * @param stacktrace Stack trace
+     * @param browserData Information about the web browser
+     */
+    void submitErrorReport(String errorDescription, String stacktrace, String browserData);
 }

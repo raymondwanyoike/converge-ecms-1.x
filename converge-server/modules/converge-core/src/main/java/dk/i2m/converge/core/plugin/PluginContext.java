@@ -40,12 +40,11 @@ import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.workflow.Edition;
 import dk.i2m.converge.core.workflow.JobQueue;
 import dk.i2m.converge.core.workflow.JobQueueParameter;
-import dk.i2m.converge.core.workflow.JobQueueStatus;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
 import dk.i2m.converge.core.workflow.WorkflowStep;
-import java.util.Calendar;
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 
@@ -61,8 +60,8 @@ public interface PluginContext {
      * Logs activity.
      *
      * @param severity Severity of the log statement
-     * @param message  Message to log
-     * @param origin   Origin of the log
+     * @param message Message to log
+     * @param origin Origin of the log
      * @param originId ID of the origin
      */
     void log(dk.i2m.converge.core.logging.LogSeverity severity,
@@ -72,11 +71,11 @@ public interface PluginContext {
     /**
      * Logs activity.
      *
-     * @param severity         Severity of the log statement
-     * @param message          Message to log
+     * @param severity Severity of the log statement
+     * @param message Message to log
      * @param messageArguments Arguments for the message
-     * @param origin           Origin of the log
-     * @param originId         ID of the origin
+     * @param origin Origin of the log
+     * @param originId ID of the origin
      */
     void log(dk.i2m.converge.core.logging.LogSeverity severity,
             java.lang.String message, java.lang.Object[] messageArguments,
@@ -86,10 +85,10 @@ public interface PluginContext {
     /**
      * Logs activity.
      *
-     * @param severity         Severity of the log statement
-     * @param message          Message to log
+     * @param severity Severity of the log statement
+     * @param message Message to log
      * @param messageArguments Arguments for the message
-     * @param subjects         {@link List} of subjects relating to the log
+     * @param subjects {@link List} of subjects relating to the log
      */
     void log(dk.i2m.converge.core.logging.LogSeverity severity,
             java.lang.String message, java.lang.Object[] messageArguments,
@@ -97,7 +96,7 @@ public interface PluginContext {
 
     /**
      * Gets a given configuration from the database.
-     * <p/>
+     *
      * @param key Key of the configuration
      * @return Configuration matching the key, or {@code null} if nothing
      * matched the key
@@ -125,7 +124,7 @@ public interface PluginContext {
      *
      * @param externalId External identifier of the {@link NewswireItem}
      * @return {@link List} of {@link NewswireItem}s with the given
-     *         {@code externalId}
+     * {@code externalId}
      */
     List<NewswireItem> findNewswireItemsByExternalId(String externalId);
 
@@ -141,36 +140,33 @@ public interface PluginContext {
     /**
      * Indexes a given {@link NewswireItem} in the search engine.
      *
-     * @param item 
-     *          {@link NewswireItem} to index
-     * @throws SearchEngineIndexingException 
-     *          If the {@link NewswireItem} could not be indexed
+     * @param item {@link NewswireItem} to index
+     * @throws SearchEngineIndexingException If the {@link NewswireItem} could
+     * not be indexed
      */
     void index(NewswireItem item) throws SearchEngineIndexingException;
 
     /**
      * Indexes a given {@link NewsItem} in the search engine.
      *
-     * @param item 
-     *          {@link NewsItem} to index
-     * @throws SearchEngineIndexingException 
-     *          If the {@link NewsItem} could not be indexed
+     * @param item {@link NewsItem} to index
+     * @throws SearchEngineIndexingException If the {@link NewsItem} could not
+     * be indexed
      */
     void index(NewsItem item) throws SearchEngineIndexingException;
 
     /**
      * Indexes a given {@link MediaItem} in the search engine.
      *
-     * @param item 
-     *          {@link MediaItem} to index
-     * @throws SearchEngineIndexingException 
-     *          If the {@link MediaItem} could not be indexed
+     * @param item {@link MediaItem} to index
+     * @throws SearchEngineIndexingException If the {@link MediaItem} could not
+     * be indexed
      */
     void index(MediaItem item) throws SearchEngineIndexingException;
 
     /**
      * Find or create a newswire {@link ContentTag}.
-     * <p/>
+     *
      * @param name Name of the {@link ContentTag}
      * @return {@link ContentTag} for the given name
      */
@@ -180,8 +176,8 @@ public interface PluginContext {
     /**
      * Dispatches e-mail.
      *
-     * @param to      Recipient
-     * @param from    Addressee
+     * @param to Recipient
+     * @param from Addressee
      * @param subject Subject of the e-mail
      * @param content Body of the e-mail
      */
@@ -199,27 +195,52 @@ public interface PluginContext {
      * Gets the {@link UserAccount} of the currently logged in user.
      *
      * @return {@link UserAccount} of the currently logged in user, or
-     *         {@code null} if the {@link UserAccount} is not available (e.g.
-     * invoked by a system timer)
-     *
+     * {@code null} if the {@link UserAccount} is not available (e.g. invoked by
+     * a system timer)
      */
     UserAccount getCurrentUserAccount();
 
     /**
      * Finds {@link UserAccount}s in a given role.
-     * <p/>
+     *
      * @param roleName Name of the user role
      * @return {@link List} of {@link UserAccount}s with the given role
      */
     List<UserAccount> findUserAccountsByRole(String roleName);
 
     /**
-     * Finds {@link NewsItem}s by their {@link WorkflowState} and {@link Outlet}.
-     * <p/>
+     * Finds {@link UserAccount}s in a given role.
+     *
+     * @param roleId Unique identifier of the {@link UserRole}
+     * @return {@link List} of {@link UserAccount}s with the given role
+     */
+    List<UserAccount> findUserAccountsByRole(Long roleId);
+
+    /**
+     * Finds a {@link UserAccount} by its username.
+     *
+     * @param username Username of the {@link UserAccount}
+     * @return {@link UserAccount} matching the username
+     * @throws DataNotFoundException If no {@link UserAccount} could be found
+     * with the given {@code username}
+     */
+    UserAccount findUserAccountByUsername(String username) throws DataNotFoundException;
+
+    /**
+     * Finds the system account used to represent automated actions.
+     *
+     * @return System {@link UserAccount}
+     */
+    UserAccount findSystemUserAccount();
+
+    /**
+     * Finds {@link NewsItem}s by their {@link WorkflowState} and
+     * {@link Outlet}.
+     * 
      * @param stateName Name of the {@link WorkflowState}
-     * @param outlet    {@link Outlet} of the {@link NewsItem}s
+     * @param outlet {@link Outlet} of the {@link NewsItem}s
      * @return {@link List} of {@link NewsItem}s in the given
-     *         {@link WorkflowState} and {@link Outlet}
+     * {@link WorkflowState} and {@link Outlet}
      */
     List<NewsItem> findNewsItemsByStateAndOutlet(String stateName, Outlet outlet);
 
@@ -242,37 +263,41 @@ public interface PluginContext {
     Catalogue findCatalogue(Long catalogueId);
 
     Rendition findRenditionByName(String name);
-    
-    /**
-     * Finds an existing {@link Rendition} by its unique identifier.
-     * 
-     * @param id Unique identifier of the {@link Rendition}
-     * @return {@link Rendition} matching the given {@code id}
-     * @throws DataNotFound If no {@link Rendition} was found to match the given {@code id}
-     */
-    Rendition findRenditionById(Long id) throws DataNotFoundException;
-    
-    /**
-     * Finds an existing {@link WorkflowStep} by its unique identifier.
-     * 
-     * @param id Unique identifier of the {@link WorkflowStep}
-     * @return {@link WorkflowStep} matching the given {@code id}
-     * @throws DataNotFoundException If no {@link WorkflowStep} was found to match the given {@code id}
-     */
-    WorkflowStep findWorkflowStep(Long id) throws DataNotFoundException;
-    
 
     /**
-     * Archives a {@link File} in a {@link dk.i2m.converge.core.content.catalogue.Catalogue}.
+     * Finds an existing {@link Rendition} by its unique identifier.
      *
-     * @param file        {@link File} to archive
-     * @param catalogueId Unique identifier of the {@link dk.i2m.converge.core.content.catalogue.Catalogue} where the file should be archived
-     * @param fileName    Name of the file
-     * @return Path and name of the archived file
-     * @throws ArchiveException If the file could not be archived in the given catalogue
+     * @param id Unique identifier of the {@link Rendition}
+     * @return {@link Rendition} matching the given {@code id}
+     * @throws DataNotFound If no {@link Rendition} was found to match the given
+     * {@code id}
      */
-    java.lang.String archive(java.io.File file, Long catalogueId,
-            String fileName) throws ArchiveException;
+    Rendition findRenditionById(Long id) throws DataNotFoundException;
+
+    /**
+     * Finds an existing {@link WorkflowStep} by its unique identifier.
+     *
+     * @param id Unique identifier of the {@link WorkflowStep}
+     * @return {@link WorkflowStep} matching the given {@code id}
+     * @throws DataNotFoundException If no {@link WorkflowStep} was found to
+     * match the given {@code id}
+     */
+    WorkflowStep findWorkflowStep(Long id) throws DataNotFoundException;
+
+    /**
+     * Archives a {@link File} in a
+     * {@link dk.i2m.converge.core.content.catalogue.Catalogue}.
+     *
+     * @param file {@link File} to archive
+     * @param catalogueId Unique identifier of the
+     * {@link dk.i2m.converge.core.content.catalogue.Catalogue} where the file
+     * should be archived
+     * @param fileName Name of the file
+     * @return Path and name of the archived file
+     * @throws ArchiveException If the file could not be archived in the given
+     * catalogue
+     */
+    String archive(File file, Long catalogueId, String fileName) throws ArchiveException;
 
     dk.i2m.converge.core.content.catalogue.MediaItemRendition createMediaItemRendition(
             java.io.File file, java.lang.Long mediaItemId,
@@ -314,7 +339,8 @@ public interface PluginContext {
      *
      * @param id Unique identifier of the {@link Outlet}
      * @return {@link Outlet} matching the unique identifier
-     * @throws DataNotFoundException If an {@link Outlet} with the given {@code id} could not be found
+     * @throws DataNotFoundException If an {@link Outlet} with the given
+     * {@code id} could not be found
      */
     Outlet findOutletById(Long id) throws DataNotFoundException;
 
@@ -323,7 +349,8 @@ public interface PluginContext {
      *
      * @param id Unique identifier of the {@link Outlet}
      * @return Next {@link Edition} for the given {@link Outlet}
-     * @throws DataNotFoundException If the {@link Outlet} does not have any future {@link Edition}s
+     * @throws DataNotFoundException If the {@link Outlet} does not have any
+     * future {@link Edition}s
      */
     Edition findNextEdition(Long id) throws DataNotFoundException;
 
@@ -371,47 +398,66 @@ public interface PluginContext {
     NewsItemEditionState updateNewsItemEditionState(
             NewsItemEditionState newsItemEditionState);
 
+    /**
+     * Finds an existing {@link NewsItem} in the database.
+     *
+     * @param id Unique identifier of the {@link NewsItem}
+     * @return {@link NewsItem} matching the given {@code id}
+     * @throws DataNotFoundException If no {@link NewsItem} matched the
+     * {@code id}
+     */
     NewsItem findNewsItemById(Long id) throws DataNotFoundException;
 
+    /**
+     * Finds an existing {@link MediaItem} in the database.
+     *
+     * @param id Unique identifier of the {@link MediaItem}
+     * @return {@link MediaItem} matching the given {@code id}
+     * @throws DataNotFoundException If no {@link MediaItem} matched the
+     * {@code id}
+     */
     MediaItem findMediaItemById(Long id) throws DataNotFoundException;
 
     /**
      * Finds an existing {@link ContentItem} by its unique identifier.
-     * 
-     * @param id
-     *          Unique identifier of the {@link ContentItem}
+     *
+     * @param id Unique identifier of the {@link ContentItem}
      * @return {@link ContentItem} matching the given {@code id}
-     * @throws DataNotFoundException 
-     *          If a {@link ContentItem} with the given {@code id} does not
-     *          exist
+     * @throws DataNotFoundException If a {@link ContentItem} with the given
+     * {@code id} does not exist
      */
     ContentItem findContentItemById(Long id) throws DataNotFoundException;
 
     /**
      * Adds an entry in the {@link JobQueue}.
-     * 
+     *
      * @param name Name of the job
      * @param typeName Type of item to act on
      * @param typeId Unique identifier of the item to act on
-     * @param pluginConfigurationId Unique identifier of the plug-in configuration to execute on the type
+     * @param pluginConfigurationId Unique identifier of the plug-in
+     * configuration to execute on the type
      * @param parameters Run-time parameters for the plug-in
      * @param scheduled Date when the item should be executed
      * @return {@link JobQueue} representing the entry in the queue
-     * @throws DataNotFoundException If the {@link PluginConfiguration} does not exist
+     * @throws DataNotFoundException If the {@link PluginConfiguration} does not
+     * exist
      */
     JobQueue addToJobQueue(String name, String typeName, Long typeId,
-            Long pluginConfigurationId, List<JobQueueParameter> parameters, 
+            Long pluginConfigurationId, List<JobQueueParameter> parameters,
             Date scheduled) throws DataNotFoundException;
-    
-    
+
     /**
      * Promotes the {@link ContentItem} in the workflow.
      *
      * @param contentItem {@link ContentItem} to promote
      * @param step Unique identifier of the next step
-     * @param stateTransition  Is the step a state transition (skipping the WorkflowOption) or is it a WorkflowOption transition. A state transition can be used to move from one state to another by-passing declared workflow options
+     * @param stateTransition Is the step a state transition (skipping the
+     * WorkflowOption) or is it a WorkflowOption transition. A state transition
+     * can be used to move from one state to another by-passing declared
+     * workflow options
      * @return Promoted {@link ContentItem}
-     * @throws WorkflowStateTransitionException If the next state is not legal or if the step failed
+     * @throws WorkflowStateTransitionException If the next state is not legal
+     * or if the step failed
      */
     ContentItem step(ContentItem ci, Long stepId, boolean stateTransition) throws WorkflowStateTransitionException;
 }
