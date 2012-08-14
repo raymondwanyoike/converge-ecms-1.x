@@ -128,11 +128,6 @@
     </tag>
 
     <tag>
-        <tag-name>newsItemModuleByLine</tag-name>
-        <source>taglib/converge/newsItemModuleByLine.xhtml</source>
-    </tag>
-
-    <tag>
         <tag-name>newsItemModuleBriefing</tag-name>
         <source>taglib/converge/newsItemModuleBriefing.xhtml</source>
     </tag>
@@ -150,11 +145,6 @@
     <tag>
         <tag-name>newsItemModuleLastTransition</tag-name>
         <source>taglib/converge/newsItemModuleLastTransition.xhtml</source>
-    </tag>
-
-    <tag>
-        <tag-name>newsItemModuleHeadline</tag-name>
-        <source>taglib/converge/newsItemModuleHeadline.xhtml</source>
     </tag>
 
     <tag>
