@@ -26,7 +26,7 @@
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>
-                            <h:graphicImage value="#{res.ALERT_ICON}" title="#{i18n.Notifications_NOTIFICATION}" alt="#{i18n.Notifications_NOTIFICATION}"/>
+                            <h:graphicImage value="#{i18n.resource_ICON_ALERT}" title="#{i18n.Notifications_NOTIFICATION}" alt="#{i18n.Notifications_NOTIFICATION}"/>
                         </rich:column>
 
                         <rich:column sortBy="#{notification.added.time}" width="185px" sortOrder="ASCENDING" styleClass="columnDateTime left">
@@ -49,7 +49,7 @@
                         <rich:column styleClass="columnIcon center">
                             <f:facet name="header">
                                 <a4j:commandLink id="lnkDismissNotifications" ajaxSingle="true" actionListener="#{userSession.onDismissAllNotifications}" reRender="frmPage, notificationCount">
-                                    <h:graphicImage alt="#{i18n.Notifications_DISMISS_ALL}" title="#{i18n.Notifications_DISMISS_ALL}" value="#{res.DELETE_ALL_ICON}"/>
+                                    <h:graphicImage alt="#{i18n.Notifications_DISMISS_ALL}" title="#{i18n.Notifications_DISMISS_ALL}" value="#{i18n.resource_ICON_DELETE_ALL}"/>
                                 </a4j:commandLink>
                             </f:facet>
                             <a4j:commandLink id="lnkDismissNotification" ajaxSingle="true">

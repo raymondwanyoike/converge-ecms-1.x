@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.plugins.actions.drupal.client;
 
+import dk.i2m.converge.core.utils.URLBuilder;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;

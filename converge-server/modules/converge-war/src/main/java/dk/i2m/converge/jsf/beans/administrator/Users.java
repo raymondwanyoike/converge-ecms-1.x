@@ -19,27 +19,28 @@ package dk.i2m.converge.jsf.beans.administrator;
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
-import dk.i2m.converge.jsf.beans.BaseBean;
 import dk.i2m.jsf.JsfUtils;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 
 /**
- * Backing-bean for <code>/administrator/Users.jspx</code>.
+ * Backing-bean for {@code /administrator/Users.jspx}.
  *
  * @author Allan Lykke Christensen
  */
-public class Users extends BaseBean {
+public class Users {
+
+    private static final Logger LOG = Logger.getLogger(Users.class.getName());
 
     @EJB private UserFacadeLocal userFacade;
 
     private DataModel users = null;
 
     private UserAccount displayUser;
-
 
     /**
      * Creates a new instance of {@link Users}.
@@ -58,7 +59,7 @@ public class Users extends BaseBean {
         try {
             this.displayUser = userFacade.findById(uid);
         } catch (DataNotFoundException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
         }
     }
 

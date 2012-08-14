@@ -42,15 +42,7 @@ public class DaoServiceBean implements DaoServiceLocal {
     @PersistenceContext(unitName = "converge-ejbPU")
     private EntityManager em;
 
-    /**
-     * Stores a given object in the data store.
-     *
-     * @param <T>
-     *          Type of entity to store
-     * @param t
-     *          Entity to store
-     * @return Object stored in the data store.
-     */
+    /** {@inheritDoc} */
     @Override
     public <T> T create(T t) {
         this.em.persist(t);
@@ -59,23 +51,13 @@ public class DaoServiceBean implements DaoServiceLocal {
         return t;
     }
     
+    /** {@inheritDoc} */
+    @Override
     public void commit() {
         this.em.getTransaction().commit();
     }
 
-    /**
-     * Finds a given entity in the data store.
-     *
-     * @param <T>
-     *          Type of entity
-     * @param type
-     *          Type of entity
-     * @param id
-     *          Unique identifier of the entity
-     * @return Entity matching the unique identifier
-     * @throws DataNotFoundException
-     *          If no match could be found
-     */
+    /** {@inheritDoc} */
     @Override
     public <T> T findById(Class<T> type, Object id) throws DataNotFoundException {
         if (id == null) {
@@ -90,14 +72,7 @@ public class DaoServiceBean implements DaoServiceLocal {
         return entity;
     }
 
-    /**
-     * Remove a given object from the data store.
-     *
-     * @param type
-     *          Type of object
-     * @param id
-     *          Unique identifier of the object
-     */
+    /** {@inheritDoc} */
     @Override
     public void delete(Class type, Object id) {
         if (id == null) {
@@ -175,6 +150,18 @@ public class DaoServiceBean implements DaoServiceLocal {
         }
     }
     
+    @Override
+    public <T> T executeNamedQuery(Class<T> type, String namedQueryName, Map<String, Object> parameters) {
+        Set<Entry<String, Object>> rawParameters = parameters.entrySet();
+        Query query = this.em.createNamedQuery(namedQueryName);
+        
+        for (Entry<String, Object> entry : rawParameters) {
+            query.setParameter(entry.getKey(), entry.getValue());
+        }
+        
+        return (T)query.getSingleResult();
+    }
+    
     /** {@inheritDoc } */
     @Override
     public <T> T findObjectWithNamedQuery(Class<T> type, String namedQueryName, QueryBuilder queryBuilder) throws DataNotFoundException {
@@ -248,6 +235,26 @@ public class DaoServiceBean implements DaoServiceLocal {
         }
         return query.getResultList();
     }
+    
+    /** {@inheritDoc } */
+    @Override
+    public List findWithQuery(Query query, Map<String, Object> parameters, int start, int resultLimit) {
+        Set<Entry<String, Object>> rawParameters = parameters.entrySet();
+
+        if (start > -1) {
+            query.setFirstResult(start);
+        }
+        query.setFirstResult(start);
+        if (resultLimit > 0) {
+            query.setMaxResults(resultLimit);
+        }
+
+
+        for (Entry<String, Object> entry : rawParameters) {
+            query.setParameter(entry.getKey(), entry.getValue());
+        }
+        return query.getResultList();
+    }
 
     /**
      * Finds a {@link List} of entities returned from the given native SQL
@@ -299,4 +306,10 @@ public class DaoServiceBean implements DaoServiceLocal {
     public <T> Number count(Class<T> type, String field) {
         return (Number)this.em.createQuery("SELECT COUNT(o." + field + ") from " + type.getSimpleName() + " o").getSingleResult();
     }
+
+    @Override
+    public EntityManager getEntityManager() {
+        return em;
+    }
+
 }

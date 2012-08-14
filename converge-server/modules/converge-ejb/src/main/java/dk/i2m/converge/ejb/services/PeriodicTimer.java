@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@ package dk.i2m.converge.ejb.services;
 import dk.i2m.converge.core.ConfigurationKey;
 
 /**
- * Enumeration of available system timers and the configuration key
- * that contains they timing interval.
- * 
+ * Enumeration of available system timers and the configuration key that
+ * contains they timing interval.
+ *
  * @author Allan Lykke Christensen
  */
 public enum PeriodicTimer {
@@ -31,8 +31,15 @@ public enum PeriodicTimer {
     CATALOGUE_WATCH(ConfigurationKey.CATALOGUE_WATCH_INTERVAL),
     SEARCH_ENGINE_INDEXING(ConfigurationKey.SEARCH_ENGINE_INDEXING_INTERVAL),
     NEWSWIRE_BASKET(ConfigurationKey.NEWSWIRE_BASKET_INTERVAL),
-    NEWSWIRE_PURGE(ConfigurationKey.NEWSWIRE_PURGE_INTERVAL);
-
+    NEWSWIRE_PURGE(ConfigurationKey.NEWSWIRE_PURGE_INTERVAL),
+    JOB_QUEUE(ConfigurationKey.JOB_QUEUE_INTERVAL),
+    /**
+     * Generic timer executed daily.
+     */
+    DAILY(ConfigurationKey.DAILY_INTERVAL);
+    /**
+     * Interval between executions of the timer.
+     */
     private final ConfigurationKey interval;
 
     PeriodicTimer(ConfigurationKey intervalKey) {

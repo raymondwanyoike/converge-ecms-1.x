@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,7 +16,7 @@
  */
 package dk.i2m.converge.plugins.emailaction;
 
-import dk.i2m.converge.core.content.NewsItem;
+import dk.i2m.converge.core.content.ContentItem;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.plugin.WorkflowAction;
 import dk.i2m.converge.core.security.UserAccount;
@@ -67,7 +67,7 @@ public class EmailAction implements WorkflowAction {
     }
 
     @Override
-    public void execute(PluginContext ctx, NewsItem item,
+    public void execute(PluginContext ctx, ContentItem item,
             WorkflowStepAction stepAction, UserAccount user) {
         Map<String, String> properties = stepAction.getPropertiesAsMap();
 
@@ -104,11 +104,12 @@ public class EmailAction implements WorkflowAction {
         ctx.dispatchMail(emailRecipient, emailSender, emailSubject, emailBody);
     }
 
-    private String compileTemplate(String template, NewsItem item,
+    private String compileTemplate(String template, ContentItem item,
             UserAccount user) {
         StringTemplate strTemplate = new StringTemplate(template,
                 DefaultTemplateLexer.class);
         strTemplate.setAttribute("newsitem", item);
+        strTemplate.setAttribute("item", item);
         strTemplate.setAttribute("initiator", user);
         return strTemplate.toString();
     }

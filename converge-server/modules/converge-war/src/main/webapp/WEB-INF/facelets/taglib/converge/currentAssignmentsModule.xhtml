@@ -3,7 +3,7 @@
         <converge:moduleHeader moduleTitle="#{i18n.currentAssignmentsModule_TITLE}" />
         <div class="moduleContent">
             <h:panelGrid columns="2">
-                <h:graphicImage value="#{res.NEWS_ITEM_ICON}" />
+                <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" />
                 <h:outputLink value="#{facesContext.externalContext.request.contextPath}/Inbox.xhtml">
                     <h:outputFormat value="#{i18n.currentAssignmentsModule_X_ASSIGNMENTS_IN_INBOX}">
                         <f:param value="#{dashboard.userAssignments.rowCount}" />

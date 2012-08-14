@@ -22,6 +22,8 @@ import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.content.catalogue.Rendition;
 import dk.i2m.converge.core.content.catalogue.RenditionNotFoundException;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
+import dk.i2m.converge.ejb.facades.ContentItemFacadeLocal;
+import static dk.i2m.jsf.JsfUtils.*;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -31,47 +33,134 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;
 import javax.imageio.ImageIO;
 import org.apache.commons.io.FileUtils;
 
 /**
- * Backing bean for {@code /CropRendition.jspx}.
+ * View-scoped managed backing bean for {@code /CropRendition.jspx}.
  *
  * @author Allan Lykke Christensen
  */
 public class CropRendition {
 
-    @EJB private CatalogueFacadeLocal catalogueFacade;
-
+    private static final Logger LOG = Logger.getLogger(CropRendition.class.
+            getName());
+    @EJB
+    private CatalogueFacadeLocal catalogueFacade;
+    @EJB
+    private ContentItemFacadeLocal contentItemFacade;
     private MediaItem mediaItem;
-
     private Rendition srcRendition;
-
     private Rendition targetRendition;
-
     private int cropX;
-
     private int cropY;
-
     private int cropX2;
-
     private int cropY2;
-
     private int cropHeight;
-
     private int cropWidth;
-
     private int generateRenditionHeight = 100;
-
     private int generateRenditionWidth = 100;
-
     private int targetWidth = 0;
-
     private int targetHeight = 0;
-
     private MediaItemRendition sourceMediaItemRendition;
+    /**
+     * Request parameter containing the MediaItem to crop.
+     */
+    private Long paramMediaItemId;
+    /**
+     * Request parameter containing the source rendition to crop.
+     */
+    private Long paramSourceRenditionId;
+    /**
+     * Request parameter containing the target rendition to create.
+     */
+    private Long paramTargetRenditionId;
+
+    /**
+     * Creates a new instance of {@link CropRendition}. The constructor sets the
+     * expected external parameters.
+     */
+    public CropRendition() {
+        if (getRequestParameterMap().containsKey("mid")) {
+            this.paramMediaItemId = Long.valueOf(
+                    getRequestParameterMap().get("mid"));
+        }
+
+        if (getRequestParameterMap().containsKey("sid")) {
+            this.paramSourceRenditionId = Long.valueOf(
+                    getRequestParameterMap().get("sid"));
+        }
+
+        if (getRequestParameterMap().containsKey("tid")) {
+            this.paramTargetRenditionId = Long.valueOf(
+                    getRequestParameterMap().get("tid"));
+        }
+    }
+
+    /**
+     * Event handler executed upon post construction of the page.
+     *
+     * @throws DataNotFoundException If the MediaItem or Renditions could not be
+     * found
+     * @throws RenditionNotFoundException If the source rendition doesn't exist
+     */
+    @PostConstruct
+    public void onInit() throws DataNotFoundException, RenditionNotFoundException {
+        setMediaItemId(paramMediaItemId);
+        setSourceRenditionId(paramSourceRenditionId);
+        setTargetRenditionId(paramTargetRenditionId);
+    }
+
+    /**
+     * Event handler for cropping the image based on the current user selection.
+     *
+     * @param event Event that invoked the handler
+     */
+    public void onCrop(ActionEvent event) {
+        try {
+            // Calculate the scale of the crop selection depending on the size of the image in the browser
+            BufferedImage src = ImageIO.read(new URL(sourceMediaItemRendition.
+                    getAbsoluteFilename()));
+            int originalW = src.getWidth(); //sourceMediaItemRendition.getWidth();
+            float increase = (float) originalW / (float) getTargetWidth();
+            int calcCropX = (int) (getCropX() * (increase));
+            int calcCropY = (int) (getCropY() * (increase));
+            int calcCropWidth = (int) ((float) getCropWidth() * (increase));
+            int calcCropHeight = (int) ((float) getCropHeight() * (increase));
+
+            // Crop image
+            BufferedImage dest = src.getSubimage(calcCropX, calcCropY,
+                    calcCropWidth, calcCropHeight);
+
+            // Scale down/up image based on the requested rendition size
+            BufferedImage scaledImage =
+                    new BufferedImage(getGenerateRenditionWidth(),
+                    getGenerateRenditionHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D graphics2D = scaledImage.createGraphics();
+            graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            graphics2D.drawImage(dest, 0, 0, getGenerateRenditionWidth(),
+                    getGenerateRenditionHeight(), null);
+            graphics2D.dispose();
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(scaledImage, "png", baos);
+
+            File tempFile = File.createTempFile("000" + getMediaItem().getId(), ""
+                    + getTargetRendition().getId());
+            FileUtils.writeByteArrayToFile(tempFile, baos.toByteArray());
+
+            catalogueFacade.create(tempFile, mediaItem, targetRendition,
+                    targetRendition.getId() + ".png", "image/png", false);
+            contentItemFacade.updateThumbnailLink(mediaItem.getId());
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, "An error occurred while cropping a rendition. "
+                    + ex.getMessage(), ex);
+        }
+    }
 
     public int getGenerateRenditionHeight() {
         return generateRenditionHeight;
@@ -117,7 +206,8 @@ public class CropRendition {
         mediaItem = catalogueFacade.findMediaItemById(id);
     }
 
-    public void setSourceRenditionId(Long id) throws DataNotFoundException, RenditionNotFoundException {
+    public void setSourceRenditionId(Long id) throws DataNotFoundException,
+            RenditionNotFoundException {
         srcRendition = catalogueFacade.findRenditionById(id);
         sourceMediaItemRendition = mediaItem.findRendition(srcRendition);
     }
@@ -125,11 +215,13 @@ public class CropRendition {
     public void setTargetRenditionId(Long id) throws DataNotFoundException {
         targetRendition = catalogueFacade.findRenditionById(id);
 
-        if (targetRendition.getDefaultHeight() != null && targetRendition.getDefaultHeight().intValue() > 0) {
+        if (targetRendition.getDefaultHeight() != null && targetRendition.
+                getDefaultHeight().intValue() > 0) {
             setGenerateRenditionHeight(targetRendition.getDefaultHeight());
         }
 
-        if (targetRendition.getDefaultWidth() != null && targetRendition.getDefaultWidth().intValue() > 0) {
+        if (targetRendition.getDefaultWidth() != null && targetRendition.
+                getDefaultWidth().intValue() > 0) {
             setGenerateRenditionWidth(targetRendition.getDefaultWidth());
         }
     }
@@ -138,7 +230,8 @@ public class CropRendition {
         return sourceMediaItemRendition;
     }
 
-    public void setSourceMediaItemRendition(MediaItemRendition sourceMediaItemRendition) {
+    public void setSourceMediaItemRendition(
+            MediaItemRendition sourceMediaItemRendition) {
         this.sourceMediaItemRendition = sourceMediaItemRendition;
     }
 
@@ -204,43 +297,5 @@ public class CropRendition {
 
     public void setTargetWidth(int targetWidth) {
         this.targetWidth = targetWidth;
-    }
-
-    /**
-     * Event handler for cropping the image based on the current user selection.
-     * 
-     * @param event Event that invoked the handler
-     */
-    public void onCrop(ActionEvent event) {
-        try {
-            // Calculate the scale of the crop selection depending on the size of the image in the browser
-            BufferedImage src = ImageIO.read(new URL(sourceMediaItemRendition.getAbsoluteFilename()));
-            int originalW = src.getWidth(); //sourceMediaItemRendition.getWidth();
-            float increase = (float) originalW / (float) getTargetWidth();
-            int calcCropX = (int) (getCropX() * (increase));
-            int calcCropY = (int) (getCropY() * (increase));
-            int calcCropWidth = (int) ((float) getCropWidth() * (increase));
-            int calcCropHeight = (int) ((float) getCropHeight() * (increase));
-
-            // Crop image
-            BufferedImage dest = src.getSubimage(calcCropX, calcCropY, calcCropWidth, calcCropHeight);
-
-            // Scale down/up image based on the requested rendition size
-            BufferedImage scaledImage = new BufferedImage(getGenerateRenditionWidth(), getGenerateRenditionHeight(), BufferedImage.TYPE_INT_ARGB);
-            Graphics2D graphics2D = scaledImage.createGraphics();
-            graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            graphics2D.drawImage(dest, 0, 0, getGenerateRenditionWidth(), getGenerateRenditionHeight(), null);
-            graphics2D.dispose();
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(scaledImage, "png", baos);
-
-            File tempFile = File.createTempFile("000" + getMediaItem().getId(), "" + getTargetRendition().getId());
-            FileUtils.writeByteArrayToFile(tempFile, baos.toByteArray());
-
-            MediaItemRendition mir = catalogueFacade.create(tempFile, mediaItem, targetRendition, targetRendition.getId() + ".png", "image/png", false);
-        } catch (IOException ex) {
-            Logger.getLogger(CropRendition.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 }

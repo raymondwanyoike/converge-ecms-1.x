@@ -22,7 +22,7 @@ import dk.i2m.converge.core.subscriber.OutletSubscriber;
 import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.facades.EntityReferenceException;
 import dk.i2m.converge.ejb.facades.OutletFacadeLocal;
-import dk.i2m.converge.jsf.beans.BaseBean;
+import dk.i2m.converge.ejb.services.ContentItemServiceLocal;
 import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.jsf.JsfUtils;
 import java.util.*;
@@ -39,9 +39,13 @@ import javax.faces.model.ListDataModel;
  *
  * @author Allan Lykke Christensen
  */
-public class Outlets extends BaseBean {
+public class Outlets {
+    
+    private static final Logger LOG = Logger.getLogger(Outlets.class.getName());
 
     @EJB private OutletFacadeLocal outletFacade;
+
+    @EJB private ContentItemServiceLocal contentItemService;
 
     private DataModel outlets = null;
 
@@ -52,8 +56,6 @@ public class Outlets extends BaseBean {
     private DataModel selectedOutletSubscribers = new ListDataModel();
 
     private OutletSubscriber selectedOutletSubscriber = null;
-
-    private Department selectedDepartment = null;
 
     private Section selectedSection = null;
 
@@ -71,7 +73,7 @@ public class Outlets extends BaseBean {
 
     /**
      * Gets the {@link Outlet} that is currently selected.
-     * <p/>
+     *
      * @return Currently selected {@link Outlet}
      */
     public Outlet getSelectedOutlet() {
@@ -80,18 +82,27 @@ public class Outlets extends BaseBean {
 
     /**
      * Sets the {@link Outlet} that was selected by the user.
-     * <p/>
-     * @param selectedOutlet {@link Outlet} selected
+     *
+     * @param selectedOutlet 
+     *          {@link Outlet} selected
      */
     public void setSelectedOutlet(Outlet selectedOutlet) {
         this.selectedOutlet = selectedOutlet;
         onLoadSelectedOutletSubscribers(null);
     }
 
+    public void onRegenerateThumbnailLinks(ActionEvent event) {
+        contentItemService.generateThumbnailLinks();
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                Bundle.i18n.name(),
+                "administrator_Outlets_THUMBNAIL_LINKS_REGENERATED");
+    }
+
     /**
      * Event handler for loading the subscribers of the selected outlet.
-     * <p/>
-     * @param event Event that invoked the handler
+     *
+     * @param event 
+     *          Event that invoked the handler
      */
     public void onLoadSelectedOutletSubscribers(ActionEvent event) {
         if (getSelectedOutlet() != null && getSelectedOutlet().getId() != null) {
@@ -151,14 +162,6 @@ public class Outlets extends BaseBean {
         this.selectedOutletTab = selectedOutletTab;
     }
 
-    public Department getSelectedDepartment() {
-        return selectedDepartment;
-    }
-
-    public void setSelectedDepartment(Department selectedDepartment) {
-        this.selectedDepartment = selectedDepartment;
-    }
-
     public Section getSelectedSection() {
         return selectedSection;
     }
@@ -190,18 +193,6 @@ public class Outlets extends BaseBean {
         return !isOutletEditMode();
     }
 
-    public boolean isDepartmentEditMode() {
-        if (selectedDepartment == null || selectedDepartment.getId() == null) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public boolean isDepartmentAddMode() {
-        return !isDepartmentEditMode();
-    }
-
     public boolean isSectionEditMode() {
         if (selectedSection == null || selectedSection.getId() == null) {
             return false;
@@ -222,7 +213,7 @@ public class Outlets extends BaseBean {
         if (selectedOutlet.getId() != null) {
             outletFacade.scheduleActionsOnOutlet(selectedOutlet.getId());
         }
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(), "administrator_Outlets_EDITIONS_RECLOSED");
     }
 
@@ -236,7 +227,7 @@ public class Outlets extends BaseBean {
         if (selectedOutlet != null && action != null) {
             outletFacade.scheduleActionOnOutlet(selectedOutlet.getId(), action.
                     getId());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Outlets_EXECUTE_ACTION_ON_EDITIONS");
         }
@@ -250,12 +241,12 @@ public class Outlets extends BaseBean {
     public void onSaveOutlet(ActionEvent event) {
         if (isOutletAddMode()) {
             selectedOutlet = outletFacade.createOutlet(selectedOutlet);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Outlets_OUTLET_CREATED");
         } else {
             selectedOutlet = outletFacade.updateOutlet(selectedOutlet);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Outlets_OUTLET_UPDATED");
         }
@@ -276,13 +267,8 @@ public class Outlets extends BaseBean {
     public void onDeleteOutlet(ActionEvent event) {
         outletFacade.deleteOutletById(selectedOutlet.getId());
         this.outlets = null;
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(), "administrator_Outlets_OUTLET_DELETED");
-    }
-
-    public void onNewDepartment(ActionEvent event) {
-        selectedDepartment = new Department();
-        selectedDepartment.setOutlet(selectedOutlet);
     }
 
     public void onNewSection(ActionEvent event) {
@@ -293,7 +279,7 @@ public class Outlets extends BaseBean {
     public void onSaveSection(ActionEvent event) {
         if (isSectionAddMode()) {
             selectedSection = outletFacade.createSection(selectedSection);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(), "administrator_Outlets_SECTION_CREATED");
         } else {
             selectedSection = outletFacade.updateSection(selectedSection);
@@ -335,16 +321,16 @@ public class Outlets extends BaseBean {
             } else {
                 selectedOutletSubscriber.setSubscriptionDate(now);
             }
-            
+
             selectedOutletSubscriber = outletFacade.createSubscriber(
                     selectedOutletSubscriber);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Outlets_OUTLET_SUBSCRIBER_CREATED");
         } else {
             selectedOutletSubscriber = outletFacade.updateSubscriber(
                     selectedOutletSubscriber);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Outlets_OUTLET_SUBSCRIBER_UPDATED");
         }
@@ -353,7 +339,7 @@ public class Outlets extends BaseBean {
 
     public void onDeleteOutletSubscriber(ActionEvent event) {
         outletFacade.deleteSubscriberById(selectedOutletSubscriber.getId());
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(),
                 "administrator_Outlets_OUTLET_SUBSCRIBER_DELETED");
         onLoadSelectedOutletSubscribers(event);
@@ -493,7 +479,7 @@ public class Outlets extends BaseBean {
      */
     public void onDeleteOutletAction(ActionEvent event) {
         selectedOutlet.getEditionActions().remove(selectedOutletEditionAction);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(),
                 "administrator_Outlets_OUTLET_ACTION_REMOVE");
 
@@ -509,13 +495,13 @@ public class Outlets extends BaseBean {
             selectedOutletEditionAction.setOutlet(selectedOutlet);
             selectedOutletEditionAction = outletFacade.createOutletAction(
                     selectedOutletEditionAction);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Outlets_OUTLET_ACTION_CREATED");
         } else {
             selectedOutletEditionAction = outletFacade.updateOutletAction(
                     selectedOutletEditionAction);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Outlets_OUTLET_ACTION_UPDATED");
         }
@@ -524,7 +510,7 @@ public class Outlets extends BaseBean {
         try {
             selectedOutlet = outletFacade.findOutletById(selectedOutlet.getId());
         } catch (DataNotFoundException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -570,7 +556,7 @@ public class Outlets extends BaseBean {
             selectedEditionPattern.setOutlet(selectedOutlet);
             selectedEditionPattern = outletFacade.createEditionPattern(
                     selectedEditionPattern);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, 
+            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Outlets_EDITION_PATTERN_CREATED");
         }
@@ -579,7 +565,7 @@ public class Outlets extends BaseBean {
         try {
             selectedOutlet = outletFacade.findOutletById(selectedOutlet.getId());
         } catch (DataNotFoundException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }

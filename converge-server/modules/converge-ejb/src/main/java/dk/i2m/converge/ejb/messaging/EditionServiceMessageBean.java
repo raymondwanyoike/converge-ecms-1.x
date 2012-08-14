@@ -113,9 +113,11 @@ public class EditionServiceMessageBean implements MessageListener {
             try {
                 UserAccount ua = userFacade.findById(uid);
                 pluginContext.setCurrentUserAccount(ua);
+                LOG.log(Level.FINE, "Executing edition action ''{0}'' as user ''{1}''",
+                        new Object[]{actionId, uid});
             } catch (Exception ex) {
-                LOG.log(Level.WARNING, "User with ID ''{0}'' could not be set",
-                        new Object[]{uid});
+                LOG.log(Level.FINE, "User with ID ''{0}'' could not be set for action ''{1}''",
+                        new Object[]{uid, actionId});
             }
 
             try {

@@ -94,17 +94,18 @@
                                 <div class="moduleContent">
                                     <h:panelGrid columns="2">
                                         <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />
-                                        <a4j:commandLink reRender="frmConceptDetails" actionListener="#{concepts.onNewConcept}">
+                                        <a4j:commandLink reRender="frmConceptDetails" 
+                                                         actionListener="#{concepts.onNewConcept}"
+                                                         oncomplete="#{rich:component('mpConceptDetails')}.show();">
                                             <h:outputText value="#{i18n.Concepts_NEW_CONCEPT}" />
-                                            <rich:componentControl for="mpConceptDetails"
-                                                                   operation="show"
-                                                                   event="oncomplete" />
                                         </a4j:commandLink>
 
                                         <h:graphicImage value="#{i18n.resource_ICON_BULLET}" rendered="#{userSession.privileged['MANAGE_CONCEPTS']}" />
-                                        <a4j:commandLink reRender="frmImport" actionListener="#{concepts.onPreImport}" rendered="#{userSession.privileged['MANAGE_CONCEPTS']}">
+                                        <a4j:commandLink reRender="frmImport" 
+                                                         actionListener="#{concepts.onPreImport}" 
+                                                         rendered="#{userSession.privileged['MANAGE_CONCEPTS']}"
+                                                         oncomplete="#{rich:component('mpImport')}.show();">
                                             <h:outputText value="#{i18n.Concepts_IMPORT_CONCEPTS}" />
-                                            <rich:componentControl for="mpImport" operation="show" event="oncomplete" />
                                         </a4j:commandLink>
 
                                         <h:graphicImage value="#{i18n.resource_ICON_BULLET}" rendered="#{userSession.privileged['MANAGE_CONCEPTS']}" />

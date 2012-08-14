@@ -18,92 +18,84 @@
                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                         <h:outputText value="&#160;" />
                         <h:column>
-                            <a4j:commandButton id="btnNew" styleClass="button dynamicButton" value="#{i18n.Catalogues_NEW}" actionListener="#{administrator_Catalogues.onNew}" reRender="frmMediaRepositoryDetails" ajaxSingle="true">
-                                <rich:componentControl for="mpCatalogueDetails" operation="show" event="oncomplete" />
-                            </a4j:commandButton>
+                            <a4j:commandButton id="btnNew" 
+                                               styleClass="button dynamicButton" 
+                                               value="#{i18n.Catalogues_NEW}" 
+                                               actionListener="#{administrator_Catalogues.onNew}" 
+                                               reRender="frmCatalogueDetails" 
+                                               ajaxSingle="true"
+                                               oncomplete="#{rich:component('mpCatalogueDetails')}.show();" />
                         </h:column>
                     </h:panelGrid>
 
-                    <rich:dataTable id="dtMediaRepositories" value="#{administrator_Catalogues.repositories}" var="repository" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
+                    <rich:dataTable id="dtCatalogues" value="#{administrator_Catalogues.catalogues}" var="catalogue" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
                         <rich:column styleClass="center columnIcon">
                             <f:facet name="header">&#160;</f:facet>
-                            <a4j:commandLink reRender="frmMediaRepositoryDetails" ajaxSingle="true">
-                                <f:setPropertyActionListener target="#{administrator_Catalogues.selectedMediaRepository}" value="#{repository}" />
-                                <rich:componentControl for="mpCatalogueDetails" operation="show" event="oncomplete" />
-                                <h:graphicImage alt="#{i18n.Catalogues_MEDIA_REPOSITORY}" title="#{i18n.Catalogues_MEDIA_REPOSITORY}" value="#{res.MEDIA_REPOSITORY_ICON}" />
+                            <a4j:commandLink reRender="frmCatalogueDetails" 
+                                             ajaxSingle="true"
+                                             oncomplete="#{rich:component('mpCatalogueDetails')}.show();">
+                                <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogue}" value="#{catalogue}" />
+                                <h:graphicImage alt="" title="" value="#{i18n.resource_ICON_CATALOGUE}" />
                             </a4j:commandLink>
                         </rich:column>
 
-                        <rich:column sortBy="#{repository.id}" styleClass="right columnId">
+                        <rich:column sortBy="#{catalogue.id}" styleClass="left columnId">
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_ID}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_NAME_TOOLTIP}" />
                             </f:facet>
-                            <a4j:commandLink reRender="frmMediaRepositoryDetails" ajaxSingle="true">
-                                <f:setPropertyActionListener target="#{administrator_Catalogues.selectedMediaRepository}" value="#{repository}" />
-                                <rich:componentControl for="mpCatalogueDetails" operation="show" event="oncomplete" />
-                                <h:outputText value="#{repository.id}">
+                            <a4j:commandLink reRender="frmCatalogueDetails" 
+                                             ajaxSingle="true"
+                                             oncomplete="#{rich:component('mpCatalogueDetails')}.show();">
+                                <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogue}" value="#{catalogue}" />
+                                <h:outputText value="#{catalogue.id}">
                                     <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
                                 </h:outputText>
                             </a4j:commandLink>
                         </rich:column>
 
-                        <rich:column sortBy="#{repository.name}" sortOrder="ASCENDING">
+                        <rich:column sortBy="#{catalogue.name}" sortOrder="ASCENDING">
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_NAME}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_NAME_TOOLTIP}" />
                             </f:facet>
-                            <h:outputText value="#{repository.name}" title="#{repository.description}" />
+                            <h:outputText value="#{catalogue.name}" title="#{catalogue.description}" />
                         </rich:column>
 
-                        <rich:column sortBy="#{repository.editorRole.name}">
-                            <f:facet name="header">
-                                <h:outputText value="#{i18n.Catalogues_EDITOR}" title="#{i18n.Catalogues_EDITOR_TOOLTIP}" />
-                            </f:facet>
-                            <h:outputText value="#{repository.editorRole.name}" />
-                        </rich:column>
-                            
-                        <rich:column sortBy="#{repository.userRole.name}">
-                            <f:facet name="header">
-                                <h:outputText value="#{i18n.administrator_Catalogues_USER_ROLE}" title="#{i18n.administrator_Catalogues_USER_ROLE_TOOLTIP}" />
-                            </f:facet>
-                            <h:outputText value="#{repository.userRole.name}" />
-                        </rich:column>
-
-                        <rich:column sortBy="#{repository.readOnly}">
+                        <rich:column sortBy="#{catalogue.readOnly}">
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_TYPE}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_TYPE_TOOLTIP}" />
                             </f:facet>
-                            <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_TYPE_READ_ONLY}" rendered="#{repository.readOnly}" />
-                            <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_TYPE_READ_WRITE}" rendered="#{!repository.readOnly}" />
+                            <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_TYPE_READ_ONLY}" rendered="#{catalogue.readOnly}" />
+                            <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_TYPE_READ_WRITE}" rendered="#{!catalogue.readOnly}" />
                         </rich:column>
 
-                        <rich:column sortBy="#{repository.spaceAvailable}">
+                        <rich:column sortBy="#{catalogue.spaceAvailable}">
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Catalogues_SPACE_AVAILABLE}" title="#{i18n.Catalogues_SPACE_AVAILABLE_TOOLTIP}" />
                             </f:facet>
-                            <h:outputText value="#{converge:displaySize(repository.spaceAvailable)}" />
+                            <h:outputText value="#{converge:displaySize(catalogue.spaceAvailable)}" />
                         </rich:column>
 
-                        <rich:column sortBy="#{repository.capacity}">
+                        <rich:column sortBy="#{catalogue.capacity}">
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Catalogues_CAPACITY}" title="#{i18n.Catalogues_CAPACITY_TOOLTIP}" />
                             </f:facet>
-                            <h:outputText value="#{converge:displaySize(repository.space)}" />
+                            <h:outputText value="#{converge:displaySize(catalogue.space)}" />
                         </rich:column>
 
-                        <rich:column sortBy="#{repository.enabled}">
+                        <rich:column sortBy="#{catalogue.enabled}">
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_ENABLED}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_ENABLED_TOOLTIP}" />
                             </f:facet>
-                            <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_ENABLED_TRUE}" styleClass="enabled" rendered="#{repository.enabled}" />
-                            <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_ENABLED_FALSE}" styleClass="disabled" rendered="#{!repository.enabled}" />
+                            <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_ENABLED_TRUE}" styleClass="enabled" rendered="#{catalogue.enabled}" />
+                            <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_ENABLED_FALSE}" styleClass="disabled" rendered="#{!catalogue.enabled}" />
                         </rich:column>
                     </rich:dataTable>
                     <rich:spacer height="30" />
                 </div>
             </h:form>
 
-            <h:form id="frmMediaRepositoryDetails">
-                <rich:modalPanel id="mpCatalogueDetails" autosized="true" domElementAttachment="parent" rendered="#{administrator_Catalogues.selectedMediaRepository != null}">
+            <h:form id="frmCatalogueDetails">
+                <rich:modalPanel id="mpCatalogueDetails" autosized="true" domElementAttachment="parent" rendered="#{administrator_Catalogues.selectedCatalogue != null}">
                     <f:facet name="header">
                         <h:panelGroup>
                             <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_DETAILS}" />
@@ -111,46 +103,64 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseCatalogueDetails" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                            <rich:componentControl for="mpCatalogueDetails" attachTo="imgCloseCatalogueDetails" operation="hide" event="onclick"/>
+                            <h:graphicImage id="imgCloseCatalogueDetails" 
+                                            value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                            style="link"
+                                            onclick="#{rich:component('mpCatalogueDetails')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
 
                     <h:panelGrid id="pgMediaRepositoryDetails" style="width: 480px;">
 
                         <rich:tabPanel id="tpMediaRepository" switchType="client" activeTabClass="tabActive" inactiveTabClass="tabInactive">
+
                             <rich:tab id="tabMediaRepository" label="#{i18n.Catalogues_MEDIA_ITEM_LABEL}">
+
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_NAME}:" />
-                                    <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedMediaRepository.name}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_NAME_TOOLTIP}" required="true" requiredMessage="#{i18n.Catalogues_MEDIA_REPOSITORY_NAME_REQUIRED}"/>
+                                    <h:inputText id="txtName" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedCatalogue.name}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_NAME_TOOLTIP}" required="true" requiredMessage="#{i18n.Catalogues_MEDIA_REPOSITORY_NAME_REQUIRED}"/>
 
                                     <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_DESCRIPTION}:" />
-                                    <h:inputTextarea id="txtDescription" styleClass="text mediumTextArea" value="#{administrator_Catalogues.selectedMediaRepository.description}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_DESCRIPTION_TOOLTIP}" />
+                                    <h:inputTextarea id="txtDescription" styleClass="text mediumTextArea" value="#{administrator_Catalogues.selectedCatalogue.description}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_DESCRIPTION_TOOLTIP}" />
 
                                     <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_ENABLED_TRUE}:" />
-                                    <h:selectBooleanCheckbox value="#{administrator_Catalogues.selectedMediaRepository.enabled}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_ENABLED}" />
+                                    <h:selectBooleanCheckbox value="#{administrator_Catalogues.selectedCatalogue.enabled}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_ENABLED}" />
 
                                     <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_TYPE_READ_ONLY}:" />
-                                    <h:selectBooleanCheckbox value="#{administrator_Catalogues.selectedMediaRepository.readOnly}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_TYPE_TOOLTIP}">
+                                    <h:selectBooleanCheckbox value="#{administrator_Catalogues.selectedCatalogue.readOnly}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_TYPE_TOOLTIP}">
                                         <a4j:support ajaxSingle="true" event="onchange" reRender="txtMaxFileUpload, somEditorRole,somUserRole" />
                                     </h:selectBooleanCheckbox>
-                                    
+
                                     <h:outputText value="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_MAX_FILE_UPLOAD_SIZE}" />
-                                    <h:inputText id="txtMaxFileUpload" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedMediaRepository.maxFileUploadSize}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_MAX_FILE_UPLOAD_SIZE_REQUIRED}" title="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_MAX_FILE_UPLOAD_SIZE_TOOLTIP}" converterMessage="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_MAX_FILE_UPLOAD_SIZE_INVALID}" disabled="#{administrator_Catalogues.selectedMediaRepository.readOnly}">
+                                    <h:inputText id="txtMaxFileUpload" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedCatalogue.maxFileUploadSize}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_MAX_FILE_UPLOAD_SIZE_REQUIRED}" title="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_MAX_FILE_UPLOAD_SIZE_TOOLTIP}" converterMessage="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_MAX_FILE_UPLOAD_SIZE_INVALID}" disabled="#{administrator_Catalogues.selectedCatalogue.readOnly}">
                                         <f:convertNumber integerOnly="true" />
                                     </h:inputText>
 
-                                    <h:outputText value="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_EDITOR_ROLE}" />
-                                    <h:selectOneMenu id="somEditorRole" value="#{administrator_Catalogues.selectedMediaRepository.editorRole}" converter="#{converters.userRoleConverter}" disabled="#{administrator_Catalogues.selectedMediaRepository.readOnly}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_EDITOR_ROLE_REQUIRED}" title="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_EDITOR_ROLE_TOOLTIP}">
+                                    <h:outputText value="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_WORKFLOW}" />
+                                    <h:selectOneMenu id="somWorkflow" value="#{administrator_Catalogues.selectedCatalogue.workflow}" converter="#{converters.workflowConverter}" disabled="#{administrator_Catalogues.selectedCatalogue.readOnly}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_WORKFLOW_REQUIRED}" title="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_WORKFLOW_TOOLTIP}">
                                         <f:selectItem itemLabel=""  />
-                                        <f:selectItems value="#{common.userRoles}" />
+                                        <f:selectItems value="#{common.workflows}" />
+                                        <a4j:support event="onchange" reRender="somSelfUploadState" />
                                     </h:selectOneMenu>
-                                    
-                                    <h:outputText value="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_USER_ROLE}" />
-                                    <h:selectOneMenu id="somUserRole" value="#{administrator_Catalogues.selectedMediaRepository.userRole}" converter="#{converters.userRoleConverter}" disabled="#{administrator_Catalogues.selectedMediaRepository.readOnly}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_USER_ROLE_REQUIRED}" title="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_USER_ROLE_TOOLTIP}">
+
+                                    <h:outputText value="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_SELF_UPLOAD_STATE}" />
+                                    <h:selectOneMenu id="somSelfUploadState" value="#{administrator_Catalogues.selectedCatalogue.selfUploadState}" converter="#{converters.workflowStateConverter}" disabled="#{administrator_Catalogues.selectedCatalogue.readOnly}" title="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_SELF_UPLOAD_STATE_TOOLTIP}">
                                         <f:selectItem itemLabel=""  />
-                                        <f:selectItems value="#{common.userRoles}" />
+                                        <f:selectItems value="#{administrator_Catalogues.selectedCatalogueWorkflowStates}" />
                                     </h:selectOneMenu>
+                                </h:panelGrid>
+                            </rich:tab>
+
+                            <rich:tab id="tabRoles" label="#{i18n.administrator_Catalogues_CATALOGUE_DETAIL_USER_ROLES}">
+                                <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
+                                    <rich:pickList id="plUserRoles"
+                                                   value="#{administrator_Catalogues.selectedCatalogue.userRoles}"
+                                                   showButtonsLabel="false"
+                                                   sourceListWidth="350"
+                                                   targetListWidth="350"
+                                                   converter="#{converters.userRoleConverter}">
+                                        <f:selectItems value="#{common.userRoles}" />
+                                    </rich:pickList>
                                 </h:panelGrid>
                             </rich:tab>
 
@@ -158,7 +168,7 @@
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:outputText value="#{i18n.Catalogues_RENDITIONS}" title="#{i18n.Catalogues_RENDITIONS_TOOLTIP}" />
 
-                                    <rich:pickList value="#{administrator_Catalogues.selectedMediaRepository.renditions}"
+                                    <rich:pickList value="#{administrator_Catalogues.selectedCatalogue.renditions}"
                                                    converter="#{converters.renditionConverter}"
                                                    copyAllControlLabel="#{i18n.pickList_ADD_ALL}"
                                                    copyControlLabel="#{i18n.pickList_ADD}"
@@ -168,13 +178,13 @@
                                     </rich:pickList>
 
                                     <h:outputText value="#{i18n.Catalogues_PREVIEW_RENDITION}" title="#{i18n.Catalogues_PREVIEW_RENDITION_TOOLTIP}" />
-                                    <h:selectOneMenu id="somPreviewRendition" value="#{administrator_Catalogues.selectedMediaRepository.previewRendition}" converter="#{converters.renditionConverter}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_PREVIEW_RENDITION_REQUIRED}">
+                                    <h:selectOneMenu id="somPreviewRendition" value="#{administrator_Catalogues.selectedCatalogue.previewRendition}" converter="#{converters.renditionConverter}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_PREVIEW_RENDITION_REQUIRED}">
                                         <f:selectItem itemLabel="" />
                                         <f:selectItems value="#{common.renditions}" />
                                     </h:selectOneMenu>
 
                                     <h:outputText value="#{i18n.Catalogues_ORIGINAL_RENDITION}" title="#{i18n.Catalogues_ORIGINAL_RENDITION_TOOLTIP}" />
-                                    <h:selectOneMenu id="somOriginalRendition" value="#{administrator_Catalogues.selectedMediaRepository.originalRendition}" converter="#{converters.renditionConverter}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_ORIGINAL_RENDITION_REQUIRED}">
+                                    <h:selectOneMenu id="somOriginalRendition" value="#{administrator_Catalogues.selectedCatalogue.originalRendition}" converter="#{converters.renditionConverter}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_ORIGINAL_RENDITION_REQUIRED}">
                                         <f:selectItem itemLabel="" />
                                         <f:selectItems value="#{common.renditions}" />
                                     </h:selectOneMenu>
@@ -184,13 +194,13 @@
                             <rich:tab id="tabLocation" label="#{i18n.Catalogues_MEDIA_ITEM_LOCATION}">
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_LOCATION}:" />
-                                    <h:inputText id="txtLocation" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedMediaRepository.location}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_LOCATION_TOOLTIP}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_LOCATION_REQUIRED}"/>
+                                    <h:inputText id="txtLocation" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedCatalogue.location}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_LOCATION_TOOLTIP}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_LOCATION_REQUIRED}"/>
 
                                     <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_WEB_ACCESS}" />
-                                    <h:inputText id="txtWebAccess" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedMediaRepository.webAccess}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_WEB_ACCESS_TOOLTIP}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_WEB_LOCATION_REQUIRED}"/>
+                                    <h:inputText id="txtWebAccess" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedCatalogue.webAccess}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_WEB_ACCESS_TOOLTIP}" required="true" requiredMessage="#{i18n.administrator_Catalogues_CATALOGUE_WEB_LOCATION_REQUIRED}"/>
 
-                                    <h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_WATCH}:" />
-                                    <h:inputText id="txtWatch" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedMediaRepository.watchLocation}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_WATCH_TOOLTIP}" />
+                                    <!--h:outputText value="#{i18n.Catalogues_MEDIA_REPOSITORY_WATCH}:" /-->
+                                    <!--h:inputText id="txtWatch" styleClass="text mediumInput" value="#{administrator_Catalogues.selectedCatalogue.watchLocation}" title="#{i18n.Catalogues_MEDIA_REPOSITORY_WATCH_TOOLTIP}" /-->
                                 </h:panelGrid>
                             </rich:tab>
 
@@ -199,21 +209,26 @@
                                 <h:panelGrid columnClasses="tabSheet" styleClass="tabSheetGrid">
                                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                                         <h:outputText value="" />
-                                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.Catalogues_MEDIA_ITEM_ACTION_NEW}" reRender="frmCatalogueActionDetails" ajaxSingle="true" actionListener="#{administrator_Catalogues.onNewCatalogueAction}">
-                                            <rich:componentControl for="mpCatalogueActionDetails" operation="show" event="oncomplete" />
+                                        <a4j:commandButton styleClass="button dynamicButton" 
+                                                           value="#{i18n.Catalogues_MEDIA_ITEM_ACTION_NEW}" 
+                                                           reRender="frmCatalogueActionDetails" 
+                                                           ajaxSingle="true" 
+                                                           actionListener="#{administrator_Catalogues.onNewCatalogueAction}"
+                                                           oncomplete="#{rich:component('mpCatalogueActionDetails')}.show();">
                                             <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogueActionDetailsTab}" value="tabCatalogueAction" />
                                         </a4j:commandButton>
                                     </h:panelGrid>
 
-                                    <rich:dataTable id="dtActions" value="#{administrator_Catalogues.selectedMediaRepository.hooks}" var="action" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
+                                    <rich:dataTable id="dtActions" value="#{administrator_Catalogues.selectedCatalogue.hooks}" var="action" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
 
                                         <rich:column styleClass="columnIcon center">
                                             <f:facet name="header">&#160;</f:facet>
-                                            <a4j:commandLink reRender="frmCatalogueActionDetails" ajaxSingle="true">
+                                            <a4j:commandLink reRender="frmCatalogueActionDetails" 
+                                                             ajaxSingle="true"
+                                                             oncomplete="#{rich:component('mpCatalogueActionDetails')}.show();">
                                                 <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogueAction}" value="#{action}" />
                                                 <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogueActionDetailsTab}" value="tabCatalogueAction" />
-                                                <rich:componentControl for="mpCatalogueActionDetails" operation="show" event="oncomplete" />
-                                                <h:graphicImage value="#{res.ADDON_ACTION_ICON}" />
+                                                <h:graphicImage value="#{i18n.resource_ICON_ADDON_ACTION}" />
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -221,10 +236,11 @@
                                             <f:facet name="header">
                                                 <h:outputText value="#{i18n.Catalogues_MEDIA_ITEM_ACTION_LABEL}" />
                                             </f:facet>
-                                            <a4j:commandLink reRender="frmCatalogueActionDetails" ajaxSingle="true">
+                                            <a4j:commandLink reRender="frmCatalogueActionDetails" 
+                                                             ajaxSingle="true"
+                                                             oncomplete="#{rich:component('mpCatalogueActionDetails')}.show();">
                                                 <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogueAction}" value="#{action}" />
                                                 <f:setPropertyActionListener target="#{administrator_Catalogues.selectedCatalogueActionDetailsTab}" value="tabCatalogueAction" />
-                                                <rich:componentControl for="mpCatalogueActionDetails" operation="show" event="oncomplete" />
                                                 <h:outputText value="#{action.label}" />
                                             </a4j:commandLink>
                                         </rich:column>
@@ -239,12 +255,12 @@
                                         <rich:column styleClass="columnIcon center">
                                             <f:facet name="header">
                                                 <a4j:commandLink id="lnkBatch" title="#{i18n.administrator_Catalogues_ACTIONS_BATCH_ALL}" actionListener="#{administrator_Catalogues.onActionBatchAll}" reRender="frmPage" >
-                                                    <h:graphicImage value="#{res.RUN_ALL_ICON}" />
+                                                    <h:graphicImage value="#{i18n.resource_ICON_RUN_ALL}" />
                                                 </a4j:commandLink>
                                             </f:facet>
                                             <a4j:commandLink ajaxSingle="true" title="#{i18n.administrator_Catalogues_ACTIONS_BATCH}" rendered="#{action.hook.supportBatch}">
                                                 <f:setPropertyActionListener target="#{administrator_Catalogues.actionBatch}" value="#{action}" />
-                                                <h:graphicImage value="#{res.RUN_ICON}" />
+                                                <h:graphicImage value="#{i18n.resource_ICON_RUN}" />
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -257,9 +273,8 @@
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSave" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Catalogues.onSave}" reRender="frmPage, pgMediaRepositoryDetails" oncomplete="if (#{converge:isAllValid()}) { Richfaces.hideModalPanel('mpCatalogueDetails'); return false;}" />
                             <a4j:commandLink id="lnkApply" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Catalogues.onSave}" reRender="frmPage, pgMediaRepositoryDetails" />
-                            <a4j:commandLink id="lnkDelete" rendered="#{administrator_Catalogues.editMode}" onclick="if (confirm('#{i18n.Catalogues_MEDIA_REPOSITORY_DELETE_CONFIRM}') != true){ return false; };" actionListener="#{administrator_Catalogues.onDelete}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="frmPage">
-                                <rich:componentControl for="mpCatalogueDetails" operation="hide" event="oncomplete" />
-                            </a4j:commandLink>
+                            <a4j:commandLink id="lnkDelete" rendered="#{administrator_Catalogues.editMode}" onclick="if (confirm('#{i18n.Catalogues_MEDIA_REPOSITORY_DELETE_CONFIRM}') != true){ return false; };" actionListener="#{administrator_Catalogues.onDelete}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="frmPage"
+                                             oncomplete="#{rich:component('mpCatalogueDetails')}.hide();" />
                             <h:commandLink id="lnkCloseDialog" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpCatalogueDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
@@ -290,13 +305,13 @@
                                         <f:selectItems value="#{common.catalogueActions}" />
                                         <a4j:support event="onchange" reRender="pgActionProperties, aboutAction" />
                                     </h:selectOneMenu>
-                                    
+
                                     <h:outputText value="#{i18n.administrator_Catalogues_MEDIA_ITEM_ACTION_EXECUTION}" />
                                     <h:selectOneRadio value="#{administrator_Catalogues.selectedCatalogueAction.manual}">
                                         <f:selectItem itemLabel="#{i18n.administrator_Catalogues_MEDIA_ITEM_ACTION_EXECUTION_AUTOMATIC}" itemValue="#{false}" />
                                         <f:selectItem itemLabel="#{i18n.administrator_Catalogues_MEDIA_ITEM_ACTION_EXECUTION_MANUAL}" itemValue="#{true}" />
                                     </h:selectOneRadio>
-                                    
+
                                     <h:outputText value="#{i18n.administrator_Catalogues_MEDIA_ITEM_ACTION_OPERATION}" />
                                     <h:selectOneRadio value="#{administrator_Catalogues.selectedCatalogueAction.asynchronous}">
                                         <f:selectItem itemLabel="#{i18n.administrator_Catalogues_MEDIA_ITEM_ACTION_OPERATION_ASYNCHRONOUS}" itemValue="#{true}" />
@@ -322,7 +337,7 @@
                                             <h:panelGroup id="colHelp">
                                                 <c:set var="help_key" value="#{administrator_Catalogues.selectedCatalogueActionProperty.key}_HELP" />
                                                 <c:set var="help_text" value="#{converge:message(administrator_Catalogues.selectedCatalogueAction.hook.bundle, help_key)}" />
-                                                <h:graphicImage url="#{res.HELP_ICON}" title="#{help_text}" rendered="#{help_text != ''}" />
+                                                <h:graphicImage url="#{i18n.resource_ICON_HELP}" title="#{help_text}" rendered="#{help_text != ''}" />
                                                 <h:outputText value="&#160;" rendered="#{help_text == ''}" />
                                             </h:panelGroup>
 
@@ -364,8 +379,15 @@
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveAction" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Catalogues.onSaveCatalogueAction}" reRender="dtActions" oncomplete="#{rich:component('mpCatalogueActionDetails')}.hide(); return false;" />
                             <a4j:commandLink id="lnkApplyAction" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Catalogues.onSaveCatalogueAction}" reRender="dtActions,pgCatalogueActionDetails" />
-                            <a4j:commandLink id="lnkDeleteAction" ajaxSingle="true" rendered="#{administrator_Catalogues.actionEditMode}" onclick="if (confirm('#{i18n.Catalogues_MEDIA_ITEM_ACTION_REMOVE_CONFIRMATION}') != true){ return false; };" actionListener="#{administrator_Catalogues.onDeleteCatalogueAction}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="dtActions">
-                                <rich:componentControl for="mpCatalogueActionDetails" operation="hide" event="oncomplete" />
+                            <a4j:commandLink id="lnkDeleteAction" 
+                                             ajaxSingle="true" 
+                                             rendered="#{administrator_Catalogues.actionEditMode}" 
+                                             onclick="if (confirm('#{i18n.Catalogues_MEDIA_ITEM_ACTION_REMOVE_CONFIRMATION}') != true){ return false; };" 
+                                             actionListener="#{administrator_Catalogues.onDeleteCatalogueAction}" 
+                                             styleClass="dialogButton" 
+                                             value="#{i18n.Generic_DELETE}" 
+                                             reRender="dtActions"
+                                             oncomplete="#{rich:component('mpCatalogueActionDetails')}.hide();">
                             </a4j:commandLink>
                             <h:commandLink id="lnkCloseActionDetails" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpCatalogueActionDetails')}.hide(); return false;" />
                         </h:panelGroup>

@@ -5,7 +5,7 @@
         <rich:dataTable id="dtWorkflowHistory" value="#{value.history}" var="history" styleClass="table no-table-header" rowClasses="odd, even" style="width: 96%; margin-left: 2%; margin-right: 2%">
 
             <rich:column styleClass="left" sortOrder="ASCENDING" sortBy="#{history.timestamp}" selfSorted="false">
-                <h:outputText value="#{history.timestamp.time}">
+                <h:outputText value="#{history.timestamp}">
                     <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                 </h:outputText>
             </rich:column>
@@ -15,9 +15,10 @@
             </rich:column>
 
             <rich:column styleClass="center columnIcon">
-                <a4j:commandLink ajaxSingle="true" reRender="mpShowWorkflowStateTransition">
+                <a4j:commandLink ajaxSingle="true" 
+                                 reRender="mpShowWorkflowStateTransition"
+                                 oncomplete="#{rich:component('mpShowWorkflowStateTransition')}.show();">
                     <f:setPropertyActionListener value="#{history}" target="#{newsItem.selectedWorkflowStateTransition}" />
-                    <rich:componentControl event="oncomplete" for="mpShowWorkflowStateTransition" operation="show" />
                     <h:graphicImage title="#{msgs.ARTICLE_VIEW_PREVIOUS_VERSION_TOOLTIP}" alt="#{msgs.ARTICLE_VIEW_PREVIOUS_VERSION_TOOLTIP}" value="/images/template/icons/examine.gif" />
                 </a4j:commandLink>
             </rich:column>
@@ -31,8 +32,10 @@
             </f:facet>
             <f:facet name="controls">
                 <h:panelGroup>
-                    <h:graphicImage id="imgCloseShowWorkflowTransitionState" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                    <rich:componentControl for="mpShowWorkflowStateTransition" attachTo="imgCloseShowWorkflowTransitionState" operation="hide" event="onclick" />
+                    <h:graphicImage id="imgCloseShowWorkflowTransitionState" 
+                                    value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                    styleClass="link"
+                                    onclick="#{rich:component('mpShowWorkflowStateTransition')}.hide();"/>
                 </h:panelGroup>
             </f:facet>
 
@@ -49,7 +52,7 @@
                             <h:inputText value="#{newsItem.selectedWorkflowStateTransition.user.fullName}" disabled="true" style="width: 100%" styleClass="text" />
 
                             <h:outputText value="#{msgs.DATE}" />
-                            <h:inputText value="#{newsItem.selectedWorkflowStateTransition.timestamp.time}" disabled="true" style="width: 100%" styleClass="text">
+                            <h:inputText value="#{newsItem.selectedWorkflowStateTransition.timestamp}" disabled="true" style="width: 100%" styleClass="text">
                                 <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                             </h:inputText>
 

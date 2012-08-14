@@ -45,10 +45,10 @@
                                 </f:facet>
                                 <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItemArchive.xhtml" target="_blank" rendered="#{assignment.endState}">
                                     <f:param value="#{assignment.id}" name="id" />
-                                    <h:graphicImage value="#{res.NEWS_ITEM_ICON}" rendered="#{!assignment.locked}" title="#{assignment.status}" alt="#{assignment.status}"  />
-                                    <h:graphicImage value="#{res.LOCK_ICON}" rendered="#{assignment.locked}" />
+                                    <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" rendered="#{!assignment.locked}" title="#{assignment.status}" alt="#{assignment.status}"  />
+                                    <h:graphicImage value="#{i18n.resource_ICON_LOCK}" rendered="#{assignment.locked}" />
                                 </h:outputLink>
-                                <h:graphicImage value="#{res.NEWS_ITEM_ICON}" title="#{assignment.status}" alt="#{assignment.status}" rendered="#{!assignment.endState}" />
+                                <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" title="#{assignment.status}" alt="#{assignment.status}" rendered="#{!assignment.endState}" />
                                 <rich:toolTip styleClass="lockTooltip" rendered="#{assignment.locked}">
 
                                     <h:outputFormat value="#{i18n.Search_LOCKED_TOOLTIP}" escape="false">

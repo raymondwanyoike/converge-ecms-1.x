@@ -42,11 +42,12 @@
 
                                 <h:graphicImage value="#{i18n.resource_ICON_BULLET}" rendered="#{userSession.privileged['CALENDAR']}" />
 
-                                <a4j:commandLink id="lnkNewEvent" reRender="frmEventDetails" actionListener="#{calendar.onNewEvent}" rendered="#{userSession.privileged['CALENDAR']}">
+                                <a4j:commandLink id="lnkNewEvent" 
+                                                 reRender="frmEventDetails" 
+                                                 actionListener="#{calendar.onNewEvent}" 
+                                                 rendered="#{userSession.privileged['CALENDAR']}"
+                                                 oncomplete="#{rich:component('mpEventDetails')}.show();">
                                     <h:outputText value="#{i18n.Calendar_NEW_EVENT}" />
-                                    <rich:componentControl for="mpEventDetails"
-                                                           operation="show"
-                                                           event="oncomplete" />
                                 </a4j:commandLink>
 
                                 <h:graphicImage value="#{i18n.resource_ICON_BULLET}" />

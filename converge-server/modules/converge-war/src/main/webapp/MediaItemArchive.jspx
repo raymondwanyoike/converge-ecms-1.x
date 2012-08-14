@@ -8,7 +8,7 @@
 
             <div id="story">
                 <div id="controls">
-                    <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{mediaItemArchive.selectedMediaItem.id}" rendered="#{mediaItemArchive.editor}">
+                    <h:outputLink value="#{facesContext.externalContext.request.contextPath}/MediaItemDetails.xhtml?id=#{mediaItemArchive.selectedMediaItem.id}" rendered="#{mediaItemArchive.currentActor}">
                         <h:graphicImage url="/images/icons/edit-media-item.png" alt="#{i18n.MediaItemArchive_CONTROL_EDIT}" title="#{i18n.MediaItemArchive_CONTROL_EDIT}" />
                     </h:outputLink>
                     <h:graphicImage url="#{i18n.resource_ICON_PRINT}" title="#{i18n.MediaItemArchive_CONTROL_PRINT}" alt="#{i18n.MediaItemArchive_CONTROL_PRINT}" onclick="javascript:window.print();" />
@@ -16,8 +16,7 @@
                 </div>
 
                 <h1 style="margin-bottom: 5px; padding-bottom: 0px;">#{mediaItemArchive.selectedMediaItem.title}</h1>
-                <h2 style="margin-top: 0px; padding-top: 0px;">#{mediaItemArchive.selectedMediaItem.byLine == '' ? mediaItemArchive.selectedMediaItem.owner.fullName : mediaItemArchive.selectedMediaItem.byLine}</h2>
-
+                <h2 style="margin-top: 0px; padding-top: 0px;">#{mediaItemArchive.selectedMediaItem.byLine}</h2>
                 
                 <h:panelGroup rendered="#{mediaItemArchive.selectedMediaItem.held}" layout="block" styleClass="mediaItemHeld">
                     <h:outputText value="#{i18n.MediaItemArchive_MEDIA_ITEM_HELD}" />
@@ -50,7 +49,7 @@
                             <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                         </f:facet>
                         <h:outputLink value="#{facesContext.externalContext.request.contextPath}/NewsItemArchive.xhtml?id=#{usage.newsItemId}">
-                            <h:graphicImage value="#{res.NEWS_ITEM_ICON}" />
+                            <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" />
                         </h:outputLink>
                     </rich:column>
 

@@ -1,0 +1,4 @@
+dk.i2m.converge.plugins.opencalais.OpenCalaisAction
+dk.i2m.converge.plugins.indexing.SearchEngineIndexingAction
+dk.i2m.converge.plugins.workflowstep.ExecuteWorkflowStepAction
+dk.i2m.converge.plugins.createnotification.CreateNotificationAction

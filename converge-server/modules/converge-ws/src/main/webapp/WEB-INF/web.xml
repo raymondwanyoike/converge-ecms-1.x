@@ -19,31 +19,31 @@
             <web-resource-name>Administrator restricted services</web-resource-name>
             <description/>
             <url-pattern>/administrator/*</url-pattern>
-            <url-pattern>/administrator*</url-pattern>
+            <url-pattern>/administrator</url-pattern>
         </web-resource-collection>
         <web-resource-collection>
             <web-resource-name>Concept Services</web-resource-name>
             <description/>
             <url-pattern>/ConceptService/*</url-pattern>
-            <url-pattern>/ConceptService*</url-pattern>
+            <url-pattern>/ConceptService</url-pattern>
         </web-resource-collection>
         <web-resource-collection>
             <web-resource-name>Outlet Services</web-resource-name>
             <description/>
             <url-pattern>/OutletService/*</url-pattern>
-            <url-pattern>/OutletService*</url-pattern>
+            <url-pattern>/OutletService</url-pattern>
         </web-resource-collection>
         <web-resource-collection>
             <web-resource-name>NewsItem Services</web-resource-name>
             <description/>
             <url-pattern>/NewsItemService/*</url-pattern>
-            <url-pattern>/NewsItemService*</url-pattern>
+            <url-pattern>/NewsItemService</url-pattern>
         </web-resource-collection>
         <web-resource-collection>
             <web-resource-name>DigitalAssets Services</web-resource-name>
             <description/>
             <url-pattern>/DigitalAssetService/*</url-pattern>
-            <url-pattern>/DigitalAssetService*</url-pattern>
+            <url-pattern>/DigitalAssetService</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <description>Converge Administrator</description>

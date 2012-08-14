@@ -20,7 +20,7 @@ import com.sun.syndication.feed.synd.*;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedOutput;
 import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.content.NewsItemActor;
+import dk.i2m.converge.core.content.ContentItemActor;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.plugin.EditionAction;
 import dk.i2m.converge.core.plugin.PluginContext;
@@ -128,7 +128,7 @@ public class AtomExportAction implements EditionAction {
             }
 
             if (newsItem.getByLine().trim().isEmpty()) {
-                for (NewsItemActor actor : newsItem.getActors()) {
+                for (ContentItemActor actor : newsItem.getActors()) {
                     if (actor.getRole().equals(edition.getOutlet().getWorkflow().
                             getStartState().getActorRole())) {
                         if (entry.getAuthor() != null && !entry.getAuthor().
@@ -143,7 +143,7 @@ public class AtomExportAction implements EditionAction {
             }
 
             entry.setPublishedDate(edition.getPublicationDate().getTime());
-            entry.setUpdatedDate(newsItem.getUpdated().getTime());
+            entry.setUpdatedDate(newsItem.getUpdated());
             entry.setUri("" + newsItem.getId());
 
             entries.add(entry);

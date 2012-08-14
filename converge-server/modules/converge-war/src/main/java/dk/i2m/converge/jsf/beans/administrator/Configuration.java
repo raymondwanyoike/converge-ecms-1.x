@@ -16,10 +16,8 @@
  */
 package dk.i2m.converge.jsf.beans.administrator;
 
-import dk.i2m.converge.core.plugin.Plugin;
 import dk.i2m.converge.domain.Property;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
-import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;
@@ -34,8 +32,6 @@ import javax.faces.model.ListDataModel;
 public class Configuration {
 
     @EJB private SystemFacadeLocal systemFacade;
-
-    private DataModel plugins = null;
 
     private DataModel properties = null;
 
@@ -52,26 +48,10 @@ public class Configuration {
      *          Event that invoked the handler
      */
     public void onUpdateProperties(ActionEvent event) {
-        List<Property> propertyList = (List<Property>) this.properties.getWrappedData();
+        List<Property> propertyList = (List<Property>) this.properties.
+                getWrappedData();
         systemFacade.updateSystemProperties(propertyList);
         this.properties = null;
-    }
-
-
-    /**
-     * Gets a {@link DataModel} of the installed plugins.
-     *
-     * @return {@link DataModel} of installed plugins
-     */
-    public DataModel getPlugins() {
-        if (this.plugins == null) {
-            List<Plugin> p = new ArrayList<Plugin>();
-            for (String key : systemFacade.getPlugins().keySet()) {
-                p.add(systemFacade.getPlugins().get(key));
-            }
-            this.plugins = new ListDataModel(p);
-        }
-        return this.plugins;
     }
 
     /**
@@ -81,7 +61,8 @@ public class Configuration {
      */
     public DataModel getProperties() {
         if (this.properties == null) {
-            this.properties = new ListDataModel(systemFacade.getSystemProperties());
+            this.properties =
+                    new ListDataModel(systemFacade.getSystemProperties());
         }
         return this.properties;
     }

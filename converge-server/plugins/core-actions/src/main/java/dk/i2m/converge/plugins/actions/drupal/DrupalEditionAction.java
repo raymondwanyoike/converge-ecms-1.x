@@ -485,7 +485,7 @@ public class DrupalEditionAction implements EditionAction {
             if (newsItem.getByLine().trim().isEmpty()) {
                 StringBuilder sb = new StringBuilder();
 
-                for (NewsItemActor actor : newsItem.getActors()) {
+                for (ContentItemActor actor : newsItem.getActors()) {
                     boolean firstActor = true;
 
                     // TODO: Document this

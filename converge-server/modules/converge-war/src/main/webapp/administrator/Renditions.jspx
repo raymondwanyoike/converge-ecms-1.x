@@ -17,19 +17,18 @@
                 <div class="moduleContent">
                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                         <h:outputText value="" />
-                        <a4j:commandButton id="btnNewMediaItemVersionLabel" styleClass="button dynamicButton" value="#{i18n.Renditions_NEW}" actionListener="#{administrator_Renditions.onNewMediaItemVersionLabel}" reRender="frmMediaItemVersionLabelDetails" ajaxSingle="true">
-                            <rich:componentControl for="mpMediaItemVersionLabelDetails" operation="show" event="oncomplete" />
-                        </a4j:commandButton>
+                        <a4j:commandButton id="btnNewMediaItemVersionLabel" styleClass="button dynamicButton" value="#{i18n.Renditions_NEW}" actionListener="#{administrator_Renditions.onNewMediaItemVersionLabel}" reRender="frmMediaItemVersionLabelDetails" ajaxSingle="true"
+                                           oncomplete="#{rich:component('mpMediaItemVersionLabelDetails')}.show();" />
                     </h:panelGrid>
 
                     <rich:dataTable id="dtRenditions" value="#{administrator_Renditions.labels}" var="label" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
 
                         <rich:column styleClass="center columnIcon">
                             <f:facet name="header">&#160;</f:facet>
-                            <a4j:commandLink reRender="frmMediaItemVersionLabelDetails" ajaxSingle="true">
+                            <a4j:commandLink reRender="frmMediaItemVersionLabelDetails" ajaxSingle="true"
+                                             oncomplete="#{rich:component('mpMediaItemVersionLabelDetails')}.show();">
                                 <f:setPropertyActionListener target="#{administrator_Renditions.selectedLabel}" value="#{label}" />
-                                <rich:componentControl for="mpMediaItemVersionLabelDetails" operation="show" event="oncomplete" />
-                                <h:graphicImage alt="#{i18n.Renditions_RENDITION}" title="#{i18n.Renditions_RENDITION}" value="#{res.RENDITION_ICON}" />
+                                <h:graphicImage alt="#{i18n.Renditions_RENDITION}" title="#{i18n.Renditions_RENDITION}" value="#{i18n.resource_ICON_RENDITION}" />
                             </a4j:commandLink>
                         </rich:column>
 
@@ -37,9 +36,9 @@
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Renditions_LABEL}" title="#{i18n.Renditions_LABEL_TOOLTIP}" />
                             </f:facet>
-                            <a4j:commandLink reRender="frmMediaItemVersionLabelDetails" ajaxSingle="true">
+                            <a4j:commandLink reRender="frmMediaItemVersionLabelDetails" ajaxSingle="true"
+                                             oncomplete="#{rich:component('mpMediaItemVersionLabelDetails')}.show();">
                                 <f:setPropertyActionListener target="#{administrator_Renditions.selectedLabel}" value="#{label}" />
-                                <rich:componentControl for="mpMediaItemVersionLabelDetails" operation="show" event="oncomplete" />
                                 <h:outputText value="#{label.label}" />
                             </a4j:commandLink>
                         </rich:column>
@@ -48,9 +47,9 @@
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Renditions_NAME}" title="#{i18n.Renditions_NAME_TOOLTIP}" />
                             </f:facet>
-                            <a4j:commandLink reRender="frmMediaItemVersionLabelDetails" ajaxSingle="true">
+                            <a4j:commandLink reRender="frmMediaItemVersionLabelDetails" ajaxSingle="true"
+                                             oncomplete="#{rich:component('mpMediaItemVersionLabelDetails')}.show();">
                                 <f:setPropertyActionListener target="#{administrator_Renditions.selectedLabel}" value="#{label}" />
-                                <rich:componentControl for="mpMediaItemVersionLabelDetails" operation="show" event="oncomplete" />
                                 <h:outputText value="#{label.name}" />
                             </a4j:commandLink>
                         </rich:column>
@@ -103,13 +102,11 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveLabel" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Renditions.onSaveMediaItemVersionLabel}" reRender="frmPage">
-                                <rich:componentControl for="mpMediaItemVersionLabelDetails" operation="hide" event="oncomplete" />
-                            </a4j:commandLink>
+                            <a4j:commandLink id="lnkSaveLabel" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Renditions.onSaveMediaItemVersionLabel}" reRender="frmPage"
+                                             oncomplete="#{rich:component('mpMediaItemVersionLabelDetails')}.hide();" />
                             <a4j:commandLink id="lnkApplyLabel" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" actionListener="#{administrator_Renditions.onSaveMediaItemVersionLabel}" reRender="frmPage" />
-                            <a4j:commandLink id="lnkDeleteLabel" rendered="#{administrator_Renditions.editMode}" onclick="if (confirm('#{i18n.Renditions_DELETE_CONFIRM}') != true){ return false; };" actionListener="#{administrator_Renditions.onDeleteMediaItemVersionLabel}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="frmPage">
-                                <rich:componentControl for="mpMediaItemVersionLabelDetails" operation="hide" event="oncomplete" />
-                            </a4j:commandLink>
+                            <a4j:commandLink id="lnkDeleteLabel" rendered="#{administrator_Renditions.editMode}" onclick="if (confirm('#{i18n.Renditions_DELETE_CONFIRM}') != true){ return false; };" actionListener="#{administrator_Renditions.onDeleteMediaItemVersionLabel}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="frmPage"
+                                             oncomplete="#{rich:component('mpMediaItemVersionLabelDetails')}.hide();" />
                             <h:commandLink id="lnkCloseOutletForm" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpMediaItemVersionLabelDetails')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>

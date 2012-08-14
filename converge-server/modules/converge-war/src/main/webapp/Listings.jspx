@@ -14,7 +14,7 @@
                     <h2>#{msgs.listing_FOREX_RATES}</h2>
                     <rich:dataTable id="dtForexRates" value="#{listings.latestForexRates}" var="item" width="100%" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
                         <rich:column styleClass="columnIcon center" headerClass="columnSubIcon">
-                            <h:graphicImage value="#{res.FOREX_VALUE_ICON}" />
+                            <h:graphicImage value="#{i18n.resource_ICON_FOREX_VALUE}" />
                         </rich:column>
 
                         <rich:column sortBy="#{item.updated}" sortOrder="DESCENDING" style="width: 115px;">
@@ -53,7 +53,7 @@
                     <h2>#{msgs.listing_FINANCIAL_MARKETS}</h2>
                     <rich:dataTable id="dtMarketValues" value="#{listings.latestFinancialMarkets}" var="item" width="100%" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
                         <rich:column styleClass="columnIcon center" headerClass="columnSubIcon">
-                            <h:graphicImage value="#{res.MARKET_VALUE_ICON}" />
+                            <h:graphicImage value="#{i18n.resource_ICON_MARKET_VALUE}" />
                         </rich:column>
 
                         <rich:column sortBy="#{item.updated}" sortOrder="DESCENDING" style="width: 115px;">
@@ -91,7 +91,7 @@
 
                     <rich:dataTable id="dtForecasts" value="#{listings.latestWeatherForecasts}" var="item" width="100%" styleClass="table" headerClass="tableHeader" rowClasses="odd, even" rows="30">
                         <rich:column styleClass="columnIcon center" headerClass="columnSubIcon">
-                            <h:graphicImage value="#{res.WEATHER_FORECAST_ICON}" />
+                            <h:graphicImage value="#{i18n.resource_ICON_WEATHER_FORECAST}" />
                         </rich:column>
 
                         <rich:column sortBy="#{item.updated}" sortOrder="DESCENDING" style="width: 115px;">

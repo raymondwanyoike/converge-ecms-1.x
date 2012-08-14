@@ -17,9 +17,13 @@
                 <div class="moduleContent">
                     <h:panelGrid columns="1" columnClasses="right" style="width: 100%">
                         <h:column>
-                            <a4j:commandButton id="btnNew" styleClass="button mediumButton" value="#{i18n.Generic_NEW}" actionListener="#{administrator_Newsfeeds.onNew}" reRender="frmNewsfeedDetails" limitToList="true">
-                                <rich:componentControl for="mpNewsfeedDetails" operation="show" event="oncomplete" />
-                            </a4j:commandButton>
+                            <a4j:commandButton id="btnNew" 
+                                               styleClass="button mediumButton" 
+                                               value="#{i18n.Generic_NEW}" 
+                                               actionListener="#{administrator_Newsfeeds.onNew}" 
+                                               reRender="frmNewsfeedDetails" 
+                                               limitToList="true"
+                                               oncomplete="#{rich:component('mpNewsfeedDetails')}.show();" />
                         </h:column>
                     </h:panelGrid>
 
@@ -34,8 +38,9 @@
                                 </a4j:status>
                             </f:facet>
 
-                            <a4j:commandLink reRender="frmNewsfeedDetails">
-                                <rich:componentControl event="oncomplete" operation="show" for="mpNewsfeedDetails" />
+                            <a4j:commandLink reRender="frmNewsfeedDetails"
+                                             ajaxSingle="true"
+                                             oncomplete="#{rich:component('mpNewsfeedDetails')}.show();">
                                 <f:setPropertyActionListener value="#{newsfeed}" target="#{administrator_Newsfeeds.selectedNewsfeed}" />
                                 <f:setPropertyActionListener value="tabDetails" target="#{administrator_Newsfeeds.selectedTab}" />
                                 <h:graphicImage alt="#{i18n.administrator_Newsfeeds_NEWSWIRE}" title="#{i18n.administrator_Newsfeeds_NEWSWIRE}" value="#{i18n.resource_ICON_NEWSWIRE}" />
@@ -47,12 +52,13 @@
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.administrator_Newsfeeds_NEWSWIRE_ID}" />
                             </f:facet>
-                            <a4j:commandLink reRender="frmNewsfeedDetails">
-                                <rich:componentControl event="oncomplete" operation="show" for="mpNewsfeedDetails" />
+                            <a4j:commandLink reRender="frmNewsfeedDetails"
+                                             ajaxSingle="true"
+                                             oncomplete="#{rich:component('mpNewsfeedDetails')}.show();">
                                 <f:setPropertyActionListener value="#{newsfeed}" target="#{administrator_Newsfeeds.selectedNewsfeed}" />
                                 <f:setPropertyActionListener value="tabDetails" target="#{administrator_Newsfeeds.selectedTab}" />
                                 <h:outputText value="#{newsfeed.id}">
-                                    <f:convertNumber integerOnly="true" type="number" pattern="#{msgs.FORMAT_ID}" />
+                                    <f:convertNumber integerOnly="true" type="number" pattern="#{i18n.Generic_FORMAT_ID}" />
                                 </h:outputText>
                             </a4j:commandLink>
                         </rich:column>
@@ -68,14 +74,18 @@
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.NewsFeeds_SUBSCRIBERS}" />
                             </f:facet>
-                            <h:outputText value="#{newsfeed.numberOfSubscribers}" />
+                            <h:outputText value="#{newsfeed.numberOfSubscribers}">
+                                <f:convertNumber pattern="#{i18n.generic_FORMAT_INTEGER}" />
+                            </h:outputText>
                         </rich:column>
 
                         <rich:column sortBy="#{newsfeed.numberOfItems}">
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.NewsFeeds_ITEMS}" />
                             </f:facet>
-                            <h:outputText value="#{newsfeed.numberOfItems}" />
+                            <h:outputText value="#{newsfeed.numberOfItems}">
+                                <f:convertNumber pattern="#{i18n.generic_FORMAT_INTEGER}" />
+                            </h:outputText>
                         </rich:column>
 
                         <rich:column sortBy="#{newsfeed.decoderClass}">
@@ -84,25 +94,24 @@
                             </f:facet>
                             <h:outputText value="#{newsfeed.decoder.name}" title="#{newsfeed.decoder.description}" />
                         </rich:column>
-                       
+
                         <rich:column sortBy="#{newsfeed.lastFetch}">
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.NewsFeeds_ACTIVE}" />
                             </f:facet>
                             <h:outputText value="#{newsfeed.lastFetch.time}" rendered="#{newsfeed.lastFetch != null}">
-                                <f:convertDateTime pattern="#{msgs.FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
+                                <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{userSession.user.timeZone}" />
                             </h:outputText>
-                            <h:outputText value="#{msgs.newswire_NEVER_UPDATED}" rendered="#{newsfeed.lastFetch == null}"/>
+                            <h:outputText value="#{i18n.administrator_Newsfeeds_NEVER_UPDATED}" rendered="#{newsfeed.lastFetch == null}"/>
                         </rich:column>
-                        
+
                         <rich:column styleClass="subColumnIcon">
                             <f:facet name="header"></f:facet>
 
-                            <a4j:commandLink ajaxSingle="true" >
-                                <h:graphicImage alt="#{i18n.NewsFeeds_ACTIVE_TRUE}" title="#{i18n.NewsFeeds_ACTIVE_TRUE}" value="#{res.PUBLISHED_ICON}" rendered="#{newsfeed.active}" />
-                                <h:graphicImage alt="#{i18n.NewsFeeds_ACTIVE_FALSE}" title="#{i18n.NewsFeeds_ACTIVE_FALSE}" value="#{res.UNPUBLISHED_ICON}" rendered="#{!newsfeed.active}" />
-                                <f:setPropertyActionListener value="#{newsfeed}" target="#{administrator_Newsfeeds.selectedNewsfeed}" />
-                                <a4j:support event="oncomplete" actionListener="#{administrator_Newsfeeds.onUpdateStatus}" reRender="dtNewsfeeds" />
+                            <a4j:commandLink ajaxSingle="true" reRender="dtNewsfeeds">
+                                <h:graphicImage alt="#{i18n.NewsFeeds_ACTIVE_TRUE}" title="#{i18n.NewsFeeds_ACTIVE_TRUE}" value="#{i18n.resource_ICON_ON}" rendered="#{newsfeed.active}" />
+                                <h:graphicImage alt="#{i18n.NewsFeeds_ACTIVE_FALSE}" title="#{i18n.NewsFeeds_ACTIVE_FALSE}" value="#{i18n.resource_ICON_OFF}" rendered="#{!newsfeed.active}" />
+                                <f:setPropertyActionListener value="#{newsfeed}" target="#{administrator_Newsfeeds.toggleNewswire}" />
                             </a4j:commandLink>
 
                         </rich:column>
@@ -110,26 +119,26 @@
                         <rich:column styleClass="subColumnIcon">
                             <f:facet name="header">
                                 <a4j:commandLink ajaxSingle="true" reRender="dtNewsfeeds" actionListener="#{administrator_Newsfeeds.onEmptyNewswireServices}">
-                                    <h:graphicImage alt="#{i18n.NewsFeeds_SERVICES_EMPTIED_TOOLTIP}" title="#{i18n.NewsFeeds_SERVICES_EMPTIED_TOOLTIP}" value="#{res.TRASH_ICON}" />
+                                    <h:graphicImage alt="#{i18n.NewsFeeds_SERVICES_EMPTIED_TOOLTIP}" title="#{i18n.NewsFeeds_SERVICES_EMPTIED_TOOLTIP}" value="#{i18n.resource_ICON_DELETE}" />
                                 </a4j:commandLink>
                             </f:facet>
-                            <a4j:commandLink ajaxSingle="true" >
-                                <h:graphicImage alt="#{i18n.NewsFeeds_EMPTY}" title="#{i18n.NewsFeeds_EMPTY}" value="#{res.TRASH_ICON}" />
-                                <f:setPropertyActionListener value="#{newsfeed}" target="#{administrator_Newsfeeds.selectedNewsfeed}" />
-                                <a4j:support event="oncomplete" actionListener="#{administrator_Newsfeeds.onEmptyNewswireService}" reRender="dtNewsfeeds" />
+                            <a4j:commandLink ajaxSingle="true" 
+                                             reRender="dtNewsfeeds">
+                                <h:graphicImage alt="#{i18n.NewsFeeds_EMPTY}" title="#{i18n.NewsFeeds_EMPTY}" value="#{i18n.resource_ICON_DELETE}" />
+                                <f:setPropertyActionListener value="#{newsfeed}" target="#{administrator_Newsfeeds.emptyNewswireService}" />
                             </a4j:commandLink>
                         </rich:column>
 
                         <rich:column styleClass="subColumnIcon">
                             <f:facet name="header">                                
                                 <a4j:commandLink ajaxSingle="true" reRender="dtNewsfeeds" actionListener="#{administrator_Newsfeeds.onDownloadFeeds}">
-                                    <h:graphicImage alt="#{i18n.NewsFeeds_SERVICE_DOWNLOAD_ALL}" title="#{i18n.NewsFeeds_SERVICE_DOWNLOAD_ALL}" value="#{res.DOWNLOAD_ICON}" />
+                                    <h:graphicImage alt="#{i18n.NewsFeeds_SERVICE_DOWNLOAD_ALL}" title="#{i18n.NewsFeeds_SERVICE_DOWNLOAD_ALL}" value="#{i18n.resource_ICON_DOWNLOAD}" />
                                 </a4j:commandLink>
                             </f:facet>
-                            <a4j:commandLink ajaxSingle="true">
-                                <h:graphicImage alt="#{i18n.NewsFeeds_SERVICE_DOWNLOAD}" title="#{i18n.NewsFeeds_SERVICE_DOWNLOAD}" value="#{res.DOWNLOAD_ICON}" />
-                                <f:setPropertyActionListener value="#{newsfeed}" target="#{administrator_Newsfeeds.selectedNewsfeed}" />
-                                <a4j:support event="oncomplete" actionListener="#{administrator_Newsfeeds.onDownloadNewswireService}" reRender="dtNewsfeeds" />
+                            <a4j:commandLink ajaxSingle="true" 
+                                             reRender="dtNewsfeeds">
+                                <h:graphicImage alt="#{i18n.NewsFeeds_SERVICE_DOWNLOAD}" title="#{i18n.NewsFeeds_SERVICE_DOWNLOAD}" value="#{i18n.resource_ICON_DOWNLOAD}" />
+                                <f:setPropertyActionListener value="#{newsfeed}" target="#{administrator_Newsfeeds.downloadNewswireService}" />
                             </a4j:commandLink>
                         </rich:column>
                     </rich:dataTable>
@@ -145,9 +154,9 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link">
-                                <rich:componentControl for="mpNewsfeedDetails" operation="hide" event="onclick"/>
-                            </h:graphicImage>
+                            <h:graphicImage value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                            style="link"
+                                            onclick="#{rich:component('mpNewsfeedDetails')}.hide();"/>
                         </h:panelGroup>
                     </f:facet>
                     <h:panelGrid>
@@ -184,7 +193,7 @@
                                     </h:panelGroup>
                                 </h:panelGrid>
                             </rich:tab>
-                            
+
                             <rich:tab id="tabCopyright" label="#{i18n.administrator_Newsfeeds_COPYRIGHTS}">
                                 <h:panelGrid columns="2" columnClasses="dialogueFieldLabel nowrap, dialogueFieldValue" styleClass="dialogue">
                                     <h:inputTextarea styleClass="text mediumTextArea" value="#{administrator_Newsfeeds.selectedNewsfeed.copyright}"/>
@@ -204,7 +213,7 @@
                                             <h:panelGroup id="colHelp">
                                                 <c:set var="help_key" value="#{administrator_Newsfeeds.selectedNewswireProperty.key}_HELP" />
                                                 <c:set var="help_text" value="#{converge:message(administrator_Newsfeeds.selectedNewsfeed.decoder.bundle, help_key)}" />
-                                                <h:graphicImage url="#{res.HELP_ICON}" title="#{help_text}" rendered="#{help_text != ''}" />
+                                                <h:graphicImage url="#{i18n.resource_ICON_HELP}" title="#{help_text}" rendered="#{help_text != ''}" />
                                                 <h:outputText value="&#160;" rendered="#{help_text == ''}" />
                                             </h:panelGroup>
 
@@ -286,19 +295,31 @@
 
                         </rich:tabPanel>
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSave" actionListener="#{administrator_Newsfeeds.onSave}" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" reRender="dtNewsfeeds">
-                                <rich:componentControl for="mpNewsfeedDetails" operation="hide" event="oncomplete" />
-                            </a4j:commandLink>
+                            <a4j:commandLink id="lnkSave" 
+                                             actionListener="#{administrator_Newsfeeds.onSave}" 
+                                             styleClass="dialogButton" 
+                                             value="#{i18n.Generic_SAVE}" 
+                                             reRender="dtNewsfeeds"
+                                             oncomplete="#{rich:component('mpNewsfeedDetails')}.hide();" />
 
                             <a4j:commandLink id="lnkApply" actionListener="#{administrator_Newsfeeds.onSave}" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" reRender="dtNewsfeeds" />
 
                             <a4j:commandLink id="lnkClearLog" actionListener="#{administrator_Newsfeeds.onClearLog}" styleClass="dialogButton" value="#{i18n.administrator_Newsfeeds_NEWSWIRE_LOG_CLEAR}" reRender="dtLogEntries" />
 
-                            <a4j:commandLink id="lnkDelete" ajaxSingle="true" rendered="#{administrator_Newsfeeds.editMode}" onclick="if (confirm('#{i18n.NewsFeeds_NEWSWIRE_PROMPT_DELETE}') != true){ return false; };" actionListener="#{administrator_Newsfeeds.onDelete}" styleClass="dialogButton" value="#{msgs.DELETE}" reRender="dtNewsfeeds">
-                                <rich:componentControl for="mpNewsfeedDetails" operation="hide" event="oncomplete" />
-                            </a4j:commandLink>
+                            <a4j:commandLink id="lnkDelete" 
+                                             ajaxSingle="true" 
+                                             rendered="#{administrator_Newsfeeds.editMode}" 
+                                             onclick="if (confirm('#{i18n.NewsFeeds_NEWSWIRE_PROMPT_DELETE}') != true){ return false; };" 
+                                             actionListener="#{administrator_Newsfeeds.onDelete}" 
+                                             styleClass="dialogButton" 
+                                             value="#{i18n.Generic_DELETE}" 
+                                             reRender="dtNewsfeeds"
+                                             oncomplete="#{rich:component('mpNewsfeedDetails')}.hide();"/>
 
-                            <h:commandLink id="lnkCloseForm" styleClass="dialogButton" value="#{i18n.Generic_CLOSE}" onclick="#{rich:component('mpNewsfeedDetails')}.hide(); return false;" />
+                            <h:commandLink id="lnkCloseForm" 
+                                           styleClass="dialogButton" 
+                                           value="#{i18n.Generic_CLOSE}" 
+                                           onclick="#{rich:component('mpNewsfeedDetails')}.hide(); return false;" />
                         </h:panelGroup>
 
                     </h:panelGrid>

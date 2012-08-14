@@ -40,21 +40,16 @@ import javax.faces.model.ListDataModel;
  */
 public class Newsfeeds {
 
-    @EJB private NewswireServiceLocal newswire;
-
-    @EJB private SystemFacadeLocal systemFacade;
-
+    @EJB
+    private NewswireServiceLocal newswire;
+    @EJB
+    private SystemFacadeLocal systemFacade;
     private DataModel newswires = null;
-
     private NewswireService selectedNewsfeed = null;
-
     private NewswireServiceProperty selectedNewswireProperty =
             new NewswireServiceProperty();
-
     private NewswireServiceProperty deletedProperty = null;
-
     private String selectedTab = "tabDetails";
-
     private DataModel log = new ListDataModel();
 
     /**
@@ -128,12 +123,13 @@ public class Newsfeeds {
     /**
      * Event handler for processing a selected {@link NewswireService}.
      * <p/>
-     * @param event Event that invoked the handler
+     * @param newswireService Newswire service to download
      */
-    public void onDownloadNewswireService(ActionEvent event) {
+    public void setDownloadNewswireService(NewswireService newswireService) {
         try {
-            newswire.downloadNewswireService(selectedNewsfeed.getId());
-            createMessage("frmPage", FacesMessage.SEVERITY_INFO, "i18n",
+            this.newswire.downloadNewswireService(newswireService.getId());
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+                    Bundle.i18n.name(),
                     "administrator_Newsfeeds_NEWSWIRE_DOWNLOAD_SCHEDULED", null);
         } catch (DataNotFoundException ex) {
         }
@@ -142,11 +138,10 @@ public class Newsfeeds {
     /**
      * Event handler for emptying the selected {@link NewswireService}.
      *
-     * @param event 
-     *          Event that invoked the handler
+     * @param newswireService Newswire service to empty
      */
-    public void onEmptyNewswireService(ActionEvent event) {
-        int deleted = newswire.emptyNewswireService(selectedNewsfeed.getId());
+    public void setEmptyNewswireService(NewswireService newswireService) {
+        int deleted = newswire.emptyNewswireService(newswireService.getId());
         createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
                 "administrator_Newsfeeds_NEWSWIRE_SERVICE_EMPTIED",
                 new Object[]{deleted});
@@ -155,9 +150,8 @@ public class Newsfeeds {
 
     /**
      * Event handler for emptying all the {@link NewswireService}s.
-     * 
-     * @param event 
-     *          Event that invoked the handler
+     *
+     * @param event Event that invoked the handler
      */
     public void onEmptyNewswireServices(ActionEvent event) {
         for (NewswireService service : newswire.getNewswireServices()) {
@@ -171,17 +165,16 @@ public class Newsfeeds {
     }
 
     /**
-     * Event handler for updating the status of a {@link NewswireService}.
+     * Event handler for toggling the status of a {@link NewswireService}.
      *
-     * @param event 
-     *          Event that invoked the handler
+     * @param newswireService Service to toggle
      */
-    public void onUpdateStatus(ActionEvent event) {
-        selectedNewsfeed.setActive(!selectedNewsfeed.isActive());
-        newswire.update(selectedNewsfeed);
+    public void setToggleNewswire(NewswireService newswireService) {
+        newswireService.setActive(!newswireService.isActive());
+        this.newswire.update(newswireService);
 
         JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
-                Bundle.i18n.name(), 
+                Bundle.i18n.name(),
                 "administrator_Newsfeeds_NEWSWIRE_STATUS_TOGGLED");
         this.newswires = null;
     }

@@ -20,10 +20,7 @@ import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.EnrichException;
 import dk.i2m.converge.core.Notification;
-import dk.i2m.converge.core.content.ContentTag;
-import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.content.NewsItemEditionState;
-import dk.i2m.converge.core.content.NewsItemPlacement;
+import dk.i2m.converge.core.content.*;
 import dk.i2m.converge.core.content.catalogue.Catalogue;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
@@ -40,12 +37,12 @@ import dk.i2m.converge.core.search.QueueEntryOperation;
 import dk.i2m.converge.core.search.QueueEntryType;
 import dk.i2m.converge.core.search.SearchEngineIndexingException;
 import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.core.workflow.Edition;
-import dk.i2m.converge.core.workflow.Outlet;
+import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.facades.*;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -62,30 +59,38 @@ import javax.ejb.Stateless;
 @Stateless
 public class PluginContextBean implements PluginContextBeanLocal {
 
-    @EJB private SystemFacadeLocal systemFacade;
-
-    @EJB private ConfigurationServiceLocal cfgService;
-
-    @EJB private NewswireServiceLocal newswireService;
-
-    @EJB private NotificationServiceLocal notificationService;
-
-    @EJB private UserServiceLocal userService;
-
-    @EJB private NewsItemFacadeLocal newsItemFacade;
-
-    @EJB private SearchEngineLocal searchEngine;
-
-    @EJB private ListingFacadeLocal listingFacade;
-
-    @EJB private DaoServiceLocal daoService;
-
-    @EJB private CatalogueFacadeLocal catalogueFacade;
-
-    @EJB private MetaDataServiceLocal metaDataService;
-
-    @EJB private OutletFacadeLocal outletFacade;
-
+    @EJB
+    private SystemFacadeLocal systemFacade;
+    @EJB
+    private ConfigurationServiceLocal cfgService;
+    @EJB
+    private NewswireServiceLocal newswireService;
+    @EJB
+    private NotificationServiceLocal notificationService;
+    @EJB
+    private UserServiceLocal userService;
+    @EJB
+    private UserFacadeLocal userFacade;
+    @EJB
+    private NewsItemFacadeLocal newsItemFacade;
+    @EJB
+    private SearchEngineLocal searchEngine;
+    @EJB
+    private ListingFacadeLocal listingFacade;
+    @EJB
+    private DaoServiceLocal daoService;
+    @EJB
+    private CatalogueFacadeLocal catalogueFacade;
+    @EJB
+    private MetaDataServiceLocal metaDataService;
+    @EJB
+    private OutletFacadeLocal outletFacade;
+    @EJB
+    private ContentItemFacadeLocal contentItemFacade;
+    @EJB
+    private ContentItemServiceLocal contentItemService;
+    @EJB
+    private WorkflowFacadeLocal workflowFacade;
     private UserAccount currentUserAccount = null;
 
     @Override
@@ -137,21 +142,77 @@ public class PluginContextBean implements PluginContextBeanLocal {
         return notificationService.create(notifcation);
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public List<UserAccount> findUserAccountsByRole(String roleName) {
         return userService.findUserAccountsByUserRoleName(roleName);
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public List<UserAccount> findUserAccountsByRole(Long roleId) {
+        return userService.getRoleMembers(roleId);
+    }
+
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public UserAccount findUserAccountByUsername(String username) throws DataNotFoundException {
+        return userFacade.findById(username);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public UserAccount findSystemUserAccount() {
+        try {
+            return userFacade.findById("converge");
+        } catch (DataNotFoundException ex) {
+            // This should never happen!
+            return null;
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public List<NewsItem> findNewsItemsByStateAndOutlet(String stateName,
             Outlet outlet) {
         return newsItemFacade.findByStateAndOutlet(stateName, outlet);
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void index(NewsItem item) throws SearchEngineIndexingException {
         searchEngine.addToIndexQueue(QueueEntryType.NEWS_ITEM, item.getId(),
                 QueueEntryOperation.UPDATE);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void index(MediaItem item) throws SearchEngineIndexingException {
+        searchEngine.addToIndexQueue(QueueEntryType.MEDIA_ITEM, item.getId(),
+                QueueEntryOperation.UPDATE);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void index(NewswireItem item) throws SearchEngineIndexingException {
+        newswireService.index(item);
     }
 
     @Override
@@ -202,6 +263,22 @@ public class PluginContextBean implements PluginContextBeanLocal {
         } catch (DataNotFoundException ex) {
             return null;
         }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public Rendition findRenditionById(Long id) throws DataNotFoundException {
+        return catalogueFacade.findRenditionById(id);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public WorkflowStep findWorkflowStep(Long id) throws DataNotFoundException {
+        return workflowFacade.findWorkflowStepById(id);
     }
 
     @Override
@@ -257,11 +334,6 @@ public class PluginContextBean implements PluginContextBeanLocal {
     }
 
     @Override
-    public void index(NewswireItem item) throws SearchEngineIndexingException {
-        newswireService.index(item);
-    }
-
-    @Override
     public void log(dk.i2m.converge.core.logging.LogSeverity severity,
             java.lang.String message, java.lang.Object[] messageArguments,
             java.lang.Object origin,
@@ -285,38 +357,50 @@ public class PluginContextBean implements PluginContextBeanLocal {
         systemFacade.log(severity, message, subjects);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Outlet findOutletById(Long id) throws DataNotFoundException {
         return outletFacade.findOutletById(id);
     }
 
-    /** {@inheritDoc } */
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Edition findNextEdition(Long id) throws DataNotFoundException {
         Outlet outlet = outletFacade.findOutletById(id);
         return outletFacade.findNextEdition(outlet);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Edition updateEdition(Edition edition) {
         return outletFacade.updateEdition(edition);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Edition createEdition(Edition edition) {
         return outletFacade.createEdition(edition);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NewsItemPlacement createPlacement(NewsItemPlacement placement) {
         return newsItemFacade.createPlacement(placement);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NewsItemEditionState addNewsItemEditionState(Long editionId,
             Long newsItemId,
@@ -337,10 +421,50 @@ public class PluginContextBean implements PluginContextBeanLocal {
         return new NewsItemEditionState();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NewsItemEditionState updateNewsItemEditionState(
             NewsItemEditionState newsItemEditionState) {
         return daoService.update(newsItemEditionState);
+    }
+
+    @Override
+    public NewsItem findNewsItemById(Long id) throws DataNotFoundException {
+        return newsItemFacade.findNewsItemById(id);
+    }
+
+    @Override
+    public MediaItem findMediaItemById(Long id) throws DataNotFoundException {
+        return catalogueFacade.findMediaItemById(id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ContentItem findContentItemById(Long id) throws DataNotFoundException {
+        return contentItemFacade.findContentItemById(id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobQueue addToJobQueue(String name, String typeName, Long typeId,
+            Long pluginConfigurationId, List<JobQueueParameter> parameters,
+            Date scheduled)
+            throws DataNotFoundException {
+        return systemFacade.addToJobQueue(name, typeName, typeId,
+                pluginConfigurationId, parameters, scheduled);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ContentItem step(ContentItem ci, Long stepId, boolean stateTransition) throws WorkflowStateTransitionException {
+        return contentItemService.step(ci, stepId, stateTransition);
     }
 }

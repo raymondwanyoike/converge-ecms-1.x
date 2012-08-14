@@ -105,9 +105,10 @@
                         </rich:column>
 
                         <rich:column styleClass="columnIcon center" rendered="#{userSession.privileged['CALENDAR']}">
-                            <a4j:commandLink id="lnkEditEvent" reRender="frmEventDetails">
+                            <a4j:commandLink id="lnkEditEvent" 
+                                             reRender="frmEventDetails"
+                                             oncomplete="#{rich:component('mpEventDetails')}.show();">
                                 <f:setPropertyActionListener value="#{event}" target="#{calendar.selectedEvent}" />
-                                <rich:componentControl for="mpEventDetails" operation="show" event="oncomplete" />
                                 <h:graphicImage alt="#{i18n.Generic_UPDATE}" title="#{i18n.Generic_UPDATE}" value="#{i18n.resource_ICON_EDIT}"/>
                             </a4j:commandLink>
                         </rich:column>
@@ -115,8 +116,8 @@
                         <rich:column rendered="#{userSession.privileged['OUTLET_PLANNING']}" styleClass="columnIcon center">
                             <a4j:commandLink id="lnkAssignEvent">
                                 <f:setPropertyActionListener value="#{event}" target="#{calendar.selectedEvent}" />
-                                <a4j:support event="oncomplete" actionListener="#{calendar.onNewAssignment}" reRender="frmAssignmentDetails">
-                                    <rich:componentControl for="mpAssignmentDetails" operation="show" event="oncomplete" />
+                                <a4j:support event="oncomplete" actionListener="#{calendar.onNewAssignment}" reRender="frmAssignmentDetails"
+                                             oncomplete="#{rich:component('mpAssignmentDetails')}.show();">
                                 </a4j:support>
                                 <h:graphicImage alt="#{i18n.Calendar_ASSIGN}" title="#{i18n.Calendar_ASSIGN}" value="#{i18n.resource_ICON_ASSIGNMENT}"/>
                             </a4j:commandLink>
@@ -137,11 +138,8 @@
                         <h:panelGroup>
                             <h:graphicImage id="imgCloseEventDetails"
                                             value="#{i18n.resource_ICON_DIALOGUE_CLOSE}"
-                                            style="link" />
-                            <rich:componentControl for="mpEventDetails"
-                                                   attachTo="imgCloseEventDetails"
-                                                   operation="hide"
-                                                   event="onclick"/>
+                                            styleClass="link"
+                                            onclick="#{rich:component('mpEventDetails')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
 
@@ -211,11 +209,8 @@
                                              actionListener="#{calendar.onDeleteEvent}"
                                              styleClass="dialogButton"
                                              value="#{i18n.Generic_DELETE}"
-                                             reRender="dtSchedule">
-                                <rich:componentControl for="mpEventDetails"
-                                                       operation="hide"
-                                                       event="oncomplete" />
-                            </a4j:commandLink>
+                                             reRender="dtSchedule"
+                                             oncomplete="#{rich:component('mpEventDetails')}.hide();" />
 
                             <h:commandLink id="lnkCancelEventDetails"
                                            styleClass="dialogButton"
@@ -239,11 +234,10 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseEventSubscribe" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                            <rich:componentControl for="mpCalendarSubscribe"
-                                                   attachTo="imgCloseEventSubscribe"
-                                                   operation="hide"
-                                                   event="onclick"/>
+                            <h:graphicImage id="imgCloseEventSubscribe" 
+                                            value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                            styleClass="link"
+                                            onclick="#{rich:component('mpCalendarSubscribe')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
 

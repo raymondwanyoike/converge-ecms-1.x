@@ -129,39 +129,6 @@ public class OutletFacadeBean implements OutletFacadeLocal {
     }
 
     /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Department createDepartment(Department department) {
-        return daoService.create(department);
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Department findDepartmentById(Long id) throws DataNotFoundException {
-        return daoService.findById(Department.class, id);
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void updateDepartment(Department department) {
-        daoService.update(department);
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void deleteDepartment(Long id) {
-        //TODO: Determine what to do about news item current in this department
-        daoService.delete(Department.class, id);
-    }
-
-    /**
      * Create a new subscriber of an {@link Outlet}.
      * <p/>
      * @param subscriber New subscriber
@@ -361,7 +328,7 @@ public class OutletFacadeBean implements OutletFacadeLocal {
         endDate.set(Calendar.HOUR_OF_DAY, 23);
         endDate.set(Calendar.MINUTE, 59);
         endDate.set(Calendar.SECOND, 59);
-        Outlet outlet = null;
+        Outlet outlet;
         try {
             outlet = findOutletById(outletId);
         } catch (DataNotFoundException ex) {

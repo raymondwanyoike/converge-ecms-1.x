@@ -20,7 +20,6 @@ import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.NewsItemField;
 import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.facades.WorkflowFacadeLocal;
-import dk.i2m.converge.jsf.beans.BaseBean;
 import dk.i2m.converge.jsf.beans.Bundle;
 import dk.i2m.jsf.JsfUtils;
 import java.util.ArrayList;
@@ -28,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -39,7 +39,10 @@ import javax.faces.model.ListDataModel;
  *
  * @author Allan Lykke Christensen
  */
-public class Workflows extends BaseBean {
+public class Workflows {
+    
+    private static final Logger LOG = Logger.getLogger(Workflows.class.
+            getName());
 
     @EJB private WorkflowFacadeLocal workflowFacade;
 
@@ -404,7 +407,7 @@ public class Workflows extends BaseBean {
             workflowFacade.updateWorkflow(selected);
             selected = workflowFacade.findWorkflowById(selected.getId());
         } catch (DataNotFoundException ex) {
-            logger.log(Level.WARNING, "Workflow does not exist", ex);
+            LOG.log(Level.WARNING, "Workflow does not exist", ex);
         }
     }
 
@@ -417,7 +420,7 @@ public class Workflows extends BaseBean {
             workflowFacade.deleteWorkflowStateById(selectedWorkflowState.getId());
             selected = workflowFacade.findWorkflowById(selected.getId());
         } catch (DataNotFoundException ex) {
-            logger.log(Level.WARNING, "Workflow does not exist", ex);
+            LOG.log(Level.WARNING, "Workflow does not exist", ex);
         }
     }
 
@@ -483,7 +486,7 @@ public class Workflows extends BaseBean {
                     workflowFacade.findWorkflowStateById(selectedWorkflowState.
                     getId());
         } catch (DataNotFoundException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -498,7 +501,7 @@ public class Workflows extends BaseBean {
                     workflowFacade.findWorkflowStateById(selectedWorkflowState.
                     getId());
         } catch (DataNotFoundException ex) {
-            logger.log(Level.WARNING, "Workflow does not exist", ex);
+            LOG.log(Level.WARNING, "Workflow does not exist", ex);
         }
     }
 
@@ -680,7 +683,7 @@ public class Workflows extends BaseBean {
                     workflowFacade.findWorkflowStepById(selectedWorkflowStep.
                     getId());
         } catch (DataNotFoundException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }
@@ -708,7 +711,7 @@ public class Workflows extends BaseBean {
                     workflowFacade.findWorkflowStepById(selectedWorkflowStep.
                     getId());
         } catch (DataNotFoundException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
     }

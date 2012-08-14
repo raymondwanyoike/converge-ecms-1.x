@@ -1,19 +1,20 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<faces-config version="1.2" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_1_2.xsd">
+<faces-config xmlns="http://java.sun.com/xml/ns/javaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"
+              version="2.0">
     <application>
+        <view-handler>org.ajax4jsf.application.AjaxViewHandler</view-handler>
+
         <locale-config>
             <default-locale>en</default-locale>
             <supported-locale>da</supported-locale>
-            <supported-locale>ar</supported-locale>
         </locale-config>
-        <message-bundle>dk.i2m.converge.i18n.Messages</message-bundle>
+        <message-bundle>dk.i2m.converge.i18n.WebUI</message-bundle>
         <resource-bundle>
             <base-name>dk.i2m.converge.i18n.Messages</base-name>
             <var>msgs</var>
-        </resource-bundle>
-        <resource-bundle>
-            <base-name>dk.i2m.converge.i18n.jsf.Resources</base-name>
-            <var>res</var>
         </resource-bundle>
         <resource-bundle>
             <base-name>dk.i2m.converge.i18n.WebUI</base-name>
@@ -38,6 +39,11 @@
         <navigation-case>
             <from-outcome>/administration/configuration</from-outcome>
             <to-view-id>/administrator/Configuration.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>/administration/jobqueue</from-outcome>
+            <to-view-id>/administrator/JobQueue.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
         <navigation-case>
@@ -68,6 +74,11 @@
         <navigation-case>
             <from-outcome>/administration/plugins</from-outcome>
             <to-view-id>/administrator/Plugins.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>/administration/plugins_discovered</from-outcome>
+            <to-view-id>/administrator/PluginsDiscovered.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
         <navigation-case>
@@ -268,152 +279,116 @@
     <managed-bean>
         <managed-bean-name>dashboard</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.Dashboard</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>activityStream</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.ActivityStream</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-
     
     <managed-bean>
         <managed-bean-name>myActivity</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.MyActivity</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>planning</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.Planning</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>calendar</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.Calendar</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>help</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.Help</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>inbox</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.Inbox</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
     <managed-bean>
         <managed-bean-name>listings</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.Listings</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-
 
     <managed-bean>
         <managed-bean-name>search</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.Search</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
     <managed-bean>
         <managed-bean-name>searchByEdition</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.SearchByEdition</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>mediaItemDetails</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.MediaItemDetails</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-        <managed-property>
-            <property-name>id</property-name>
-            <value>#{param['id']}</value>
-        </managed-property>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
     <managed-bean>
         <managed-bean-name>cropRendition</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.CropRendition</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-        <managed-property>
-            <property-name>mediaItemId</property-name>
-            <value>#{param['mid']}</value>
-        </managed-property>
-        <managed-property>
-            <property-name>sourceRenditionId</property-name>
-            <value>#{param['sid']}</value>
-        </managed-property>
-        <managed-property>
-            <property-name>targetRenditionId</property-name>
-            <value>#{param['tid']}</value>
-        </managed-property>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>mediaItemArchive</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.MediaItemArchive</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-        <managed-property>
-            <property-name>id</property-name>
-            <value>#{param['id']}</value>
-        </managed-property>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
 
     <managed-bean>
         <managed-bean-name>newsItem</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.NewsItem</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-        <managed-property>
-            <property-name>id</property-name>
-            <value>#{param['id']}</value>
-        </managed-property>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>newsItemArchive</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.NewsItemArchive</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-        <managed-property>
-            <property-name>id</property-name>
-            <value>#{param['id']}</value>
-        </managed-property>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>newsReader</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.NewsReader</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>reporting</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.Reporting</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-
 
     <managed-bean>
         <managed-bean-name>reportActivity</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.ReportActivity</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-
 
     <managed-bean>
         <managed-bean-name>concepts</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.Concepts</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-        <managed-property>
-            <property-name>id</property-name>
-            <value>#{param['id']}</value>
-        </managed-property>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
@@ -423,87 +398,102 @@
     </managed-bean>
 
     <managed-bean>
+        <managed-bean-name>administrator_JobQueue</managed-bean-name>
+        <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.JobQueue</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
         <managed-bean-name>administrator_Administration</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Administration</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>administrator_Log</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Log</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>administrator_OpenCalais</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.OpenCalais</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
     <managed-bean>
         <managed-bean-name>administrator_Processes</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Processes</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>administrator_Announcements</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Announcements</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>administrator_CalendarCategories</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.CalendarCategories</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>administrator_Configuration</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Configuration</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>administrator_Languages</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Languages</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-
 
     <managed-bean>
         <managed-bean-name>administrator_Renditions</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Renditions</managed-bean-class>
-    
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>administrator_Catalogues</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Catalogues</managed-bean-class>
-    
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>administrator_Newsfeeds</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Newsfeeds</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <!-- Outlet Administration Start -->
     <managed-bean>
         <managed-bean-name>administrator_Outlets</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Outlets</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <!-- Outlet Administration End -->
+
+    <managed-bean>
+        <managed-bean-name>administrator_Plugins</managed-bean-name>
+        <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Plugins</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>administrator_PluginConfigurationDetail</managed-bean-name>
+        <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.PluginConfigurationDetail</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
 
     <!-- Workflow Administration Start -->
     <managed-bean>
         <managed-bean-name>administrator_Workflows</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Workflows</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <!-- Workflow Administration End -->
 
@@ -511,38 +501,39 @@
     <managed-bean>
         <managed-bean-name>administrator_Users</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Users</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
     <managed-bean>
         <managed-bean-name>administrator_UserSessions</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.UserSessions</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
     <managed-bean>
         <managed-bean-name>administrator_Roles</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Roles</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
     <managed-bean>
         <managed-bean-name>administrator_UserConfiguration</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.UserConfiguration</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-        <!-- User Administration End -->
+    <!-- User Administration End -->
     
     <managed-bean>
         <managed-bean-name>administrator_SearchEngine</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.SearchEngine</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>administrator_Timers</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.administrator.Timers</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-
-
 
     <managed-bean>
         <managed-bean-name>common</managed-bean-name>
@@ -550,25 +541,16 @@
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
 
-
     <managed-bean>
         <managed-bean-name>newswire</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.Newswire</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-        <managed-property>
-            <property-name>linkSearch</property-name>
-            <value>#{param['q']}</value>
-        </managed-property>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <managed-bean>
         <managed-bean-name>newswireitem</managed-bean-name>
         <managed-bean-class>dk.i2m.converge.jsf.beans.NewswireItem</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-        <managed-property>
-            <property-name>id</property-name>
-            <value>#{param['id']}</value>
-        </managed-property>
+        <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
     <component>
@@ -583,6 +565,11 @@
             <renderer-class>dk.i2m.converge.jsf.components.message.MessageRenderer</renderer-class>
         </renderer>
     </render-kit>
-
+    <managed-bean>
+        <description>Backing bean for Error.jspx</description>
+        <managed-bean-name>Error</managed-bean-name>
+        <managed-bean-class>dk.i2m.converge.jsf.beans.Error</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
 </faces-config>
 

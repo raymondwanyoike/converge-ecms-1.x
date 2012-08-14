@@ -33,41 +33,32 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * {@link CatalogueHook} resizing an uploaded image and saves the resized image as a {@link Rendition} of the {@link MediaItem}.
+ * {@link CatalogueHook} resizing an uploaded image and saves the resized image
+ * as a {@link Rendition} of the {@link MediaItem}.
  *
  * @author Allan Lykke Christensen
  */
 @CatalogueAction
 public class ResizeImageHook extends CatalogueHook {
 
+    private static final Logger LOG = Logger.getLogger(ResizeImageHook.class.getName());
     public static final String ORIGINAL_RENDITION = "rendition_original";
-
     public static final String RESIZED_RENDITION = "rendition_resized";
-
     public static final String RESIZE_WIDTH = "width";
-
     public static final String RESIZE_HEIGHT = "height";
-
     public static final String RESIZE_QUALITY = "quality";
-
     public static final String ENABLE_ON_UPDATE = "ENABLE_ON_UPDATE";
-
     private Map<String, String> instanceProperties = new HashMap<String, String>();
-
     private Map<String, String> availableProperties = null;
-
     private String originalRendition;
-
     private String resizeRendition;
-
     private Integer width;
-
     private Integer height;
-
     private Integer quality;
-
     private ResourceBundle bundle = ResourceBundle.getBundle("dk.i2m.converge.plugins.actions.resizeimage.Messages");
 
     @Override
@@ -75,35 +66,39 @@ public class ResizeImageHook extends CatalogueHook {
 
         instanceProperties = instance.getPropertiesAsMap();
 
+        LOG.log(Level.FINE,"Validating properties");
         validateProperties();
+        LOG.log(Level.FINE,"Properties validated");
 
         boolean executeOnUpdate = false;
 
         if (instanceProperties.containsKey(ENABLE_ON_UPDATE)) {
             executeOnUpdate = Boolean.parseBoolean(instanceProperties.get(ENABLE_ON_UPDATE));
-
         }
-
+        
         // Check that we only re-act to the Upload of new or update renditions
         if (event.getType() != CatalogueEvent.Event.UploadRendition && event.getType() != CatalogueEvent.Event.UpdateRendition) {
+            LOG.log(Level.FINE, "Ignoring Event {0}", event.getType());
             return;
         }
 
         // Check that we only re-act to the Upload of updated renditions if the ENABLE_ON_UPDATE was set
         if (!executeOnUpdate && event.getType() == CatalogueEvent.Event.UpdateRendition) {
+            LOG.log(Level.FINE, "Ignoring update");
             return;
         }
-
 
         // Determine if we need to act on the uploaded rendition
         MediaItemRendition uploadRendition = event.getRendition();
         Rendition rendition = uploadRendition.getRendition();
 
         if (!rendition.getName().equalsIgnoreCase(originalRendition)) {
+            LOG.log(Level.FINE, "Ignoring {0} rendition. Looking for {1}", new Object[]{rendition.getName(), originalRendition});
             return;
         }
 
         if (!uploadRendition.isImage()) {
+            LOG.log(Level.FINE, "Ignoring rendition. Not an image ({0})", uploadRendition.getContentType());
             return;
         }
 
@@ -150,12 +145,12 @@ public class ResizeImageHook extends CatalogueHook {
     }
 
     /**
-     * Validates that the necessary properties have been provided. If not, a 
-     * {@link CatalogueEventException} will be thrown. Validated properties
-     * are initialised in the necessary instance properties.
-     * 
-     * @throws CatalogueEventException 
-     *          If a required property is missing or specified incorrectly
+     * Validates that the necessary properties have been provided. If not, a
+     * {@link CatalogueEventException} will be thrown. Validated properties are
+     * initialised in the necessary instance properties.
+     *
+     * @throws CatalogueEventException If a required property is missing or
+     * specified incorrectly
      */
     private void validateProperties() throws CatalogueEventException {
         if (!instanceProperties.containsKey(ORIGINAL_RENDITION)) {

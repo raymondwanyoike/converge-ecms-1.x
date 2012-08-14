@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root version="2.0" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jstl/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:a4j="http://richfaces.org/a4j" xmlns:rich="http://richfaces.org/rich" xmlns:converge="http://com.interactivemediamanagement.converge/tags">
+    <ui:composition template="/WEB-INF/facelets/templates/administration.xhtml">
+        <ui:define name="title">#{i18n.administrator_JobQueue_TITLE}</ui:define>
+        <ui:define name="body">
+            <a4j:keepAlive beanName="administrator_JobQueue" />
+
+            <a4j:region id="regJobQueue">
+                <h:form id="frmJobQueue">
+                    <a4j:poll reRender="dtJobQueue" ajaxSingle="true" interval="5000" ignoreDupResponses="true" limitToList="true" />
+                    <converge:moduleHeader moduleTitle="#{i18n.administrator_JobQueue_TITLE}" />
+                    <div class="moduleContent">
+
+                        <h:panelGroup layout="block" styleClass="info">
+                            <h:outputText value="#{i18n.administrator_JobQueue_PAGE_DESCRIPTION}" escape="false" />
+                        </h:panelGroup>
+
+
+                        <rich:dataTable id="dtJobQueue" value="#{administrator_JobQueue.jobQueue}" var="job" styleClass="table" headerClass="tableHeader">
+                            <rich:column styleClass="center columnIcon">
+                                <f:facet name="header">
+                                    <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
+                                </f:facet>
+                                <h:graphicImage title="" alt="" value="#{i18n.resource_ICON_AJAX_LOADING}" />
+                            </rich:column>
+                            <rich:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Name" />
+                                </f:facet>
+                                <h:outputText value="#{job.name}" />
+                            </rich:column>
+                            <rich:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Status" />
+                                </f:facet>
+                                <h:outputText value="#{job.status}"  />
+                            </rich:column>
+                            <rich:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Duration" />
+                                </f:facet>
+                                <h:outputText value="#{converge:formatDuration(job.duration)}"  />
+                            </rich:column>
+                            <rich:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Started" />
+                                </f:facet>
+                                <h:outputText value="#{job.started}">
+                                    <f:convertDateTime pattern="#{i18n.Generic_FORMAT_DATE_AND_TIME}" timeZone="#{common.systemTimeZone}" />
+                                </h:outputText>
+                            </rich:column>
+                        </rich:dataTable>
+                    </div>
+                </h:form>
+
+            </a4j:region>
+
+        </ui:define>
+    </ui:composition>
+</jsp:root>

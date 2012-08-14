@@ -26,12 +26,10 @@ import dk.i2m.converge.core.newswire.NewswireService;
 import dk.i2m.converge.core.reporting.activity.UserActivitySummary;
 import dk.i2m.converge.core.security.SystemPrivilege;
 import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.core.wiki.Page;
 import dk.i2m.converge.core.workflow.Outlet;
 import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.converge.ejb.facades.*;
-import dk.i2m.converge.jsf.beans.administrator.Catalogues;
 import dk.i2m.converge.jsf.model.MenuHelper;
 import dk.i2m.converge.jsf.model.MenuItem;
 import dk.i2m.converge.jsf.model.MenuItems;
@@ -90,8 +88,6 @@ public class UserSession {
 
     private Map<String, Boolean> privileges = new HashMap<String, Boolean>();
 
-    private Map<Long, Boolean> catalogueEditor = new HashMap<Long, Boolean>();
-
     private List<Catalogue> catalogues = new ArrayList<Catalogue>();
 
     private Notification selectedNotification;
@@ -123,16 +119,7 @@ public class UserSession {
      * Internal method for updating the user privileges.
      */
     private void updatePrivileges() {
-        String uid = getUser().getUsername();
-        List<UserRole> userRoles = getUser().getUserRoles();
-        this.catalogues = catalogueFacade.findCataloguesByUser(uid);
-
-        this.catalogueEditor.clear();
-        List<Catalogue> allCatalogues = catalogueFacade.findAllCatalogues();
-        for (Catalogue c : allCatalogues) {
-            this.catalogueEditor.put(c.getId(), userRoles.contains(c.
-                    getEditorRole()));
-        }
+        this.catalogues = getUser().getPrivilegedCatalogues();
     }
 
     /**
@@ -164,29 +151,6 @@ public class UserSession {
     public boolean isUserInRole(String role) {
         FacesContext ctx = FacesContext.getCurrentInstance();
         return ctx.getExternalContext().isUserInRole(role);
-    }
-
-    /**
-     * Determines if the current user is an editor of a catalogue.
-     * <p/>
-     * @return {@code true} if the current user is an editor of a
-     * catalogue, otherwise {@code false}
-     */
-    public boolean isCatalogueEditor() {
-        return userFacade.isCatalogueEditor(getUser().getUsername());
-    }
-
-    /**
-     * Gets a {@link Map} of {@link Catalogues} with the {@link Catalogue} id
-     * in the key of the {@link Map}, and a {@link Boolean} value in the value
-     * of the {@link Map}. The {@link Boolean} value indicates if the current
-     * user is an editor for the given {@link Catalogue}.
-     * <p/>
-     * @return {@link Map} of {@link Catalogues} indicator whether the current
-     * user is an editor.
-     */
-    public Map<Long, Boolean> getCatalogueEditorRole() {
-        return catalogueEditor;
     }
 
     public UserActivitySummary getLastMonthActivity() {
@@ -439,6 +403,26 @@ public class UserSession {
         }
         return mine;
     }
+    
+    /**
+     * Gets the privileged <em>self-upload</em> catalogues of the current user.
+     * 
+     * @return {@link Map} of privileged <em>self-upload</em> catalogues of the 
+     *         current user
+     */
+    public Map<String, Catalogue> getMySelfUploadCatalogues() {
+        Map<String, Catalogue> mine = new LinkedHashMap<String, Catalogue>();
+        for (Catalogue c : this.catalogues) {
+            if (c.getSelfUploadState() == null) continue;
+            
+            String key = c.getName();
+            if (mine.containsKey(key)) {
+                key = key + " (" + c.getId() + ")";
+            }
+            mine.put(key, c);
+        }
+        return mine;
+    }
 
     /**
      * Refreshes the {@link UserActivitySummary} for the past two months.
@@ -580,7 +564,7 @@ public class UserSession {
 
     /**
      * Gets the URL of the user photo.
-     * <p/>
+     *
      * @return URL of the user photo
      */
     public String getPhotoUrl() {
@@ -590,8 +574,9 @@ public class UserSession {
 
     /**
      * Sets the {@link Locale} of the current user.
-     * <p/>
-     * @param locale {@link Locale} of the current user
+     *
+     * @param locale 
+     *          {@link Locale} of the current user
      */
     private void setLocale(Locale locale) {
         FacesContext.getCurrentInstance().getViewRoot().setLocale(locale);
@@ -600,8 +585,9 @@ public class UserSession {
     /**
      * Event handler (setPropertyActionListener) for selecting the wiki page
      * that should be displayed.
-     * <p/>
-     * @param wikiPage Name of the wiki page to be displayed.
+     *
+     * @param wikiPage 
+     *          Name of the wiki page to be displayed.
      */
     public void setLoadWikiPage(String wikiPage) {
         this.wikiPageTitle = wikiPage;

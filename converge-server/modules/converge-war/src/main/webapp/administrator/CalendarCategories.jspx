@@ -24,21 +24,6 @@
                 <converge:moduleHeader moduleTitle="#{i18n.administrator_CalendarCategories_CATEGORY}" />
                 <div class="moduleContent">
 
-                    <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
-                        <h:outputText value="" />
-                        <a4j:commandButton id="btnNewCategory"
-                                           styleClass="button mediumButton"
-                                           value="#{i18n.administrator_CalendarCategories_CATEGORY_NEW}"
-                                           actionListener="#{administrator_CalendarCategories.onNew}"
-                                           reRender="frmEventCategoryDetails">
-                            <rich:componentControl for="mpEventCategoryDetails"
-                                                   operation="show"
-                                                   event="oncomplete" />
-                        </a4j:commandButton>
-                    </h:panelGrid>
-
-
-
                     <rich:dataTable id="dtCalendarCategories"
                                     value="#{administrator_CalendarCategories.categories}" var="category"
                                     styleClass="table" headerClass="tableHeader"
@@ -51,16 +36,22 @@
                                         <h:graphicImage value="#{i18n.resource_ICON_AJAX_LOADING}" />
                                     </f:facet>
                                     <f:facet name="stop">
-                                        <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
+                                        <a4j:commandLink id="lnkNewCategory"
+                                                         actionListener="#{administrator_CalendarCategories.onNew}"
+                                                         reRender="frmEventCategoryDetails"
+                                                         oncomplete="#{rich:component('mpEventCategoryDetails')}.show();" 
+                                                         ajaxSingle="true">
+                                            <h:graphicImage value="#{i18n.resource_ICON_ADD}" 
+                                                            width="16" height="16" />
+                                        </a4j:commandLink>
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>
-                            <a4j:commandLink reRender="frmEventCategoryDetails">
+                            <a4j:commandLink reRender="frmEventCategoryDetails"
+                                             oncomplete="#{rich:component('mpEventCategoryDetails')}.show();"
+                                             ajaxSingle="true">
                                 <f:setPropertyActionListener value="#{category}"
                                                              target="#{administrator_CalendarCategories.selectedCategory}" />
-                                <rich:componentControl for="mpEventCategoryDetails"
-                                                       operation="show"
-                                                       event="oncomplete" />
                                 <h:graphicImage alt="#{i18n.administrator_CalendarCategories_CATEGORY}"
                                                 title="#{i18n.administrator_CalendarCategories_CATEGORY}"
                                                 value="#{i18n.resource_ICON_EVENT_CATEGORY}" />
@@ -70,12 +61,10 @@
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.administrator_CalendarCategories_CATEGORY}" />
                             </f:facet>
-                            <a4j:commandLink reRender="frmEventCategoryDetails">
+                            <a4j:commandLink reRender="frmEventCategoryDetails"
+                                             oncomplete="#{rich:component('mpEventCategoryDetails')}.show();">
                                 <f:setPropertyActionListener value="#{category}"
                                                              target="#{administrator_CalendarCategories.selectedCategory}" />
-                                <rich:componentControl for="mpEventCategoryDetails"
-                                                       operation="show"
-                                                       event="oncomplete" />
                                 <h:outputText value="#{category.name}" />
                             </a4j:commandLink>
                         </rich:column>
@@ -100,11 +89,8 @@
                         <h:panelGroup>
                             <h:graphicImage id="imgCloseEventCategoryDetails"
                                             value="#{i18n.resource_ICON_DIALOGUE_CLOSE}"
-                                            style="link" />
-                            <rich:componentControl for="mpEventCategoryDetails"
-                                                   attachTo="imgCloseEventCategoryDetails"
-                                                   operation="hide"
-                                                   event="onclick"/>
+                                            styleClass="link" 
+                                            onclick="#{rich:component('mpEventCategoryDetails')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
 
@@ -146,10 +132,8 @@
                                              actionListener="#{administrator_CalendarCategories.onDelete}"
                                              styleClass="dialogButton"
                                              value="#{i18n.Generic_DELETE}"
-                                             reRender="frmCalendarCategories">
-                                <rich:componentControl for="mpEventCategoryDetails"
-                                                       operation="hide"
-                                                       event="oncomplete" />
+                                             reRender="frmCalendarCategories"
+                                             oncomplete="#{rich:component('mpEventCategoryDetails')}.hide();">
                             </a4j:commandLink>
 
                             <h:commandLink id="lnkCancelEventCategoryDetails"

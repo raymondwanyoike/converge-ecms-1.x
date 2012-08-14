@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
@@ -45,43 +46,46 @@ import org.richfaces.model.UploadItem;
  */
 public class Concepts {
 
-    private static final Logger log = Logger.getLogger(Concepts.class.getName());
-
-    @EJB private MetaDataFacadeLocal metaDataFacade;
-
+    private static final Logger LOG = Logger.getLogger(Concepts.class.getName());
+    @EJB
+    private MetaDataFacadeLocal metaDataFacade;
     private DataModel mostPopular = null;
-
     private DataModel mostRecent = null;
-
     private String search = "";
-
     private String show = "";
-
     private String importLanguage;
-
     private String importFormat = "NEWSML_G2_KNOWLEDGE_ITEM";
-
     private Long id;
-
     private List<UploadItem> uploadedConcepts = new ArrayList<UploadItem>();
-
     private Map<String, String> availableLanguages =
             new LinkedHashMap<String, String>();
-
     private Concept selectedConcept;
-
     private DataModel searchResult;
-
     private String newName = "";
-
     private String newType = "";
-
     private boolean updatingConcept = false;
-
     private Concept selectedMetaDataConcept;
-
     private String conceptAddType = "";
-    
+
+    /**
+     * Creates a new instance of {@link Concepts}.
+     */
+    public Concepts() {
+        if (JsfUtils.getRequestParameterMap().containsKey("id")) {
+            this.id = Long.valueOf(JsfUtils.getRequestParameterMap().get("id"));
+        }
+    }
+
+    /**
+     * If an ID was provided, it should be used to display the Concept.
+     */
+    @PostConstruct
+    public void onInit() {
+        if (this.id != null) {
+            setId(this.id);
+        }
+    }
+
     public Long getId() {
         return id;
     }
@@ -91,13 +95,11 @@ public class Concepts {
 
         if (id != null) {
             try {
-                Logger.getLogger(Concepts.class.getName()).log(Level.INFO,
-                        "Loading concept {0}", id);
+                LOG.log(Level.INFO, "Loading concept {0}", id);
                 selectedConcept = metaDataFacade.findConceptById(id);
                 show = "SHOW_CONCEPT";
             } catch (DataNotFoundException ex) {
-                Logger.getLogger(Concepts.class.getName()).log(Level.SEVERE,
-                        "Unknown concept identifier", ex);
+                LOG.log(Level.SEVERE, "Unknown concept identifier", ex);
             }
         }
     }
@@ -225,38 +227,38 @@ public class Concepts {
         this.uploadedConcepts = new ArrayList<UploadItem>();
         this.availableLanguages = new LinkedHashMap<String, String>();
     }
-    
+
     /**
      * Event handler for exporting subjects in a Microsoft Excel spreadsheet.
-     * 
+     *
      * @param event Event that invoked the handler
      */
     public void onExportSubjects(ActionEvent event) {
         byte[] output = metaDataFacade.exportConcepts(Subject.class, ConceptOutput.MICROSOFT_EXCEL);
-        
-         try {
+
+        try {
             // here you need to get the byte[] representation of 
             // the file you want to send
             byte[] binary_data = output;
             String filename = "subjects.xls";
-            FacesContext fctx = FacesContext.getCurrentInstance();   
+            FacesContext fctx = FacesContext.getCurrentInstance();
             ExternalContext ectx = fctx.getExternalContext();
- 
-            
-            
+
+
+
             HttpServletResponse response = (HttpServletResponse) ectx.getResponse();
             response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
             response.setHeader("Content-Transfer-Encoding", "Binary");
             response.setHeader("Pragma", "private");
             response.setHeader("cache-control", "private, must-revalidate");
             response.setContentType("application/vnd.ms-excel");
- 
+
             ServletOutputStream outs = response.getOutputStream();
             outs.write(binary_data);
             outs.flush();
             outs.close();
             response.flushBuffer();
- 
+
             fctx.responseComplete();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -406,8 +408,7 @@ public class Concepts {
      *
      * @return {@link Map} of {@link Locale}s with the available languages for
      * importing subjects codes
-     * @throws IOException
-* If any of the uploaded files could not be read
+     * @throws IOException If any of the uploaded files could not be read
      */
     public Map<String, String> getAvailableImportLanguages() {
         return this.availableLanguages;
@@ -556,7 +557,7 @@ public class Concepts {
                     getId());
         } catch (DataNotFoundException ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
-                        "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
+                    "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
         }
     }
 
@@ -568,7 +569,7 @@ public class Concepts {
             selectedConcept = metaDataFacade.update(selectedConcept);
         } catch (DataNotFoundException ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
-                        "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
+                    "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
         }
     }
 
@@ -580,7 +581,7 @@ public class Concepts {
             selectedConcept = metaDataFacade.update(selectedConcept);
         } catch (DataNotFoundException ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
-                        "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
+                    "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
         }
     }
 
@@ -596,7 +597,7 @@ public class Concepts {
             selectedConcept = metaDataFacade.update(selectedConcept);
         } catch (DataNotFoundException ex) {
             JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
-                        "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
+                    "Generic_AN_ERROR_OCCURRED_X", new Object[]{ex.getMessage()});
         }
     }
 

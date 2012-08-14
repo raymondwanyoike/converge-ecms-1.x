@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.plugins.joomla;
 
+import dk.i2m.converge.core.content.ContentItem;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.logging.LogSeverity;
@@ -55,8 +56,14 @@ public class JoomlaAction extends JoomlaPlugin implements WorkflowAction {
     }
 
     @Override
-    public void execute(PluginContext ctx, NewsItem item,
+    public void execute(PluginContext ctx, ContentItem item,
             WorkflowStepAction stepAction, UserAccount user) {
+        
+        if (!(item instanceof NewsItem)) {
+            return;
+        }
+        NewsItem newsItem = (NewsItem)item;
+        
         this.properties = stepAction.getPropertiesAsMap();
         this.categoryMapping = new HashMap<String, String>();
 
@@ -181,7 +188,7 @@ public class JoomlaAction extends JoomlaPlugin implements WorkflowAction {
         }
 
         if (method.equalsIgnoreCase(JoomlaAction.XMLRPC_METHOD_NEW_ARTICLE)) {
-            for (NewsItemPlacement placement : item.getPlacements()) {
+            for (NewsItemPlacement placement : newsItem.getPlacements()) {
                 try {
                     newArticle(connection, placement);
                 } catch (JoomlaActionException ex) {
@@ -192,7 +199,7 @@ public class JoomlaAction extends JoomlaPlugin implements WorkflowAction {
         } else if (method.equalsIgnoreCase(
                 JoomlaAction.XMLRPC_METHOD_DELETE_ARTICLE)) {
             try {
-                deleteArticle(connection, item);
+                deleteArticle(connection, newsItem);
             } catch (JoomlaActionException ex) {
                 LOG.log(Level.SEVERE, ex.getMessage());
                 LOG.log(Level.FINE, "", ex);

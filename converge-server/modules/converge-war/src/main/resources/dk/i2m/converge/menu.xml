@@ -91,13 +91,7 @@
                 <label>menu_SYSTEM_CONFIGURATION</label>
                 <role>ADMINISTRATOR</role>
             </children>
-            
-            <children id="lnkAdministrationPlugins" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
-                <action>/administration/plugins</action>
-                <label>menu_SYSTEM_PLUGINS</label>
-                <role>ADMINISTRATOR</role>
-            </children>
-            
+                        
             <children id="lnkAdministrationTimers" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/timers</action>
                 <label>menu_SYSTEM_TIMERS</label>
@@ -110,6 +104,12 @@
                 <role>ADMINISTRATOR</role>
             </children>
             
+            <children id="lnkAdministrationJobQueue" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/jobqueue</action>
+                <label>menu_JOB_QUEUE</label>
+                <role>ADMINISTRATOR</role>
+            </children>
+            
             <children id="lnkAdministrationLog" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/log</action>
                 <label>menu_SYSTEM_LOG</label>
@@ -117,6 +117,27 @@
             </children>
         </children>
         
+        <children id="lnkAdministrationPlugins" resetOnClick="false" sectionMenu="true">
+            <action>/administration/plugins</action>
+            <label>menu_SYSTEM_PLUGINS</label>
+            <role>ADMINISTRATOR</role>
+            <children id="lnkAdministrationPluginCfg" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/plugins</action>
+                <label>menu_SYSTEM_PLUGINS_CONFIGURATIONS</label>
+                <role>ADMINISTRATOR</role>
+            </children>
+            <children id="lnkAdministrationPluginsDiscovered" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/plugins_discovered</action>
+                <label>menu_SYSTEM_PLUGINS_DISCOVERED</label>
+                <role>ADMINISTRATOR</role>
+            </children>
+            <children id="lnkAdministrationJobQueue" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/jobqueue</action>
+                <label>menu_JOB_QUEUE</label>
+                <role>ADMINISTRATOR</role>
+            </children>
+        </children>
+                                
         <children id="lnkAdministrationUsers" resetOnClick="false" sectionMenu="true">
             <action>/administration/user_sessions</action>
             <label>menu_USER_MANAGEMENT</label>
@@ -147,14 +168,20 @@
             </children>
         </children>
 
-        <children id="lnkAdministrationOutlets" resetOnClick="false" sectionMenu="true">
+        <children id="lnkAdministrationContent" resetOnClick="false" sectionMenu="true">
             <action>/administration/outlets</action>
-            <label>menu_OUTLETS</label>
+            <label>menu_ADMINISTRATION_CONTENT</label>
             <role>ADMINISTRATOR</role>
 
             <children id="lnkOutlets" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/outlets</action>
                 <label>menu_OUTLETS</label>
+                <role>ADMINISTRATOR</role>
+            </children>
+            
+            <children id="lnkCatalogues" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
+                <action>/administration/catalogues</action>
+                <label>menu_CATALOGUES</label>
                 <role>ADMINISTRATOR</role>
             </children>
             
@@ -167,18 +194,6 @@
             <children id="lnkAdministrationLanguages" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
                 <action>/administration/languages</action>
                 <label>menu_LANGUAGES</label>
-                <role>ADMINISTRATOR</role>
-            </children>
-        </children>
-
-        <children id="lnkAdministrationCatalogues" resetOnClick="false" sectionMenu="true">
-            <action>/administration/catalogues</action>
-            <label>menu_CATALOGUES</label>
-            <role>ADMINISTRATOR</role>
-
-            <children id="lnkCatalogues" resetOnClick="false" sectionMenu="false" resetSectionMenu="false">
-                <action>/administration/catalogues</action>
-                <label>menu_CATALOGUES</label>
                 <role>ADMINISTRATOR</role>
             </children>
 

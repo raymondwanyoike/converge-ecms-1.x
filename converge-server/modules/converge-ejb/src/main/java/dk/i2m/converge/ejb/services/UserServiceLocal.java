@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 - 2010 Interactive Media Management
+ * Copyright (C) 2009 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -128,15 +128,6 @@ public interface UserServiceLocal {
     List<UserAccount> getMembers(Long outletId, SystemPrivilege privilege);
 
     /**
-     * Finds all the {@link UserAccount}s in a given {@link Department}.
-     *
-     * @param departmentId
-     *          Unique identifier of the department
-     * @return {@link UserAccount}s in a given {@link Department}
-     */
-    List<UserAccount> getMembers(Long departmentId);
-
-    /**
      * Takes a {@link UserAccount} from the database and supplies it with
      * information from the configured LDAP directory.
      *
@@ -158,7 +149,7 @@ public interface UserServiceLocal {
      *          Unique identifier of the role
      * @return  {@link List} of {@link UserAccount} with the given role
      */
-    java.util.List<dk.i2m.converge.core.security.UserAccount> getRoleMembers(java.lang.Long roleId);
+    List<UserAccount> getRoleMembers(Long roleId);
 
-    public java.util.List<dk.i2m.converge.core.security.UserAccount> getDirectoryMembers() throws javax.naming.NamingException;
+    List<UserAccount> getDirectoryMembers() throws NamingException;
 }

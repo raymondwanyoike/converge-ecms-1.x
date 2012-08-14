@@ -25,18 +25,23 @@ import dk.i2m.converge.core.logging.LogEntry;
 import dk.i2m.converge.core.logging.LogSeverity;
 import dk.i2m.converge.core.logging.LogSubject;
 import dk.i2m.converge.core.newswire.NewswireService;
-import dk.i2m.converge.core.plugin.Plugin;
-import dk.i2m.converge.core.plugin.PluginManager;
+import dk.i2m.converge.core.plugin.*;
+import dk.i2m.converge.core.workflow.JobQueue;
+import dk.i2m.converge.core.workflow.JobQueueParameter;
+import dk.i2m.converge.core.workflow.JobQueueStatus;
 import dk.i2m.converge.domain.Property;
 import dk.i2m.converge.ejb.services.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -51,16 +56,22 @@ public class SystemFacadeBean implements SystemFacadeLocal {
 
     private static final Logger LOG = Logger.getLogger(SystemFacadeBean.class.
             getName());
-
-    @EJB private UserServiceLocal userService;
-
-    @EJB private ConfigurationServiceLocal cfgService;
-
-    @EJB private DaoServiceLocal daoService;
-
-    @EJB private NewsItemFacadeLocal newsItemFacade;
-
-    @EJB private TimerServiceLocal timerService;
+    @EJB
+    private UserServiceLocal userService;
+    @EJB
+    private ConfigurationServiceLocal cfgService;
+    @EJB
+    private DaoServiceLocal daoService;
+    @EJB
+    private NewsItemFacadeLocal newsItemFacade;
+    @EJB
+    private TimerServiceLocal timerService;
+    @EJB
+    private PluginContextBeanLocal pluginContext;
+    @EJB
+    private NotificationServiceLocal notificationService;
+    @Resource
+    private SessionContext ctx;
 
     /**
      * Creates a new instance of {@link SystemFacadeBean}.
@@ -71,7 +82,8 @@ public class SystemFacadeBean implements SystemFacadeLocal {
     /**
      * Conducts a sanity check of the system.
      *
-     * @return {@code true} if the sanity of the system is OK, otherwise {@code false}
+     * @return {@code true} if the sanity of the system is OK, otherwise
+     * {@code false}
      */
     @Override
     public boolean sanityCheck() {
@@ -80,7 +92,7 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         LOG.log(Level.INFO,
                 "{0} newswire {0, choice, 0#services|1#service|2#services} reset",
                 reset);
-        
+
         int userCount = userService.findAll().size();
         LOG.log(Level.INFO,
                 "{0} user {0, choice, 0#accounts|1#account|2#accounts} in the system",
@@ -109,8 +121,14 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         }
 
         timerService.startTimers();
+        PluginService pluginService = PluginManager.createPluginService();
 
         return true;
+    }
+
+    @Override
+    public Iterator<PluginAction> findPluginActions() {
+        return PluginManager.createPluginService().getPlugins();
     }
 
     /**
@@ -347,7 +365,8 @@ public class SystemFacadeBean implements SystemFacadeLocal {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void log(LogSeverity severity, String message, Object origin, String originId) {
+    public void log(LogSeverity severity, String message, Object origin,
+            String originId) {
         log(severity, message, origin.getClass().getName(), originId);
     }
 
@@ -398,7 +417,280 @@ public class SystemFacadeBean implements SystemFacadeLocal {
         }
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void clearAllLogEntries() {
+        daoService.executeQuery(LogEntry.DELETE_ALL);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void clearOldLogEntries(Date date) {
+        daoService.executeQuery(LogEntry.DELETE_OLD, QueryBuilder.with(LogEntry.PARAMETER_DATE, date));
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void clearOldLogEntries() {
+        int daysToKeep = cfgService.getInteger(ConfigurationKey.LOG_KEEP);
+        Calendar now = Calendar.getInstance();
+        now.add(Calendar.DAY_OF_MONTH, -daysToKeep);
+        clearOldLogEntries(now.getTime());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<JobQueue> findJobQueue() {
+        return daoService.findAll(JobQueue.class, "executionTime", true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeJobQueue(Long id) {
+        daoService.delete(JobQueue.class, id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobQueue addToJobQueue(String name, String typeName, Long typeId,
+            Long pluginConfigurationId, List<JobQueueParameter> parameters, Date scheduled)
+            throws DataNotFoundException {
+
+        JobQueue q = new JobQueue();
+        q.setAdded(Calendar.getInstance().getTime());
+        q.setName(name);
+        if (scheduled == null) {
+            q.setExecutionTime(Calendar.getInstance().getTime());
+        } else {
+            q.setExecutionTime(scheduled);
+        }
+        q.setParameters(parameters);
+        q.setStatus(JobQueueStatus.WAITING);
+        q.setPluginConfiguration(pluginConfigurationId);
+        PluginConfiguration pluginCfg =
+                daoService.findById(PluginConfiguration.class,
+                pluginConfigurationId);
+        q.setPluginAction(pluginCfg.getActionClass());
+        q.setTypeClass(typeName);
+        q.setTypeClassId(typeId);
+
+        return daoService.create(q);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void executeJobQueue() {
+        List<JobQueue> queue = findJobQueue();
+        Calendar now = Calendar.getInstance();
+        boolean itemsAddedDuringExecution = false;
+        for (JobQueue item : queue) {
+            try {
+                LOG.log(Level.FINE, "Examining {0} {1}", new Object[]{item.getId(), item.getName()});
+                if (item.getStatus().equals(JobQueueStatus.WAITING) && now.getTime().after(
+                        item.getExecutionTime())) {
+                    LOG.log(Level.FINE, "{0} {1} is ready for execution", new Object[]{item.getId(), item.getName()});
+                    item.setStatus(JobQueueStatus.READY);
+                }
+
+                if (item.getStatus().equals(JobQueueStatus.READY) || item.
+                        getStatus().equals(JobQueueStatus.FAILED)) {
+                    LOG.log(Level.FINE, "Starting execution of {0} {1}", new Object[]{item.getId(), item.getName()});
+                    item.setStatus(JobQueueStatus.EXECUTION);
+                    item.setStarted(Calendar.getInstance().getTime());
+                    daoService.update(item);
+                    PluginAction action = item.getAction();
+
+                    try {
+                        PluginConfiguration cfg =
+                                daoService.findById(PluginConfiguration.class,
+                                item.getPluginConfiguration());
+                        action.execute(pluginContext, item.getTypeClass(),
+                                item.getTypeClassId(), cfg, item.
+                                getParametersMap());
+
+                        item.setFinished(Calendar.getInstance().getTime());
+                        item.setStatus(JobQueueStatus.COMPLETED);
+
+                        LOG.log(Level.FINE, "PluginConfiguratione executed successfully");
+                        LOG.log(Level.FINE, "Adding 'oncomplete' PluginConfigurations to JobQueue");
+                        for (PluginConfiguration completeCfg : cfg.getOnCompletePluginConfiguration()) {
+                            LOG.log(Level.FINE, "+ {1} {0}", new Object[]{completeCfg.getName(), completeCfg.getId()});
+                            addToJobQueue(completeCfg.getName(), item.getTypeClass(), item.getTypeClassId(), completeCfg.getId(), item.getParameters(), Calendar.getInstance().getTime());
+                            itemsAddedDuringExecution = true;
+                        }
+                    } catch (DataNotFoundException ex) {
+                        LOG.log(Level.FINE, "Failed execution of {0} {1}. " + ex.getMessage(), new Object[]{item.getId(), item.getName()});
+                        item.setStatus(JobQueueStatus.FAILED_COMPLETED);
+                        item.setFinished(Calendar.getInstance().getTime());
+                    } catch (PluginActionException ex) {
+                        if (ex.isPermanent()) {
+                            item.setStatus(JobQueueStatus.FAILED_COMPLETED);
+                        } else {
+                            item.setStatus(JobQueueStatus.FAILED);
+                        }
+                        LOG.log(Level.FINE, "Failed execution of {0} {1}. " + ex.getMessage(), new Object[]{item.getId(), item.getName()});
+
+                        item.setFinished(Calendar.getInstance().getTime());
+                    }
+                    daoService.update(item);
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+        }
+
+        daoService.executeQuery(JobQueue.REMOVE_COMPLETED);
+
+        // If items were added to the job queue during the execution, process the queue again
+        if (itemsAddedDuringExecution) {
+            executeJobQueue();
+        }
+
+    }
+
     private int removeAllNewswireProcessing() {
         return daoService.executeQuery(NewswireService.RESET_PROCESSING);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public List<PluginConfiguration> findPluginConfigurations() {
+        return daoService.findAll(PluginConfiguration.class);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public PluginConfiguration findPluginConfigurationById(Long id) throws
+            DataNotFoundException {
+        return daoService.findById(PluginConfiguration.class, id);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public PluginConfiguration createPluginConfiguration(
+            PluginConfiguration pluginConfiguration) {
+        return daoService.create(pluginConfiguration);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public PluginConfiguration updatePluginConfiguration(
+            PluginConfiguration pluginConfiguration) {
+        return daoService.update(pluginConfiguration);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void deletePluginConfigurationById(Long id) {
+        daoService.delete(PluginConfiguration.class, id);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public PluginConfiguration initPluginConfiguration() {
+        PluginConfiguration cfg = new PluginConfiguration();
+
+        // Set the default action
+        PluginService pluginService = PluginManager.createPluginService();
+        Iterator<PluginAction> plugins = pluginService.getPlugins();
+        if (!plugins.hasNext()) {
+            throw new RuntimeException("No plugin actions found. Aborting");
+        }
+        PluginAction firstAction = plugins.next();
+        cfg.setActionClass(firstAction.getClass().getName());
+
+        return cfg;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void submitErrorReport(String errorDescription, String stacktrace, String browserData) {
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("<table border=\"1\">");
+        sb.append("    <tr>");
+        sb.append("        <td><b>Message</b>:</td>");
+        sb.append("        <td>");
+        sb.append(errorDescription);
+        sb.append("        </td>");
+        sb.append("    </tr>");
+        sb.append("    <tr>");
+        sb.append("        <td><b>Time</b>:</td>");
+        sb.append("        <td>");
+        sb.append(df.format(Calendar.getInstance().getTime()));
+        sb.append("        </td>");
+        sb.append("    </tr>");
+        sb.append("    <tr>");
+        sb.append("        <td><b>Server IP address</b>:</td>");
+        sb.append("        <td>");
+        try {
+            InetAddress addr = InetAddress.getLocalHost();
+            sb.append(addr.getHostAddress());
+        } catch (UnknownHostException e) {
+            sb.append("Unknown");
+        }
+        sb.append("        </td>");
+        sb.append("    </tr>");
+        sb.append("    <tr>");
+        sb.append("        <td><b>Version</b>:</td>");
+        sb.append("        <td>");
+        sb.append(getApplicationVersion());
+        sb.append("        </td>");
+        sb.append("    </tr>");
+        sb.append("    <tr>");
+        sb.append("        <td><b>User</b>:</td>");
+        sb.append("        <td>");
+        sb.append(ctx.getCallerPrincipal().getName());
+        sb.append("        </td>");
+        sb.append("    </tr>");
+        sb.append("    <tr>");
+        sb.append("        <td><b>Request</b>:</td>");
+        sb.append("        <td><pre>");
+        sb.append(browserData);
+        sb.append("        </pre></td>");
+        sb.append("    </tr>");
+        sb.append("    <tr>");
+        sb.append("        <td><b>Stacktrace</b>:</td>");
+        sb.append("        <td><pre>");
+        sb.append(stacktrace);
+        sb.append("        </pre></td>");
+        sb.append("    </tr>");
+        sb.append("<table>");
+
+        // TODO: Add e-mails to configuration
+        notificationService.dispatchMail("errorreport.converge@i2m.dk",
+                "converge@i2m.dk",
+                "Error report",
+                sb.toString(), "");
     }
 }

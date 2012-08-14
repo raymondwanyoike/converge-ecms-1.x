@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE resources PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 Resource Definitions//EN" "http://glassfish.org/dtds/glassfish-resources_1_5.dtd">
+<resources>
+    
+    <jdbc-resource enabled="true" jndi-name="jdbc/converge" object-type="user" pool-name="convergePool">
+        <description/>
+    </jdbc-resource>
+    <mail-resource debug="false" enabled="true" from="converge@getconverge.com" host="localhost" jndi-name="mail/converge" object-type="user" store-protocol="imap" store-protocol-class="com.sun.mail.imap.IMAPStore" transport-protocol="smtp" transport-protocol-class="com.sun.mail.smtp.SMTPTransport" user="converge">
+        <description/>
+    </mail-resource>
+    <admin-object-resource enabled="true" jndi-name="jms/catalogueHookQueue" object-type="user" res-adapter="jmsra" res-type="javax.jms.Queue">
+        <description/>
+        <property name="Name" value="catalogueHookQueue"/>
+        <property name="Description" value="Queue for executing CatalogueHooks"/>
+    </admin-object-resource>
+    <admin-object-resource enabled="true" jndi-name="jms/editionServiceQueue" object-type="user" res-adapter="jmsra" res-type="javax.jms.Queue">
+        <description/>
+        <property name="Name" value="editionServiceQueue"/>
+        <property name="Description" value="Queue for executing Edition plugins"/>
+    </admin-object-resource>
+    <admin-object-resource enabled="true" jndi-name="jms/newswireServiceQueue" object-type="user" res-adapter="jmsra" res-type="javax.jms.Queue">
+        <description/>
+        <property name="Name" value="newswireServiceQueue"/>
+        <property name="Description" value="Queue for executing newswire decoders"/>
+    </admin-object-resource>
+    <connector-resource enabled="true" jndi-name="jms/connectionFactory" object-type="user" pool-name="jms/connectionFactory">
+        <description/>
+    </connector-resource>
+    <jdbc-connection-pool allow-non-component-callers="false" associate-with-thread="false" connection-creation-retry-attempts="0" connection-creation-retry-interval-in-seconds="10" connection-leak-reclaim="false" connection-leak-timeout-in-seconds="0" connection-validation-method="auto-commit" datasource-classname="com.mysql.jdbc.jdbc2.optional.MysqlDataSource" fail-all-connections="false" idle-timeout-in-seconds="300" is-connection-validation-required="false" is-isolation-level-guaranteed="true" lazy-connection-association="false" lazy-connection-enlistment="false" match-connections="false" max-connection-usage-count="0" max-pool-size="32" max-wait-time-in-millis="60000" name="convergePool" non-transactional-connections="false" ping="false" pool-resize-quantity="2" pooling="true" res-type="javax.sql.DataSource" statement-cache-size="0" statement-leak-reclaim="false" statement-leak-timeout-in-seconds="0" statement-timeout-in-seconds="-1" steady-pool-size="8" validate-atmost-once-period-in-seconds="0" wrap-jdbc-objects="false">
+        <property name="URL" value="jdbc:mysql://localhost:3306/converge-mgk?zeroDateTimeBehavior=convertToNull"/>
+        <property name="User" value="root"/>
+        <property name="Password" value="root"/>
+    </jdbc-connection-pool>
+    <connector-connection-pool associate-with-thread="false" connection-creation-retry-attempts="0" connection-creation-retry-interval-in-seconds="10" connection-definition-name="javax.jms.QueueConnectionFactory" connection-leak-reclaim="false" connection-leak-timeout-in-seconds="0" fail-all-connections="false" idle-timeout-in-seconds="300" is-connection-validation-required="false" lazy-connection-association="false" lazy-connection-enlistment="false" match-connections="true" max-connection-usage-count="0" max-pool-size="32" max-wait-time-in-millis="60000" name="jms/connectionFactory" ping="false" pool-resize-quantity="2" pooling="true" resource-adapter-name="jmsra" steady-pool-size="8" validate-atmost-once-period-in-seconds="0"/>
+</resources>

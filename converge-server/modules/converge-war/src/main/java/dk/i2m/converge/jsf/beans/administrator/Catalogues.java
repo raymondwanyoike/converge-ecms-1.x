@@ -22,11 +22,13 @@ import dk.i2m.converge.core.content.catalogue.CatalogueHookInstance;
 import dk.i2m.converge.core.content.catalogue.CatalogueHookInstanceProperty;
 import dk.i2m.converge.core.plugin.CatalogueHook;
 import dk.i2m.converge.core.plugin.Plugin;
+import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import dk.i2m.converge.jsf.beans.Bundle;
-import dk.i2m.jsf.JsfUtils;
+import static dk.i2m.jsf.JsfUtils.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -49,9 +51,9 @@ public class Catalogues {
 
     @EJB private SystemFacadeLocal systemFacade;
 
-    private DataModel repositories = null;
+    private DataModel catalogues = null;
 
-    private Catalogue selectedMediaRepository = null;
+    private Catalogue selectedCatalogue = null;
 
     private String selectedCatalogueActionDetailsTab = "tabCatalogueAction";
 
@@ -68,62 +70,62 @@ public class Catalogues {
     public void onIndex(ActionEvent event) {
         try {
             catalogueFacade.indexCatalogues();
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_INDEXING_COMPLETE");
         } catch (Exception ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR,
                     Bundle.i18n.name(), "Generic_AN_ERROR_OCCURRED_X",
                     new Object[]{ex.getMessage()});
         }
     }
 
     public void onNew(ActionEvent event) {
-        selectedMediaRepository = new Catalogue();
+        selectedCatalogue = new Catalogue();
     }
 
     public void onSave(ActionEvent event) {
-        repositories = null;
+        catalogues = null;
         if (isEditMode()) {
-            selectedMediaRepository = catalogueFacade.update(
-                    selectedMediaRepository);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            selectedCatalogue = catalogueFacade.update(
+                    selectedCatalogue);
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_UPDATED");
         } else {
-            selectedMediaRepository = catalogueFacade.create(
-                    selectedMediaRepository);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            selectedCatalogue = catalogueFacade.create(
+                    selectedCatalogue);
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_CREATED");
         }
     }
 
     /**
-     * Event handler for deleting the {@link Catalogues#selectedMediaRepository}.
+     * Event handler for deleting the {@link Catalogues#selectedCatalogue}.
      * 
      * @param event 
      *          Event that invoked the handler
      */
     public void onDelete(ActionEvent event) {
         try {
-            catalogueFacade.deleteCatalogueById(selectedMediaRepository.getId());
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            catalogueFacade.deleteCatalogueById(selectedCatalogue.getId());
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_DELETED");
         } catch (DataNotFoundException ex) {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_DELETED_FAILED");
         }
-        this.repositories = null;
+        this.catalogues = null;
     }
 
     public void onActionBatchAll(ActionEvent event) {
-        for (CatalogueHookInstance instance : selectedMediaRepository.getHooks()) {
+        for (CatalogueHookInstance instance : selectedCatalogue.getHooks()) {
             try {
                 catalogueFacade.executeBatchHook(instance,
-                        selectedMediaRepository.getId());
+                        selectedCatalogue.getId());
             } catch (DataNotFoundException ex) {
                 return;
             }
@@ -132,31 +134,59 @@ public class Catalogues {
 
     public void setActionBatch(CatalogueHookInstance instance) {
         try {
-            catalogueFacade.executeBatchHook(instance, selectedMediaRepository.
-                    getId());
+            catalogueFacade.executeBatchHook(instance, selectedCatalogue.getId());
         } catch (DataNotFoundException ex) {
             return;
         }
     }
 
-    public DataModel getRepositories() {
-        if (repositories == null) {
-            repositories =
-                    new ListDataModel(catalogueFacade.findAllCatalogues());
+    /**
+     * Gets a {@link DataModel} of available {@link Catalogue}s.
+     * 
+     * @return {@link DataModel} of available {@link Catalogue}s
+     */
+    public DataModel getCatalogues() {
+        if (this.catalogues == null) {
+            this.catalogues = new ListDataModel(catalogueFacade.
+                    findAllCatalogues());
         }
-        return repositories;
+        return this.catalogues;
     }
 
-    public Catalogue getSelectedMediaRepository() {
-        return selectedMediaRepository;
+    /**
+     * Gets the {@link WorkflowState}s in the {@link Workflow} of the selected
+     * {@link Catalogue}.
+     * 
+     * @return {@link WorkflowState}s in the {@link Workflow} of the selected
+     *         {@link Catalogue}
+     */
+    public Map<String, WorkflowState> getSelectedCatalogueWorkflowStates() {
+        Map<String, WorkflowState> states =
+                new LinkedHashMap<String, WorkflowState>();
+        if (getSelectedCatalogue().getWorkflow() != null) {
+            for (WorkflowState state : getSelectedCatalogue().getWorkflow().
+                    getStates()) {
+                String key = state.getName();
+                if (states.containsKey(key)) {
+                    key = key + " (" + state.getId() + ")";
+                }
+                states.put(key, state);
+            }
+        }
+
+        return states;
     }
 
-    public void setSelectedMediaRepository(Catalogue selectedMediaRepository) {
-        this.selectedMediaRepository = selectedMediaRepository;
+    public Catalogue getSelectedCatalogue() {
+        return selectedCatalogue;
+    }
+
+    public void setSelectedCatalogue(Catalogue catalogue) {
+        this.selectedCatalogue = catalogue;
     }
 
     public boolean isEditMode() {
-        if (selectedMediaRepository == null || selectedMediaRepository.getId()
+        if (selectedCatalogue == null || selectedCatalogue.getId()
                 == null) {
             return false;
         } else {
@@ -265,7 +295,7 @@ public class Catalogues {
     public void onNewCatalogueAction(ActionEvent event) {
         selectedCatalogueActionProperty = new CatalogueHookInstanceProperty();
         selectedCatalogueAction = new CatalogueHookInstance();
-        selectedCatalogueAction.setCatalogue(selectedMediaRepository);
+        selectedCatalogueAction.setCatalogue(selectedCatalogue);
         selectedCatalogueAction.setExecuteOrder(1);
         // A default action class is required to avoid NullPointerException from JSF
         Map<String, Plugin> plugins = systemFacade.getPlugins();
@@ -279,25 +309,25 @@ public class Catalogues {
     }
 
     public void onDeleteCatalogueAction(ActionEvent event) {
-        selectedMediaRepository.getHooks().remove(selectedCatalogueAction);
-        JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+        selectedCatalogue.getHooks().remove(selectedCatalogueAction);
+        createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                 Bundle.i18n.name(),
                 "administrator_Catalogues_CATALOGUE_ACTION_DELETED");
     }
 
     public void onSaveCatalogueAction(ActionEvent event) {
         if (isActionAddMode()) {
-            selectedCatalogueAction.setCatalogue(selectedMediaRepository);
+            selectedCatalogueAction.setCatalogue(selectedCatalogue);
             selectedCatalogueAction = catalogueFacade.createCatalogueAction(
                     selectedCatalogueAction);
-            selectedMediaRepository.getHooks().add(selectedCatalogueAction);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            selectedCatalogue.getHooks().add(selectedCatalogueAction);
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_ACTION_CREATED");
         } else {
             selectedCatalogueAction = catalogueFacade.updateCatalogueAction(
                     selectedCatalogueAction);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO,
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO,
                     Bundle.i18n.name(),
                     "administrator_Catalogues_CATALOGUE_ACTION_UPDATED");
         }
