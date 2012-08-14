@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.plugins.actions.drupal.client;
 
+import dk.i2m.converge.core.utils.URLBuilder;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;

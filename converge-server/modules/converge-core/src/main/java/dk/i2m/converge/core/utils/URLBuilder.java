@@ -30,7 +30,7 @@
  POSSIBILITY OF SUCH DAMAGE.
 
  */
-package dk.i2m.converge.plugins.actions.drupal.client;
+package dk.i2m.converge.core.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
