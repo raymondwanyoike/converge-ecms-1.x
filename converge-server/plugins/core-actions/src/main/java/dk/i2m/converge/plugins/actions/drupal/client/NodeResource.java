@@ -14,28 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.plugins.actions.drupal.client.resources;
+package dk.i2m.converge.plugins.actions.drupal.client;
 
-import dk.i2m.converge.plugins.actions.drupal.client.DrupalConnector;
-import dk.i2m.converge.plugins.actions.drupal.client.messages.DrupalMessage;
-import dk.i2m.converge.plugins.actions.drupal.client.messages.NodeCreateMessage;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.sf.json.JSONObject;
-import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-import dk.i2m.converge.core.utils.URLBuilder;
 
 /**
- * The core that allows node content to be submitted to the site.
+ * The core that allows nodes to be submitted to the site.
  *
  * @author Raymond Wanyoike
  */
 public class NodeResource {
+
+    private static final Logger LOG = Logger.getLogger("NodeResource");
 
     private static final String NODE = "node";
 
@@ -43,33 +45,24 @@ public class NodeResource {
 
     private URI uri;
 
-    private HttpResponse responce;
-
-    /**
-     * Create an empty Node resource.
-     */
-    public NodeResource() {
-    }
-
     /**
      * Constructs a Node resource from the given components.
      *
-     * @param connector Connector instance
+     * @param client Client instance
      */
-    public NodeResource(DrupalConnector connector) {
-        this.uri = connector.getUri();
-        this.httpClient = connector.getHttpClient();
+    public NodeResource(DrupalClient client) {
+        this.uri = client.uri();
+        this.httpClient = client.getHttpClient();
     }
 
     /**
      * Creates a new node based on submitted values.
      *
-     * @param message Instance representing the attributes a node edit form would submit
+     * @param message  Instance representing the attributes a node edit form would submit
      * @return A populated {@link NodeCreateMessage} instance
+     * @throws IOException 
      */
-    public NodeCreateMessage create(DrupalMessage message) throws Exception {
-        NodeCreateMessage nodeCreateMessage = new NodeCreateMessage();
-
+    public NodeCreateMessage create(DrupalMessage message) throws IOException {
         JSONObject json = new JSONObject();
 
         for (String fieldName : message.getFields().keySet()) {
@@ -79,32 +72,26 @@ public class NodeResource {
         try {
             StringEntity input = new StringEntity(json.toString());
             String url = new URLBuilder(uri).add(NODE).toString();
+            
             HttpPost post = new HttpPost(url);
             post.setEntity(input);
+            post.addHeader(DrupalClient.JSON_HEADER);
 
-            ResponseHandler<String> responseHandler = new BasicResponseHandler();
-            responce = httpClient.execute(post);
+            ResponseHandler<String> handler = new BasicResponseHandler();
+            String response = httpClient.execute(post, handler);
 
-            String handledResponse = responseHandler.handleResponse(responce);
+            JSONObject object = JSONObject.fromObject(response);
+            Object toBean = JSONObject.toBean(object, NodeCreateMessage.class);
 
-            nodeCreateMessage =
-                    (NodeCreateMessage) JSONObject.toBean(JSONObject.fromObject(
-                    handledResponse), NodeCreateMessage.class);
-
-        } finally {
-            EntityUtils.consume(responce.getEntity());
+            return (NodeCreateMessage) toBean;
+        } catch (MalformedURLException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        } catch (ClientProtocolException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            LOG.log(Level.SEVERE, null, ex);
         }
 
-        return nodeCreateMessage;
-    }
-
-    /**
-     * Set the connector to be used by this class.
-     *
-     * @param connector Connector to use
-     */
-    public void setDrupalConnector(DrupalConnector connector) {
-        this.uri = connector.getUri();
-        this.httpClient = connector.getHttpClient();
+        return null;
     }
 }

@@ -14,10 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.plugins.actions.drupal.client.fields;
+package dk.i2m.converge.plugins.actions.drupal.client;
 
 /**
- * Defines a simple text field type.
+ * Basic text field.
+ * 
+ * @author Raymond Wanyoike
  */
 public class TextField {
 
@@ -28,17 +30,17 @@ public class TextField {
     private String format;
 
     /**
-     * Create an empty TextField.
+     * Construct a text field.
      */
     public TextField() {
     }
 
     /**
-     * Constructs a TextField from the given components.
-     *
-     * @param summary This allows authors to input an explicit summary
-     * @param value The value of the textfield
-     * @param format The format of the textfield (plaintext, html etc)
+     * Construct a text field.
+     * 
+     * @param summary summary
+     * @param value body
+     * @param format text format
      */
     public TextField(String summary, String value, String format) {
         this.summary = summary;
@@ -47,55 +49,44 @@ public class TextField {
     }
 
     /**
-     * Return the format of the textfield.
-     *
-     * @return The format
-     */
-    public String getFormat() {
-        return format;
-    }
-
-    /**
-     * Sets the format of the textfield
-     * @param format The format (plaintext, html etc)
-     */
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
-    /**
-     * Return the field summary.
-     *
-     * @return The field summary
+     * @return the summary
      */
     public String getSummary() {
         return summary;
     }
 
     /**
-     * Sets the field summary, this allows authors to input an explicit summary.
-     *
-     * @param summary The field summary
+     * @param summary the summary to set
      */
     public void setSummary(String summary) {
         this.summary = summary;
     }
 
     /**
-     * Return the field value
-     *
-     * @return The field value
+     * @return the value
      */
     public String getValue() {
         return value;
     }
 
     /**
-     * Sets the value of the field
-     *
-     * @param value The field value
+     * @param value the value to set
      */
     public void setValue(String value) {
         this.value = value;
+    }
+
+    /**
+     * @return the format
+     */
+    public String getFormat() {
+        return format;
+    }
+
+    /**
+     * @param format the format to set
+     */
+    public void setFormat(String format) {
+        this.format = format;
     }
 }

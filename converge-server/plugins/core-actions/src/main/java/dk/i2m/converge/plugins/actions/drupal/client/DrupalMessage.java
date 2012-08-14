@@ -14,24 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.plugins.actions.drupal.client.fields;
+package dk.i2m.converge.plugins.actions.drupal.client;
 
-public class FileField {
+import java.util.HashMap;
+import java.util.Map;
 
-    private Long fid;
+/**
+ * 
+ * @author Raymond Wanyoike
+ */
+public class DrupalMessage {
 
-    public FileField() {
+    private Map<String, Object> fields = new HashMap<String, Object>();
+
+    /**
+     * @return the fields
+     */
+    public Map<String, Object> getFields() {
+        return fields;
     }
 
-    public FileField(Long fid) {
-        this.fid = fid;
-    }
-
-    public Long getFid() {
-        return fid;
-    }
-
-    public void setFid(Long fid) {
-        this.fid = fid;
+    /**
+     * @param fields the fields to set
+     */
+    public void setFields(Map<String, Object> fields) {
+        this.fields = fields;
     }
 }

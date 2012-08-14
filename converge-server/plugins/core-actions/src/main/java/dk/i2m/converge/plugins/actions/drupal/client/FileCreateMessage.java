@@ -14,27 +14,44 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.plugins.actions.drupal.client.fields;
+package dk.i2m.converge.plugins.actions.drupal.client;
 
 /**
- *
+ * Default response from the file create resource.
+ * 
+ * @author Raymond Wanyoike
  */
-public class ListField {
+public class FileCreateMessage {
 
-    private Long tid;
+    private Long fid;
 
-    public ListField() {
+    private String uri;
+
+    /**
+     * @return the fid
+     */
+    public Long getFid() {
+        return fid;
     }
 
-    public ListField(Long tid) {
-        this.tid = tid;
+    /**
+     * @param fid the fid to set
+     */
+    public void setFid(Long fid) {
+        this.fid = fid;
     }
 
-    public Long getTid() {
-        return tid;
+    /**
+     * @return the uri
+     */
+    public String getUri() {
+        return uri;
     }
 
-    public void setTid(Long tid) {
-        this.tid = tid;
+    /**
+     * @param uri the uri to set
+     */
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 }

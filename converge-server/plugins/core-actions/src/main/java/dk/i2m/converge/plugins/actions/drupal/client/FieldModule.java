@@ -14,28 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.i2m.converge.plugins.actions.drupal.client.modules;
+package dk.i2m.converge.plugins.actions.drupal.client;
 
 import java.util.Map;
 
 /**
- *
+ * Field wrapper for basic Drupal fields.
+ * 
+ * @author Raymond Wanyoike
  */
 public class FieldModule {
 
     private Map<String, Object> und;
 
-    public FieldModule() {
-    }
-
     public FieldModule(Map<String, Object> und) {
         this.und = und;
     }
 
+    /**
+     * @return the und
+     */
     public Map<String, Object> getUnd() {
         return und;
     }
 
+    /**
+     * @param und the und to set
+     */
     public void setUnd(Map<String, Object> und) {
         this.und = und;
     }

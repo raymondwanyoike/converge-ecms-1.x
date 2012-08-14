@@ -30,7 +30,7 @@
  POSSIBILITY OF SUCH DAMAGE.
 
  */
-package dk.i2m.converge.core.utils;
+package dk.i2m.converge.plugins.actions.drupal.client;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -119,17 +119,26 @@ public final class URLBuilder {
     // this separates the segments of the path
     private static final char PATH_SEGMENT_SEPARATOR = '/';
     // this separates the entire query string from the rest of the URL
+
     private static final char QUERY_DELIMITER = '?';
     // the separates the various query parameters from each other
+
     private static final char QUERY_PARAM_SEPARATOR = '&';
     // join the key and value into a single query parameter
+
     private static final char QUERY_PARAM_JOINER = '=';
     // this separates the fragment from the rest of the URL
+
     private static final char FRAGMENT_DELIMITER = '#';
+
     private static final String UTF8 = "UTF-8";
+
     private URI base;
+
     private ArrayList<String> path;
+
     private ArrayList<QueryParam> query;
+
     private String fragment;
 
     /**
@@ -425,6 +434,7 @@ public final class URLBuilder {
     public final class QueryParam {
 
         private final Object key;
+
         private final Object value;
 
         /**
