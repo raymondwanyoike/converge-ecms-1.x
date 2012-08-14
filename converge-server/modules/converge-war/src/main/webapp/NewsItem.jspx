@@ -12,7 +12,7 @@
                     <h:panelGrid id="pgProperties" style="margin-left: 2%; margin-right: 2%; width: 98%" rowClasses="left" columns="2">
                         <h:outputText value="#{i18n.NewsItem_ID}"  />
                         <h:outputText value="#{newsItem.selectedNewsItem.id}" />
-                        
+
                         <h:outputText value="#{i18n.NewsItem_WORKFLOW_OUTLET}"  />
                         <h:outputText value="#{newsItem.selectedNewsItem.outlet.title}" />
 
@@ -62,7 +62,20 @@
                 <converge:newsItemModulePlacement value="#{newsItem}" />
                 <converge:newsItemModuleHeadline value="#{newsItem}" />
                 <converge:newsItemModuleByLine value="#{newsItem}" />
-                <converge:newsItemModuleBrief value="#{newsItem}" />
+
+
+                <c:if test="#{newsItem.fieldVisible['BRIEF']}">
+                    <converge:moduleHeader moduleTitle="#{i18n.NewsItem_BRIEF}" />
+                    <div class="moduleContent">
+                        <h:inputTextarea id="txtNewsItemBrief" 
+                                         value="#{newsItem.selectedNewsItem.brief}" 
+                                         style="width: 98%; height: 100px; margin-left: 1%; margin-right: 1%" 
+                                         styleClass="text mediumInput" 
+                                         disabled="#{!newsItem.currentActor || newsItem.readOnly}" />
+                    </div>
+                    <converge:moduleSpacer />
+                </c:if>
+
                 <converge:newsItemModuleStory value="#{newsItem}" />
                 <converge:newsItemModuleConcepts value="#{newsItem}" />
                 <converge:newsItemModuleMedia value="#{newsItem}" />

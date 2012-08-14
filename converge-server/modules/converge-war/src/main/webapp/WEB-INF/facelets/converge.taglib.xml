@@ -163,11 +163,6 @@
     </tag>
 
     <tag>
-        <tag-name>newsItemModuleBrief</tag-name>
-        <source>taglib/converge/newsItemModuleBrief.xhtml</source>
-    </tag>
-
-    <tag>
         <tag-name>newsItemModuleStory</tag-name>
         <source>taglib/converge/newsItemModuleStory.xhtml</source>
     </tag>
