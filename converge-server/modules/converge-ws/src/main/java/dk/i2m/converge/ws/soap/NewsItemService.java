@@ -16,6 +16,7 @@
  */
 package dk.i2m.converge.ws.soap;
 
+import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
 import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.content.NewsItemPlacement;
@@ -63,10 +64,10 @@ public class NewsItemService {
     /**
      * Starts the workflow of a new {@link dk.i2m.converge.core.content.NewsItem}.
      *
-     * @param outletId
-* Unique identifier of the Outlet where to place the news item
-     * @param title
-   * Title of the news item
+     * @param outletId 
+     *          Unique identifier of the Outlet where to place the news item
+     * @param title 
+     *          Title of the news item
      * @return Unique identifier of the new news item
      * @throws WorkflowStateTransitionException * If the workflow could not be started
      */
@@ -102,12 +103,12 @@ public class NewsItemService {
         dk.i2m.converge.core.content.NewsItem newsItem =
                 new dk.i2m.converge.core.content.NewsItem();
         dk.i2m.converge.core.workflow.Workflow workflow = outlet.getWorkflow();
-        dk.i2m.converge.core.content.NewsItemActor nia =
-                new dk.i2m.converge.core.content.NewsItemActor();
+        dk.i2m.converge.core.content.ContentItemActor nia =
+                new dk.i2m.converge.core.content.ContentItemActor();
 
         nia.setRole(workflow.getStartState().getActorRole());
         nia.setUser(userAccount);
-        nia.setNewsItem(newsItem);
+        nia.setContentItem(newsItem);
         newsItem.getActors().add(nia);
         newsItem.setLanguage(outlet.getLanguage());
         newsItem.setTitle(title);
@@ -157,11 +158,12 @@ public class NewsItemService {
             LOG.log(Level.WARNING, "User is not authenticated");
             return output;
         }
-
+        
         String username = context.getUserPrincipal().getName();
         LOG.log(Level.INFO, "Fetching assignments for {0}", username);
 
-        List<InboxView> assignments = newsItemFacade.findInbox(username);
+//        List<InboxView> assignments = newsItemFacade.findInbox(username);
+        List<InboxView> assignments = java.util.Collections.EMPTY_LIST;
         LOG.log(Level.INFO, "{0} items for {1}", new Object[]{assignments.size(),
                     username});
 

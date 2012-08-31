@@ -3,7 +3,7 @@
     <parent>
         <artifactId>converge</artifactId>
         <groupId>dk.i2m.converge</groupId>
-        <version>1.1.4-SNAPSHOT</version>
+        <version>1.2.0-B3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>modules</artifactId>
@@ -19,7 +19,6 @@
         <module>converge-ws-client</module>
         <module>converge-war</module>
         <module>converge-ear</module>
-        <module>converge-mobile-server</module>
     </modules>
 
     <dependencies>

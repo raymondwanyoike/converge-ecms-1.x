@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
  */
 package dk.i2m.converge.ejb.facades;
 
+import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.dto.OutletActionView;
 import dk.i2m.converge.core.workflow.*;
-import dk.i2m.converge.core.DataNotFoundException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -40,15 +40,6 @@ public interface OutletFacadeLocal {
     Edition createEdition(EditionCandidate editionCandidate);
 
     Outlet createOutlet(Outlet outlet);
-
-    /**
-     * Deletes an existing {@link Department} by its unique
-     * <code>id</code>.
-     *
-     * @param id
-     * Unique id of the {@link Department}
-     */
-    void deleteDepartment(Long id);
 
     /**
      * Delete an existing {@link Edition} by its unique
@@ -73,19 +64,6 @@ public interface OutletFacadeLocal {
      * @return {@link List} of all {@link Outlet}s
      */
     List<Outlet> findAllOutlets();
-
-    /**
-     * Finds a {@link Department} by its unique
-     * <code>id</code>.
-     *
-     * @param if
-     * Unique id of the {@link department}
-     * @return {@link Department} matching the
-     * <code>id</code>
-     * @throws DataNotFoundException
-     * If the {@link Department} could not be found
-     */
-    Department findDepartmentById(Long id) throws DataNotFoundException;
 
     Edition findEditionById(long id) throws DataNotFoundException;
 
@@ -163,23 +141,6 @@ public interface OutletFacadeLocal {
      * <code>id</code>
      */
     Outlet findOutletById(Long id) throws DataNotFoundException;
-
-    /**
-     * Creates a new {@link Department}.
-     *
-     * @param department
-     * {@link Department} to update
-     * @return {@link Department} containing generated values from the database
-     */
-    Department createDepartment(Department department);
-
-    /**
-     * Updates an existing {@link Department}.
-     *
-     * @param department
-     * {@link Department} to update
-     */
-    void updateDepartment(Department department);
 
     /**
      * Updates an existing {@link Edition}.

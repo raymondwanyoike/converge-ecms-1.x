@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -17,8 +17,10 @@
 package dk.i2m.converge.plugins.alertaction;
 
 import dk.i2m.converge.core.Notification;
+import dk.i2m.converge.core.content.ContentItem;
+import dk.i2m.converge.core.content.ContentItemActor;
 import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.content.NewsItemActor;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.plugin.WorkflowAction;
 import dk.i2m.converge.core.security.UserAccount;
@@ -36,7 +38,7 @@ import org.apache.commons.lang.StringEscapeUtils;
  *
  * For the {@code message} property, the following variables are available:
  *
- * <ul> <li>initiator</li> <li>newsitem</li> </ul>
+ * <ul> <li>initiator</li> <li>item</li> </ul>
  *
  * All variables must be enclosed in dollar signs, e.g. $action-initiator$.
  *
@@ -52,11 +54,15 @@ public class AlertAction implements WorkflowAction {
     private static final String PROPERTY_MESSAGE = "message";
 
     private static final String PROPERTY_LINK = "link";
+    
+    private static final String VARIABLE_ITEM = "item";
+    
+    private static final String VARIABLE_INITIATOR = "initiator";
 
     private Map<String, String> availableProperties = null;
 
-    private static final Logger LOG = Logger.getLogger(AlertAction.class.
-            getName());
+    private static final Logger LOG =
+            Logger.getLogger(AlertAction.class.getName());
 
     private ResourceBundle bundle = ResourceBundle.getBundle(
             "dk.i2m.converge.plugins.alertaction.Messages");
@@ -68,7 +74,7 @@ public class AlertAction implements WorkflowAction {
     }
 
     @Override
-    public void execute(PluginContext ctx, NewsItem item,
+    public void execute(PluginContext ctx, ContentItem item,
             WorkflowStepAction stepAction, UserAccount user) {
         Map<String, String> properties = stepAction.getPropertiesAsMap();
 
@@ -115,22 +121,34 @@ public class AlertAction implements WorkflowAction {
                 properties.get(AlertAction.PROPERTY_MESSAGE),
                 DefaultTemplateLexer.class);
         template.setAttribute("newsitem", item);
-        template.setAttribute("html-newsitem-title", StringEscapeUtils.
-                escapeHtml(item.getTitle()));
-        template.setAttribute("initiator", user);
+        template.setAttribute(VARIABLE_ITEM, item);
+        if (item instanceof NewsItem) {
+            template.setAttribute("html-newsitem-title", StringEscapeUtils.
+                    escapeHtml(((NewsItem) item).getTitle()));
+        } else if (item instanceof MediaItem) {
+            template.setAttribute("html-newsitem-title", StringEscapeUtils.
+                    escapeHtml(((MediaItem) item).getTitle()));
+        }
+        template.setAttribute(VARIABLE_INITIATOR, user);
         String notificationMessage = template.toString();
 
         template = new StringTemplate(link, DefaultTemplateLexer.class);
         template.setAttribute("newsitem", item);
-        template.setAttribute("html-newsitem-title", StringEscapeUtils.
-                escapeHtml(item.getTitle()));
-        template.setAttribute("initiator", user);
+        template.setAttribute(VARIABLE_ITEM, item);
+        if (item instanceof NewsItem) {
+            template.setAttribute("html-newsitem-title", StringEscapeUtils.
+                    escapeHtml(((NewsItem) item).getTitle()));
+        } else if (item instanceof MediaItem) {
+            template.setAttribute("html-newsitem-title", StringEscapeUtils.
+                    escapeHtml(((MediaItem) item).getTitle()));
+        }
+        template.setAttribute(VARIABLE_INITIATOR, user);
         link = template.toString();
 
         List<UserAccount> usersToNotify = new ArrayList<UserAccount>();
 
         if (sendToUser) {
-            for (NewsItemActor actor : item.getActors()) {
+            for (ContentItemActor actor : item.getActors()) {
                 if (actor.getRole().getName().equalsIgnoreCase(sendToUserRole)) {
                     usersToNotify.add(actor.getUser());
                 }

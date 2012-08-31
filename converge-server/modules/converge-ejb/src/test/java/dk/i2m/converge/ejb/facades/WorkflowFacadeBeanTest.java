@@ -22,6 +22,7 @@ import dk.i2m.converge.core.workflow.Workflow;
 import dk.i2m.converge.EjbTestCase;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 /**
  *
@@ -32,6 +33,7 @@ public class WorkflowFacadeBeanTest extends EjbTestCase {
     public static final String BEAN_INTERFACE = "WorkflowFacadeBeanLocal";
 
     @Test
+    @Ignore
     public void testObtainBean() throws Exception {
         Object object = getInitialContext().lookup(BEAN_INTERFACE);
         assertNotNull(object);
@@ -39,6 +41,7 @@ public class WorkflowFacadeBeanTest extends EjbTestCase {
     }
 
     @Test
+    @Ignore
     public void testCascadeWorkflowStep() throws Exception {
         Object object = getInitialContext().lookup(BEAN_INTERFACE);
         WorkflowFacadeLocal workflowFacade = (WorkflowFacadeLocal) object;

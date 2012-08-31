@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,8 +31,7 @@ public interface NotificationServiceLocal {
     /**
      * Creates a new {@link Notification}.
      *
-     * @param notification
-     *          Notification to create
+     * @param notification Notification to create
      * @return Created {@link Notification}
      */
     Notification create(Notification notification);
@@ -40,10 +39,8 @@ public interface NotificationServiceLocal {
     /**
      * Creates a new {@link Notification}.
      *
-     * @param recipient
-     *          Recipient of the {@link Notification}
-     * @param message
-     *          Message in the {@link Notification}
+     * @param recipient Recipient of the {@link Notification}
+     * @param message Message in the {@link Notification}
      * @return Created {@link Notification}
      */
     Notification create(UserAccount recipient, String message);
@@ -51,25 +48,42 @@ public interface NotificationServiceLocal {
     /**
      * Dismisses an existing {@link Notification}.
      *
-     * @param notification
-     *          {@link Notification} to dismiss
+     * @param notification {@link Notification} to dismiss
      */
     void dismiss(Notification notification);
 
     /**
-     * Dispatches a plain-text e-mail to a given person with a given subject
-     * and body.
+     * Dispatches a plain-text e-mail to a given person with a given subject and
+     * body.
      *
-     * @param to
-     *          Recipient e-mail
-     * @param from
-     *          Sender e-mail
-     * @param subject
-     *          E-mail subject
-     * @param content
-     *          E-mail content body
+     * @param to Recipient e-mail
+     * @param from Sender e-mail
+     * @param subject E-mail subject
+     * @param content E-mail content body
      */
     void dispatchMail(String to, String from, String subject, String content);
 
+    /**
+     * Dispatches an e-mail with both HTML and plain text content.
+     *
+     * @param to E-mail address of the recipient
+     * @param from E-mail address of the sender
+     * @param subject Subject of the e-mail
+     * @param htmlContent HTML content of the e-mail
+     * @param plainContent Plain content of the e-mail
+     */
     void dispatchMail(java.lang.String to, java.lang.String from, java.lang.String subject, java.lang.String htmlContent, java.lang.String plainContent);
+
+    /**
+     * Delete notifications older than the given date.
+     *
+     * @param date Date of latest notification to keep
+     */
+    void deleteOld(java.util.Date date);
+
+    /**
+     * Delete notifications older than the retention period specified in the
+     * application configuration.
+     */
+    void deleteOld();
 }

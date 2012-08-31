@@ -18,6 +18,8 @@ package dk.i2m.converge.core.content.catalogue;
 
 import dk.i2m.converge.core.newswire.NewswireItemAttachment;
 import dk.i2m.converge.core.security.UserRole;
+import dk.i2m.converge.core.workflow.Workflow;
+import dk.i2m.converge.core.workflow.WorkflowState;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -39,23 +41,16 @@ import org.eclipse.persistence.annotations.PrivateOwned;
 @Entity()
 @Table(name = "catalogue")
 @NamedQueries({
-    @NamedQuery(name = Catalogue.FIND_BY_USER, query = "SELECT c FROM Catalogue c JOIN c.userRole u JOIN c.editorRole e JOIN u.userAccounts a JOIN e.userAccounts AS editors WHERE c.enabled=true AND (a = :" + Catalogue.PARAM_FIND_BY_USER_USER + " OR editors = :" + Catalogue.PARAM_FIND_BY_USER_USER + ")"),
     @NamedQuery(name = Catalogue.FIND_ENABLED, query = "SELECT c FROM Catalogue c WHERE c.enabled=true"),
     @NamedQuery(name = Catalogue.FIND_WRITABLE, query = "SELECT c FROM Catalogue c WHERE c.readOnly=false AND c.enabled=true")
 })
 public class Catalogue implements Serializable {
 
-    /** Query for finding the list of catalogues for a given user. */
-    public static final String FIND_BY_USER = "Catalogue.findByUser";
-    
     /** Query for finding the list of enabled catalogues. */
     public static final String FIND_ENABLED = "Catalogue.findEnabled";
 
     /** Query for finding the list of writable catalogues. */
     public static final String FIND_WRITABLE = "Catalogue.findWritable";
-
-    /** Parameter used in the {@link Catalogue#FIND_BY_USER} query. */
-    public static final String PARAM_FIND_BY_USER_USER = "user";
 
     private static final long serialVersionUID = 3L;
 
@@ -100,29 +95,36 @@ public class Catalogue implements Serializable {
     @Column(name = "last_item_count")
     private int itemCount = 0;
 
-    @ManyToOne
-    @JoinColumn(name = "editor_role_id")
-    private UserRole editorRole;
-    
-    @ManyToOne
-    @JoinColumn(name = "user_role_id")
-    private UserRole userRole;
-    
     @Column(name = "max_file_upload_size")
     private Long maxFileUploadSize;
 
     @OneToMany(mappedBy = "catalogue")
     private List<NewswireItemAttachment> newswireItemAttachments;
 
-    @OneToMany(mappedBy = "catalogue", fetch= FetchType.EAGER)
+    @OneToMany(mappedBy = "catalogue", fetch = FetchType.EAGER)
     @PrivateOwned
     private List<CatalogueHookInstance> hooks = new ArrayList<CatalogueHookInstance>();
 
     @ManyToMany
     @JoinTable(name = "catalogue_rendition",
-    joinColumns = {@JoinColumn(referencedColumnName = "id", name = "catalogue_id", nullable = false)},
-    inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "rendition_id", nullable = false)})
+        joinColumns = {@JoinColumn(referencedColumnName = "id", name = "catalogue_id", nullable = false)},
+        inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "rendition_id", nullable = false)})
     private List<Rendition> renditions = new ArrayList<Rendition>();
+
+    /** {@link Workflow} definition used for processing items added to this {@link Catalogue}. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workflow_id")
+    private Workflow workflow;
+        
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "catalogue_role",
+        joinColumns = {@JoinColumn(referencedColumnName = "id", name = "catalogue_id", nullable = false)},
+        inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "role_id", nullable = false)})
+    private List<UserRole> userRoles = new ArrayList<UserRole>();
+    
+    @ManyToOne
+    @JoinColumn(name="self_upload_state")
+    private WorkflowState selfUploadState;
 
     /**
      * Creates a new instance of {@link Catalogue}.
@@ -149,7 +151,7 @@ public class Catalogue implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -220,58 +222,37 @@ public class Catalogue implements Serializable {
         this.itemCount = itemCount;
     }
 
-    /**
-     * Get the {@link UserRole} of the editor of the {@link Catalogue}. Only
-     * users with this {@link UserRole} can approve items for this 
-     * {@link Catalogue}.
-     * 
-     * @return {@link UserRole} of the editor
-     */
-    public UserRole getEditorRole() {
-        return editorRole;
-    }
-
-    /**
-     * Set the {@link UserRole} of the editor of the {@link Catalogue}. Only
-     * users with this {@link UserRole} can approve items for this 
-     * {@link Catalogue}.
-     * 
-     * @param editorRole
-     *          {@link UserRole} of editors who should be able to approve items
-     */
-    public void setEditorRole(UserRole editorRole) {
-        this.editorRole = editorRole;
-    }
-
-    /**
-     * Get the {@link UserRole} of users who should be able to submit items
-     * to this {@link Catalogue}. Users without this {@link UserRole} cannot
-     * submit items to the {@link Catalogue}.
-     * 
-     * @return {@link UserRole} of users who should be able to submit items
-     */
-    public UserRole getUserRole() {
-        return userRole;
-    }
-
-    /**
-     * Set the {@link UserRole} of users who should be able to submit items
-     * to this {@link Catalogue}. Users without this {@link UserRole} cannot
-     * submit items to the {@link Catalogue}.
-     * 
-     * @param userRole
-     *          {@link UserRole} of users who should be able to submit items
-     */
-    public void setUserRole(UserRole userRole) {
-        this.userRole = userRole;
-    }
-
     public String getWebAccess() {
         return webAccess;
     }
 
     public void setWebAccess(String webAccess) {
         this.webAccess = webAccess;
+    }
+
+    /**
+     * Gets the {@link WorkflowState} to use for self-uploaded 
+     * {@link ContentItem}s. This state will automatically be set for 
+     * {@link ContentItem} uploaded inside a {@link NewsItem}.
+     * 
+     * @return {@link WorkflowState} to use for self-uploaded 
+     *         {@link ContentItem}s
+     */
+    public WorkflowState getSelfUploadState() {
+        return selfUploadState;
+    }
+
+    /**
+     * Sets the {@link WorkflowState} to use for self-uploaded 
+     * {@link ContentItem}s. This state will automatically be set for 
+     * {@link ContentItem} uploaded inside a {@link NewsItem}.
+     * 
+     * @param selfUploadState
+     *          {@link WorkflowState} to use for self-uploaded 
+     *          {@link ContentItem}s
+     */
+    public void setSelfUploadState(WorkflowState selfUploadState) {
+        this.selfUploadState = selfUploadState;
     }
 
     /**
@@ -382,6 +363,52 @@ public class Catalogue implements Serializable {
     public void setMaxFileUploadSize(Long maxFileUploadSize) {
         this.maxFileUploadSize = maxFileUploadSize;
     }
+
+    /**
+     * Property containing the {@link Workflow} definition for processing items 
+     * added to this {@link Catalogue}.
+     * 
+     * @return {@link Workflow} definition for processing items added to this
+     *         {@link Catalogue}
+     */
+    public Workflow getWorkflow() {
+        return workflow;
+    }
+
+    /**
+     * Property containing the {@link Workflow} definition for processing items 
+     * added to this {@link Catalogue}.
+     * 
+     * @param workflow
+     *          {@link Workflow} definition for processing items added to this
+     *          {@link Catalogue}
+     */
+    public void setWorkflow(Workflow workflow) {
+        this.workflow = workflow;
+    }
+
+    /**
+     * Gets a {@link List} of the {@link UserRole} with access to this 
+     * {@link Catalogue}.
+     * 
+     * @return {@link List} of {@link UserRole}s with access to this
+     *         {@link Catalogue}
+     */
+    public List<UserRole> getUserRoles() {
+        return userRoles;
+    }
+
+    /**
+     * Sets a {@link List} of the {@link UserRole} with access to this 
+     * {@link Catalogue}.
+     * 
+     * @param userRoles
+     *          {@link List} of {@link UserRole}s with access to this
+     *          {@link Catalogue}
+     */
+    public void setUserRoles(List<UserRole> userRoles) {
+        this.userRoles = userRoles;
+    }
     
     /**
      * Gets the space (bytes) available in the {@link Catalogue}
@@ -399,7 +426,7 @@ public class Catalogue implements Serializable {
             return -1L;
         }
     }
-    
+
     /**
      * Gets the total space (bytes) in the {@link Catalogue}
      * {@link Catalogue#location}.
@@ -416,7 +443,7 @@ public class Catalogue implements Serializable {
             return -1L;
         }
     }
-    
+
     /**
      * Determines if the {@link Catalogue#location} of the 
      * {@link Catalogue} is a directory and whether files can
@@ -428,23 +455,23 @@ public class Catalogue implements Serializable {
     public boolean isCatalogueLocationValid() {
         boolean status = true;
         File f = new File(getLocation());
-        
+
         // Location must be a directory
         if (!f.isDirectory()) {
             status = false;
         }
-        
+
         // Must be possible to read from the directory
         if (!f.canRead()) {
             status = false;
         }
-        
+
         // If the location is read/write, it must be possible
         // to write to the location
         if (!isReadOnly() && !f.canWrite()) {
             status = false;
         }
-        
+
         return status;
     }
 
@@ -457,12 +484,14 @@ public class Catalogue implements Serializable {
             return false;
         }
         final Catalogue other = (Catalogue) obj;
-        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+        if (this.id != other.id
+                && (this.id == null || !this.id.equals(other.id))) {
             return false;
         }
         return true;
     }
 
+    /** {@inheritDoc } */
     @Override
     public int hashCode() {
         int hash = 7;

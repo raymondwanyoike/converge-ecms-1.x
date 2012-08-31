@@ -1,11 +1,18 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later 
+ * version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with 
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package dk.i2m.converge.jsf.beans;
 
@@ -16,7 +23,7 @@ import dk.i2m.converge.core.newswire.NewswireItemAttachment;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.services.NewswireServiceLocal;
-import dk.i2m.jsf.JsfUtils;
+import static dk.i2m.jsf.JsfUtils.*;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -32,15 +39,12 @@ public class NewswireItem {
 
     private static final Logger LOG = Logger.getLogger(NewswireItem.class.
             getName());
-
-    @EJB private NewswireServiceLocal newswireService;
-
-    @EJB private CatalogueFacadeLocal catalogueFacade;
-
+    @EJB
+    private NewswireServiceLocal newswireService;
+    @EJB
+    private CatalogueFacadeLocal catalogueFacade;
     private Long id = 0L;
-
     private dk.i2m.converge.core.newswire.NewswireItem selectedItem = null;
-
     private Catalogue importCatalogue = null;
 
     public NewswireItem() {
@@ -53,6 +57,9 @@ public class NewswireItem {
         if (defaultCatalogue != null) {
             importCatalogue = defaultCatalogue;
         }
+
+        // Load the requested {@link NewswireItem}
+        setId(Long.valueOf(getRequestParameterMap().get("id")));
     }
 
     public Long getId() {
@@ -84,8 +91,7 @@ public class NewswireItem {
     }
 
     private UserAccount getUser() {
-        return (UserAccount) JsfUtils.getValueOfValueExpression(
-                "#{userSession.user}");
+        return (UserAccount) getValueOfValueExpression("#{userSession.user}");
     }
 
     /**
@@ -104,10 +110,10 @@ public class NewswireItem {
     }
 
     /**
-     * Determines if the {@link dk.i2m.converge.core.newswire.NewswireItem}
-     * can be imported to a {@link Catalogue}. It is only possible
-     * to import {@link dk.i2m.converge.core.newswire.NewswireItem}s where
-     * attachments have {@link Rendition}s set.
+     * Determines if the {@link dk.i2m.converge.core.newswire.NewswireItem} can
+     * be imported to a {@link Catalogue}. It is only possible to import
+     * {@link dk.i2m.converge.core.newswire.NewswireItem}s where attachments
+     * have {@link Rendition}s set.
      * <p/>
      * @return {@code true} if the {@link NewswireItem} can be imported,
      * otherwise {@code false}
@@ -126,8 +132,8 @@ public class NewswireItem {
     }
 
     /**
-     * Adds the attachments of a {@link NewswireItem} to the users
-     * default catalogue.
+     * Adds the attachments of a {@link NewswireItem} to the users default
+     * catalogue.
      * <p/>
      * @param event * Event that invoked the handler
      */
@@ -135,10 +141,10 @@ public class NewswireItem {
         if (importCatalogue != null) {
             MediaItem item = catalogueFacade.create(selectedItem,
                     importCatalogue);
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
+            createMessage("frmPage", FacesMessage.SEVERITY_INFO, Bundle.i18n.name(),
                     "NewswireItem_IMPORT_SUCCESSFUL", new Object[]{importCatalogue.getName()});
         } else {
-            JsfUtils.createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
+            createMessage("frmPage", FacesMessage.SEVERITY_ERROR, Bundle.i18n.name(),
                     "NewswireItem_IMPORT_FAILED");
         }
     }

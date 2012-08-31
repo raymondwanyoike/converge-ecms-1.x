@@ -16,12 +16,15 @@
  */
 package dk.i2m.converge.ejb.facades;
 
+import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
 import dk.i2m.converge.core.DataNotFoundException;
+import dk.i2m.converge.core.content.ContentResultSet;
 import dk.i2m.converge.core.content.catalogue.*;
 import dk.i2m.converge.core.newswire.NewswireItem;
 import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.ejb.services.InvalidMediaRepositoryException;
-import dk.i2m.converge.ejb.services.MediaRepositoryIndexingException;
+import dk.i2m.converge.core.workflow.WorkflowState;
+import dk.i2m.converge.ejb.services.CatalogueIndexingException;
+import dk.i2m.converge.ejb.services.InvalidCatalogueException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -72,8 +75,8 @@ public interface CatalogueFacadeLocal {
 
     Catalogue findCatalogueById(Long id) throws DataNotFoundException;
 
-    void indexCatalogues() throws InvalidMediaRepositoryException,
-            MediaRepositoryIndexingException;
+    void indexCatalogues() throws InvalidCatalogueException,
+            CatalogueIndexingException;
 
     void scanDropPoints();
 
@@ -98,44 +101,39 @@ public interface CatalogueFacadeLocal {
     void deleteRendition(Long id);
 
     /**
-     * Creates a {@link MediaItem} in the database.
+     * Creates a {@link MediaItem} with the current state set to the initial
+     * state of the {@link Workflow} attached to its {@link Catalogue}.
      *
      * @param mediaItem 
      *          {@link MediaItem} to create
-     * @return Created {@link MediaItem}
+     * @throws WorkflowStateTransitionException
+     *          If the {@link MediaItem} could not be created
      */
-    MediaItem create(MediaItem mediaItem);
+    MediaItem create(MediaItem mediaItem) throws
+            WorkflowStateTransitionException;
 
     MediaItem create(NewswireItem newswireItem, Catalogue catalogue);
 
+    /**
+     * Updates an existing {@link MediaItem} in the database.
+     *
+     * @param mediaItem 
+     *          {@link MediaItem} to update
+     * @return Updated {@link MediaItem}
+     */
     MediaItem update(MediaItem mediaItem);
 
+    /**
+     * Deletes an existing {@link MediaItem} from the database. Upon deletion
+     * the {@link MediaItem} will also be removed from the search engine and the
+     * {@link MediaItemRendition} files will be deleted.
+     *
+     * @param id 
+     *          Unique identifier of the {@link MediaItem}
+     */
     void deleteMediaItemById(Long id);
 
     MediaItem findMediaItemById(Long id) throws DataNotFoundException;
-
-    List<MediaItem> findMediaItemsByStatus(MediaItemStatus status);
-
-    List<MediaItem> findMediaItemsByOwner(UserAccount owner);
-
-    List<MediaItem> findCurrentMediaItems(UserAccount user, Long catalogueId);
-
-    /**
-     * Finds the {@link MediaItem}s for a given {@code UserAccount}, with a
-     * given {@link MediaItemStatus} in a given {@link Catalogue}.
-     *
-     * @param user
-     *          {@link UserAccount} owning the {@link MediaItem}s
-     * @param mediaItemStatus
-     *          Status of the {@link MediaItem}s
-     * @param catalogueId
-     *          {@link Catalogue} containing the {@link MediaItem}s
-     * @return {@link List} of {@link MediaItem}s owned by the given 
-     *         {@link UserAccount} with the given {@link MediaItemStatus}, in 
-     *         the given {@link Catalogue}
-     */
-    List<MediaItem> findCurrentMediaItems(UserAccount user,
-            MediaItemStatus mediaItemStatus, Long catalogueId);
 
     /**
      * Determines if the given {@link MediaItem} is referenced by a
@@ -159,8 +157,14 @@ public interface CatalogueFacadeLocal {
      */
     List<MediaItemUsage> getMediaItemUsage(Long id) throws DataNotFoundException;
 
-    String archive(File file, Catalogue catalogue, String fileName) throws IOException;
+    String archive(File file, Catalogue catalogue, String fileName) throws
+            IOException;
 
+    /**
+     * Deletes an existing {@link MediaItemRendition} from a {@link MediaItem}.
+     *
+     * @param id Unique identifier of the {@link MediaItemRendition}
+     */
     void deleteMediaItemRenditionById(java.lang.Long id);
 
     /**
@@ -216,7 +220,8 @@ public interface CatalogueFacadeLocal {
 
     CatalogueHookInstance updateCatalogueAction(CatalogueHookInstance action);
 
-    void executeBatchHook(CatalogueHookInstance hookInstance, Long catalogueId) throws
+    void executeBatchHook(CatalogueHookInstance hookInstance, Long catalogueId)
+            throws
             DataNotFoundException;
 
     /**
@@ -230,18 +235,6 @@ public interface CatalogueFacadeLocal {
             throws dk.i2m.converge.core.DataNotFoundException;
 
     /**
-     * Finds a {@link List} of {@link Catalogue}s accessible to a given
-     * {@link UserAccount}.
-     * 
-     * @param username 
-     *          Username of the {@link UserAccount} for which to find the 
-     *          accessible {@link Catalogue}s
-     * @return {@link List} of {@link Catalogue}s accessible to the given
-     *         {@link UserAccount}
-     */
-    List<Catalogue> findCataloguesByUser(String username);
-
-    /**
      * Updates an existing {@link MediaItemRendition} in the database without
      * executing {@link CatalogueHook}s.
      *
@@ -250,4 +243,96 @@ public interface CatalogueFacadeLocal {
      * @return Updated {@link MediaItemRendition}
      */
     MediaItemRendition update(MediaItemRendition mir);
+
+    
+    /**
+     * Finds {@link MediaItem}s in a given {@link Catalogue} with a given 
+     * {@link WorkflowState}.
+     * 
+     * @param catalogue
+     *          {@link Catalogue} to look for
+     * @param state
+     *          {@link WorkflowState} to look for
+     * @param start
+     *          First result to retrieve
+     * @param rows
+     *          Number of results to retrieve
+     * @param sortField
+     *           Field to sort by
+     * @param sortDirection
+     *           Direction to sort ({@code ASC} or {@code DESC})
+     * @return {@link ContentResultSet} containing {@link MediaItem}s in a given
+     *         {@link Catalogue} with a given {@link WorkflowState}
+     */
+    ContentResultSet findMediaItemsByWorkflowState(Catalogue catalogue, WorkflowState state, int start, int rows,
+            String sortField, String sortDirection);
+    
+    /**
+     * Finds {@link MediaItem}s in a given {@link Catalogue} with a given 
+     * {@link WorkflowState} authorised for viewing or editing by the given
+     * {@link UserAccount}.
+     * 
+     * @param username
+     *          Username of the {@link UserAccount}
+     * @param catalogue
+     *          {@link Catalogue} to look for
+     * @param state
+     *          {@link WorkflowState} to look for
+     * @param start
+     *          First result to retrieve
+     * @param rows
+     *          Number of results to retrieve
+     * @param sortField
+     *           Field to sort by
+     * @param sortDirection
+     *           Direction to sort ({@code ASC} or {@code DESC})
+     * @return {@link ContentResultSet} containing {@link MediaItem}s in a given
+     *         {@link Catalogue} with a given {@link WorkflowState} authorised 
+     *         for viewing or editing by the given {@link UserAccount}.
+     */
+    ContentResultSet findMediaItemsByWorkflowState(String username,
+            Catalogue catalogue, WorkflowState state, int start, int rows,
+            String sortField, String sortDirection);
+
+    /**
+     * Finds {@link MediaItem}s in a given {@link Catalogue} with access to a 
+     * given {@link UserAccount}.
+     * 
+     * @param username
+     *           Username of the {@link UserAccount}
+     * @param catalogue
+     *           {@link Catalogue} to look for
+     * @param pagingStart
+     *           First result to retrieve
+     * @param pagingRows
+     *           Number of results to retrieve
+     * @param sortField
+     *           Field to sort by
+     * @param sortDirection
+     *           Direction to sort ({@code ASC} or {@code DESC})
+     * @return {@link ContentResultSet} containing {@link MediaItem}s in a given
+     *         {@link Catalogue} authorised for viewing or editing by the given
+     *         {@link UserAccount}.
+     */
+    ContentResultSet findMediaItemsByCatalogue(String username,
+            Catalogue catalogue, int pagingStart, int pagingRows,
+            String sortField,
+            String sortDirection);
+
+    /**
+     * Perform a workflow transition on a {@link MediaItem}.
+     * 
+     * @param mediaItem
+     *          {@link MediaItem} to promote
+     * @param stepId
+     *          Unique identifier of the {@link WorkflowStep} to take
+     * @param stateTransition
+     *          Is the step a {@link WorkflowState} transition without a 
+     *          {@link WorkflowStep}. If this is {@code true}, then 
+     *          {@code stepId} should be the unique identifier of a 
+     *          {@link WorkflowState}
+     * @return {@link MediaItem} after the transition has occurred 
+     */
+    MediaItem step(MediaItem mediaItem, Long stepId, boolean stateTransition) 
+            throws WorkflowStateTransitionException;
 }

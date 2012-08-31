@@ -32,7 +32,7 @@ public class ModelConverter {
             "d MMMM yyyy");
 
     public static NewsItemActor toNewsItemActor(
-            dk.i2m.converge.core.content.NewsItemActor actor) {
+            dk.i2m.converge.core.content.ContentItemActor actor) {
         NewsItemActor nia = new NewsItemActor();
         nia.setUsername(actor.getUser().getUsername());
         nia.setName(actor.getUser().getFullName());
@@ -108,7 +108,7 @@ public class ModelConverter {
         item.setSection(s);
 
         // Convert Actors
-        for (dk.i2m.converge.core.content.NewsItemActor actor :
+        for (dk.i2m.converge.core.content.ContentItemActor actor :
                 nip.getNewsItem().getActors()) {
             item.getActors().add(toNewsItemActor(actor));
         }
@@ -144,7 +144,7 @@ public class ModelConverter {
         item.setSection(null);
 
         // Convert Actors
-        for (dk.i2m.converge.core.content.NewsItemActor actor : ni.getActors()) {
+        for (dk.i2m.converge.core.content.ContentItemActor actor : ni.getActors()) {
             item.getActors().add(toNewsItemActor(actor));
         }
 

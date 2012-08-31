@@ -57,10 +57,8 @@ public class Outlet implements Serializable {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "outlet_role",
-    joinColumns = {@JoinColumn(referencedColumnName = "id", name = "outlet_id",
-        nullable = false)},
-    inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name =
-        "role_id", nullable = false)})
+        joinColumns = {@JoinColumn(referencedColumnName = "id", name = "outlet_id", nullable = false)},
+        inverseJoinColumns = {@JoinColumn(referencedColumnName = "id", name = "role_id", nullable = false)})
     private List<UserRole> roles = new ArrayList<UserRole>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -73,11 +71,9 @@ public class Outlet implements Serializable {
 
     @OneToMany(mappedBy = "outlet", fetch = FetchType.LAZY)
     @PrivateOwned
-    private List<OutletEditionAction> editionActions =
-            new ArrayList<OutletEditionAction>();
+    private List<OutletEditionAction> editionActions = new ArrayList<OutletEditionAction>();
 
-    @OneToMany(mappedBy = "outlet", cascade = CascadeType.PERSIST, fetch =
-    FetchType.LAZY)
+    @OneToMany(mappedBy = "outlet", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @PrivateOwned
     private List<EditionPattern> editionPatterns =
             new ArrayList<EditionPattern>();

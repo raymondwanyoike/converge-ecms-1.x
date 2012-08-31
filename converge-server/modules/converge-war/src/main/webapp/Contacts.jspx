@@ -18,9 +18,14 @@
                     <h:panelGrid columns="1" columnClasses="right" style="width: 100%">
                         <h:column>
                             <a4j:commandButton id="btnRefresh" styleClass="button dynamicButton" value="#{i18n.Generic_REFRESH}" actionListener="#{contacts.onRefresh}" reRender="dtContacts" ajaxSingle="true" />
-                            <a4j:commandButton id="btnNew" styleClass="button dynamicButton" style="margin-left: 5px;" value="#{i18n.Contacts_NEW_CONTACT}" actionListener="#{contacts.onNew}" reRender="frmContactDetails" ajaxSingle="true">
-                                <rich:componentControl for="mpContactDetails" operation="show" event="oncomplete" />
-                            </a4j:commandButton>
+                            <a4j:commandButton id="btnNew" 
+                                               styleClass="button dynamicButton" 
+                                               style="margin-left: 5px;" 
+                                               value="#{i18n.Contacts_NEW_CONTACT}" 
+                                               actionListener="#{contacts.onNew}" 
+                                               reRender="frmContactDetails" 
+                                               ajaxSingle="true"
+                                               oncomplete="#{rich:component('mpContactDetails')}.show();" />
                         </h:column>
                     </h:panelGrid>
 
@@ -34,7 +39,7 @@
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>
-                            <h:graphicImage value="#{res.USER_ICON}" />
+                            <h:graphicImage value="#{i18n.resource_ICON_USER}" />
                         </rich:column>
 
                         <rich:column styleClass="left" sortBy="#{contact.updated.time}">
@@ -98,10 +103,11 @@
                         </rich:column>
 
                         <rich:column styleClass="columnIcon center" rendered="#{userSession.privileged['CONTACTS_MANAGE']}">
-                            <a4j:commandLink id="lnkEditContact" reRender="frmContactDetails">
+                            <a4j:commandLink id="lnkEditContact" 
+                                             reRender="frmContactDetails"
+                                             oncomplete="#{rich:component('mpContactDetails')}.show();">
                                 <f:setPropertyActionListener value="#{contact}" target="#{contacts.selectedContact}" />
-                                <rich:componentControl for="mpContactDetails" operation="show" event="oncomplete" />
-                                <h:graphicImage alt="#{i18n.Generic_UPDATE}" title="#{i18n.Generic_UPDATE}" value="#{res.UPDATE_ICON}"/>
+                                <h:graphicImage alt="#{i18n.Generic_UPDATE}" title="#{i18n.Generic_UPDATE}" value="#{i18n.resource_ICON_UPDATE}"/>
                             </a4j:commandLink>
                         </rich:column>
 
@@ -119,8 +125,10 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseContactDetails" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                            <rich:componentControl for="mpContactDetails" attachTo="imgCloseContactDetails" operation="hide" event="onclick"/>
+                            <h:graphicImage id="imgCloseContactDetails" 
+                                            value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                            styleClass="link"
+                                            onclick="#{rich:component('mpContactDetails')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
 
@@ -179,7 +187,7 @@
                                             <a4j:commandLink ajaxSingle="true">
                                                 <f:setPropertyActionListener value="#{phone}" target="#{contacts.moveContactPhone}" />
                                                 <a4j:support event="oncomplete" actionListener="#{contacts.onMoveContactPhoneUp}" reRender="dtContactPhones" ajaxSingle="true" />
-                                                <h:graphicImage alt="#{i18n.Contacts_MOVE_UP}" title="#{i18n.Contacts_MOVE_UP}" value="#{res.MOVE_UP_ICON}"/>
+                                                <h:graphicImage alt="#{i18n.Contacts_MOVE_UP}" title="#{i18n.Contacts_MOVE_UP}" value="#{i18n.resource_ICON_MOVE_UP}"/>
                                             </a4j:commandLink>
                                         </rich:column>
 
@@ -187,7 +195,7 @@
                                             <a4j:commandLink ajaxSingle="true">
                                                 <f:setPropertyActionListener value="#{phone}" target="#{contacts.moveContactPhone}" />
                                                 <a4j:support event="oncomplete" actionListener="#{contacts.onMoveContactPhoneDown}" reRender="dtContactPhones" ajaxSingle="true" />
-                                                <h:graphicImage alt="#{i18n.Contacts_MOVE_DOWN}" title="#{i18n.Contacts_MOVE_DOWN}" value="#{res.MOVE_DOWN_ICON}"/>
+                                                <h:graphicImage alt="#{i18n.Contacts_MOVE_DOWN}" title="#{i18n.Contacts_MOVE_DOWN}" value="#{i18n.resource_ICON_MOVE_DOWN}"/>
                                             </a4j:commandLink>
                                         </rich:column>
 

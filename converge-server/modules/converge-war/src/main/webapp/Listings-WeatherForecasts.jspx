@@ -38,7 +38,7 @@
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>
-                            <h:graphicImage value="#{res.WEATHER_FORECAST_ICON}" />
+                            <h:graphicImage value="#{i18n.resource_ICON_WEATHER_FORECAST}" />
                         </rich:column>
 
                         <rich:column sortBy="#{item.updated}" sortOrder="DESCENDING" style="width: 115px;">
@@ -164,7 +164,7 @@
                                         <rich:column styleClass="columnIcon center" headerClass="columnSubIcon">
                                             <f:facet name="header">
                                             </f:facet>
-                                            <h:graphicImage value="#{res.WEATHER_FORECAST_ICON}" />
+                                            <h:graphicImage value="#{i18n.resource_ICON_WEATHER_FORECAST}" />
                                         </rich:column>
 
                                         <rich:column sortBy="#{location.id}">
@@ -269,7 +269,7 @@
                                         <rich:column styleClass="columnIcon center" headerClass="columnSubIcon">
                                             <f:facet name="header">
                                             </f:facet>
-                                            <h:graphicImage value="#{res.WEATHER_FORECAST_ICON}" />
+                                            <h:graphicImage value="#{i18n.resource_ICON_WEATHER_FORECAST}" />
                                         </rich:column>
 
                                         <rich:column sortBy="#{situation.name}">

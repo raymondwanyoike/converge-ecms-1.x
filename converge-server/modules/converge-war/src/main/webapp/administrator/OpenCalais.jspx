@@ -32,7 +32,7 @@
                             <f:facet name="header">
                                 <h:graphicImage value="#{i18n.resource_ICON_EMPTY}" width="16" height="16" />
                             </f:facet>
-                            <h:graphicImage title="#{i18n.OpenCalais_PROPERTY}" alt="#{i18n.OpenCalais_PROPERTY}" value="#{res.PROPERTY_ICON}" />
+                            <h:graphicImage title="#{i18n.OpenCalais_PROPERTY}" alt="#{i18n.OpenCalais_PROPERTY}" value="#{i18n.resource_ICON_PROPERTY}" />
                         </rich:column>
                         <rich:column>
                             <f:facet name="header">
@@ -70,9 +70,12 @@
 
                         <rich:column styleClass="columnOneButton center" headerClass="columnOneButton center">
                             <f:facet name="header">
-                                <a4j:commandButton styleClass="button smallButton" value="#{i18n.Generic_ADD}" actionListener="#{administrator_OpenCalais.onNewMapping}" reRender="frmMappingDetails" ajaxSingle="true">
-                                    <rich:componentControl for="mpMappingDetails" operation="show" event="oncomplete" />
-                                </a4j:commandButton>
+                                <a4j:commandButton styleClass="button smallButton" 
+                                                   value="#{i18n.Generic_ADD}" 
+                                                   actionListener="#{administrator_OpenCalais.onNewMapping}" 
+                                                   reRender="frmMappingDetails" 
+                                                   ajaxSingle="true"
+                                                   oncomplete="#{rich:component('mpMappingDetails')}.show();" />
                             </f:facet>
 
                             <a4j:commandButton styleClass="button smallButton" value="#{i18n.Generic_REMOVE}" reRender="dtMappings" onclick="if (confirm('#{i18n.administrator_OpenCalais_MAPPING_REMOVE_COMFIRM}') != true){ return false; };">
@@ -111,9 +114,11 @@
                                     <h:column>
                                         <h:inputHidden id="ihConcept" required="true" value="#{administrator_OpenCalais.conceptId}" requiredMessage="#{i18n.administrator_OpenCalais_MAPPING_CONCEPT_REQUIRED}" />
                                         <h:inputText id="txtConceptName" styleClass="text" style="width: 370px; margin-right: 5px;" value="#{administrator_OpenCalais.selectedMapping.concept.fullTitle}" disabled="true" />
-                                        <a4j:commandButton styleClass="button dynamicButton" value="#{i18n.Generic_SELECT}" reRender="frmConceptSelector" ajaxSingle="true">
-                                            <rich:componentControl for="mpConceptSelector" operation="show" event="oncomplete" />
-                                        </a4j:commandButton>
+                                        <a4j:commandButton styleClass="button dynamicButton" 
+                                                           value="#{i18n.Generic_SELECT}" 
+                                                           reRender="frmConceptSelector" 
+                                                           ajaxSingle="true"
+                                                           oncomplete="#{rich:component('mpConceptSelector')}.show();" />
                                     </h:column>
                                 </h:panelGrid>
                             </rich:tab>
@@ -136,8 +141,9 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseConceptSelector" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                            <rich:componentControl for="mpConceptSelector" attachTo="imgCloseConceptSelector" operation="hide" event="onclick"/>
+                            <h:graphicImage id="imgCloseConceptSelector" 
+                                            value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                            onclick="#{rich:component('mpConceptSelector')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
 

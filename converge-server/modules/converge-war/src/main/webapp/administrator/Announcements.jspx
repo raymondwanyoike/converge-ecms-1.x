@@ -18,9 +18,12 @@
 
                     <h:panelGrid columns="2" columnClasses="left, right" style="width: 100%">
                         <h:outputText value="" />
-                        <a4j:commandButton id="btnNew" styleClass="button dynamicButton" value="#{i18n.Announcements_Button_NEW}" actionListener="#{administrator_Announcements.onNew}" reRender="frmAnnouncementDetails">
-                            <rich:componentControl for="mpAnnouncementDetails" operation="show" event="oncomplete" />
-                        </a4j:commandButton>
+                        <a4j:commandButton id="btnNew" 
+                                           styleClass="button dynamicButton" 
+                                           value="#{i18n.Announcements_Button_NEW}" 
+                                           actionListener="#{administrator_Announcements.onNew}" 
+                                           reRender="frmAnnouncementDetails"
+                                           oncomplete="#{rich:component('mpAnnouncementDetails')}.show();" />
                     </h:panelGrid>
 
                     <rich:dataTable id="dtAnnouncements" value="#{administrator_Announcements.announcements}" var="announcement" styleClass="table" headerClass="tableHeader" rowClasses="odd, even">
@@ -35,9 +38,9 @@
                                     </f:facet>
                                 </a4j:status>
                             </f:facet>
-                            <a4j:commandLink reRender="frmAnnouncementDetails">
+                            <a4j:commandLink reRender="frmAnnouncementDetails"
+                                             oncomplete="#{rich:component('mpAnnouncementDetails')}.show();">
                                 <f:setPropertyActionListener value="#{announcement}" target="#{administrator_Announcements.selectedAnnouncement}" />
-                                <rich:componentControl for="mpAnnouncementDetails" operation="show" event="oncomplete" />
                                 <h:graphicImage alt="#{i18n.Announcements_ANNOUNCEMENT_LABEL}" title="#{i18n.Announcements_ANNOUNCEMENT_LABEL}" value="#{i18n.resource_ICON_ALERT}" />
                             </a4j:commandLink>
                         </rich:column>
@@ -46,9 +49,9 @@
                             <f:facet name="header">
                                 <h:outputText value="#{i18n.Announcements_TITLE}" />
                             </f:facet>
-                            <a4j:commandLink reRender="frmAnnouncementDetails">
+                            <a4j:commandLink reRender="frmAnnouncementDetails"
+                                             oncomplete="#{rich:component('mpAnnouncementDetails')}.show();">
                                 <f:setPropertyActionListener value="#{announcement}" target="#{administrator_Announcements.selectedAnnouncement}" />
-                                <rich:componentControl for="mpAnnouncementDetails" operation="show" event="oncomplete" />
                                 <h:outputText value="#{announcement.title}" />
                             </a4j:commandLink>
                         </rich:column>
@@ -82,8 +85,10 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseAnnouncementDetails" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                            <rich:componentControl for="mpAnnouncementDetails" attachTo="imgCloseAnnouncementDetails" operation="hide" event="onclick"/>
+                            <h:graphicImage id="imgCloseAnnouncementDetails" 
+                                            value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                            styleClass="link"
+                                            onclick="#{rich:component('mpAnnouncementDetails')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
 
@@ -114,9 +119,9 @@
                         <h:panelGroup styleClass="dialogueButtons">
                             <a4j:commandLink id="lnkSaveAnnouncementDetails" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{administrator_Announcements.onSave}" reRender="frmAnnouncementDetails,dtAnnouncements" oncomplete="if (#{converge:isAllValid()}) { Richfaces.hideModalPanel('mpAnnouncementDetails'); return false;}" />
                             <a4j:commandLink id="lnkApplyAnnouncementDetails" styleClass="dialogButton" value="#{i18n.Generic_APPLY}" reRender="frmAnnouncementDetails,dtAnnouncements" actionListener="#{administrator_Announcements.onSave}" />
-                            <a4j:commandLink id="lnkDeleteAnnouncementDetails" rendered="#{administrator_Announcements.editMode}" onclick="if (confirm('#{i18n.Announcements_DELETE_PROMPT}') != true){ return false; };" actionListener="#{administrator_Announcements.onDelete}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" reRender="frmAnnouncementDetails,dtAnnouncements">
-                                <rich:componentControl for="mpAnnouncementDetails" operation="hide" event="oncomplete" />
-                            </a4j:commandLink>
+                            <a4j:commandLink id="lnkDeleteAnnouncementDetails" rendered="#{administrator_Announcements.editMode}" onclick="if (confirm('#{i18n.Announcements_DELETE_PROMPT}') != true){ return false; };" actionListener="#{administrator_Announcements.onDelete}" styleClass="dialogButton" value="#{i18n.Generic_DELETE}" 
+                                             reRender="frmAnnouncementDetails,dtAnnouncements"
+                                             oncomplete="#{rich:component('mpAnnouncementDetails')}.hide();" />
                             <h:commandLink id="lnkCancelAnnouncementDetails" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpAnnouncementDetails')}.hide(); return false;" />
                         </h:panelGroup>
 

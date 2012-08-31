@@ -32,7 +32,7 @@
                                 </f:facet>
                                 <a4j:commandLink id="lnkDisplayUserFromIcon" actionListener="#{administrator_Users.onDisplayUser}" reRender="frmUserDetails" ajaxSingle="true" oncomplete="#{rich:component('mpUserDetails')}.show()">
                                     <f:param name="uid" value="#{user.username}" />
-                                    <h:graphicImage alt="#{i18n.User_USER}" title="#{i18n.User_USER}" value="#{res.USER_ICON}" />
+                                    <h:graphicImage alt="#{i18n.User_USER}" title="#{i18n.User_USER}" value="#{i18n.resource_ICON_USER}" />
                                 </a4j:commandLink>
                             </rich:column>
 

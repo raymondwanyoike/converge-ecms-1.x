@@ -44,6 +44,15 @@
                                 </f:facet>
                                 <h:outputText value="#{logEntry.description}"  />
                             </rich:column>
+                            
+                            <rich:column styleClass="logEntrySeverity#{logEntry.severity}" headerClass="columnIconHeader">
+                                <f:facet name="header">
+                                    <a4j:commandLink ajaxSingle="true" reRender="dtLogEntries" actionListener="#{administrator_Log.onClearLog}">
+                                        <h:graphicImage value="#{i18n.resource_ICON_DELETE}" />
+                                    </a4j:commandLink>
+                                </f:facet>
+                                <h:outputText value=""  />
+                            </rich:column>
                         </rich:dataTable>
                     </div>
                 </h:form>

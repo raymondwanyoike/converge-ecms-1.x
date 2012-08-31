@@ -17,7 +17,7 @@
 package dk.i2m.converge.plugins.joomla;
 
 import dk.i2m.converge.core.content.NewsItem;
-import dk.i2m.converge.core.content.NewsItemActor;
+import dk.i2m.converge.core.content.ContentItemActor;
 import dk.i2m.converge.core.content.NewsItemMediaAttachment;
 import dk.i2m.converge.core.content.NewsItemPlacement;
 import dk.i2m.converge.core.content.catalogue.MediaItem;
@@ -300,7 +300,7 @@ public abstract class JoomlaPlugin {
             if (item.getByLine().trim().isEmpty()) {
                 StringBuilder by = new StringBuilder();
 
-                for (NewsItemActor actor : item.getActors()) {
+                for (ContentItemActor actor : item.getActors()) {
                     boolean firstActor = true;
                     if (actor.getRole().equals(item.getOutlet().getWorkflow().
                             getStartState().getActorRole())) {

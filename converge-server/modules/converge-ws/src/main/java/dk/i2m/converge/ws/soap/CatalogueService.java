@@ -20,10 +20,10 @@ import dk.i2m.converge.core.DataNotFoundException;
 import dk.i2m.converge.core.content.catalogue.*;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.security.UserAccount;
-import dk.i2m.converge.core.security.UserRole;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.MetaDataFacadeLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
+import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
@@ -47,6 +47,8 @@ import org.apache.commons.io.FileUtils;
 @WebService(serviceName = "DigitalAssetService")
 public class CatalogueService {
 
+    private static final Logger LOG = Logger.getLogger(CatalogueService.class.getName());
+    
     @EJB private CatalogueFacadeLocal catalogueFacade;
 
     @EJB private UserFacadeLocal userFacade;
@@ -79,19 +81,23 @@ public class CatalogueService {
         MediaItem mediaItem = new MediaItem();
         mediaItem.setCatalogue(catalogue);
         mediaItem.setByLine(byLine);
-        mediaItem.setCreated(now);
+        mediaItem.setCreated(now.getTime());
         mediaItem.setDescription(description);
 
         mediaItem.setEditorialNote(editorialNote);
         Calendar mediaDate = Calendar.getInstance();
         mediaDate.setTime(assetDate);
         mediaItem.setMediaDate(mediaDate);
-        mediaItem.setOwner(userAccount);
         mediaItem.setTitle(title);
-        mediaItem.setUpdated(now);
-        mediaItem.setStatus(MediaItemStatus.UNSUBMITTED);
-
-        mediaItem = catalogueFacade.create(mediaItem);
+        mediaItem.setUpdated(now.getTime());
+        // TODO: Worklflow Transition
+        //mediaItem.setStatus(MediaItemStatus.UNSUBMITTED);
+        
+        try {
+            catalogueFacade.create(mediaItem);
+        } catch (WorkflowStateTransitionException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        }
 
         return mediaItem.getId();
     }
@@ -129,40 +135,41 @@ public class CatalogueService {
         return mir.getId();
     }
 
-    @WebMethod(operationName = "changeStatus")
-    public void changeStatus(
-            @WebParam(name = "digitalAssetId") Long digitalAssetId,
-            @WebParam(name = "status") String status) throws
-            DigitalAssetNotFoundException, InvalidMediaItemStatusException,
-            ServiceSecurityException {
-        UserAccount userAccount = getCaller();
-
-        Calendar now = Calendar.getInstance();
-
-        MediaItemStatus mediaItemStatus;
-        try {
-            mediaItemStatus = MediaItemStatus.valueOf(status);
-        } catch (IllegalArgumentException ex) {
-            throw new InvalidMediaItemStatusException(ex);
-        }
-
-        MediaItem item;
-        try {
-            item = catalogueFacade.findMediaItemById(digitalAssetId);
-        } catch (DataNotFoundException ex) {
-            throw new DigitalAssetNotFoundException(ex);
-        }
-
-        UserRole catalogueEditor = item.getCatalogue().getEditorRole();
-        if (!userAccount.getUserRoles().contains(catalogueEditor)) {
-            throw new ServiceSecurityException(userAccount.getUsername()
-                    + " is not in the catalogue editor role '"
-                    + catalogueEditor.getName() + "'");
-        }
-
-        item.setStatus(mediaItemStatus);
-        catalogueFacade.update(item);
-    }
+//    @WebMethod(operationName = "changeStatus")
+//    public void changeStatus(
+//            @WebParam(name = "digitalAssetId") Long digitalAssetId,
+//            @WebParam(name = "status") String status) throws
+//            DigitalAssetNotFoundException, InvalidMediaItemStatusException,
+//            ServiceSecurityException {
+//        UserAccount userAccount = getCaller();
+//
+//        Calendar now = Calendar.getInstance();
+//
+//        MediaItemStatus mediaItemStatus;
+//        try {
+//            mediaItemStatus = MediaItemStatus.valueOf(status);
+//        } catch (IllegalArgumentException ex) {
+//            throw new InvalidMediaItemStatusException(ex);
+//        }
+//
+//        MediaItem item;
+//        try {
+//            item = catalogueFacade.findMediaItemById(digitalAssetId);
+//        } catch (DataNotFoundException ex) {
+//            throw new DigitalAssetNotFoundException(ex);
+//        }
+//
+//        // TODO: Fix - Security
+////        UserRole catalogueEditor = item.getCatalogue().getEditorRole();
+////        if (!userAccount.getUserRoles().contains(catalogueEditor)) {
+////            throw new ServiceSecurityException(userAccount.getUsername()
+////                    + " is not in the catalogue editor role '"
+////                    + catalogueEditor.getName() + "'");
+////        }
+//
+//        item.setStatus(mediaItemStatus);
+//        catalogueFacade.update(item);
+//    }
     
     /**
      * Adds a {@link Concept} to a digital asset.

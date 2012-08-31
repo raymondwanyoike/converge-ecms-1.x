@@ -261,8 +261,10 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseMyNewswireSubscriptions" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                            <rich:componentControl for="mpMyNewswireSubscriptions" attachTo="imgCloseMyNewswireSubscriptions" operation="hide" event="onclick"/>
+                            <h:graphicImage id="imgCloseMyNewswireSubscriptions" 
+                                            value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                            styleClass="link" 
+                                            onclick="#{rich:component('mpMyNewswireSubscriptions')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
 
@@ -285,9 +287,12 @@
                             </rich:tab>
                         </rich:tabPanel>
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveSubscriptions" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{newswire.onSaveSubscriptions}" reRender="frmPage,frmQuery,frmSubscriptions">
-                                <rich:componentControl for="mpMyNewswireSubscriptions" operation="hide" event="oncomplete" />
-                            </a4j:commandLink>
+                            <a4j:commandLink id="lnkSaveSubscriptions" 
+                                             styleClass="dialogButton" 
+                                             value="#{i18n.Generic_SAVE}" 
+                                             actionListener="#{newswire.onSaveSubscriptions}" 
+                                             reRender="frmPage,frmQuery,frmSubscriptions"
+                                             oncomplete="#{rich:component('mpMyNewswireSubscriptions')}.hide();" />
                             <h:commandLink id="lnkClose" styleClass="dialogButton" value="#{i18n.Generic_CLOSE}" onclick="#{rich:component('mpMyNewswireSubscriptions')}.hide(); return false;" />
                         </h:panelGroup>
                     </h:panelGrid>
@@ -303,8 +308,10 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseNewswireItemDetail" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                            <rich:componentControl for="mpNewswireItemDetail" attachTo="imgCloseNewswireItemDetail" operation="hide" event="onclick"/>
+                            <h:graphicImage id="imgCloseNewswireItemDetail" 
+                                            value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                            styleClass="link"
+                                            onclick="#{rich:component('mpNewswireItemDetail')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
 
@@ -367,9 +374,10 @@
                         <h:panelGroup styleClass="dialogueButtons">
 
                             <a4j:commandLink id="lnkAssign" styleClass="dialogButton" value="#{i18n.Generic_ASSIGN}">
-                                <a4j:support event="oncomplete" actionListener="#{newswire.onAssign}" reRender="frmAssignmentDetails">
-                                    <rich:componentControl for="mpAssignmentDetails" operation="show" event="oncomplete" />
-                                </a4j:support>
+                                <a4j:support event="oncomplete" 
+                                             actionListener="#{newswire.onAssign}" 
+                                             reRender="frmAssignmentDetails"
+                                             oncomplete="#{rich:component('mpAssignmentDetails')}.show();" />
                             </a4j:commandLink>
 
 
@@ -391,8 +399,10 @@
                     </f:facet>
                     <f:facet name="controls">
                         <h:panelGroup>
-                            <h:graphicImage id="imgCloseBasketDetail" value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" style="link" />
-                            <rich:componentControl for="mpBasketDetail" attachTo="imgCloseBasketDetail" operation="hide" event="onclick"/>
+                            <h:graphicImage id="imgCloseBasketDetail" 
+                                            value="#{i18n.resource_ICON_DIALOGUE_CLOSE}" 
+                                            styleClass="link"
+                                            onclick="#{rich:component('mpBasketDetail')}.hide();" />
                         </h:panelGroup>
                     </f:facet>
 

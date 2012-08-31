@@ -18,12 +18,16 @@ package dk.i2m.converge.web.servlets;
 
 import dk.i2m.converge.core.ConfigurationKey;
 import dk.i2m.converge.core.DataNotFoundException;
+import dk.i2m.converge.core.content.ContentItemActor;
 import dk.i2m.converge.core.content.catalogue.*;
 import dk.i2m.converge.core.security.UserAccount;
 import dk.i2m.converge.core.utils.HttpUtils;
+import dk.i2m.converge.core.workflow.Workflow;
+import dk.i2m.converge.core.workflow.WorkflowState;
 import dk.i2m.converge.ejb.facades.CatalogueFacadeLocal;
 import dk.i2m.converge.ejb.facades.SystemFacadeLocal;
 import dk.i2m.converge.ejb.facades.UserFacadeLocal;
+import dk.i2m.converge.core.workflow.WorkflowStateTransitionException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -235,8 +239,9 @@ public class FileUploadServlet extends HttpServlet {
 
     /**
      * Checks if the user is authenticated and exist in the database.
-     * <p/>
-     * @param request {@link HttpServletRequest} received from the user
+     *
+     * @param request 
+     *          {@link HttpServletRequest} received from the user
      * @return {@code true} if the user is authenticated and existing, otherwise
      *         {@code false}
      */
@@ -302,15 +307,24 @@ public class FileUploadServlet extends HttpServlet {
             return;
         }
 
+        // Create MediaItem
         MediaItem mediaItem = new MediaItem();
         mediaItem.setTitle(FilenameUtils.getBaseName(fileItem.getName()));
-        mediaItem.setStatus(MediaItemStatus.SELF_UPLOAD);
         mediaItem.setCatalogue(catalogue);
-        mediaItem.setOwner(user);
-        mediaItem.setByLine("");
-        mediaItem = catalogueFacade.create(mediaItem);
+        mediaItem.setByLine(user.getFullName());
+        Workflow workflow = catalogue.getWorkflow();
+        WorkflowState startState = workflow.getStartState();
+        ContentItemActor cia = new ContentItemActor(user, startState.getActorRole(), mediaItem);
+        mediaItem.getActors().add(cia);
+        
+        try {
+            mediaItem = catalogueFacade.create(mediaItem);
+        } catch (WorkflowStateTransitionException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        }
         this.returnValue = "" + mediaItem.getId();
 
+        // Store MediaItemRendition
         MediaItemRendition mir = new MediaItemRendition();
         mir.setMediaItem(mediaItem);
         mir.setRendition(catalogue.getOriginalRendition());
@@ -322,7 +336,6 @@ public class FileUploadServlet extends HttpServlet {
             mir = catalogueFacade.create(uploadedFile,
                     mediaItem, mir.getRendition(), filename,
                     fileItem.getContentType(), true);
-
             LOG.log(Level.FINE,
                     "New media item and rendition created: {0} / {1}",
                     new Object[]{mediaItem.getId(), mir.getId()});
@@ -332,6 +345,15 @@ public class FileUploadServlet extends HttpServlet {
         }
 
         uploadedFile.delete();
+        
+        // Workflow Transition (to self-upload)
+        if (catalogue.getSelfUploadState() != null) {
+            try {
+                mediaItem = catalogueFacade.step(mediaItem, catalogue.getSelfUploadState().getId(), true);
+            } catch (WorkflowStateTransitionException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     private void executeUpdateRendition(HttpServletRequest request,
@@ -376,7 +398,8 @@ public class FileUploadServlet extends HttpServlet {
                 new File(getTemporaryDirectory(), fileItem.getName());
         try {
             mediaItemRendition = catalogueFacade.update(uploadedFile, fileItem.
-                    getName(), fileItem.getContentType(), mediaItemRendition, true);
+                    getName(), fileItem.getContentType(), mediaItemRendition,
+                    true);
             this.returnValue = "" + mediaItemRendition.getId();
             LOG.log(Level.FINE, "Media item #{0} was updated",
                     new Object[]{mediaItemRendition.getId()});
@@ -414,32 +437,44 @@ public class FileUploadServlet extends HttpServlet {
             mediaItem = catalogueFacade.findMediaItemById(mediaItemId);
             rendition = catalogueFacade.findRenditionById(renditionId);
         } catch (DataNotFoundException ex) {
-            LOG.log(Level.WARNING, "Unknown data requested. {0}", ex.getMessage());
+            LOG.log(Level.WARNING, "Unknown data requested. {0}",
+                    ex.getMessage());
             return;
         }
 
-        File uploadedFile = new File(getTemporaryDirectory(), fileItem.getName());
+        File uploadedFile =
+                new File(getTemporaryDirectory(), fileItem.getName());
         MediaItemRendition mediaItemRendition;
         try {
-            mediaItemRendition = catalogueFacade.create(uploadedFile, mediaItem, rendition, fileItem.getName(), fileItem.getContentType(), true);
-            LOG.log(Level.FINE, "New media item rendition created: {0}", mediaItemRendition.getId());
+            mediaItemRendition = catalogueFacade.create(uploadedFile, mediaItem,
+                    rendition, fileItem.getName(), fileItem.getContentType(),
+                    true);
+            LOG.log(Level.FINE, "New media item rendition created: {0}",
+                    mediaItemRendition.getId());
             this.returnValue = "" + mediaItemRendition.getId();
         } catch (IOException ex) {
-            LOG.log(Level.SEVERE, "Could not create media item rendition. {0}", ex.getMessage());
+            LOG.log(Level.SEVERE, "Could not create media item rendition. {0}",
+                    ex.getMessage());
         }
-        
+
         uploadedFile.delete();
     }
 
     /**
      * Gets the temporary directory for storing incoming files.
-     * <p/>
+     *
      * @return Temporary directory for storing incoming files
      */
     private String getTemporaryDirectory() {
         String home = systemFacade.getProperty(
                 ConfigurationKey.WORKING_DIRECTORY);
         String tempDirectory = home + "/tmp/";
+
+        File f = new File(tempDirectory);
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+
         return tempDirectory;
     }
 

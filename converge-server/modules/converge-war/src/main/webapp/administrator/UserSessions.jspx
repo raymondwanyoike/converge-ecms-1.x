@@ -101,9 +101,12 @@
                             <f:facet name="header">
                                 <h:outputText value="&#160;" />
                             </f:facet>
-                            <a4j:commandButton id="logoff" value="#{i18n.administrator_UserSessions_LOGOFF}" styleClass="button dynamicButton" ajaxSingle="true">
+                            <a4j:commandButton id="logoff" 
+                                               value="#{i18n.administrator_UserSessions_LOGOFF}" 
+                                               styleClass="button dynamicButton" 
+                                               ajaxSingle="true"
+                                               reRender="frmUserSessions">
                                 <f:setPropertyActionListener target="#{administrator_UserSessions.invalidateSession}" value="#{activeSession}" />
-                                <a4j:support event="oncomplete" reRender="frmUserSessions"/>
                             </a4j:commandButton>
                         </rich:column>
 

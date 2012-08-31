@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 - 2011 Interactive Media Management
+ * Copyright (C) 2010 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,31 +16,20 @@
  */
 package dk.i2m.converge.core.workflow;
 
+import dk.i2m.converge.core.content.ContentItem;
 import dk.i2m.converge.core.content.NewsItem;
 import dk.i2m.converge.core.security.UserAccount;
 import java.io.Serializable;
-import java.util.Calendar;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import java.util.Date;
+import javax.persistence.*;
 
 /**
- * Entity representing a workflow transition of a {@link NewsItem}.
+ * Entity representing a workflow transition of a {@link ContentItem}.
  *
  * @author Allan Lykke Christensen
  */
 @Entity
-@Table(name = "news_item_workflow_state_transition")
+@Table(name = "content_item_workflow_transition")
 public class WorkflowStateTransition implements Serializable {
 
     private static final long serialVersionUID = 2L;
@@ -51,12 +40,12 @@ public class WorkflowStateTransition implements Serializable {
     private Long id;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "news_item_id")
-    private NewsItem newsItem;
+    @JoinColumn(name = "content_item_id")
+    private ContentItem contentItem;
 
     @Column(name = "transition_timestamp")
     @Temporal(value = TemporalType.TIMESTAMP)
-    private Calendar timestamp;
+    private Date timestamp;
 
     @Column(name = "comment") @Lob
     private String comment = "";
@@ -90,8 +79,8 @@ public class WorkflowStateTransition implements Serializable {
     /**
      * Creates a new instance of {@link WorkflowStateTransition}.
      *
-     * @param newsItem
-     *          {@link NewsItem} that has transitioned
+     * @param contentItem
+     *          {@link ContentItem} that has transitioned
      * @param timestamp
      *          Time when the {@link NewsItem} transitioned
      * @param state
@@ -99,9 +88,9 @@ public class WorkflowStateTransition implements Serializable {
      * @param user
      *          {@link UserAccount} who initiated the transition
      */
-    public WorkflowStateTransition(NewsItem newsItem, Calendar timestamp,
+    public WorkflowStateTransition(ContentItem contentItem, Date timestamp,
             WorkflowState state, UserAccount user) {
-        this.newsItem = newsItem;
+        this.contentItem = contentItem;
         this.timestamp = timestamp;
         this.state = state;
         this.user = user;
@@ -127,38 +116,38 @@ public class WorkflowStateTransition implements Serializable {
     }
 
     /**
-     * Gets the {@link NewsItem} for which the transition belongs.
+     * Gets the {@link ContentItem} for which the transition belongs.
      *
-     * @return {@link NewsItem} for which the transition belongs
+     * @return {@link ContentItem} for which the transition belongs
      */
-    public NewsItem getNewsItem() {
-        return newsItem;
+    public ContentItem getContentItem() {
+        return contentItem;
     }
 
     /**
-     * Sets the {@link NewsItem} for which the transition belongs.
+     * Sets the {@link ContentItem} for which the transition belongs.
      *
-     * @param newsItem
-     *          {@link NewsItem} for which the transition belongs
+     * @param contentItem
+     *          {@link ContentItem} for which the transition belongs
      */
-    public void setNewsItem(NewsItem newsItem) {
-        this.newsItem = newsItem;
+    public void setContentItem(ContentItem contentItem) {
+        this.contentItem = contentItem;
     }
 
     /**
-     * Gets the new workflow state of the {@link NewsItem}.
+     * Gets the new workflow state of the {@link ContentItem}.
      *
-     * @return new {@link WorkflowState} of the {@link NewsItem}
+     * @return new {@link WorkflowState} of the {@link ContentItem}
      */
     public WorkflowState getState() {
         return state;
     }
 
     /**
-     * Sets the new workflow state of the {@link NewsItem}.
+     * Sets the new workflow state of the {@link ContentItem}.
      *
      * @param state
-     *          New {@link WorkflowState} of the {@link NewsItem}
+     *          New {@link WorkflowState} of the {@link ContentItem}
      */
     public void setState(WorkflowState state) {
         this.state = state;
@@ -169,7 +158,7 @@ public class WorkflowStateTransition implements Serializable {
      *
      * @return Date and time when the transition occurred
      */
-    public Calendar getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 
@@ -179,7 +168,7 @@ public class WorkflowStateTransition implements Serializable {
      * @param timestamp
      *          Date and time when the transition occurred
      */
-    public void setTimestamp(Calendar timestamp) {
+    public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -201,7 +190,7 @@ public class WorkflowStateTransition implements Serializable {
     public void setComment(String comment) {
         this.comment = comment;
     }
-    
+
     /**
      * Determine if there is a comment available in the
      * {@link WorkflowStateTransition}.
@@ -326,6 +315,7 @@ public class WorkflowStateTransition implements Serializable {
         this.submitted = submitted;
     }
 
+    /** {@inheritDoc } */
     @Override
     public int hashCode() {
         int hash = 0;
@@ -339,12 +329,14 @@ public class WorkflowStateTransition implements Serializable {
             return false;
         }
         WorkflowStateTransition other = (WorkflowStateTransition) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null
+                && !this.id.equals(other.id))) {
             return false;
         }
         return true;
     }
 
+    /** {@inheritDoc } */
     @Override
     public String toString() {
         return getClass().getName() + "[id=" + id + "]";

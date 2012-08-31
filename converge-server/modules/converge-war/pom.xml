@@ -3,13 +3,19 @@
     <parent>
         <artifactId>modules</artifactId>
         <groupId>dk.i2m.converge</groupId>
-        <version>1.1.4-SNAPSHOT</version>
+        <version>1.2.0-B3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>converge-war</artifactId>
     <packaging>war</packaging>
     <name>Converge - Web Application</name>
 
+    <properties>
+        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+        <netbeans.hint.packaging>war</netbeans.hint.packaging>
+        <org.richfaces.version>3.3.3.Final</org.richfaces.version>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -29,7 +35,7 @@
         <dependency>
             <groupId>dk.i2m.jsf</groupId>
             <artifactId>i2m-jsf</artifactId>
-            <version>1.5</version>
+            <version>1.6</version>
         </dependency>
 
         <dependency>
@@ -61,23 +67,24 @@
             <artifactId>commons-fileupload</artifactId>
             <version>1.2.2</version>
         </dependency>
-
+        
         <dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>el-api</artifactId>
-            <version>1.0</version>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>6.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>javax.faces</groupId>
             <artifactId>jsf-api</artifactId>
-            <version>1.2_12</version>
+            <version>1.2_15</version>
         </dependency>
 
         <dependency>
             <groupId>javax.faces</groupId>
             <artifactId>jsf-impl</artifactId>
-            <version>1.2_12</version>
+            <version>1.2_15</version>
         </dependency>
 
         <dependency>
@@ -108,7 +115,7 @@
         <dependency>
             <groupId>com.sun.facelets</groupId>
             <artifactId>jsf-facelets</artifactId>
-            <version>1.1.15.B1</version>
+            <version>1.1.15</version>
         </dependency>
 
         <dependency>
@@ -133,14 +140,21 @@
 
         <dependency>
             <groupId>org.richfaces.framework</groupId>
-            <artifactId>richfaces-impl</artifactId>
-            <version>3.3.3.Final</version>
+            <artifactId>richfaces-api</artifactId>
+            <version>${org.richfaces.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.richfaces.ui</groupId>
             <artifactId>richfaces-ui</artifactId>
-            <version>3.3.3.Final</version>
+            <version>${org.richfaces.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.richfaces.framework</groupId>
+            <artifactId>richfaces-impl-jsf2</artifactId>
+            <version>${org.richfaces.version}</version>
         </dependency>
 
         <dependency>
@@ -182,21 +196,38 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-
-
     </repositories>
+    
     <build>
         <plugins>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.1.1</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                    </archive>
-                </configuration>
+                <version>2.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.1</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${endorsed.dir}</outputDirectory>
+                            <silent>true</silent>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>javax</groupId>
+                                    <artifactId>javaee-endorsed-api</artifactId>
+                                    <version>6.0</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.sun.tools.jxc.maven2</groupId>
@@ -243,7 +274,5 @@
 
         </plugins>
     </build>
-    <properties>
-        <netbeans.hint.packaging>war</netbeans.hint.packaging>
-    </properties>
+    
 </project>

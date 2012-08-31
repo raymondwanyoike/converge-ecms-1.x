@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010 Interactive Media Management
+ *  Copyright (C) 2010 - 2012 Interactive Media Management
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 package dk.i2m.converge.core.content;
 
 /**
- * User permission indicator for a given content item.
+ * User permission indicator for a given {@link ContentItem}.
  *
  * @author Allan Lykke Christensen
  */

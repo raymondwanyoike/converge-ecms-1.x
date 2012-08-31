@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Interactive Media Management
+ * Copyright (C) 2011 - 2012 Interactive Media Management
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -17,7 +17,10 @@
 package dk.i2m.converge.plugins.actions.opencalais;
 
 import dk.i2m.converge.core.EnrichException;
+import dk.i2m.converge.core.content.ContentItem;
 import dk.i2m.converge.core.content.NewsItem;
+import dk.i2m.converge.core.content.catalogue.MediaItem;
+import dk.i2m.converge.core.content.catalogue.MediaItemRendition;
 import dk.i2m.converge.core.metadata.Concept;
 import dk.i2m.converge.core.plugin.PluginContext;
 import dk.i2m.converge.core.plugin.WorkflowAction;
@@ -29,8 +32,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * {@link WorkflowAction} for discovering {@link Concept}s for a story through
- * the OpenCalais service.
+ * {@link WorkflowAction} for discovering {@link Concept}s for a story or 
+ * document through the OpenCalais service.
  *
  * @author Allan Lykke Christensen
  */
@@ -42,24 +45,40 @@ public class OpenCalaisWorkflowAction implements WorkflowAction {
     private static final Logger LOG =
             Logger.getLogger(OpenCalaisWorkflowAction.class.getName());
 
-    private ResourceBundle bundle =
-            ResourceBundle.getBundle(
+    private ResourceBundle bundle = ResourceBundle.getBundle(
             "dk.i2m.converge.plugins.actions.opencalais.WorkflowActionMessages");
 
     @Override
-    public void execute(PluginContext ctx, NewsItem item,
+    public void execute(PluginContext ctx, ContentItem item,
             WorkflowStepAction stepAction, UserAccount user) {
         List<Concept> concepts = new ArrayList<Concept>();
         try {
-            concepts = ctx.enrich(item.getStory());
+            if (item instanceof NewsItem) {
+                NewsItem ni = (NewsItem) item;
+                concepts = ctx.enrich(ni.getStory());
+                ni.getConcepts().addAll(concepts);
+                Set<Concept> set = new HashSet<Concept>(ni.getConcepts());
+                ArrayList<Concept> unique = new ArrayList<Concept>(set);
+                ni.setConcepts(unique);
+            } else if (item instanceof MediaItem) {
+                MediaItem mi = (MediaItem) item;
+                if (!mi.isOriginalAvailable() || !mi.getOriginal().isDocument()) {
+                    return;
+                }
+
+                MediaItemRendition rendition = mi.getOriginal();
+                String content = ctx.extractContent(rendition);
+                concepts = ctx.enrich(content);
+                concepts.addAll(mi.getConcepts());
+                Set<Concept> uniqueConcepts = new HashSet<Concept>(concepts);
+                concepts = new ArrayList<Concept>(uniqueConcepts);
+                mi.setConcepts(concepts);
+                LOG.log(Level.INFO, "{0} concepts discovered",
+                        concepts.size());
+            }
         } catch (EnrichException ex) {
             LOG.log(Level.SEVERE, ex.getMessage());
         }
-
-        item.getConcepts().addAll(concepts);
-        Set<Concept> set = new HashSet<Concept>(item.getConcepts());
-        ArrayList<Concept> unique = new ArrayList<Concept>(set);
-        item.setConcepts(unique);
     }
 
     @Override

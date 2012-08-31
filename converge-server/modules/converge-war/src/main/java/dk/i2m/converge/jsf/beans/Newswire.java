@@ -31,13 +31,12 @@ import dk.i2m.converge.ejb.services.NewswireServiceLocal;
 import dk.i2m.converge.jsf.components.tags.DialogAssignment;
 import dk.i2m.converge.jsf.components.tags.DialogEventSelection;
 import dk.i2m.jsf.JsfUtils;
-import static dk.i2m.jsf.JsfUtils.createMessage;
+import static dk.i2m.jsf.JsfUtils.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -45,13 +44,14 @@ import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
+import org.apache.commons.lang.StringUtils;
 
 /**
- * Request-scoped backing bean for the {@code Newswire.jspx} page.
+ * View-scoped backing bean for the {@code /Newswire.jspx} page.
  *
  * @author Allan Lykke Christensen
  */
-public class Newswire {
+public final class Newswire {
 
     private static final Logger LOG = Logger.getLogger(Newswire.class.getName());
 
@@ -117,10 +117,28 @@ public class Newswire {
 
     private String linkSearch = "";
 
+    /**
+     * Creates a new instance of {@link Newswire}. The constructor looks for the
+     * {@code q} parameter in the request and stores it in {@link #linkSearch}.
+     */
+    public Newswire() {
+        if (getRequestParameterMap().containsKey("q")) {
+            this.linkSearch = getRequestParameterMap().get("q");
+        }
+    }
+
+    /**
+     * Post-construction of the bean. It will load user settings and determine
+     * the initial search to conduct.
+     */
     @PostConstruct
     public void onInit() {
         displayContentTags = getUserAccount().isDefaultSearchEngineTags();
-        onShowTodaysNews(null);
+        if (StringUtils.isBlank(this.linkSearch)) {
+            onShowTodaysNews(null);
+        } else {
+            setLinkSearch(linkSearch);
+        }
     }
 
     /**

@@ -31,9 +31,14 @@
                     <div class="moduleContent">
 
                         <h:panelGrid columns="1" columnClasses="right" style="width: 100%">
-                            <a4j:commandButton id="btnNewEdition" styleClass="button mediumButton" value="#{i18n.Planning_EDITION_NEW}" title="#{i18n.Planning_EDITION_NEW_TOOLTIP}" actionListener="#{planning.onNewEdition}" reRender="frmEditionDetails" ajaxSingle="true">
-                                <rich:componentControl for="mpEditionDetails" operation="show" event="oncomplete" />
-                            </a4j:commandButton>
+                            <a4j:commandButton id="btnNewEdition" 
+                                               styleClass="button mediumButton" 
+                                               value="#{i18n.Planning_EDITION_NEW}" 
+                                               title="#{i18n.Planning_EDITION_NEW_TOOLTIP}" 
+                                               actionListener="#{planning.onNewEdition}" 
+                                               reRender="frmEditionDetails" 
+                                               ajaxSingle="true"
+                                               oncomplete="#{rich:component('mpEditionDetails')}.show();" />
                         </h:panelGrid>
 
                         <ui:repeat value="#{planning.selectedEditions}" var="edition">
@@ -48,9 +53,10 @@
                                             sortPriority="#{converge:createList('colStart,colEnd')}">
 
                                 <f:facet name="header">
-                                    <a4j:commandLink reRender="frmEditionDetails" limitToList="true">
+                                    <a4j:commandLink reRender="frmEditionDetails" 
+                                                     limitToList="true"
+                                                     oncomplete="#{rich:component('mpEditionDetails')}.show();">
                                         <f:setPropertyActionListener value="#{edition}" target="#{planning.selectedEdition}" />
-                                        <rich:componentControl for="mpEditionDetails" operation="show" event="oncomplete" />
 
                                         <h:outputFormat value="#{i18n.Planning_EDITION_HEADER}">
                                             <f:param value="#{edition.volume}" />
@@ -98,8 +104,10 @@
                                     <a4j:commandButton styleClass="button mediumButton" value="#{i18n.planning_NEW_ASSIGNMENT}" ajaxSingle="true" rendered="#{edition.open}">
                                         <f:setPropertyActionListener target="#{planning.selectedEdition}" value="#{edition}" />
                                         <f:setPropertyActionListener target="#{planning.selectedEditionSection}" value="#{section}" />
-                                        <a4j:support event="oncomplete" actionListener="#{planning.onNewEditionPlacement}" reRender="frmAssignmentDetails">
-                                            <rich:componentControl for="mpAssignmentDetails" operation="show" event="oncomplete" />
+                                        <a4j:support event="oncomplete" 
+                                                     actionListener="#{planning.onNewEditionPlacement}" 
+                                                     reRender="frmAssignmentDetails"
+                                                     oncomplete="#{rich:component('mpAssignmentDetails')}.show();">
                                         </a4j:support>
                                     </a4j:commandButton>
                                 </rich:column>
@@ -111,7 +119,7 @@
                                                rowClasses="odd, even"
                                                sortPriority="#{converge:createList('colPosition,colPriority')}">
                                     <rich:column>
-                                        <h:graphicImage value="#{res.NEWS_ITEM_ICON}" alt="#{i18n.Planning_NEWS_ITEM}" title="#{i18n.Planning_NEWS_ITEM}" />
+                                        <h:graphicImage value="#{i18n.resource_ICON_NEWS_ITEM}" alt="#{i18n.Planning_NEWS_ITEM}" title="#{i18n.Planning_NEWS_ITEM}" />
                                     </rich:column>
 
                                     <rich:column>
@@ -141,9 +149,13 @@
                                         <h:outputText value="#{item.position}" />
                                     </rich:column>
                                     <rich:column>
-                                        <a4j:commandButton rendered="#{false}" styleClass="button mediumButton" value="#{i18n.Planning_DETAILS}" reRender="frmAssignmentDetails" ajaxSingle="true">
+                                        <a4j:commandButton rendered="#{false}" 
+                                                           styleClass="button mediumButton" 
+                                                           value="#{i18n.Planning_DETAILS}" 
+                                                           reRender="frmAssignmentDetails" 
+                                                           ajaxSingle="true"
+                                                           oncomplete="#{rich:component('mpAssignmentDetails')}.show();">
                                             <f:setPropertyActionListener target="#{planning.selectedAssignment}" value="#{item}" />
-                                            <rich:componentControl for="mpAssignmentDetails" operation="show" event="oncomplete" />
                                         </a4j:commandButton>
                                     </rich:column>
                                 </rich:subTable>
@@ -196,11 +208,8 @@
                                                                value="#{i18n.Planning_TEMPLATES}"
                                                                title="#{i18n.Planning_TEMPLATES_TOOLTIP}"
                                                                reRender="frmEditionTemplateDetails"
-                                                               limitToList="true">
-                                                <rich:componentControl for="mpEditionTemplateDetails"
-                                                                       operation="show"
-                                                                       event="oncomplete" />
-                                            </a4j:commandButton>
+                                                               limitToList="true"
+                                                               oncomplete="#{rich:component('mpEditionTemplateDetails')}.show();" />
 
                                             <a4j:commandButton id="btnNewSection"
                                                                styleClass="button smallButton"
@@ -208,10 +217,8 @@
                                                                title="#{i18n.Planning_EDITION_SECTION_NEW_TOOLTIP}"
                                                                actionListener="#{planning.onNewEditionSection}"
                                                                reRender="frmEditionSectionDetails"
-                                                               limitToList="true">
-                                                <rich:componentControl for="mpEditionSectionDetails"
-                                                                       operation="show"
-                                                                       event="oncomplete" />
+                                                               limitToList="true"
+                                                               oncomplete="#{rich:component('mpEditionSectionDetails')}.show();">
                                             </a4j:commandButton>
                                         </h:column>
                                     </h:panelGrid>
@@ -227,10 +234,8 @@
                                         <rich:column>
                                             <f:facet name="header">&#160;</f:facet>
                                             <a4j:commandLink reRender="frmEditionSectionDetails"
-                                                             limitToList="true">
-                                                <rich:componentControl for="mpEditionSectionDetails"
-                                                                       operation="show"
-                                                                       event="oncomplete" />
+                                                             limitToList="true"
+                                                             oncomplete="#{rich:component('mpEditionSectionDetails')}.show();">
                                                 <f:setPropertyActionListener value="#{section}"
                                                                              target="#{planning.selectedEditionSection}" />
                                                 <h:graphicImage value="/images/icons/section.gif"
@@ -249,10 +254,8 @@
                                                               title="#{i18n.Planning_EDITION_SECTION_NAME_TOOLTIP}" />
                                             </f:facet>
                                             <a4j:commandLink reRender="frmEditionSectionDetails"
-                                                             limitToList="true">
-                                                <rich:componentControl for="mpEditionSectionDetails"
-                                                                       operation="show"
-                                                                       event="oncomplete" />
+                                                             limitToList="true"
+                                                             oncomplete="#{rich:component('mpEditionSectionDetails')}.show();">
                                                 <f:setPropertyActionListener value="#{section}"
                                                                              target="#{planning.selectedEditionSection}" />
 
@@ -280,8 +283,12 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkSaveEdition" styleClass="dialogButton" value="#{i18n.Generic_SAVE}" actionListener="#{planning.onSaveEdition}" reRender="frmPage">
-                                <rich:componentControl for="mpEditionDetails" operation="hide" event="oncomplete" />
+                            <a4j:commandLink id="lnkSaveEdition" 
+                                             styleClass="dialogButton" 
+                                             value="#{i18n.Generic_SAVE}" 
+                                             actionListener="#{planning.onSaveEdition}" 
+                                             reRender="frmPage"
+                                             oncomplete="#{rich:component('mpEditionDetails')}.hide();">
                             </a4j:commandLink>
 
                             <a4j:commandLink id="lnkApplyEdition"
@@ -296,12 +303,8 @@
                                              actionListener="#{planning.onDeleteEdition}"
                                              styleClass="dialogButton"
                                              value="#{i18n.Generic_DELETE}"
-                                             reRender="frmPage">
-                                <rich:componentControl for="mpEditionDetails"
-                                                       operation="hide"
-                                                       event="oncomplete" />
-                            </a4j:commandLink>
-
+                                             reRender="frmPage"
+                                             oncomplete="#{rich:component('mpEditionDetails')}.hide();" />
 
                             <h:commandLink id="lnkCloseOutletForm"
                                            styleClass="dialogButton"
@@ -353,11 +356,8 @@
                                              value="#{i18n.Generic_SAVE}"
                                              actionListener="#{planning.onSaveEditionSection}"
                                              reRender="pgEditionSections"
-                                             limitToList="true">
-                                <rich:componentControl for="mpEditionSectionDetails"
-                                                       operation="hide"
-                                                       event="oncomplete" />
-                            </a4j:commandLink>
+                                             limitToList="true"
+                                             oncomplete="#{rich:component('mpEditionSectionDetails')}.hide();" />
 
                             <a4j:commandLink id="lnkApplyEditionSection"
                                              styleClass="dialogButton"
@@ -373,10 +373,8 @@
                                              styleClass="dialogButton"
                                              value="#{i18n.Generic_DELETE}"
                                              reRender="pgEditionSections"
-                                             limitToList="true">
-                                <rich:componentControl for="mpEditionSectionDetails"
-                                                       operation="hide"
-                                                       event="oncomplete" />
+                                             limitToList="true"
+                                             oncomplete="#{rich:component('mpEditionSectionDetails')}.hide();">
                             </a4j:commandLink>
 
 
@@ -457,8 +455,13 @@
                         </rich:tabPanel>
 
                         <h:panelGroup styleClass="dialogueButtons">
-                            <a4j:commandLink id="lnkUseTemplate" styleClass="dialogButton" value="#{i18n.Planning_EDITION_USE_TEMPLATE}" title="#{i18n.Planning_EDITION_USE_TEMPLATE_TOOLTIP}" actionListener="#{planning.onUseEditionTemplate}" reRender="pgEditionSections">
-                                <rich:componentControl for="mpEditionTemplateDetails" operation="hide" event="oncomplete" />
+                            <a4j:commandLink id="lnkUseTemplate" 
+                                             styleClass="dialogButton" 
+                                             value="#{i18n.Planning_EDITION_USE_TEMPLATE}" 
+                                             title="#{i18n.Planning_EDITION_USE_TEMPLATE_TOOLTIP}" 
+                                             actionListener="#{planning.onUseEditionTemplate}" 
+                                             reRender="pgEditionSections"
+                                             oncomplete="#{rich:component('mpEditionTemplateDetails')}.hide();">
                             </a4j:commandLink>
                             <h:commandLink id="lnkCloseTemplates" styleClass="dialogButton" value="#{i18n.Generic_CANCEL}" onclick="#{rich:component('mpEditionTemplateDetails')}.hide(); return false;" />
                         </h:panelGroup>
