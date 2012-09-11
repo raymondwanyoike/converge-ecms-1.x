@@ -208,6 +208,9 @@ public class DrupalEditionAction implements EditionAction {
         FileResource fr = new FileResource(dc);
         NodeResource nr = new NodeResource(dc);
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = sdf.format(edition.getPublicationDate().getTime());
+
         int errors = 0;
 
         try {
@@ -229,6 +232,7 @@ public class DrupalEditionAction implements EditionAction {
                 fb
                         .add(new BasicWrapper("title", getTitle(newsItem)))
                         .add(new BasicWrapper("type", nodeType))
+                        .add(new BasicWrapper("date", date))
                         .add(new TextWrapper("body", newsItem.getBrief(),
                         newsItem.getStory(), "full_html"))
                         .add(
