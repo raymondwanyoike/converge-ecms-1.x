@@ -173,4 +173,15 @@ public class OutletService {
         }
         return edition;
     }
+
+    @WebMethod(operationName = "scheduleAction")
+    public void scheduleAction(@WebParam(name = "editionId") Long editionId,
+            @WebParam(name = "actionId") Long actionId) {
+        outletFacade.scheduleAction(editionId, actionId);
+    }
+
+    @WebMethod(operationName = "scheduleActions")
+    public void scheduleActions(@WebParam(name = "editionId") Long editionId) {
+        outletFacade.scheduleActions(editionId);
+    }
 }
