@@ -142,28 +142,35 @@ public class DrupalEditionAction implements EditionAction {
     @Override
     public void execute(PluginContext ctx, Edition edition,
             OutletEditionAction action) {
-        setupPlugin(action);
-        date = sdf.format(edition.getPublicationDate().getTime());
-        int errors = 0;
-
         LOG.log(Level.INFO, "Starting action... Edition #{0}", edition.getId());
+        
+        setupPlugin(action);
+        
+        int errors = 0;
 
         try {
             dc.setup();
             ur.login();
+            
+            date = sdf.format(edition.getPublicationDate().getTime());
 
             LOG.log(Level.INFO, "Found {0} NewsItem(s)", edition.
                     getNumberOfPlacements());
 
             for (NewsItemPlacement nip : edition.getPlacements()) {
-                HttpMessageBuilder fb = new HttpMessageBuilder();
                 NewsItem newsItem = nip.getNewsItem();
+
+                if (!newsItem.isEndState()) {
+                    continue;
+                }
+
+                HttpMessageBuilder fb = new HttpMessageBuilder();
                 boolean update = false;
 
                 try {
                     update = newsItemExists(nir, newsItem);
                 } catch (Exception ex) {
-                    LOG.log(Level.SEVERE, "> Retrieving NewsItem #{0} failed",
+                    LOG.log(Level.SEVERE, "Retrieving NewsItem #{0} failed",
                             newsItem.getId());
                     LOG.log(Level.SEVERE, null, ex);
 
@@ -197,21 +204,21 @@ public class DrupalEditionAction implements EditionAction {
 
                     try {
                         for (MediaItem mediaItem : mediaItems) {
-                            MediaItemRendition mir = mediaItem.getOriginal();
+                            MediaItemRendition mir = null;
 
                             try {
                                 mir = mediaItem.findRendition(renditionName);
                             } catch (RenditionNotFoundException ex) {
-                                LOG.log(Level.SEVERE,
-                                        "Rendition ''{0}'' missing for MediaItem #{1} - NewsItem #{2}",
+                                LOG.log(Level.INFO,
+                                        "Rendition ''{0}'' missing for MediaItem #{1}",
                                         new Object[]{renditionName, mediaItem.
-                                            getId(), newsItem.getId()});
+                                            getId()});
+                                continue;
                             }
 
                             String title = truncateString(mediaItem.getTitle(),
                                     20);
                             File file = new File(mir.getFileLocation());
-
                             FileMessage fileMessage = fr.createRaw(file, title);
 
                             String fid = fileMessage.getId().toString();
@@ -227,8 +234,8 @@ public class DrupalEditionAction implements EditionAction {
                             fb.add(imageWrapper);
                         }
                     } catch (Exception ex) {
-                        LOG.log(Level.SEVERE,
-                                "> Uploading NewsItem #{0} image(s) failed",
+                        LOG.log(Level.INFO,
+                                "Uploading NewsItem #{0} image(s) failed",
                                 newsItem.getId());
                         LOG.log(Level.SEVERE, null, ex);
 
@@ -244,7 +251,7 @@ public class DrupalEditionAction implements EditionAction {
 
                 if (update) {
                     LOG.log(Level.INFO,
-                            "> Updating Node #{0} with NewsItem #{1} & {2} image(s)",
+                            "Updating Node #{0} with NewsItem #{1} & {2} image(s)",
                             new Object[]{nodeId, newsItem.getId(), mediaItems.
                                 size()});
 
@@ -262,8 +269,9 @@ public class DrupalEditionAction implements EditionAction {
                         }
                     }
                 } else {
-                    LOG.log(Level.INFO,
-                            "> Uploading NewsItem #{0} & {1} image(s)",
+                    LOG.
+                            log(Level.INFO,
+                            "Uploading NewsItem #{0} & {1} image(s)",
                             new Object[]{newsItem.getId(), mediaItems.size()});
 
                     NewsItemEditionState status = ctx.
@@ -326,17 +334,23 @@ public class DrupalEditionAction implements EditionAction {
     @Override
     public void executePlacement(PluginContext ctx, NewsItemPlacement placement,
             Edition edition, OutletEditionAction action) {
-        setupPlugin(action);
-        date = sdf.format(edition.getPublicationDate().getTime());
+        NewsItem newsItem = placement.getNewsItem();
+
+        if (!newsItem.isEndState()) {
+            return;
+        }
 
         LOG.log(Level.INFO, "Starting action... Edition #{0}", edition.getId());
-
+        
+        setupPlugin(action);
+        
         try {
             dc.setup();
             ur.login();
 
+            date = sdf.format(edition.getPublicationDate().getTime());
+            
             HttpMessageBuilder fb = new HttpMessageBuilder();
-            NewsItem newsItem = placement.getNewsItem();
             boolean update = newsItemExists(nir, newsItem);
 
             if (nodeLanguage != null) {
@@ -360,15 +374,16 @@ public class DrupalEditionAction implements EditionAction {
 
                 try {
                     for (MediaItem mediaItem : mediaItems) {
-                        MediaItemRendition mir = mediaItem.getOriginal();
+                        MediaItemRendition mir = null;
 
                         try {
                             mir = mediaItem.findRendition(renditionName);
                         } catch (RenditionNotFoundException ex) {
-                            LOG.log(Level.SEVERE,
-                                    "Rendition ''{0}'' missing for MediaItem #{1} - NewsItem #{2}",
+                            LOG.log(Level.INFO,
+                                    "Rendition ''{0}'' missing for MediaItem #{1}",
                                     new Object[]{renditionName, mediaItem.
-                                        getId(), newsItem.getId()});
+                                        getId()});
+                            continue;
                         }
 
                         String title = truncateString(mediaItem.getTitle(), 20);
@@ -389,7 +404,7 @@ public class DrupalEditionAction implements EditionAction {
                     }
                 } catch (Exception ex) {
                     LOG.log(Level.SEVERE,
-                            "> Uploading NewsItem #{0} image(s) failed",
+                            "Uploading NewsItem #{0} image(s) failed",
                             newsItem.getId());
                     LOG.log(Level.SEVERE, null, ex);
                 }
@@ -397,10 +412,10 @@ public class DrupalEditionAction implements EditionAction {
 
             if (update) {
                 LOG.log(Level.INFO,
-                        "> Updating Node #{0} with NewsItem #{1} & {2} image(s)",
+                        "Updating Node #{0} with NewsItem #{1} & {2} image(s)",
                         new Object[]{nodeId, newsItem.getId(), mediaItems.size()});
             } else {
-                LOG.log(Level.INFO, "> Uploading NewsItem #{0} & {1} image(s)",
+                LOG.log(Level.INFO, "Uploading NewsItem #{0} & {1} image(s)",
                         new Object[]{newsItem.getId(), mediaItems.size()});
             }
 
