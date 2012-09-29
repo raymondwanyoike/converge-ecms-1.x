@@ -26,6 +26,7 @@ import dk.i2m.converge.core.subscriber.OutletSubscriber;
 import dk.i2m.converge.core.utils.BeanComparator;
 import dk.i2m.converge.core.workflow.*;
 import dk.i2m.converge.ejb.messaging.EditionServiceMessageBean;
+import dk.i2m.converge.ejb.messaging.OutletServiceMessageBean;
 import dk.i2m.converge.ejb.services.DaoServiceLocal;
 import dk.i2m.converge.ejb.services.QueryBuilder;
 import dk.i2m.converge.utils.CalendarUtils;
@@ -50,6 +51,8 @@ public class OutletFacadeBean implements OutletFacadeLocal {
     @EJB private DaoServiceLocal daoService;
 
     @Resource(mappedName = "jms/editionServiceQueue") private Destination destination;
+
+    @Resource(mappedName = "jms/outletServiceQueue") private Destination outletServiceQueue;
 
     @Resource(mappedName = "jms/connectionFactory") private ConnectionFactory jmsConnectionFactory;
 
@@ -192,7 +195,7 @@ public class OutletFacadeBean implements OutletFacadeLocal {
         } catch (DataNotFoundException ex) {
             LOG.log(Level.SEVERE, "Original subscriber does not exist");
         }
-        
+
         return daoService.update(subscriber);
     }
 
@@ -232,7 +235,8 @@ public class OutletFacadeBean implements OutletFacadeLocal {
             Map<String, Object> params = QueryBuilder.with(
                     OutletSubscriber.OUTLET_PARAMETER, outlet).parameters();
 
-            return daoService.findWithNamedQuery(OutletSubscriber.FIND_BY_OUTLET,
+            return daoService.
+                    findWithNamedQuery(OutletSubscriber.FIND_BY_OUTLET,
                     params, start, results);
         } catch (DataNotFoundException ex) {
             return Collections.EMPTY_LIST;
@@ -321,7 +325,8 @@ public class OutletFacadeBean implements OutletFacadeLocal {
         Edition edition = new Edition();
         edition.setCloseDate(editionCandidate.getCloseDate());
         edition.setExpirationDate(Calendar.getInstance());
-        edition.getExpirationDate().setTime(editionCandidate.getExpirationDate());
+        edition.getExpirationDate().
+                setTime(editionCandidate.getExpirationDate());
         edition.setPublicationDate(Calendar.getInstance());
         edition.getPublicationDate().setTime(
                 editionCandidate.getPublicationDate());
@@ -764,9 +769,11 @@ public class OutletFacadeBean implements OutletFacadeLocal {
             MessageProducer producer = session.createProducer(destination);
 
             MapMessage message = session.createMapMessage();
-            message.setLongProperty(EditionServiceMessageBean.Property.EDITION_ID.
+            message.
+                    setLongProperty(EditionServiceMessageBean.Property.EDITION_ID.
                     name(), editionId);
-            message.setLongProperty(EditionServiceMessageBean.Property.ACTION_ID.
+            message.
+                    setLongProperty(EditionServiceMessageBean.Property.ACTION_ID.
                     name(), actionId);
             producer.send(message);
 
@@ -806,9 +813,11 @@ public class OutletFacadeBean implements OutletFacadeLocal {
 
             for (OutletEditionAction action : actions) {
                 MapMessage message = session.createMapMessage();
-                message.setLongProperty(EditionServiceMessageBean.Property.EDITION_ID.
+                message.
+                        setLongProperty(EditionServiceMessageBean.Property.EDITION_ID.
                         name(), editionId);
-                message.setLongProperty(EditionServiceMessageBean.Property.ACTION_ID.
+                message.
+                        setLongProperty(EditionServiceMessageBean.Property.ACTION_ID.
                         name(), action.getId());
                 producer.send(message);
             }
@@ -857,13 +866,17 @@ public class OutletFacadeBean implements OutletFacadeLocal {
 
             for (OutletActionView action : actions) {
                 MapMessage message = session.createMapMessage();
-                message.setLongProperty(EditionServiceMessageBean.Property.EDITION_ID.
+                message.
+                        setLongProperty(EditionServiceMessageBean.Property.EDITION_ID.
                         name(), editionId);
-                message.setLongProperty(EditionServiceMessageBean.Property.ACTION_ID.
+                message.
+                        setLongProperty(EditionServiceMessageBean.Property.ACTION_ID.
                         name(), action.getId());
-                message.setLongProperty(EditionServiceMessageBean.Property.NEWS_ITEM_PLACEMENT_ID.
+                message.
+                        setLongProperty(EditionServiceMessageBean.Property.NEWS_ITEM_PLACEMENT_ID.
                         name(), newsItemPlacementId);
-                message.setString(EditionServiceMessageBean.Property.USER_ACCOUNT_ID.
+                message.
+                        setString(EditionServiceMessageBean.Property.USER_ACCOUNT_ID.
                         name(), ctx.getCallerPrincipal().getName());
                 producer.send(message);
             }
@@ -906,13 +919,17 @@ public class OutletFacadeBean implements OutletFacadeLocal {
             MessageProducer producer = session.createProducer(destination);
 
             MapMessage message = session.createMapMessage();
-            message.setLongProperty(EditionServiceMessageBean.Property.EDITION_ID.
+            message.
+                    setLongProperty(EditionServiceMessageBean.Property.EDITION_ID.
                     name(), editionId);
-            message.setLongProperty(EditionServiceMessageBean.Property.ACTION_ID.
+            message.
+                    setLongProperty(EditionServiceMessageBean.Property.ACTION_ID.
                     name(), actionId);
-            message.setLongProperty(EditionServiceMessageBean.Property.NEWS_ITEM_PLACEMENT_ID.
+            message.
+                    setLongProperty(EditionServiceMessageBean.Property.NEWS_ITEM_PLACEMENT_ID.
                     name(), newsItemPlacementId);
-            message.setStringProperty(EditionServiceMessageBean.Property.USER_ACCOUNT_ID.
+            message.
+                    setStringProperty(EditionServiceMessageBean.Property.USER_ACCOUNT_ID.
                     name(), ctx.getCallerPrincipal().getName());
             producer.send(message);
 
@@ -955,9 +972,11 @@ public class OutletFacadeBean implements OutletFacadeLocal {
 
                 for (OutletEditionAction action : actions) {
                     MapMessage message = session.createMapMessage();
-                    message.setLongProperty(EditionServiceMessageBean.Property.EDITION_ID.
+                    message.
+                            setLongProperty(EditionServiceMessageBean.Property.EDITION_ID.
                             name(), edition.getId());
-                    message.setLongProperty(EditionServiceMessageBean.Property.ACTION_ID.
+                    message.
+                            setLongProperty(EditionServiceMessageBean.Property.ACTION_ID.
                             name(), action.getId());
                     producer.send(message);
                 }
@@ -988,36 +1007,28 @@ public class OutletFacadeBean implements OutletFacadeLocal {
     @TransactionAttribute(TransactionAttributeType.NEVER)
     public void scheduleActionOnOutlet(Long outletId, Long actionId) {
         Connection connection = null;
+
         try {
-            Outlet outlet = findOutletById(outletId);
-
-            List<Edition> editions = findEditionsByStatus(false, outlet);
-
             connection = jmsConnectionFactory.createConnection();
             Session session = connection.createSession(true,
                     Session.AUTO_ACKNOWLEDGE);
-            MessageProducer producer = session.createProducer(destination);
+            MessageProducer producer = session.
+                    createProducer(outletServiceQueue);
 
-            for (Edition edition : editions) {
-                MapMessage message = session.createMapMessage();
-                message.setLongProperty(EditionServiceMessageBean.Property.EDITION_ID.
-                        name(), edition.getId());
-                message.setLongProperty(EditionServiceMessageBean.Property.ACTION_ID.
-                        name(), actionId);
-                producer.send(message);
-            }
+            MapMessage message = session.createMapMessage();
+            message.setLongProperty(OutletServiceMessageBean.Property.OUTLET_ID.
+                    name(), outletId);
+            message.setLongProperty(OutletServiceMessageBean.Property.ACTION_ID.
+                    name(), actionId);
+            producer.send(message);
+
             session.close();
             connection.close();
-
-        } catch (DataNotFoundException ex) {
-            LOG.log(Level.WARNING, ex.getMessage());
         } catch (JMSException ex) {
-            Logger.getLogger(OutletFacadeBean.class.getName()).log(Level.SEVERE,
-                    null, ex);
+            LOG.log(Level.SEVERE, null, ex);
         } finally {
             if (connection != null) {
                 try {
-
                     connection.close();
                 } catch (Exception e) {
                 }
