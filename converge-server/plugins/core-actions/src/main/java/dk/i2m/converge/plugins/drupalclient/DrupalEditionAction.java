@@ -37,13 +37,15 @@ import dk.i2m.drupal.field.wrapper.BasicWrapper;
 import dk.i2m.drupal.field.wrapper.ImageWrapper;
 import dk.i2m.drupal.field.wrapper.ListWrapper;
 import dk.i2m.drupal.field.wrapper.TextWrapper;
+import dk.i2m.drupal.message.FileMessage;
+import dk.i2m.drupal.message.NodeMessage;
 import dk.i2m.drupal.resource.FileResource;
+import dk.i2m.drupal.resource.NewsItemResource;
 import dk.i2m.drupal.resource.NodeResource;
 import dk.i2m.drupal.resource.UserResource;
-import dk.i2m.drupal.response.FileResponce;
-import dk.i2m.drupal.response.NodeResponse;
 import dk.i2m.drupal.util.HttpMessageBuilder;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,6 +58,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.client.HttpResponseException;
 
 /**
  *
@@ -77,7 +81,6 @@ public class DrupalEditionAction implements EditionAction {
         SECTION_MAPPING,
         SERVICE_ENDPOINT,
         SOCKET_TIMEOUT,
-        UNDISCLOSED_AUTHOR,
         URL,
         USERNAME
     }
@@ -104,114 +107,46 @@ public class DrupalEditionAction implements EditionAction {
 
     private Map<String, String> availableProperties;
 
+    private Map<Long, Long> sectionMapping;
+
+    private DrupalClient dc;
+
+    private UserResource ur;
+
+    private FileResource fr;
+
+    private NodeResource nr;
+
+    private NewsItemResource nir;
+
+    private SimpleDateFormat sdf;
+
     private String publishDelay;
 
     private String publishImmediately;
 
     private String renditionName;
 
-    private String undisclosedAuthor;
-
     private String frontpagePlacement;
 
-    private Map<Long, Long> sectionMapping;
+    private String nodeLanguage;
+
+    private String nodeType;
+
+    private String mappings;
+
+    private String date;
+
+    private Long nodeId;
 
     @Override
     public void execute(PluginContext ctx, Edition edition,
             OutletEditionAction action) {
-        Map<String, String> properties = action.getPropertiesAsMap();
-
-        String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT.
-                name());
-        String mappings = properties.get(Property.SECTION_MAPPING.name());
-        String nodeType = properties.get(Property.NODE_TYPE.name());
-        String nodeLanguage = properties.get(Property.NODE_LANGUAGE.name());
-        String password = properties.get(Property.PASSWORD.name());
-        String endpoint = properties.get(Property.SERVICE_ENDPOINT.name());
-        String socketTimeout = properties.get(Property.SOCKET_TIMEOUT.name());
-        String hostname = properties.get(Property.URL.name());
-        String username = properties.get(Property.USERNAME.name());
-
-        publishDelay = properties.get(Property.PUBLISH_DELAY.name());
-        publishImmediately = properties.get(Property.PUBLISH_IMMEDIATELY.name());
-        renditionName = properties.get(Property.IMAGE_RENDITION.name());
-        undisclosedAuthor = properties.get(Property.UNDISCLOSED_AUTHOR.name());
-        frontpagePlacement = properties.get(Property.FRONTPAGE_PLACEMENT.name());
-        sectionMapping = new HashMap<Long, Long>();
-
-        if (hostname == null) {
-            throw new IllegalArgumentException("'hostname' cannot be null");
-        }
-
-        if (endpoint == null) {
-            throw new IllegalArgumentException("'endpoint' cannot be null");
-        }
-
-        if (username == null) {
-            throw new IllegalArgumentException("'username' cannot be null");
-        }
-
-        if (password == null) {
-            throw new IllegalArgumentException("'password' cannot be null");
-        }
-
-        if (nodeType == null) {
-            throw new IllegalArgumentException("'nodeType' cannot be null");
-        }
-
-        if (mappings == null) {
-            throw new IllegalArgumentException("'mappings' cannot be null");
-        }
-
-        if (publishImmediately == null && publishDelay == null) {
-            throw new IllegalArgumentException(
-                    "'publishImmediately' or 'publishDelay' cannot be null");
-        }
-
-        if (publishImmediately == null && publishDelay != null) {
-            if (!isInteger(publishDelay)) {
-                throw new IllegalArgumentException(
-                        "'publishDelay' must be an integer");
-            } else if (Integer.parseInt(publishDelay) <= 0) {
-                throw new IllegalArgumentException(
-                        "'publishDelay' cannot be <= 0");
-            }
-        }
-
-        if (frontpagePlacement != null && !isInteger(frontpagePlacement)) {
-            throw new IllegalArgumentException(
-                    "'frontpagePlacement' must be an integer");
-        }
-
-        if (connectionTimeout == null) {
-            connectionTimeout = "30000"; // 30 seconds
-        } else if (!isInteger(connectionTimeout)) {
-            throw new IllegalArgumentException(
-                    "'connectionTimeout' must be an integer");
-        }
-
-        if (socketTimeout == null) {
-            socketTimeout = "30000"; // 30 seconds
-        } else if (!isInteger(socketTimeout)) {
-            throw new IllegalArgumentException(
-                    "'socketTimeout' must be an integer");
-        }
+        setupPlugin(action);
+        date = sdf.format(edition.getPublicationDate().getTime());
+        int errors = 0;
 
         LOG.log(Level.INFO, "Starting action... Edition #{0}", edition.getId());
-
-        setSectionMapping(mappings);
-
-        DrupalClient dc =
-                new DefaultDrupalClient(URI.create(hostname), endpoint, Integer.
-                parseInt(connectionTimeout), Integer.parseInt(socketTimeout));
-        UserResource ur = new UserResource(dc, username, password);
-        FileResource fr = new FileResource(dc);
-        NodeResource nr = new NodeResource(dc);
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String date = sdf.format(edition.getPublicationDate().getTime());
-
-        int errors = 0;
 
         try {
             dc.setup();
@@ -222,84 +157,13 @@ public class DrupalEditionAction implements EditionAction {
 
             for (NewsItemPlacement nip : edition.getPlacements()) {
                 HttpMessageBuilder fb = new HttpMessageBuilder();
-
-                if (nodeLanguage != null) {
-                    fb = new HttpMessageBuilder(nodeLanguage);
-                }
-
                 NewsItem newsItem = nip.getNewsItem();
-
-                fb
-                        .add(new BasicWrapper("title", getTitle(newsItem)))
-                        .add(new BasicWrapper("type", nodeType))
-                        .add(new BasicWrapper("date", date))
-                        .add(new TextWrapper("body", newsItem.getBrief(),
-                        newsItem.getStory(), "full_html"))
-                        .add(
-                        new TextWrapper("field_author", getAuthor(newsItem)))
-                        .add(new TextWrapper("field_newsitem", newsItem.getId().
-                        toString()))
-                        .add(new TextWrapper("field_edition", edition.getId().
-                        toString()));
-
-                if (getPromoted(nip) != null) {
-                    fb.add(new BasicWrapper("promote", getPromoted(nip)));
-                }
-
-                if (getPublishOn() != null) {
-                    fb.add(new BasicWrapper("publish_on", getPublishOn()));
-                }
-
-                if (getSection(nip) != null) {
-                    fb.add(new ListWrapper("field_section", getSection(nip)));
-                }
-
-                if (nip.getStart() != null) {
-                    fb.add(new TextWrapper("field_placement_start", nip.
-                            getStart().toString()));
-                }
-
-                if (nip.getPosition() != null) {
-                    fb.add(new TextWrapper("field_placement_position", nip.
-                            getPosition().toString()));
-                }
-
-                List<MediaItem> mediaItems = getMediaItems(newsItem);
+                boolean update = false;
 
                 try {
-                    ImageWrapper imageWrapper = new ImageWrapper("field_image");
-
-                    for (MediaItem mediaItem : mediaItems) {
-                        MediaItemRendition mir = mediaItem.getOriginal();
-
-                        try {
-                            mir = mediaItem.findRendition(renditionName);
-                        } catch (RenditionNotFoundException ex) {
-                            LOG.log(Level.SEVERE,
-                                    "Rendition ''{0}'' missing for MediaItem #{1} - NewsItem #{2}",
-                                    new Object[]{renditionName, mediaItem.
-                                        getId(), newsItem.getId()});
-                        }
-
-                        File file = new File(mir.getFileLocation());
-                        String title = truncateString(mediaItem.getTitle(), 20);
-
-                        FileResponce fileResponce = fr.createRaw(file, title);
-
-                        String fid = fileResponce.getId().toString();
-                        String alt = truncateString(mediaItem.getTitle(), 512);
-                        String description = truncateString(mediaItem.
-                                getDescription(), 1024);
-
-                        imageWrapper.add(new Image(fid, alt, description));
-                    }
-
-                    if (!mediaItems.isEmpty()) {
-                        fb.add(imageWrapper);
-                    }
+                    update = newsItemExists(nir, newsItem);
                 } catch (Exception ex) {
-                    LOG.log(Level.SEVERE,
-                            "> Uploading NewsItem #{0} image(s) failed",
+                    LOG.log(Level.SEVERE, "> Retrieving NewsItem #{0} failed",
                             newsItem.getId());
                     LOG.log(Level.SEVERE, null, ex);
 
@@ -312,50 +176,140 @@ public class DrupalEditionAction implements EditionAction {
                     }
                 }
 
-                NewsItemEditionState status = ctx.
-                        addNewsItemEditionState(edition.getId(), newsItem.
-                        getId(), STATUS_LABEL, UPLOADING.toString());
-                NewsItemEditionState nid = ctx.addNewsItemEditionState(edition.
-                        getId(), newsItem.getId(), NID_LABEL, null);
-                NewsItemEditionState uri = ctx.addNewsItemEditionState(edition.
-                        getId(), newsItem.getId(), URI_LABEL, null);
-                NewsItemEditionState submitted = ctx.
-                        addNewsItemEditionState(edition.getId(), newsItem.
-                        getId(), DATE, null);
+                if (nodeLanguage != null) {
+                    fb = new HttpMessageBuilder(nodeLanguage);
+                }
 
-                LOG.log(Level.INFO, "> Uploading NewsItem #{0} & {1} image(s)",
-                        new Object[]{newsItem.getId(), mediaItems.size()});
+                fb = prepareHttpMessage(edition, nip, fb);
 
-                try {
-                    NodeResponse nodeResponse = nr.create(fb.
-                            toUrlEncodedFormEntity());
+                if (!update && getPublishOn() != null) {
+                    fb.add(new BasicWrapper("publish_on", getPublishOn()));
+                }
 
-                    nid.setValue(nodeResponse.getId().toString());
-                    uri.setValue(nodeResponse.getUri().toString());
-                    submitted.setValue(new Date().toString());
-                    status.setValue(UPLOADED.toString());
-                } catch (Exception ex) {
-                    status.setValue(FAILED.toString());
-                    LOG.log(Level.SEVERE, null, ex);
+                List<MediaItem> mediaItems = getMediaItems(newsItem);
+
+                if (!mediaItems.isEmpty()) {
+                    ImageWrapper imageWrapper = new ImageWrapper("field_image");
+
+                    if (update) {
+                        deleteNodeFiles();
+                    }
+
+                    try {
+                        for (MediaItem mediaItem : mediaItems) {
+                            MediaItemRendition mir = mediaItem.getOriginal();
+
+                            try {
+                                mir = mediaItem.findRendition(renditionName);
+                            } catch (RenditionNotFoundException ex) {
+                                LOG.log(Level.SEVERE,
+                                        "Rendition ''{0}'' missing for MediaItem #{1} - NewsItem #{2}",
+                                        new Object[]{renditionName, mediaItem.
+                                            getId(), newsItem.getId()});
+                            }
+
+                            String title = truncateString(mediaItem.getTitle(),
+                                    20);
+                            File file = new File(mir.getFileLocation());
+
+                            FileMessage fileMessage = fr.createRaw(file, title);
+
+                            String fid = fileMessage.getId().toString();
+                            String alt = truncateString(mediaItem.getTitle(),
+                                    512);
+                            String description = truncateString(mediaItem.
+                                    getDescription(), 1024);
+
+                            imageWrapper.add(new Image(fid, alt, description));
+                        }
+
+                        if (!mediaItems.isEmpty()) {
+                            fb.add(imageWrapper);
+                        }
+                    } catch (Exception ex) {
+                        LOG.log(Level.SEVERE,
+                                "> Uploading NewsItem #{0} image(s) failed",
+                                newsItem.getId());
+                        LOG.log(Level.SEVERE, null, ex);
+
+                        errors++;
+
+                        if (errors > 4) {
+                            break;
+                        } else {
+                            continue;
+                        }
+                    }
+                }
+
+                if (update) {
+                    LOG.log(Level.INFO,
+                            "> Updating Node #{0} with NewsItem #{1} & {2} image(s)",
+                            new Object[]{nodeId, newsItem.getId(), mediaItems.
+                                size()});
+
+                    try {
+                        nr.update(nodeId, fb.toUrlEncodedFormEntity());
+                    } catch (Exception ex) {
+                        LOG.log(Level.SEVERE, null, ex);
+
+                        errors++;
+
+                        if (errors > 4) {
+                            break;
+                        } else {
+                            continue;
+                        }
+                    }
+                } else {
+                    LOG.log(Level.INFO,
+                            "> Uploading NewsItem #{0} & {1} image(s)",
+                            new Object[]{newsItem.getId(), mediaItems.size()});
+
+                    NewsItemEditionState status = ctx.
+                            addNewsItemEditionState(edition.getId(), newsItem.
+                            getId(), STATUS_LABEL, UPLOADING.toString());
+                    NewsItemEditionState nid = ctx.
+                            addNewsItemEditionState(edition.
+                            getId(), newsItem.getId(), NID_LABEL, null);
+                    NewsItemEditionState uri = ctx.
+                            addNewsItemEditionState(edition.
+                            getId(), newsItem.getId(), URI_LABEL, null);
+                    NewsItemEditionState submitted = ctx.
+                            addNewsItemEditionState(edition.getId(), newsItem.
+                            getId(), DATE, null);
+
+                    try {
+                        NodeMessage nodeMessage = nr.create(fb.
+                                toUrlEncodedFormEntity());
+
+                        nid.setValue(nodeMessage.getId().toString());
+                        uri.setValue(nodeMessage.getUri().toString());
+                        submitted.setValue(new Date().toString());
+                        status.setValue(UPLOADED.toString());
+                    } catch (Exception ex) {
+                        status.setValue(FAILED.toString());
+                        LOG.log(Level.SEVERE, null, ex);
+
+                        ctx.updateNewsItemEditionState(status);
+                        ctx.updateNewsItemEditionState(nid);
+                        ctx.updateNewsItemEditionState(uri);
+                        ctx.updateNewsItemEditionState(submitted);
+
+                        errors++;
+
+                        if (errors > 4) {
+                            break;
+                        } else {
+                            continue;
+                        }
+                    }
 
                     ctx.updateNewsItemEditionState(status);
                     ctx.updateNewsItemEditionState(nid);
                     ctx.updateNewsItemEditionState(uri);
                     ctx.updateNewsItemEditionState(submitted);
-
-                    errors++;
-
-                    if (errors > 4) {
-                        break;
-                    } else {
-                        continue;
-                    }
                 }
-
-                ctx.updateNewsItemEditionState(status);
-                ctx.updateNewsItemEditionState(nid);
-                ctx.updateNewsItemEditionState(uri);
-                ctx.updateNewsItemEditionState(submitted);
             }
 
             LOG.log(Level.INFO, "Encountered {0} error(s)", errors);
@@ -372,7 +326,101 @@ public class DrupalEditionAction implements EditionAction {
     @Override
     public void executePlacement(PluginContext ctx, NewsItemPlacement placement,
             Edition edition, OutletEditionAction action) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        setupPlugin(action);
+        date = sdf.format(edition.getPublicationDate().getTime());
+
+        LOG.log(Level.INFO, "Starting action... Edition #{0}", edition.getId());
+
+        try {
+            dc.setup();
+            ur.login();
+
+            HttpMessageBuilder fb = new HttpMessageBuilder();
+            NewsItem newsItem = placement.getNewsItem();
+            boolean update = newsItemExists(nir, newsItem);
+
+            if (nodeLanguage != null) {
+                fb = new HttpMessageBuilder(nodeLanguage);
+            }
+
+            fb = prepareHttpMessage(edition, placement, fb);
+
+            if (!update && getPublishOn() != null) {
+                fb.add(new BasicWrapper("publish_on", getPublishOn()));
+            }
+
+            List<MediaItem> mediaItems = getMediaItems(newsItem);
+
+            if (!mediaItems.isEmpty()) {
+                ImageWrapper imageWrapper = new ImageWrapper("field_image");
+
+                if (update) {
+                    deleteNodeFiles();
+                }
+
+                try {
+                    for (MediaItem mediaItem : mediaItems) {
+                        MediaItemRendition mir = mediaItem.getOriginal();
+
+                        try {
+                            mir = mediaItem.findRendition(renditionName);
+                        } catch (RenditionNotFoundException ex) {
+                            LOG.log(Level.SEVERE,
+                                    "Rendition ''{0}'' missing for MediaItem #{1} - NewsItem #{2}",
+                                    new Object[]{renditionName, mediaItem.
+                                        getId(), newsItem.getId()});
+                        }
+
+                        String title = truncateString(mediaItem.getTitle(), 20);
+                        File file = new File(mir.getFileLocation());
+
+                        FileMessage fileMessage = fr.createRaw(file, title);
+
+                        String fid = fileMessage.getId().toString();
+                        String alt = truncateString(mediaItem.getTitle(), 512);
+                        String description = truncateString(mediaItem.
+                                getDescription(), 1024);
+
+                        imageWrapper.add(new Image(fid, alt, description));
+                    }
+
+                    if (!mediaItems.isEmpty()) {
+                        fb.add(imageWrapper);
+                    }
+                } catch (Exception ex) {
+                    LOG.log(Level.SEVERE,
+                            "> Uploading NewsItem #{0} image(s) failed",
+                            newsItem.getId());
+                    LOG.log(Level.SEVERE, null, ex);
+                }
+            }
+
+            if (update) {
+                LOG.log(Level.INFO,
+                        "> Updating Node #{0} with NewsItem #{1} & {2} image(s)",
+                        new Object[]{nodeId, newsItem.getId(), mediaItems.size()});
+            } else {
+                LOG.log(Level.INFO, "> Uploading NewsItem #{0} & {1} image(s)",
+                        new Object[]{newsItem.getId(), mediaItems.size()});
+            }
+
+            try {
+                if (update) {
+                    nr.update(nodeId, fb.toUrlEncodedFormEntity());
+                } else {
+                    nr.create(fb.toUrlEncodedFormEntity());
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, null, ex);
+            }
+
+            ur.logout();
+            dc.shutdown();
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        }
+
+        LOG.log(Level.INFO, "Finishing action... Edition #{0}", edition.getId());
     }
 
     @Override
@@ -382,7 +430,7 @@ public class DrupalEditionAction implements EditionAction {
 
     @Override
     public boolean isSupportPlacementExecute() {
-        return false;
+        return true;
     }
 
     @Override
@@ -486,7 +534,6 @@ public class DrupalEditionAction implements EditionAction {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, Integer.valueOf(publishDelay));
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return sdf.format(calendar.getTime());
     }
 
@@ -516,7 +563,7 @@ public class DrupalEditionAction implements EditionAction {
      */
     private String getAuthor(NewsItem newsItem) {
         if (newsItem.isUndisclosedAuthor()) {
-            return undisclosedAuthor;
+            return "N/A";
         } else {
             if (newsItem.getByLine().trim().isEmpty()) {
                 StringBuilder sb = new StringBuilder();
@@ -601,5 +648,159 @@ public class DrupalEditionAction implements EditionAction {
         } catch (Exception ex) {
             return false;
         }
+    }
+
+    private HttpMessageBuilder prepareHttpMessage(Edition edition,
+            NewsItemPlacement nip, HttpMessageBuilder fb) {
+        NewsItem newsItem = nip.getNewsItem();
+
+        fb.add(new BasicWrapper("type", nodeType));
+        fb.add(new BasicWrapper("date", date));
+        fb.add(new BasicWrapper("title", getTitle(newsItem)));
+        fb.add(new TextWrapper("body", newsItem.getBrief(), newsItem.getStory(),
+                "full_html"));
+
+        if (getPromoted(nip) != null) {
+            fb.add(new BasicWrapper("promote", getPromoted(nip)));
+        }
+
+        fb.add(new TextWrapper("field_author", getAuthor(newsItem)));
+        fb.add(new TextWrapper("field_newsitem", newsItem.getId().toString()));
+        fb.add(new TextWrapper("field_edition", edition.getId().toString()));
+
+        if (getSection(nip) != null) {
+            fb.add(new ListWrapper("field_section", getSection(nip)));
+        }
+
+        if (nip.getStart() != null) {
+            fb.add(new TextWrapper("field_placement_start", nip.getStart().
+                    toString()));
+        }
+
+        if (nip.getPosition() != null) {
+            fb.add(new TextWrapper("field_placement_position",
+                    nip.getPosition().toString()));
+        }
+
+        return fb;
+    }
+
+    private boolean newsItemExists(NewsItemResource nir, NewsItem newsItem)
+            throws HttpResponseException, IOException {
+        try {
+            NodeMessage nodeMessage = nir.retrieve(newsItem.getId());
+
+            if (nodeMessage == null) {
+                return false;
+            } else {
+                nodeId = nodeMessage.getId();
+                return true;
+            }
+        } catch (HttpResponseException ex) {
+            if (ex.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
+                return false;
+            } else {
+                throw ex;
+            }
+        }
+    }
+
+    private void deleteNodeFiles() throws
+            HttpResponseException, IOException {
+        List<FileMessage> fileMessages = nr.loadFiles(nodeId);
+
+        for (FileMessage fileMessage : fileMessages) {
+            fr.delete(fileMessage.getId());
+        }
+    }
+
+    private void setupPlugin(OutletEditionAction action) {
+        Map<String, String> properties = action.getPropertiesAsMap();
+
+        mappings = properties.get(Property.SECTION_MAPPING.name());
+        nodeType = properties.get(Property.NODE_TYPE.name());
+        nodeLanguage = properties.get(Property.NODE_LANGUAGE.name());
+        publishDelay = properties.get(Property.PUBLISH_DELAY.name());
+        publishImmediately = properties.get(Property.PUBLISH_IMMEDIATELY.name());
+        renditionName = properties.get(Property.IMAGE_RENDITION.name());
+        frontpagePlacement = properties.get(Property.FRONTPAGE_PLACEMENT.name());
+        sectionMapping = new HashMap<Long, Long>();
+
+        String hostname = properties.get(Property.URL.name());
+        String endpoint = properties.get(Property.SERVICE_ENDPOINT.name());
+        String username = properties.get(Property.USERNAME.name());
+        String password = properties.get(Property.PASSWORD.name());
+        String connectionTimeout = properties.get(Property.CONNECTION_TIMEOUT.
+                name());
+        String socketTimeout = properties.get(Property.SOCKET_TIMEOUT.name());
+
+        if (hostname == null) {
+            throw new IllegalArgumentException("'hostname' cannot be null");
+        }
+
+        if (endpoint == null) {
+            throw new IllegalArgumentException("'endpoint' cannot be null");
+        }
+
+        if (username == null) {
+            throw new IllegalArgumentException("'username' cannot be null");
+        }
+
+        if (password == null) {
+            throw new IllegalArgumentException("'password' cannot be null");
+        }
+
+        if (nodeType == null) {
+            throw new IllegalArgumentException("'nodeType' cannot be null");
+        }
+
+        if (mappings == null) {
+            throw new IllegalArgumentException("'mappings' cannot be null");
+        }
+
+        if (publishImmediately == null && publishDelay == null) {
+            throw new IllegalArgumentException(
+                    "'publishImmediately' or 'publishDelay' cannot be null");
+        }
+
+        if (publishImmediately == null && publishDelay != null) {
+            if (!isInteger(publishDelay)) {
+                throw new IllegalArgumentException(
+                        "'publishDelay' must be an integer");
+            } else if (Integer.parseInt(publishDelay) <= 0) {
+                throw new IllegalArgumentException(
+                        "'publishDelay' cannot be <= 0");
+            }
+        }
+
+        if (frontpagePlacement != null && !isInteger(frontpagePlacement)) {
+            throw new IllegalArgumentException(
+                    "'frontpagePlacement' must be an integer");
+        }
+
+        if (connectionTimeout == null) {
+            connectionTimeout = "30000"; // 30 seconds
+        } else if (!isInteger(connectionTimeout)) {
+            throw new IllegalArgumentException(
+                    "'connectionTimeout' must be an integer");
+        }
+
+        if (socketTimeout == null) {
+            socketTimeout = "30000"; // 30 seconds
+        } else if (!isInteger(socketTimeout)) {
+            throw new IllegalArgumentException(
+                    "'socketTimeout' must be an integer");
+        }
+
+        setSectionMapping(mappings);
+
+        dc = new DefaultDrupalClient(URI.create(hostname), endpoint, Integer.
+                parseInt(connectionTimeout), Integer.parseInt(socketTimeout));
+        ur = new UserResource(dc, username, password);
+        fr = new FileResource(dc);
+        nr = new NodeResource(dc);
+        nir = new NewsItemResource(dc);
+
+        sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
 }
