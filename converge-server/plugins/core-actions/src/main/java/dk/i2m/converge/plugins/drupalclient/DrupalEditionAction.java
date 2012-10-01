@@ -40,7 +40,6 @@ import dk.i2m.drupal.field.wrapper.TextWrapper;
 import dk.i2m.drupal.message.FileMessage;
 import dk.i2m.drupal.message.NodeMessage;
 import dk.i2m.drupal.resource.FileResource;
-import dk.i2m.drupal.resource.NewsItemResource;
 import dk.i2m.drupal.resource.NodeResource;
 import dk.i2m.drupal.resource.UserResource;
 import dk.i2m.drupal.util.HttpMessageBuilder;
