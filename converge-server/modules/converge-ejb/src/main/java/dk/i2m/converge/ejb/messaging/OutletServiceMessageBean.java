@@ -37,6 +37,8 @@ import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
 import javax.ejb.MessageDrivenContext;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -61,7 +63,8 @@ public class OutletServiceMessageBean implements MessageListener {
 
         USER_ACCOUNT_ID,
         OUTLET_ID,
-        ACTION_ID,}
+        ACTION_ID,
+    }
 
     private static final Logger LOG = Logger.
             getLogger(OutletServiceMessageBean.class.getName());
@@ -77,6 +80,7 @@ public class OutletServiceMessageBean implements MessageListener {
     @EJB private UserFacadeLocal userFacade;
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void onMessage(Message msg) {
         Long id = 0L;
 
