@@ -30,9 +30,9 @@
     </developers>
 
     <scm>
-        <url>http://convergeecms.git.sourceforge.net/</url>
-        <developerConnection>scm:git:ssh://convergeecms.git.sourceforge.net/gitroot/convergeecms/convergeecms</developerConnection>
-        <connection>scm:git:git://convergeecms.git.sourceforge.net/gitroot/convergeecms/convergeecms</connection>
+        <url>http://scm.i2m.dk/converge-1.x/</url>
+        <developerConnection>scm:git:https://bitbucket.org/interactivemediamanagement/converge-1.x.git</developerConnection>
+        <connection>scm:git:git://bitbucket.org/interactivemediamanagement/converge-1.x.git</connection>
     </scm>
     
     <build>
@@ -46,6 +46,11 @@
                 <groupId>org.apache.maven.wagon</groupId>
                 <artifactId>wagon-ssh</artifactId>
                 <version>1.0-beta-7</version>
+            </extension>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh-external</artifactId>
+                <version>1.0-alpha-5</version>
             </extension>
         </extensions>
         <plugins>
@@ -93,56 +98,17 @@
     <distributionManagement>
         <repository>
             <id>m2.i2m.dk</id>
-            <name>I2M Artifact Repository</name>
-            <url>ftp://www.i2m.dk/m2.i2m.dk</url>
+            <name>I2M Maven Artifact Repository</name>
+            <url>scpexe://m2.i2m.dk:/var/www/m2.i2m.dk</url>
         </repository>
     </distributionManagement>
     
     <modules>
         <module>modules</module>
         <module>plugins</module>
-  </modules>
+    </modules>
     
     <properties>
-                <!--
-            Source formatting guidelines for the complete application.
-            The formatting guidelines are only active when using the NetBeans
-            IDE. After changing code activate the "Source -> Format" option.
-        -->
-        <org-netbeans-modules-editor-indent.CodeStyle.usedProfile>project</org-netbeans-modules-editor-indent.CodeStyle.usedProfile>
-        <org-netbeans-modules-editor-indent.CodeStyle.project.tab-size>8</org-netbeans-modules-editor-indent.CodeStyle.project.tab-size>
-        <org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>70</org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaces-per-tab>4</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaces-per-tab>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.tab-size>8</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.tab-size>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.indent-shift-width>4</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.indent-shift-width>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.expand-tabs>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.expand-tabs>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.text-limit-width>80</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.text-limit-width>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapAssert>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapAssert>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapBinaryOps>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapBinaryOps>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapExtendsImplementsKeyword>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapExtendsImplementsKeyword>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapWhileStatement>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapWhileStatement>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapAnnotationArgs>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapAnnotationArgs>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapAnnotations>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapAnnotations>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapDoWhileStatement>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapDoWhileStatement>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapIfStatement>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapIfStatement>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapThrowsKeyword>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapThrowsKeyword>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapMethodParams>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapMethodParams>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapTernaryOps>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapTernaryOps>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapExtendsImplementsList>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapExtendsImplementsList>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapAssignOps>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapAssignOps>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapForStatement>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapForStatement>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapEnumConstants>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapEnumConstants>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.blankLinesBeforeFields>1</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.blankLinesBeforeFields>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapChainedMethodCalls>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapChainedMethodCalls>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapMethodCallArgs>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapMethodCallArgs>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapArrayInit>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapArrayInit>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapFor>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapFor>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapThrowsList>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapThrowsList>
-        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.enableCommentFormatting>false</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.enableCommentFormatting>
-        <!--
-            License to include in the header of the file when filesa are created
-            through the NetBeans IDE.
-        -->
         <netbeans.hint.license>gpl30</netbeans.hint.license>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
