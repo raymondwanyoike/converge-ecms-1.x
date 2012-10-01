@@ -78,6 +78,7 @@ public abstract class EjbTestCase {
         p.put("jms/connectionFactory", "new://Resource?type=javax.jms.ConnectionFactory");
         p.put("jms/connectionFactory.ResourceAdapter", "MyJmsResourceAdapter");
         p.put("jms/editionServiceQueue", "new://Resource?type=javax.jms.Queue");
+        p.put("jms/outletServiceQueue", "new://Resource?type=javax.jms.Queue");
         p.put("jms/newswireServiceQueue", "new://Resource?type=javax.jms.Queue");
         p.put("jms/catalogueHookQueue", "new://Resource?type=javax.jms.Queue");
         p.put("converge-ejbPU.eclipselink.target-server", "org.apache.openejb.eclipselink.JTATransactionController");
