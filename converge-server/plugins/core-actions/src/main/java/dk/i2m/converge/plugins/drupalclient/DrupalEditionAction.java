@@ -145,16 +145,15 @@ public class DrupalEditionAction implements EditionAction {
     public void execute(PluginContext ctx, Edition edition,
             OutletEditionAction action) {
         LOG.log(Level.INFO, "Starting action... Edition #{0}", edition.getId());
-        
-        setupPlugin(action);
-        
-        int errors = 0;
 
         try {
+            setupPlugin(action);
+            int errors = 0;
+
+            date = sdf.format(edition.getPublicationDate().getTime());
+
             dc.setup();
             ur.login();
-            
-            date = sdf.format(edition.getPublicationDate().getTime());
 
             LOG.log(Level.INFO, "Found {0} NewsItem(s)", edition.
                     getNumberOfPlacements());
@@ -171,7 +170,6 @@ public class DrupalEditionAction implements EditionAction {
                     }
                 }
 
-                HttpMessageBuilder fb = new HttpMessageBuilder();
                 boolean update = false;
 
                 try {
@@ -189,6 +187,8 @@ public class DrupalEditionAction implements EditionAction {
                         continue;
                     }
                 }
+
+                HttpMessageBuilder fb = new HttpMessageBuilder();
 
                 if (nodeLanguage != null) {
                     fb = new HttpMessageBuilder(nodeLanguage);
@@ -277,8 +277,7 @@ public class DrupalEditionAction implements EditionAction {
                         }
                     }
                 } else {
-                    LOG.
-                            log(Level.INFO,
+                    LOG.log(Level.INFO,
                             "Uploading NewsItem #{0} & {1} image(s)",
                             new Object[]{newsItem.getId(), mediaItems.size()});
 
@@ -346,7 +345,7 @@ public class DrupalEditionAction implements EditionAction {
 
         try {
             setupPlugin(action);
-            
+
             NewsItem newsItem = placement.getNewsItem();
 
             if (!newsItem.isEndState()) {
@@ -364,13 +363,14 @@ public class DrupalEditionAction implements EditionAction {
             ur.login();
 
             HttpMessageBuilder fb = new HttpMessageBuilder();
-            boolean update = newsItemExists(nir, newsItem);
 
             if (nodeLanguage != null) {
                 fb = new HttpMessageBuilder(nodeLanguage);
             }
 
             fb = prepareHttpMessage(edition, placement, fb);
+
+            boolean update = newsItemExists(nir, newsItem);
 
             if (!update && getPublishOn(edition) != null) {
                 fb.add(new BasicWrapper("publish_on", getPublishOn(edition)));
@@ -492,8 +492,8 @@ public class DrupalEditionAction implements EditionAction {
     @Override
     public Date getDate() {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            return sdf.parse(bundle.getString("PLUGIN_BUILD_TIME"));
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").
+                    parse(bundle.getString("PLUGIN_BUILD_TIME"));
         } catch (Exception e) {
             return new Date();
         }
@@ -517,15 +517,15 @@ public class DrupalEditionAction implements EditionAction {
     private void setSectionMapping(String mapping) {
         String[] values = mapping.split(";");
 
-        LOG.log(Level.INFO, "Found {0} Section mapping(s)", values.length);
-
         for (int i = 0; i < values.length; i++) {
             String[] value = values[i].split(":");
-
             Long convergeId = Long.valueOf(value[0].trim());
             Long drupalId = Long.valueOf(value[1].trim());
             sectionMapping.put(convergeId, drupalId);
         }
+
+        LOG.log(Level.INFO, "Found {0} Section mapping(s)", sectionMapping.
+                size());
     }
 
     /**
@@ -537,7 +537,7 @@ public class DrupalEditionAction implements EditionAction {
         if (mapping != null) {
             ignoredMapping = Arrays.asList(mapping.split(";"));
         }
-
+        
         LOG.log(Level.INFO, "Found {0} Ignored mapping(s)", ignoredMapping.
                 size());
     }
@@ -812,34 +812,24 @@ public class DrupalEditionAction implements EditionAction {
 
         if (hostname == null) {
             throw new IllegalArgumentException("'hostname' cannot be null");
-        }
-
-        if (endpoint == null) {
+        } else if (endpoint == null) {
             throw new IllegalArgumentException("'endpoint' cannot be null");
-        }
-
-        if (username == null) {
+        } else if (username == null) {
             throw new IllegalArgumentException("'username' cannot be null");
-        }
-
-        if (password == null) {
+        } else if (password == null) {
             throw new IllegalArgumentException("'password' cannot be null");
         }
 
         if (nodeType == null) {
             throw new IllegalArgumentException("'nodeType' cannot be null");
-        }
-
-        if (mappings == null) {
+        } else if (mappings == null) {
             throw new IllegalArgumentException("'mappings' cannot be null");
         }
 
         if (publishImmediately == null && publishDelay == null) {
             throw new IllegalArgumentException(
                     "'publishImmediately' or 'publishDelay' cannot be null");
-        }
-
-        if (publishImmediately == null && publishDelay != null) {
+        } else if (publishImmediately == null && publishDelay != null) {
             if (!isInteger(publishDelay)) {
                 throw new IllegalArgumentException(
                         "'publishDelay' must be an integer");
@@ -872,7 +862,6 @@ public class DrupalEditionAction implements EditionAction {
         fr = new FileResource(dc);
         nr = new NodeResource(dc);
         nir = new NewsItemResource(dc);
-
         sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
 }
