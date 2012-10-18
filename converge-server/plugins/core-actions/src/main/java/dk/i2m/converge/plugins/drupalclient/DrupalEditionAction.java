@@ -509,6 +509,11 @@ public class DrupalEditionAction implements EditionAction {
         return bundle.getString("PLUGIN_ABOUT");
     }
 
+    /**
+     * Set the section mapping.
+     * 
+     * @param mapping mapping to set.
+     */
     private void setSectionMapping(String mapping) {
         String[] values = mapping.split(";");
 
@@ -635,7 +640,7 @@ public class DrupalEditionAction implements EditionAction {
     }
 
     /**
-     * Get Section taxonomy field.
+     * Return {@link Section} Drupal mapping.
      * 
      * @param nip {@link NewsItemPlacement}
      * @return 
@@ -692,6 +697,14 @@ public class DrupalEditionAction implements EditionAction {
         }
     }
 
+    /**
+     * Prepare HTTP message to send.
+     * 
+     * @param edition {@link Edition} 
+     * @param nip {@link NewsItemPlacement} 
+     * @param fb {@link HttpMessageBuilder} to build
+     * @return prepared {@link HttpMessageBuilder}
+     */
     private HttpMessageBuilder prepareHttpMessage(Edition edition,
             NewsItemPlacement nip, HttpMessageBuilder fb) {
         NewsItem newsItem = nip.getNewsItem();
@@ -727,6 +740,15 @@ public class DrupalEditionAction implements EditionAction {
         return fb;
     }
 
+    /**
+     * Returns true if a news item exists.
+     * 
+     * @param nir {@link NewsItemResource} to use
+     * @param newsItem {@link NewsItem} to check
+     * @return true if exists
+     * @throws HttpResponseException
+     * @throws IOException 
+     */
     private boolean newsItemExists(NewsItemResource nir, NewsItem newsItem)
             throws HttpResponseException, IOException {
         try {
@@ -747,8 +769,13 @@ public class DrupalEditionAction implements EditionAction {
         }
     }
 
-    private void deleteNodeFiles() throws
-            HttpResponseException, IOException {
+    /**
+     * Delete all of a node's files.
+     * 
+     * @throws HttpResponseException
+     * @throws IOException 
+     */
+    private void deleteNodeFiles() throws HttpResponseException, IOException {
         List<FileMessage> fileMessages = nr.loadFiles(nodeId);
 
         for (FileMessage fileMessage : fileMessages) {
@@ -756,6 +783,11 @@ public class DrupalEditionAction implements EditionAction {
         }
     }
 
+    /**
+     * Setup the plugin.
+     * 
+     * @param action {@link OutletEditionAction}
+     */
     private void setupPlugin(OutletEditionAction action) {
         Map<String, String> properties = action.getPropertiesAsMap();
 
