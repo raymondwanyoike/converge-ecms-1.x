@@ -585,24 +585,6 @@ public class DrupalEditionAction implements EditionAction {
     }
 
     /**
-     * Get Promoted to front page checkbox value.
-     * 
-     * @param placement {@link NewsItemPlacement}
-     * @return
-     */
-    private String getPromoted(NewsItemPlacement placement) {
-        if (frontpagePlacement == null) {
-            return null;
-        }
-
-        if (placement.getStart() == Integer.parseInt(frontpagePlacement)) {
-            return "1";
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Get Author text field.
      * 
      * @param newsItem {@link NewsItem}
@@ -714,11 +696,6 @@ public class DrupalEditionAction implements EditionAction {
         fb.add(new BasicWrapper("title", getTitle(newsItem)));
         fb.add(new TextWrapper("body", newsItem.getBrief(), newsItem.getStory(),
                 "full_html"));
-
-        if (getPromoted(nip) != null) {
-            fb.add(new BasicWrapper("promote", getPromoted(nip)));
-        }
-
         fb.add(new TextWrapper("field_author", getAuthor(newsItem)));
         fb.add(new TextWrapper("field_newsitem", newsItem.getId().toString()));
         fb.add(new TextWrapper("field_edition", edition.getId().toString()));
