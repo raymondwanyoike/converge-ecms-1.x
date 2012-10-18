@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -70,7 +71,6 @@ public class DrupalEditionAction implements EditionAction {
     private enum Property {
 
         CONNECTION_TIMEOUT,
-        FRONTPAGE_PLACEMENT,
         IMAGE_RENDITION,
         NODE_LANGUAGE,
         NODE_TYPE,
@@ -78,6 +78,7 @@ public class DrupalEditionAction implements EditionAction {
         PUBLISH_DELAY,
         PUBLISH_IMMEDIATELY,
         SECTION_MAPPING,
+        IGNORED_MAPPING,
         SERVICE_ENDPOINT,
         SOCKET_TIMEOUT,
         URL,
@@ -108,6 +109,8 @@ public class DrupalEditionAction implements EditionAction {
 
     private Map<Long, Long> sectionMapping;
 
+    private List<String> ignoredMapping;
+
     private DrupalClient dc;
 
     private UserResource ur;
@@ -126,13 +129,13 @@ public class DrupalEditionAction implements EditionAction {
 
     private String renditionName;
 
-    private String frontpagePlacement;
-
     private String nodeLanguage;
 
     private String nodeType;
 
     private String mappings;
+
+    private String ignoredMappings;
 
     private String date;
 
@@ -161,6 +164,11 @@ public class DrupalEditionAction implements EditionAction {
 
                 if (!newsItem.isEndState()) {
                     continue;
+                } else if (getSection(nip) != null) {
+                    if (ignoredMapping.contains(nip.getSection().getId().
+                            toString())) {
+                        continue;
+                    }
                 }
 
                 HttpMessageBuilder fb = new HttpMessageBuilder();
@@ -333,22 +341,27 @@ public class DrupalEditionAction implements EditionAction {
     @Override
     public void executePlacement(PluginContext ctx, NewsItemPlacement placement,
             Edition edition, OutletEditionAction action) {
-        NewsItem newsItem = placement.getNewsItem();
-
-        if (!newsItem.isEndState()) {
-            return;
-        }
-
         LOG.log(Level.INFO, "Starting action... Edition #{0}", edition.getId());
-        
-        setupPlugin(action);
-        
+
         try {
+            setupPlugin(action);
+            
+            NewsItem newsItem = placement.getNewsItem();
+
+            if (!newsItem.isEndState()) {
+                return;
+            } else if (getSection(placement) != null) {
+                if (ignoredMapping.contains(placement.getSection().getId().
+                        toString())) {
+                    return;
+                }
+            }
+
+            date = sdf.format(edition.getPublicationDate().getTime());
+
             dc.setup();
             ur.login();
 
-            date = sdf.format(edition.getPublicationDate().getTime());
-            
             HttpMessageBuilder fb = new HttpMessageBuilder();
             boolean update = newsItemExists(nir, newsItem);
 
@@ -507,6 +520,20 @@ public class DrupalEditionAction implements EditionAction {
             Long drupalId = Long.valueOf(value[1].trim());
             sectionMapping.put(convergeId, drupalId);
         }
+    }
+
+    /**
+     * Set the ignored mapping.
+     * 
+     * @param mapping mapping to set.
+     */
+    private void setIgnoredMapping(String mapping) {
+        if (mapping != null) {
+            ignoredMapping = Arrays.asList(mapping.split(";"));
+        }
+
+        LOG.log(Level.INFO, "Found {0} Ignored mapping(s)", ignoredMapping.
+                size());
     }
 
     /**
@@ -732,13 +759,15 @@ public class DrupalEditionAction implements EditionAction {
         Map<String, String> properties = action.getPropertiesAsMap();
 
         mappings = properties.get(Property.SECTION_MAPPING.name());
+        ignoredMappings = properties.get(Property.IGNORED_MAPPING.name());
         nodeType = properties.get(Property.NODE_TYPE.name());
         nodeLanguage = properties.get(Property.NODE_LANGUAGE.name());
         publishDelay = properties.get(Property.PUBLISH_DELAY.name());
         publishImmediately = properties.get(Property.PUBLISH_IMMEDIATELY.name());
         renditionName = properties.get(Property.IMAGE_RENDITION.name());
-        frontpagePlacement = properties.get(Property.FRONTPAGE_PLACEMENT.name());
+
         sectionMapping = new HashMap<Long, Long>();
+        ignoredMapping = new ArrayList<String>();
 
         String hostname = properties.get(Property.URL.name());
         String endpoint = properties.get(Property.SERVICE_ENDPOINT.name());
@@ -787,11 +816,6 @@ public class DrupalEditionAction implements EditionAction {
             }
         }
 
-        if (frontpagePlacement != null && !isInteger(frontpagePlacement)) {
-            throw new IllegalArgumentException(
-                    "'frontpagePlacement' must be an integer");
-        }
-
         if (connectionTimeout == null) {
             connectionTimeout = "30000"; // 30 seconds
         } else if (!isInteger(connectionTimeout)) {
@@ -807,6 +831,7 @@ public class DrupalEditionAction implements EditionAction {
         }
 
         setSectionMapping(mappings);
+        setIgnoredMapping(ignoredMappings);
 
         dc = new DefaultDrupalClient(URI.create(hostname), endpoint, Integer.
                 parseInt(connectionTimeout), Integer.parseInt(socketTimeout));
