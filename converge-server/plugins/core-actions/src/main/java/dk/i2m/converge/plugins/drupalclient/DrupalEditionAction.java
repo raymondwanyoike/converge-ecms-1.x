@@ -211,36 +211,7 @@ public class DrupalEditionAction implements EditionAction {
                     }
 
                     try {
-                        for (MediaItem mediaItem : mediaItems) {
-                            MediaItemRendition mir = null;
-
-                            try {
-                                mir = mediaItem.findRendition(renditionName);
-                            } catch (RenditionNotFoundException ex) {
-                                LOG.log(Level.INFO,
-                                        "Rendition ''{0}'' missing for MediaItem #{1}",
-                                        new Object[]{renditionName, mediaItem.
-                                            getId()});
-                                continue;
-                            }
-
-                            String title = truncateString(mediaItem.getTitle(),
-                                    20);
-                            File file = new File(mir.getFileLocation());
-                            FileMessage fileMessage = fr.createRaw(file, title);
-
-                            String fid = fileMessage.getId().toString();
-                            String alt = truncateString(mediaItem.getTitle(),
-                                    512);
-                            String description = truncateString(mediaItem.
-                                    getDescription(), 1024);
-
-                            imageWrapper.add(new Image(fid, alt, description));
-                        }
-
-                        if (!mediaItems.isEmpty()) {
-                            fb.add(imageWrapper);
-                        }
+                        fb = processMediaItems(fb, imageWrapper, mediaItems);
                     } catch (Exception ex) {
                         LOG.log(Level.INFO,
                                 "Uploading NewsItem #{0} image(s) failed",
@@ -386,35 +357,7 @@ public class DrupalEditionAction implements EditionAction {
                 }
 
                 try {
-                    for (MediaItem mediaItem : mediaItems) {
-                        MediaItemRendition mir = null;
-
-                        try {
-                            mir = mediaItem.findRendition(renditionName);
-                        } catch (RenditionNotFoundException ex) {
-                            LOG.log(Level.INFO,
-                                    "Rendition ''{0}'' missing for MediaItem #{1}",
-                                    new Object[]{renditionName, mediaItem.
-                                        getId()});
-                            continue;
-                        }
-
-                        String title = truncateString(mediaItem.getTitle(), 20);
-                        File file = new File(mir.getFileLocation());
-
-                        FileMessage fileMessage = fr.createRaw(file, title);
-
-                        String fid = fileMessage.getId().toString();
-                        String alt = truncateString(mediaItem.getTitle(), 512);
-                        String description = truncateString(mediaItem.
-                                getDescription(), 1024);
-
-                        imageWrapper.add(new Image(fid, alt, description));
-                    }
-
-                    if (!mediaItems.isEmpty()) {
-                        fb.add(imageWrapper);
-                    }
+                    fb = processMediaItems(fb, imageWrapper, mediaItems);
                 } catch (Exception ex) {
                     LOG.log(Level.SEVERE,
                             "Uploading NewsItem #{0} image(s) failed",
@@ -449,6 +392,39 @@ public class DrupalEditionAction implements EditionAction {
         }
 
         LOG.log(Level.INFO, "Finishing action... Edition #{0}", edition.getId());
+    }
+
+    private HttpMessageBuilder processMediaItems(HttpMessageBuilder fb,
+            ImageWrapper imageWrapper, List<MediaItem> mediaItems) throws
+            Exception {
+        for (MediaItem mediaItem : mediaItems) {
+            MediaItemRendition mir = null;
+
+            try {
+                mir = mediaItem.findRendition(renditionName);
+            } catch (RenditionNotFoundException ex) {
+                LOG.log(Level.INFO,
+                        "Rendition ''{0}'' missing for MediaItem #{1}",
+                        new Object[]{renditionName, mediaItem.getId()});
+                continue;
+            }
+
+            String title = truncateString(mediaItem.getTitle(), 20);
+            File file = new File(mir.getFileLocation());
+            FileMessage fileMessage = fr.createRaw(file, title);
+            String fid = fileMessage.getId().toString();
+            String alt = truncateString(mediaItem.getTitle(), 512);
+            String description = truncateString(mediaItem.getDescription(),
+                    1024);
+
+            imageWrapper.add(new Image(fid, alt, description));
+        }
+
+        if (!mediaItems.isEmpty()) {
+            fb.add(imageWrapper);
+        }
+
+        return fb;
     }
 
     @Override
