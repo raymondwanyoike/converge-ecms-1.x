@@ -151,6 +151,7 @@ public class DrupalEditionAction implements EditionAction {
             int errors = 0;
 
             date = sdf.format(edition.getPublicationDate().getTime());
+            String publishOn = getPublishOn(edition);
 
             dc.setup();
             ur.login();
@@ -196,9 +197,8 @@ public class DrupalEditionAction implements EditionAction {
 
                 fb = prepareHttpMessage(edition, nip, fb);
 
-                if (!update && getPublishOn(edition) != null) {
-                    fb.add(new BasicWrapper("publish_on", getPublishOn(
-                            edition)));
+                if (!update && publishOn != null) {
+                    fb.add(new BasicWrapper("publish_on", publishOn));
                 }
 
                 List<MediaItem> mediaItems = getMediaItems(newsItem);
@@ -342,9 +342,10 @@ public class DrupalEditionAction implements EditionAction {
             fb = prepareHttpMessage(edition, placement, fb);
 
             boolean update = newsItemExists(nir, newsItem);
+            String publishOn = getPublishOn(edition);
 
-            if (!update && getPublishOn(edition) != null) {
-                fb.add(new BasicWrapper("publish_on", getPublishOn(edition)));
+            if (!update && publishOn != null) {
+                fb.add(new BasicWrapper("publish_on", publishOn));
             }
 
             List<MediaItem> mediaItems = getMediaItems(newsItem);
@@ -554,7 +555,7 @@ public class DrupalEditionAction implements EditionAction {
             return null;
         }
 
-        Calendar calendar = edition.getPublicationDate();
+        Calendar calendar = (Calendar) edition.getPublicationDate().clone();
         calendar.add(Calendar.HOUR_OF_DAY, Integer.valueOf(publishDelay));
 
         return sdf.format(calendar.getTime());
