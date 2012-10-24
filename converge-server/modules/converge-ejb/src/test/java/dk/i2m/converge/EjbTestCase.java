@@ -59,7 +59,7 @@ public abstract class EjbTestCase {
      * @throws Exception
      *          If the {@link InitialContext} or dataset could not be set-up
      */
-    @Before
+    //@Before
     public void setUp() throws Exception {
         // Avoid creating the Derby log file
         System.setProperty("derby.stream.error.field", getClass().getName() + ".DEV_NULL");
