@@ -149,9 +149,9 @@ public class DrupalEditionAction implements EditionAction {
         try {
             setupPlugin(action);
             int errors = 0;
-
             date = sdf.format(edition.getPublicationDate().getTime());
             String publishOn = getPublishOn(edition);
+            boolean update = false;
 
             dc.setup();
             ur.login();
@@ -171,8 +171,6 @@ public class DrupalEditionAction implements EditionAction {
                     }
                 }
 
-                boolean update = false;
-
                 try {
                     update = newsItemExists(nir, newsItem);
                 } catch (Exception ex) {
@@ -180,21 +178,16 @@ public class DrupalEditionAction implements EditionAction {
                             newsItem.getId());
                     LOG.log(Level.SEVERE, null, ex);
 
-                    errors++;
-
-                    if (errors > 4) {
+                    if (errors++ > 4) {
                         break;
                     } else {
                         continue;
                     }
                 }
 
-                HttpMessageBuilder fb = new HttpMessageBuilder();
-
-                if (nodeLanguage != null) {
-                    fb = new HttpMessageBuilder(nodeLanguage);
-                }
-
+                HttpMessageBuilder fb = (nodeLanguage != null
+                        ? new HttpMessageBuilder(nodeLanguage)
+                        : new HttpMessageBuilder());
                 fb = prepareHttpMessage(edition, nip, fb);
 
                 if (!update && publishOn != null) {
@@ -239,9 +232,7 @@ public class DrupalEditionAction implements EditionAction {
                     } catch (Exception ex) {
                         LOG.log(Level.SEVERE, null, ex);
 
-                        errors++;
-
-                        if (errors > 4) {
+                        if (errors++ > 4) {
                             break;
                         } else {
                             continue;
@@ -282,9 +273,7 @@ public class DrupalEditionAction implements EditionAction {
                         ctx.updateNewsItemEditionState(uri);
                         ctx.updateNewsItemEditionState(submitted);
 
-                        errors++;
-
-                        if (errors > 4) {
+                        if (errors++ > 4) {
                             break;
                         } else {
                             continue;
@@ -316,7 +305,6 @@ public class DrupalEditionAction implements EditionAction {
 
         try {
             setupPlugin(action);
-
             NewsItem newsItem = placement.getNewsItem();
 
             if (!newsItem.isEndState()) {
@@ -333,15 +321,11 @@ public class DrupalEditionAction implements EditionAction {
             dc.setup();
             ur.login();
 
-            HttpMessageBuilder fb = new HttpMessageBuilder();
-
-            if (nodeLanguage != null) {
-                fb = new HttpMessageBuilder(nodeLanguage);
-            }
-
-            fb = prepareHttpMessage(edition, placement, fb);
-
             boolean update = newsItemExists(nir, newsItem);
+            HttpMessageBuilder fb = (nodeLanguage != null
+                    ? new HttpMessageBuilder(nodeLanguage)
+                    : new HttpMessageBuilder());
+            fb = prepareHttpMessage(edition, placement, fb);
             String publishOn = getPublishOn(edition);
 
             if (!update && publishOn != null) {
@@ -488,7 +472,7 @@ public class DrupalEditionAction implements EditionAction {
 
     /**
      * Set the section mapping.
-     * 
+     *
      * @param mapping mapping to set.
      */
     private void setSectionMapping(String mapping) {
@@ -507,21 +491,21 @@ public class DrupalEditionAction implements EditionAction {
 
     /**
      * Set the ignored mapping.
-     * 
+     *
      * @param mapping mapping to set.
      */
     private void setIgnoredMapping(String mapping) {
         if (mapping != null) {
             ignoredMapping = Arrays.asList(mapping.split(";"));
         }
-        
+
         LOG.log(Level.INFO, "Found {0} Ignored mapping(s)", ignoredMapping.
                 size());
     }
 
     /**
      * Truncate text.
-     * 
+     *
      * @param value text
      * @param length length to truncate
      * @return truncated text
@@ -536,7 +520,7 @@ public class DrupalEditionAction implements EditionAction {
 
     /**
      * Get Title text value.
-     * 
+     *
      * @param newsItem {@link NewsItem}
      * @return
      */
@@ -547,7 +531,7 @@ public class DrupalEditionAction implements EditionAction {
 
     /**
      * Get Publish on text value.
-     * 
+     *
      * @return "YYYY-MM-DD HH:MM:SS" or ""
      */
     private String getPublishOn(Edition edition) {
@@ -563,7 +547,7 @@ public class DrupalEditionAction implements EditionAction {
 
     /**
      * Get Author text field.
-     * 
+     *
      * @param newsItem {@link NewsItem}
      * @return
      */
@@ -600,9 +584,9 @@ public class DrupalEditionAction implements EditionAction {
 
     /**
      * Return {@link Section} Drupal mapping.
-     * 
+     *
      * @param nip {@link NewsItemPlacement}
-     * @return 
+     * @return
      */
     private String getSection(NewsItemPlacement nip) {
         Section section = nip.getSection();
@@ -626,9 +610,9 @@ public class DrupalEditionAction implements EditionAction {
 
     /**
      * Get {@link ImageField}s for {@link NewsItem}.
-     * 
+     *
      * @param newsItem NewsItem
-     * @return 
+     * @return
      */
     private List<MediaItem> getMediaItems(NewsItem newsItem) {
         List<MediaItem> mediaItems = new ArrayList<MediaItem>();
@@ -658,9 +642,9 @@ public class DrupalEditionAction implements EditionAction {
 
     /**
      * Prepare HTTP message to send.
-     * 
-     * @param edition {@link Edition} 
-     * @param nip {@link NewsItemPlacement} 
+     *
+     * @param edition {@link Edition}
+     * @param nip {@link NewsItemPlacement}
      * @param fb {@link HttpMessageBuilder} to build
      * @return prepared {@link HttpMessageBuilder}
      */
@@ -696,12 +680,12 @@ public class DrupalEditionAction implements EditionAction {
 
     /**
      * Returns true if a news item exists.
-     * 
+     *
      * @param nir {@link NewsItemResource} to use
      * @param newsItem {@link NewsItem} to check
      * @return true if exists
      * @throws HttpResponseException
-     * @throws IOException 
+     * @throws IOException
      */
     private boolean newsItemExists(NewsItemResource nir, NewsItem newsItem)
             throws HttpResponseException, IOException {
@@ -725,9 +709,9 @@ public class DrupalEditionAction implements EditionAction {
 
     /**
      * Delete all of a node's files.
-     * 
+     *
      * @throws HttpResponseException
-     * @throws IOException 
+     * @throws IOException
      */
     private void deleteNodeFiles() throws HttpResponseException, IOException {
         List<FileMessage> fileMessages = nr.loadFiles(nodeId);
@@ -739,7 +723,7 @@ public class DrupalEditionAction implements EditionAction {
 
     /**
      * Setup the plugin.
-     * 
+     *
      * @param action {@link OutletEditionAction}
      */
     private void setupPlugin(OutletEditionAction action) {
