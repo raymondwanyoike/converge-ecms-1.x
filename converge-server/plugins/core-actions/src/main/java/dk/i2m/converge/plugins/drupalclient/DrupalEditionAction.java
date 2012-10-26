@@ -33,7 +33,6 @@ import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.drupal.DefaultDrupalClient;
 import dk.i2m.drupal.core.DrupalClient;
 import dk.i2m.drupal.field.wrapper.BasicWrapper;
-import dk.i2m.drupal.field.wrapper.ImageWrapper;
 import dk.i2m.drupal.field.wrapper.ListWrapper;
 import dk.i2m.drupal.field.wrapper.TextWrapper;
 import dk.i2m.drupal.message.FileMessage;
@@ -552,21 +551,25 @@ public class DrupalEditionAction implements EditionAction {
      * Get Author text field.
      *
      * @param newsItem {@link NewsItem}
-     * @return
+     * @return By-line to use for the story when published on Drupal
      */
     private String getAuthor(NewsItem newsItem) {
         if (newsItem.isUndisclosedAuthor()) {
             return "N/A";
         } else {
             if (newsItem.getByLine().trim().isEmpty()) {
+                // No by-line specified in the news item. 
+                // Generate by-line from actors on news item
+                
                 StringBuilder sb = new StringBuilder();
 
+                // Iterate through actors specified on the news item
                 for (NewsItemActor actor : newsItem.getActors()) {
                     boolean firstActor = true;
 
-                    // TODO: Document this
-                    if (actor.getRole().equals(newsItem.getOutlet().
-                            getWorkflow().getStartState().getActorRole())) {
+                    // If the actor has the role from the initial state of the 
+                    // workflow, he is the author of the story
+                    if (actor.getRole().equals(newsItem.getOutlet().getWorkflow().getStartState().getActorRole())) {
                         if (!firstActor) {
                             sb.append(", ");
                         } else {
