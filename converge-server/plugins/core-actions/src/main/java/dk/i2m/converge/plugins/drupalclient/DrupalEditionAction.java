@@ -32,7 +32,6 @@ import dk.i2m.converge.core.workflow.OutletEditionAction;
 import dk.i2m.converge.core.workflow.Section;
 import dk.i2m.drupal.DefaultDrupalClient;
 import dk.i2m.drupal.core.DrupalClient;
-import dk.i2m.drupal.field.Image;
 import dk.i2m.drupal.field.wrapper.BasicWrapper;
 import dk.i2m.drupal.field.wrapper.ImageWrapper;
 import dk.i2m.drupal.field.wrapper.ListWrapper;
@@ -40,7 +39,6 @@ import dk.i2m.drupal.field.wrapper.TextWrapper;
 import dk.i2m.drupal.message.FileMessage;
 import dk.i2m.drupal.message.NodeMessage;
 import dk.i2m.drupal.resource.FileResource;
-import dk.i2m.drupal.resource.NodeResource;
 import dk.i2m.drupal.resource.UserResource;
 import dk.i2m.drupal.util.HttpMessageBuilder;
 import java.io.File;
@@ -117,7 +115,7 @@ public class DrupalEditionAction implements EditionAction {
 
     private FileResource fr;
 
-    private NodeResource nr;
+    private NodeResourceFix nr;
 
     private NewsItemResource nir;
 
@@ -196,31 +194,6 @@ public class DrupalEditionAction implements EditionAction {
 
                 List<MediaItem> mediaItems = getMediaItems(newsItem);
 
-                if (!mediaItems.isEmpty()) {
-                    ImageWrapper imageWrapper = new ImageWrapper("field_image");
-
-                    if (update) {
-                        deleteNodeFiles();
-                    }
-
-                    try {
-                        fb = processMediaItems(fb, imageWrapper, mediaItems);
-                    } catch (Exception ex) {
-                        LOG.log(Level.INFO,
-                                "Uploading NewsItem #{0} image(s) failed",
-                                newsItem.getId());
-                        LOG.log(Level.SEVERE, null, ex);
-
-                        errors++;
-
-                        if (errors > 4) {
-                            break;
-                        } else {
-                            continue;
-                        }
-                    }
-                }
-
                 if (update) {
                     LOG.log(Level.INFO,
                             "Updating Node #{0} with NewsItem #{1} & {2} image(s)",
@@ -228,7 +201,24 @@ public class DrupalEditionAction implements EditionAction {
                                 size()});
 
                     try {
-                        nr.update(nodeId, fb.toUrlEncodedFormEntity());
+                        NodeMessage response = nr.update(nodeId, fb.
+                                toUrlEncodedFormEntity());
+
+                        if (!mediaItems.isEmpty()) {
+                            deleteNodeFiles();
+
+                            try {
+                                Map<File, Map<String, String>> files =
+                                        processMediaItems(mediaItems);
+                                nr.attachFilesFix(response.getId(), files,
+                                        "field_image", false);
+                            } catch (Exception ex) {
+                                LOG.log(Level.SEVERE,
+                                        "Uploading NewsItem #{0} image(s) failed",
+                                        newsItem.getId());
+                                LOG.log(Level.SEVERE, null, ex);
+                            }
+                        }
                     } catch (Exception ex) {
                         LOG.log(Level.SEVERE, null, ex);
 
@@ -257,11 +247,25 @@ public class DrupalEditionAction implements EditionAction {
                             getId(), DATE, null);
 
                     try {
-                        NodeMessage nodeMessage = nr.create(fb.
+                        NodeMessage response = nr.create(fb.
                                 toUrlEncodedFormEntity());
 
-                        nid.setValue(nodeMessage.getId().toString());
-                        uri.setValue(nodeMessage.getUri().toString());
+                        if (!mediaItems.isEmpty()) {
+                            try {
+                                Map<File, Map<String, String>> files =
+                                        processMediaItems(mediaItems);
+                                nr.attachFilesFix(response.getId(), files,
+                                        "field_image", false);
+                            } catch (Exception ex) {
+                                LOG.log(Level.SEVERE,
+                                        "Uploading NewsItem #{0} image(s) failed",
+                                        newsItem.getId());
+                                LOG.log(Level.SEVERE, null, ex);
+                            }
+                        }
+
+                        nid.setValue(response.getId().toString());
+                        uri.setValue(response.getUri().toString());
                         submitted.setValue(new Date().toString());
                         status.setValue(UPLOADED.toString());
                     } catch (Exception ex) {
@@ -334,23 +338,6 @@ public class DrupalEditionAction implements EditionAction {
 
             List<MediaItem> mediaItems = getMediaItems(newsItem);
 
-            if (!mediaItems.isEmpty()) {
-                ImageWrapper imageWrapper = new ImageWrapper("field_image");
-
-                if (update) {
-                    deleteNodeFiles();
-                }
-
-                try {
-                    fb = processMediaItems(fb, imageWrapper, mediaItems);
-                } catch (Exception ex) {
-                    LOG.log(Level.SEVERE,
-                            "Uploading NewsItem #{0} image(s) failed",
-                            newsItem.getId());
-                    LOG.log(Level.SEVERE, null, ex);
-                }
-            }
-
             if (update) {
                 LOG.log(Level.INFO,
                         "Updating Node #{0} with NewsItem #{1} & {2} image(s)",
@@ -361,10 +348,26 @@ public class DrupalEditionAction implements EditionAction {
             }
 
             try {
-                if (update) {
-                    nr.update(nodeId, fb.toUrlEncodedFormEntity());
-                } else {
-                    nr.create(fb.toUrlEncodedFormEntity());
+                NodeMessage response = (update ? nr.update(nodeId, fb.
+                        toUrlEncodedFormEntity()) : nr.create(fb.
+                        toUrlEncodedFormEntity()));
+
+                if (!mediaItems.isEmpty()) {
+                    if (update) {
+                        deleteNodeFiles();
+                    }
+
+                    try {
+                        Map<File, Map<String, String>> files =
+                                processMediaItems(mediaItems);
+                        nr.attachFilesFix(response.getId(), files,
+                                "field_image", false);
+                    } catch (Exception ex) {
+                        LOG.log(Level.SEVERE,
+                                "Uploading NewsItem #{0} image(s) failed",
+                                newsItem.getId());
+                        LOG.log(Level.SEVERE, null, ex);
+                    }
                 }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, null, ex);
@@ -379,9 +382,11 @@ public class DrupalEditionAction implements EditionAction {
         LOG.log(Level.INFO, "Finishing action... Edition #{0}", edition.getId());
     }
 
-    private HttpMessageBuilder processMediaItems(HttpMessageBuilder fb,
-            ImageWrapper imageWrapper, List<MediaItem> mediaItems) throws
-            Exception {
+    private Map<File, Map<String, String>> processMediaItems(
+            List<MediaItem> mediaItems) throws Exception {
+        Map<File, Map<String, String>> files =
+                new LinkedHashMap<File, Map<String, String>>();
+
         for (MediaItem mediaItem : mediaItems) {
             MediaItemRendition mir = null;
 
@@ -394,22 +399,20 @@ public class DrupalEditionAction implements EditionAction {
                 continue;
             }
 
-            String title = truncateString(mediaItem.getTitle(), 20);
             File file = new File(mir.getFileLocation());
-            FileMessage fileMessage = fr.createRaw(file, title);
-            String fid = fileMessage.getId().toString();
+            String name = truncateString(mediaItem.getTitle(), 20);
             String alt = truncateString(mediaItem.getTitle(), 512);
-            String description = truncateString(mediaItem.getDescription(),
-                    1024);
+            String title = truncateString(mediaItem.getDescription(), 1024);
 
-            imageWrapper.add(new Image(fid, alt, description));
+            Map<String, String> values = new HashMap<String, String>();
+            values.put("name", name);
+            values.put("alt", alt);
+            values.put("title", title);
+
+            files.put(file, values);
         }
 
-        if (!mediaItems.isEmpty()) {
-            fb.add(imageWrapper);
-        }
-
-        return fb;
+        return files;
     }
 
     @Override
@@ -798,7 +801,7 @@ public class DrupalEditionAction implements EditionAction {
                 parseInt(connectionTimeout), Integer.parseInt(socketTimeout));
         ur = new UserResource(dc, username, password);
         fr = new FileResource(dc);
-        nr = new NodeResource(dc);
+        nr = new NodeResourceFix(dc);
         nir = new NewsItemResource(dc);
         sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
